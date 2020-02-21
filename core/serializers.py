@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from legacy import models as legacy_models
+from core import models
 
 
-class DossierSerializer(serializers.ModelSerializer):
+class BookingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = legacy_models.Dossier
+        model = models.Booking
         fields = '__all__'
