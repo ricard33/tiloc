@@ -86,13 +86,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
-    'legacy': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':   '/Applications/XAMPP/xamppfiles/htdocs/lsai/location3.db',
-    }
+    # 'legacy': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME':   '/Applications/XAMPP/xamppfiles/htdocs/lsai/location3.db',
+    # }
 }
 
-DATABASE_ROUTERS = ['core.db_router.Router', ]
+# DATABASE_ROUTERS = ['core.db_router.Router', ]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
