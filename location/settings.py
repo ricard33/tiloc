@@ -158,5 +158,7 @@ CONSTANCE_CONFIG = {
     # 'DEBUG': (False, 'Turn on DEBUG information on Django'),
 }
 
+GRAPPELLI_ADMIN_TITLE = _("Tourism Location")
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())

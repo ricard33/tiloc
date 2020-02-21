@@ -1,3 +1,13 @@
+# Dev dependencies
+
+This project is designed to be deployed on Heroku.
+
+## Buildpacks
+
+Gettext is needed for compiling translations
+
+    $ heroku create --buildpack https://github.com/grauwoelfchen/heroku-buildpack-gettext.git
+
 # Development commands
 
 ## Run any command remotely
