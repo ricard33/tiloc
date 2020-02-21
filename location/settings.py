@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", True)
 
 ALLOWED_HOSTS = []
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'constance',
     'rest_framework',
     'legacy',
     'core'
@@ -149,6 +150,10 @@ STATICFILES_DIRS = (
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
+}
+
+CONSTANCE_CONFIG = {
+    # 'DEBUG': (False, 'Turn on DEBUG information on Django'),
 }
 
 # Activate Django-Heroku.
