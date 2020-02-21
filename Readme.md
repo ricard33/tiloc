@@ -17,3 +17,11 @@ In Heroku (limited to 1500 lines):
 With papertail addon:
 
     $ heroku addons:open papertrail
+
+# Release on Heroku
+
+## Variables
+
+Some settings are stored as environment variables and should be set on Heroku:
+
+* DJANGO_DEBUG
