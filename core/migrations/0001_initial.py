@@ -108,9 +108,9 @@ class Migration(migrations.Migration):
             name='Booking',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('customer_name', models.CharField(max_length=256)),
-                ('customer_contact', models.TextField(blank=True, null=True)),
-                ('customer_address', models.TextField(blank=True, null=True)),
+                ('guest_name', models.CharField(max_length=256)),
+                ('guest_contact', models.TextField(blank=True, null=True)),
+                ('guest_address', models.TextField(blank=True, null=True)),
                 ('begin_date', models.DateField()),
                 ('end_date', models.DateField()),
                 ('duration', models.PositiveSmallIntegerField()),

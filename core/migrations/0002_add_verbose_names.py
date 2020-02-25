@@ -88,18 +88,18 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='booking',
-            name='customer_address',
-            field=models.TextField(blank=True, null=True, verbose_name='customer address'),
+            name='guest_address',
+            field=models.TextField(blank=True, null=True, verbose_name='guest address'),
         ),
         migrations.AlterField(
             model_name='booking',
-            name='customer_contact',
-            field=models.TextField(blank=True, null=True, verbose_name='customer contact'),
+            name='guest_contact',
+            field=models.TextField(blank=True, null=True, verbose_name='guest contact'),
         ),
         migrations.AlterField(
             model_name='booking',
-            name='customer_name',
-            field=models.CharField(max_length=256, verbose_name='customer name'),
+            name='guest_name',
+            field=models.CharField(max_length=256, verbose_name='guest name'),
         ),
         migrations.AlterField(
             model_name='booking',

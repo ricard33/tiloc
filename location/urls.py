@@ -23,7 +23,7 @@ router = routers.DefaultRouter()
 router.register(r'booking', views.BookingViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('api/', include((router.urls, 'drf'), namespace='api')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS

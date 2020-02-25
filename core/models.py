@@ -1,8 +1,19 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
 class Owner(models.Model):
+    class DepositOrDownPayment(models.TextChoices):
+        DEPOSIT = 'deposit', _('Deposit')
+        DOWN_PAYMENT = 'down_payment', _('Down payment')
+
+    class InvoiceLabel(models.TextChoices):
+        INVOICE = 'invoice', _('Invoice')
+        NOTE = 'note', _('Note')
+        RECEIPT = 'receipt', _('Receipt')
+        QUITTANCE = 'quittance', _('Quittance')
+
     active = models.BooleanField(_("active"), default=True)
     name = models.CharField(_("name"), max_length=200)
     email = models.EmailField(_("email"))
@@ -13,44 +24,39 @@ class Owner(models.Model):
     payment = models.TextField(_("payment"), blank=True, null=True, help_text=_("Payment information"))
     billing = models.TextField(_("billing"), blank=True, null=True, help_text=_("Billing conditions"))
     no_vat = models.BooleanField(_("no vat"), )
-    vat_rate = models.DecimalField(_("vat rate"), max_digits=10, decimal_places=2, blank=True, null=True, db_column='proprietaire_tva1')
-    note = models.TextField(_("note"), )
-    invoice_label = models.CharField(_("invoice label"), max_length=30)
-    deposit_label = models.CharField(_("deposit label"), max_length=30)
-    logo = models.ImageField(_("logo"), )
-    signature = models.ImageField(_("signature"), )
-    display_week = models.NullBooleanField(_("display week"), )
+    vat_rate = models.DecimalField(_("vat rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    note = models.TextField(_("note"), blank=True)
+    invoice_label = models.CharField(_("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT)
+    deposit_label = models.CharField(_("deposit or down payment"), max_length=30, choices=DepositOrDownPayment.choices, default=DepositOrDownPayment.DEPOSIT)
+    logo = models.ImageField(_("logo"), blank=True)
+    signature = models.ImageField(_("signature"), blank=True)
+    display_week = models.BooleanField(_("display week number"), default=False)
 
     class Meta:
         verbose_name = _("Owner")
 
-
-class Property(models.Model):
-    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
-    active = models.BooleanField(_("active"), default=True)
-    name = models.CharField(_("name"), max_length=200)
-    address = models.TextField(_("address"), )
-
-    class Meta:
-        verbose_name = _("Property")
+    def __str__(self):
+        return self.name
 
 
 class Lodging(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
     active = models.BooleanField(_("active"), default=True)
     name = models.CharField(_("name"), max_length=200)
     rank = models.IntegerField(_("rank"), )
     address = models.TextField(_("address"), )
-    default_price = models.DecimalField(_("default price"), max_digits=10, decimal_places=2)
+    default_price = models.DecimalField(_("daily default price"), max_digits=10, decimal_places=2, help_text=_("Default price for one night"))
     # weekly_package = models.BooleanField(_("weekly package"), default=False)
     # weekly_price = models.DecimalField(_("weekly price"), max_digits=10, decimal_places=2)
-    guaranty = models.DecimalField(_("guaranty deposit"), max_digits=10, decimal_places=2)
-    cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2)
-    capacity = models.IntegerField(_("capacity"), )
-    information = models.TextField(_("information"), )
+    guaranty = models.DecimalField(_("guaranty deposit"), max_digits=10, decimal_places=2, null=True, blank=True)
+    cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2, null=True, blank=True)
+    capacity = models.IntegerField(_("capacity"), null=True, blank=True)
+    information = models.TextField(_("information"), blank=True)
 
     class Meta:
         verbose_name = _("Lodging")
+
+    def __str__(self):
+        return self.name
 
 
 class Category(models.Model):
@@ -60,6 +66,9 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
+
+    def __str__(self):
+        return self.name
 
 
 class Service(models.Model):
@@ -75,14 +84,22 @@ class Service(models.Model):
     class Meta:
         verbose_name = _("Service")
 
+    def __str__(self):
+        return self.designation
+
 
 class BookingStatus(models.Model):
     name = models.CharField(_("name"), max_length=100)
     color = models.CharField(_("color"), max_length=10)
+    rank = models.PositiveSmallIntegerField(_("rank"))
 
     class Meta:
         verbose_name = _("Booking status")
         verbose_name_plural = _("Booking statuses")
+        ordering = ['rank']
+
+    def __str__(self):
+        return self.name
 
 
 class BookingChannel(models.Model):
@@ -91,6 +108,9 @@ class BookingChannel(models.Model):
 
     class Meta:
         verbose_name = _("Booking channel")
+
+    def __str__(self):
+        return self.name
 
 
 class Booking(models.Model):
@@ -101,11 +121,11 @@ class Booking(models.Model):
         FULL = 'full', _('Full board')
 
     lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
-    customer_name = models.CharField(_("customer name"), max_length=256)
-    customer_contact = models.TextField(_("customer contact"), blank=True, null=True)
-    customer_address = models.TextField(_("customer address"), blank=True, null=True)
+    guest_name = models.CharField(_("guest name"), max_length=256)
+    guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
+    guest_address = models.TextField(_("guest address"), blank=True, null=True)
     status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT)
-    source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT)
+    source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT, blank=True, null=True)
     begin_date = models.DateField(_("begin date"), )
     end_date = models.DateField(_("end date"), )
     duration = models.PositiveSmallIntegerField(_("duration"), )
@@ -127,6 +147,12 @@ class Booking(models.Model):
 
     class Meta:
         verbose_name = _("Booking")
+
+    def __str__(self):
+        return "%s from %s to %s" % (self.guest_name, self.begin_date, self.end_date)
+
+    def get_absolute_url(self):
+        return reverse('booking-detail', kwargs={'pk': self.pk})
 
 
 class BookedService(models.Model):

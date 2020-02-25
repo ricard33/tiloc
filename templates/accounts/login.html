@@ -20,10 +20,10 @@
           <h6 class="card-category">
               {% if msg %}
                 <span class="text-danger">{{ msg }}</span>
-              {% else %}
-                  Use default credentials: test / ApS12_ZZs8
-                  <br />
-                  OR <a href={% url 'register' %} >create your own user</a>
+{#              {% else %}#}
+{#                  Use default credentials: test / ApS12_ZZs8#}
+{#                  <br />#}
+{#                  OR <a href={% url 'register' %} >create your own user</a>#}
               {% endif %}  
           </h6>
           
@@ -58,9 +58,9 @@
             <button type="submit" name="login" class="btn btn-primary pull-left">Login</button>
 
             &nbsp; &nbsp; 
-            <span class="pull-right">
-              Don't have an account? <a href="{% url 'register' %}" class="text-primary">Create</a>
-            </span>
+{#            <span class="pull-right">#}
+{#              Don't have an account? <a href="{% url 'register' %}" class="text-primary">Create</a>#}
+{#            </span>#}
 
             <div class="clearfix"></div>
 

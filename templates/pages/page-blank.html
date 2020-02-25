@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Page Blank {% endblock %} 
+{% block title %} Page Blank {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -15,7 +15,7 @@
                     <h4 class="card-title">
                         Add your content 
                     </h4>
-                    <a href="/" class="btn btn-primary btn-round">Home</a>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-round">Home</a>
                 </div>
             </div>
         </div>

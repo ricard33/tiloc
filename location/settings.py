@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.forms',
     'rest_framework',
     # 'legacy',
     'core',
@@ -80,6 +81,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 WSGI_APPLICATION = 'location.wsgi.application'
 
@@ -157,6 +160,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+APP_NAME = _("My Rentals")
 CONSTANCE_CONFIG = {
     # 'DEBUG': (False, 'Turn on DEBUG information on Django'),
 }

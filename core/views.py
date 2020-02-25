@@ -7,7 +7,7 @@ from core.models import Booking
 
 class BookingViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows bookings to be viewed or edited.
     """
     queryset = Booking.objects.all().order_by('-begin_date')
     serializer_class = BookingSerializer
