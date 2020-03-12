@@ -27,6 +27,7 @@ SECRET_KEY = '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')
 
 ALLOWED_HOSTS = []
 
@@ -47,6 +48,8 @@ INSTALLED_APPS = [
     # 'legacy',
     'core',
     'app',
+    # 'frontend',
+    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -166,6 +169,14 @@ CONSTANCE_CONFIG = {
 }
 
 GRAPPELLI_ADMIN_TITLE = _("Tourism Location")
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+            'BUNDLE_DIR_NAME': 'bundles/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+        }
+}
+
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

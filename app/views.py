@@ -14,11 +14,11 @@ from core import models
 
 @login_required(login_url="/login/")
 def index(request):
-    return render(request, "index.html")
+    return render(request, "ui/index.html")
 
 
 def todo(request):
-    return render(request, "pages/page-blank.html")
+    return render(request, "ui/pages/page-blank.html")
 
 
 @login_required(login_url="/login/")
@@ -28,17 +28,17 @@ def pages(request):
     # Pick out the html file name from the url. And load that template.
     try:
         load_template = request.path.split('/')[-1]
-        template = loader.get_template('pages/' + load_template)
+        template = loader.get_template('ui/pages/' + load_template)
         return HttpResponse(template.render(context, request))
 
     except:
-        template = loader.get_template('pages/error-404.html')
+        template = loader.get_template('ui/pages/error-404.html')
         return HttpResponse(template.render(context, request))
 
 
 @method_decorator(login_required, name='dispatch')
 class BookingList(generic.ListView):
-    # template_name = 'pages/bookings.html'
+    template_name = 'ui/core/booking_list.html'
     context_object_name = 'bookings'
 
     def get_queryset(self):
@@ -48,18 +48,20 @@ class BookingList(generic.ListView):
 
 @method_decorator(login_required, name='dispatch')
 class BookingDetail(generic.DetailView):
-    # template_name = 'pages/booking-detail.html'
+    template_name = 'ui/core/booking_form.html'
     context_object_name = 'booking'
     queryset = models.Booking.objects.all()
 
 
 class BookingCreate(generic.CreateView):
+    template_name = 'ui/core/booking_form.html'
     model = models.Booking
     form_class = forms.BookingForm
     # fields = ['status', 'lodging', 'guest_name', 'guest_contact', 'guest_address', ]
 
 
 class BookingUpdate(generic.UpdateView):
+    template_name = 'ui/core/booking_form.html'
     model = models.Booking
     form_class = forms.BookingForm
     # fields = ['status', 'lodging', 'guest_name', 'guest_contact', 'guest_address', ]
