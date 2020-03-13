@@ -41,34 +41,3 @@ urlpatterns = [
     # path('', include('frontend.urls')),
     url(r'^', TemplateView.as_view(template_name="index.html")),
 ]
-
-# if settings.ENV == 'dev':
-#     # to use index.html
-#     urlpatterns.append(
-#         url(r'^$', ensure_csrf_cookie(never_cache(serve_static_file)),
-#             kwargs={'document_path': os.path.join(settings.BASE_DIR, 'frontend', '.tmp', 'index.html')})
-#     )
-#
-#     # for all others static files
-#     urlpatterns.extend(map(lambda x, y: url('^%s(?P<path>.+)$' % x, never_cache(serve),
-#                                             kwargs={'document_root': os.path.join(settings.BASE_DIR, 'frontend', y),
-#                                                     'show_indexes': False}), *zip(*[
-#         ('node_modules', 'node_modules'),
-#         ('.tmp', '.tmp'),
-#         ('css', '.tmp'),        # for pdf templates
-#         ('img', 'img'),
-#         ('js', 'js'),
-#         ('locales', './static/locales'),
-#         ('fonts', './static/fonts'),
-#         ('', 'app'),
-#     ])))
-# else:
-#     FRONT_ROOT = os.path.join(settings.BASE_DIR, 'frontend', 'static')
-#     urlpatterns.extend([
-#         # to use index.html
-#         url(r'^$', ensure_csrf_cookie(never_cache(serve_static_file)),
-#             kwargs={'document_path': os.path.join(FRONT_ROOT, 'index.html')}),
-#         # for all others static files
-#         url(r'^(?P<path>.+)$', never_cache(serve),
-#             kwargs={'document_root': FRONT_ROOT, 'show_indexes': False}),
-#     ])

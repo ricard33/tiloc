@@ -15,11 +15,13 @@ const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 // single-page apps that may serve index.html for nested URLs like /todos/42.
 // We can't use a relative path in HTML because we don't want to load something
 // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
-const publicUrlOrPath = getPublicUrlOrPath(
-  process.env.NODE_ENV === 'development',
-  require(resolveApp('package.json')).homepage,
-  process.env.PUBLIC_URL
-);
+// const publicUrlOrPath = getPublicUrlOrPath(
+//   process.env.NODE_ENV === 'development',
+//   require(resolveApp('package.json')).homepage,
+//   process.env.PUBLIC_URL
+// );
+const publicUrlOrPath = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000/' : '/static/bundles/';
 
 const moduleFileExtensions = [
   'web.mjs',
@@ -52,7 +54,7 @@ const resolveModule = (resolveFn, filePath) => {
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
-  appBuild: resolveApp('build'),
+  appBuild: resolveApp('../assets/bundles/'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
   appIndexJs: resolveModule(resolveApp, 'src/index'),
@@ -65,6 +67,7 @@ module.exports = {
   proxySetup: resolveApp('src/setupProxy.js'),
   appNodeModules: resolveApp('node_modules'),
   publicUrlOrPath,
+  statsRoot: resolveApp('../'),
 };
 
 
