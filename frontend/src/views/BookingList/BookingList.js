@@ -1,47 +1,46 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
+import BookingsTable from "./components/BookingsTable";
+import BookingsToolbar from "./components/BookingsToolbar/BookingsToolbar";
+import { makeStyles } from "@material-ui/styles";
 
-export default class BookingList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: [],
-      loaded: false,
-      placeholder: "Loading"
-    };
+const useStyles = makeStyles(theme => ({
+  root: {
+    padding: theme.spacing(3)
+  },
+  content: {
+    marginTop: theme.spacing(2)
   }
+}));
 
-  componentDidMount() {
+const BookingList = () => {
+  const [bookings, setBookings] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const [placeholder, setPlaceholder] = useState("Loading");
+
+  const classes = useStyles();
+
+  useEffect(() => {
     fetch("api/booking/")
-        .then(response => {
-          if (response.status > 400) {
-            return this.setState(() => {
-              return {placeholder: "Something went wrong!"};
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          this.setState(() => {
-            return {
-              data: data.results,
-              loaded: true
-            };
-          });
-        });
-  }
+      .then(response => {
+        if (response.status > 400) {
+          return setPlaceholder("Something went wrong!");
+        }
+        return response.json();
+      })
+      .then(data => {
+        setBookings(data.results);
+        // setLoaded(true);
+      });
+  }, []);
 
-  render() {
-    return (
-        <ul>
-          {console.log(this.state.data)}
-          {this.state.data.map(booking => {
-            return (
-                <li key={booking.id}>
-                  {booking.begin_date} -> {booking.end_date}: {booking.guest_name}
-                </li>
-            );
-          })}
-        </ul>
-    );
-  }
-}
+  return (
+    <div className={classes.root}>
+      <BookingsToolbar/>
+      <div className={classes.content}>
+        <BookingsTable bookings={bookings}/>
+      </div>
+    </div>
+  );
+};
+
+export default BookingList;
