@@ -18,7 +18,6 @@ from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -30,7 +29,6 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -64,16 +62,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'location.urls'
-LOGIN_REDIRECT_URL = "home"   # Route defined in app/urls.py
+LOGIN_REDIRECT_URL = "home"  # Route defined in app/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")  # ROOT dir for templates
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR],
+        'BACKEND':  'django.template.backends.django.DjangoTemplates',
+        'DIRS':     [TEMPLATE_DIR],
         'APP_DIRS': True,
-        'OPTIONS': {
+        'OPTIONS':  {
             'context_processors': [
                 'constance.context_processors.config',
                 'django.template.context_processors.debug',
@@ -89,14 +87,13 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 WSGI_APPLICATION = 'location.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME':   os.path.join(BASE_DIR, 'db.sqlite3'),
     },
     # 'legacy': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -123,7 +120,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -160,7 +156,7 @@ STATICFILES_DIRS = (
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE':                10
 }
 
 APP_NAME = _("My Rentals")
@@ -172,11 +168,10 @@ GRAPPELLI_ADMIN_TITLE = _("Tourism Location")
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-            'BUNDLE_DIR_NAME': 'bundles/',
-            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
-        }
+        'BUNDLE_DIR_NAME':    'bundles/',
+        'STATS_FILE':         os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+    }
 }
-
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

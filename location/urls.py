@@ -15,17 +15,15 @@ Including another URLconf
 """
 import os
 
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls import include, url
+from django.contrib import admin
+from django.urls import path
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.generic import TemplateView
-from django.views.static import serve
 from rest_framework import routers
 
 from core import views
+from core.views import IndexPage
 from location.serve_static_file import serve_static_file
 
 router = routers.DefaultRouter()
@@ -39,5 +37,16 @@ urlpatterns = [
     path("", include("authentication.urls")),
     path("app/", include("app.urls")),
     # path('', include('frontend.urls')),
-    url(r'^', TemplateView.as_view(template_name="index.html")),
+    url(r'^', IndexPage.as_view(template_name="index.html")),
 ]
+
+if settings.ENV == 'dev':
+    # patch for static files from React (They are broken due to use of django dev server instead of Webpack one)
+    public_path = os.path.join(settings.BASE_DIR, 'frontend', 'public')
+    for root, dirs, files in os.walk(public_path, topdown=True):
+        for name in files:
+            fullpath = os.path.join(root, name)
+            relative_path = os.path.relpath(fullpath, public_path)
+            print(relative_path)
+            urlpatterns.insert(-1, url(relative_path, never_cache(serve_static_file),
+                                       kwargs={'document_path': fullpath}))

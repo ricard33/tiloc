@@ -5,3 +5,4 @@ django-heroku
 gunicorn
 Pillow
 django-constance[redis]
+requests

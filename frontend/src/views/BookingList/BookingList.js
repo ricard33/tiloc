@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import 'typeface-roboto';
 
 export default class BookingList extends Component {
   constructor(props) {

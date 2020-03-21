@@ -6,6 +6,7 @@
     "@babel/core": "7.8.4",
     "@material-ui/core": "^4.9.5",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/styles": "^4.9.0",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -19,6 +20,8 @@
     "babel-preset-react-app": "^9.1.1",
     "camelcase": "^5.3.1",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
+    "chart.js": "^2.9.3",
+    "clsx": "^1.1.0",
     "css-loader": "3.4.2",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
@@ -32,6 +35,7 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "file-loader": "4.3.0",
     "fs-extra": "^8.1.0",
+    "history": "^4.10.1",
     "html-webpack-plugin": "4.0.0-beta.11",
     "identity-obj-proxy": "3.0.0",
     "jest": "24.9.0",
@@ -39,6 +43,8 @@
     "jest-resolve": "24.9.0",
     "jest-watch-typeahead": "0.4.2",
     "mini-css-extract-plugin": "0.9.0",
+    "moment": "^2.24.0",
+    "node-sass": "^4.13.1",
     "optimize-css-assets-webpack-plugin": "5.0.3",
     "pnp-webpack-plugin": "1.6.0",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -46,10 +52,16 @@
     "postcss-normalize": "8.0.1",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "4.0.1",
+    "prop-types": "^15.7.2",
     "react": "^16.13.0",
     "react-app-polyfill": "^1.0.6",
+    "react-chartjs-2": "^2.9.0",
     "react-dev-utils": "^10.2.0",
     "react-dom": "^16.13.0",
+    "react-perfect-scrollbar": "^1.5.8",
+    "react-redux": "^7.2.0",
+    "react-router-dom": "^5.1.2",
+    "redux": "^4.0.5",
     "resolve": "1.15.0",
     "resolve-url-loader": "3.1.1",
     "sass-loader": "8.0.2",
@@ -59,6 +71,8 @@
     "ts-pnp": "1.1.5",
     "typeface-roboto": "^0.0.75",
     "url-loader": "2.3.0",
+    "uuid": "^7.0.2",
+    "validate.js": "^0.13.1",
     "webpack": "4.41.5",
     "webpack-bundle-tracker": "^1.0.0-alpha.0",
     "webpack-dev-server": "3.10.2",
@@ -139,5 +153,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1"
   }
 }
