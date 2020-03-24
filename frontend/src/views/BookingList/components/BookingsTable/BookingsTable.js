@@ -10,6 +10,7 @@ import {
   CardContent,
   Checkbox,
   Table,
+  Link,
   TableBody,
   TableCell,
   TableHead,
@@ -17,6 +18,7 @@ import {
   Typography,
   TablePagination
 } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -116,6 +118,8 @@ const BookingsTable = props => {
                   <TableCell>Customer</TableCell>
                   <TableCell>Lodging</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -146,9 +150,15 @@ const BookingsTable = props => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {booking.lodging}
+                      {booking.lodging.name}
                     </TableCell>
-                    <TableCell>{booking.status}</TableCell>
+                    <TableCell>{booking.status.name}</TableCell>
+                    <TableCell>{booking.price}</TableCell>
+                    <TableCell>
+                      <Link href="/bookings/{booking.id}">
+                        <EditIcon/>
+                      </Link>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

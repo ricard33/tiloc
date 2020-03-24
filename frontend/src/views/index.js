@@ -1,6 +1,7 @@
 export { default as NotFound } from './NotFound';
 export { default as Dashboard } from './Dashboard';
 export { default as BookingList } from './BookingList';
+export { default as BookingEdit } from './BookingEdit';
 // export { default as Icons } from './Icons';
 // export { default as ProductList } from './ProductList';
 // export { default as Settings } from './Settings';

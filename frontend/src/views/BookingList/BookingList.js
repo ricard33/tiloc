@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import BookingsTable from "./components/BookingsTable";
 import BookingsToolbar from "./components/BookingsToolbar/BookingsToolbar";
 import { makeStyles } from "@material-ui/styles";
+import axios from "axios";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -9,27 +12,27 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     marginTop: theme.spacing(2)
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff"
   }
 }));
 
 const BookingList = () => {
   const [bookings, setBookings] = useState([]);
   const [loaded, setLoaded] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Loading");
-
+  // const [placeholder, setPlaceholder] = useState("Loading");
   const classes = useStyles();
 
   useEffect(() => {
-    fetch("api/booking/")
+    axios.get("api/booking/")
       .then(response => {
-        if (response.status > 400) {
-          return setPlaceholder("Something went wrong!");
-        }
-        return response.json();
+        setBookings(response.data.results);
+        setLoaded(true);
       })
-      .then(data => {
-        setBookings(data.results);
-        // setLoaded(true);
+      .catch(() => {
+        setLoaded(true);
       });
   }, []);
 
@@ -38,6 +41,9 @@ const BookingList = () => {
       <BookingsToolbar/>
       <div className={classes.content}>
         <BookingsTable bookings={bookings}/>
+        <Backdrop className={classes.backdrop} open={!loaded} timeout={0}>
+          <CircularProgress color="inherit"/>
+        </Backdrop>
       </div>
     </div>
   );

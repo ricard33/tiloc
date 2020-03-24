@@ -47,6 +47,6 @@ if settings.ENV == 'dev':
         for name in files:
             fullpath = os.path.join(root, name)
             relative_path = os.path.relpath(fullpath, public_path)
-            print(relative_path)
+            # print(relative_path)
             urlpatterns.insert(-1, url(relative_path, never_cache(serve_static_file),
                                        kwargs={'document_path': fullpath}))
