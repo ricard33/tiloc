@@ -5,7 +5,7 @@ import { createStore } from 'redux';
 // import './index.css';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
-import { loadErrors } from "./actions/alert";
+import { alert } from "./actions";
 import rootReducer from './reducers/index';
 import { Provider } from "react-redux";
 
@@ -19,7 +19,7 @@ axios.interceptors.response.use(
   },
   function(error) {
     console.error("Network error: " + error);
-    store.dispatch(loadErrors("Network error", error));
+    store.dispatch(alert.loadErrors("Network error", error));
     return Promise.reject(error);
   }
 );

@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { clearAlert } from "../actions/alert";
+import { alert } from "../actions";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
@@ -13,7 +13,7 @@ export default function AlertHandler() {
     if (reason === "clickaway") {
       return;
     }
-    dispatch(clearAlert());
+    dispatch(alert.clearAlert());
   };
 
   console.log(error);
