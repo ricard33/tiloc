@@ -1,4 +1,4 @@
-import uuid from 'uuid/v1';
+import {v1 as uuid} from 'uuid';
 import moment from 'moment';
 import Product1Image from 'assets/images/products/product_1.png'
 import Product2Image from 'assets/images/products/product_2.png'
