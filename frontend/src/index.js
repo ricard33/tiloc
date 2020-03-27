@@ -1,15 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 // import './index.css';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
 import { alert } from "./actions";
 import rootReducer from './reducers/index';
 import { Provider } from "react-redux";
+import thunk from "redux-thunk";
 
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 // Response interceptor.
 axios.interceptors.response.use(

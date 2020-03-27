@@ -16,7 +16,6 @@ export default function AlertHandler() {
     dispatch(alert.clearAlert());
   };
 
-  console.log(error);
   return (error.severity !== undefined &&
     <Snackbar
       autoHideDuration={10000}

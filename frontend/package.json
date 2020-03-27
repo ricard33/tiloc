@@ -27,7 +27,7 @@
     "css-loader": "3.4.2",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
-    "eslint": "^6.6.0",
+    "eslint": "^6.8.0",
     "eslint-config-react-app": "^5.2.0",
     "eslint-loader": "3.0.3",
     "eslint-plugin-flowtype": "4.6.0",
@@ -64,6 +64,7 @@
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
     "resolve": "1.15.0",
     "resolve-url-loader": "3.1.1",
     "sass-loader": "8.0.2",
@@ -129,7 +130,9 @@
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ],
-    "modulePaths": [],
+    "modulePaths": [
+      "src"
+    ],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
@@ -157,6 +160,10 @@
     ]
   },
   "devDependencies": {
-    "prettier": "^1.19.1"
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "eslint-plugin-jest": "^23.8.2",
+    "prettier": "^1.19.1",
+    "redux-mock-store": "^1.5.4"
   }
 }

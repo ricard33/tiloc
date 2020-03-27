@@ -57,7 +57,8 @@
   },
   "env": {
     "es6": true,
-    "browser": true
+    "browser": true,
+    "jest": true
   },
   "extends": "eslint:recommended",
   "ecmaFeatures": {
@@ -66,6 +67,7 @@
   },
   "plugins": [
     "react",
-    "react-hooks"
+    "react-hooks",
+    "jest"
   ]
 }

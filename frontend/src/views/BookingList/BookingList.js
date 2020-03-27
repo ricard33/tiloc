@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import BookingsTable from "./components/BookingsTable";
 import BookingsToolbar from "./components/BookingsToolbar/BookingsToolbar";
 import { makeStyles } from "@material-ui/styles";
-import axios from "axios";
+// import axios from "axios";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {bookings} from "../../actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -20,28 +22,22 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingList = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+  // const [bookings, setBookings] = useState([]);
   // const [placeholder, setPlaceholder] = useState("Loading");
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const allBookings = useSelector(store => store.bookings);
 
   useEffect(() => {
-    axios.get("api/booking/")
-      .then(response => {
-        setBookings(response.data.results);
-        setLoaded(true);
-      })
-      .catch(() => {
-        setLoaded(true);
-      });
-  }, []);
+    dispatch(bookings.fetchBookings());
+  }, [dispatch]);
 
   return (
     <div className={classes.root}>
       <BookingsToolbar/>
       <div className={classes.content}>
-        <BookingsTable bookings={bookings}/>
-        <Backdrop className={classes.backdrop} open={!loaded} timeout={0}>
+        <BookingsTable bookings={allBookings.results ||[]}/>
+        <Backdrop className={classes.backdrop} open={allBookings.loading} timeout={0}>
           <CircularProgress color="inherit"/>
         </Backdrop>
       </div>
