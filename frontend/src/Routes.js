@@ -5,10 +5,11 @@ import { RouteWithLayout } from "./components";
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
 import {
-  BookingList as BookingView,
   BookingEdit,
+  BookingList as BookingView,
   Dashboard as DashboardView,
-  NotFound as NotFoundView,
+  SignIn,
+  NotFound as NotFoundView
 } from "./views";
 
 const Routes = () => {
@@ -18,6 +19,11 @@ const Routes = () => {
         exact
         from="/"
         to="/dashboard"
+      />
+      <RouteWithLayout
+        component={SignIn} exact layout={MinimalLayout}
+        needAuthentication={false}
+        path="/login"
       />
       <RouteWithLayout
         component={DashboardView}

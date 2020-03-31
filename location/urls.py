@@ -22,16 +22,20 @@ from django.urls import path
 from django.views.decorators.cache import never_cache
 from rest_framework import routers
 
-from core import views
+from core import api
 from core.views import IndexPage
 from location.serve_static_file import serve_static_file
 
 router = routers.DefaultRouter()
-router.register(r'booking', views.BookingViewSet)
+router.register(r'booking', api.BookingViewSet, 'booking')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # url("^api/auth/register/$", api.RegistrationAPI.as_view()),
+    url("^api/auth/login/$", api.LoginAPI.as_view()),
+    url("^api/auth/user/$", api.UserAPI.as_view()),
+    url(r'^api/auth/', include('knox.urls')),
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
     path("", include("authentication.urls")),

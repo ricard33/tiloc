@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import BookingsTable from "./components/BookingsTable";
 import BookingsToolbar from "./components/BookingsToolbar/BookingsToolbar";
 import { makeStyles } from "@material-ui/styles";
-// import axios from "axios";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {bookings} from "../../actions";
@@ -22,8 +21,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingList = () => {
-  // const [bookings, setBookings] = useState([]);
-  // const [placeholder, setPlaceholder] = useState("Loading");
   const classes = useStyles();
   const dispatch = useDispatch();
   const allBookings = useSelector(store => store.bookings);

@@ -2,6 +2,7 @@ django
 djangorestframework
 django-grappelli
 django-heroku
+django-rest-knox
 gunicorn
 Pillow
 django-constance[redis]

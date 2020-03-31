@@ -18,6 +18,8 @@
 //      2,
 //      "single"
 //    ],
+    "no-unused-vars": "warn",
+    "no-undef": "error",
     "react/display-name": 1,
     "react/forbid-prop-types": 0,
     "react/sort-prop-types": 1,
@@ -60,11 +62,12 @@
     "browser": true,
     "jest": true
   },
-  "extends": "eslint:recommended",
-  "ecmaFeatures": {
-    "jsx": true,
-    "experimentalObjectRestSpread": true
-  },
+  "extends": "react-app",
+  //  "extends": "eslint:recommended",
+//  "ecmaFeatures": {
+//    "jsx": true,
+//    "experimentalObjectRestSpread": true
+//  },
   "plugins": [
     "react",
     "react-hooks",
