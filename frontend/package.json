@@ -39,6 +39,9 @@
     "fs-extra": "^8.1.0",
     "history": "^4.10.1",
     "html-webpack-plugin": "4.0.0-beta.11",
+    "i18next": "^19.3.4",
+    "i18next-browser-languagedetector": "^4.0.2",
+    "i18next-xhr-backend": "^3.2.2",
     "identity-obj-proxy": "3.0.0",
     "jest": "24.9.0",
     "jest-environment-jsdom-fourteen": "1.0.1",
@@ -60,6 +63,7 @@
     "react-chartjs-2": "^2.9.0",
     "react-dev-utils": "^10.2.0",
     "react-dom": "^16.13.0",
+    "react-i18next": "^11.3.4",
     "react-perfect-scrollbar": "^1.5.8",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
@@ -85,7 +89,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "extract": "i18next 'src/**/*.{js,hbs}' -c config/i18next-parser.config.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -163,6 +168,7 @@
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint-plugin-jest": "^23.8.2",
+    "i18next-parser": "^1.0.2",
     "prettier": "^1.19.1",
     "redux-mock-store": "^1.5.4"
   }
