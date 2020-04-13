@@ -41,7 +41,7 @@ const Topbar = props => {
           />
         </RouterLink>
         <div className={classes.flexGrow} />
-        <Hidden mdDown>
+        <Hidden smDown>
           <IconButton color="inherit">
             <Badge
               badgeContent={notifications.length}
@@ -58,7 +58,7 @@ const Topbar = props => {
             <InputIcon />
           </IconButton>
         </Hidden>
-        <Hidden lgUp>
+        <Hidden mdUp>
           <IconButton
             color="inherit"
             onClick={onSidebarOpen}
