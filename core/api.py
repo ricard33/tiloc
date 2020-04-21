@@ -6,8 +6,9 @@ from rest_framework.response import Response
 
 from knox.models import AuthToken
 
-from .models import Booking
-from .serializers import CreateUserSerializer, UserSerializer, BookingSerializer, LoginUserSerializer
+from . import models
+from .serializers import CreateUserSerializer, UserSerializer, BookingSerializer, LoginUserSerializer, \
+    BookingStatusSerializer
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -55,5 +56,10 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows bookings to be viewed or edited.
     """
-    queryset = Booking.objects.all().order_by('-begin_date')
+    queryset = models.Booking.objects.all().order_by('-begin_date')
     serializer_class = BookingSerializer
+
+
+class BookingStatusViewSet(viewsets.ModelViewSet):
+    queryset = models.BookingStatus.objects.all()
+    serializer_class = BookingStatusSerializer

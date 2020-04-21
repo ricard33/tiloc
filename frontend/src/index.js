@@ -2,17 +2,21 @@ import React from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import { applyMiddleware, createStore } from "redux";
+import createSagaMiddleware from 'redux-saga';
 // import './index.css';
 import * as serviceWorker from "./serviceWorker";
 import App from "./App";
 import { alert } from "./actions";
 import rootReducer from "./reducers/index";
 import { Provider } from "react-redux";
-import thunk from "redux-thunk";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
+import rootSaga from './sagas'
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
+const sagaMiddleware = createSagaMiddleware()
+const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
+
+sagaMiddleware.run(rootSaga);
 
 
 // Add a request interceptor
@@ -72,4 +76,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.register();

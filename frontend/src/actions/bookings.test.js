@@ -18,7 +18,7 @@ describe("booking actions", () => {
 
     const expectedActions = [
       { type: types.FETCH_BOOKINGS_REQUEST },
-      { type: types.FETCH_BOOKINGS_SUCCESS, bookings: resp.data },
+      { type: types.FETCH_BOOKINGS_SUCCESS, data: resp.data },
     ];
 
     return store.dispatch(bookings.fetchBookings()).then(() => {
@@ -39,5 +39,29 @@ describe("booking actions", () => {
       expect(store.getActions()).toEqual(expectedActions);
     });
 
+  });
+});
+
+describe("generic restful client", () =>{
+  it("should use composed action names", () => {
+    expect(types["FETCH_BOOKING_STATUSES_REQUEST"]).toEqual(types.FETCH_BOOKING_STATUSES_REQUEST);
+  });
+});
+
+describe("booking status actions", () => {
+  it("should get booking statuses", () => {
+    const mocked_statuses = [{ name: "Option"}, {name: "Deposit paid"}];
+    const resp = { data: { results: mocked_statuses } };
+    axios.get.mockResolvedValue(resp);
+    const store = mockStore({ statuses: {} });
+
+    const expectedActions = [
+      { type: types.FETCH_BOOKING_STATUSES_REQUEST },
+      { type: types.FETCH_BOOKING_STATUSES_SUCCESS, data: resp.data },
+    ];
+
+    return store.dispatch(bookings.fetchBookingStatuses()).then(() => {
+      expect(store.getActions()).toEqual(expectedActions);
+    });
   });
 });

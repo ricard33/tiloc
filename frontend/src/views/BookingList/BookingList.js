@@ -33,7 +33,7 @@ const BookingList = () => {
     <div className={classes.root}>
       <BookingsToolbar/>
       <div className={classes.content}>
-        <BookingsTable bookings={allBookings.results ||[]}/>
+        <BookingsTable bookings={allBookings.data ||[]}/>
         <Backdrop className={classes.backdrop} open={allBookings.loading} timeout={0}>
           <CircularProgress color="inherit"/>
         </Backdrop>

@@ -28,6 +28,7 @@ from location.serve_static_file import serve_static_file
 
 router = routers.DefaultRouter()
 router.register(r'booking', api.BookingViewSet, 'booking')
+router.register(r'booking_status', api.BookingStatusViewSet, 'booking_status')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),

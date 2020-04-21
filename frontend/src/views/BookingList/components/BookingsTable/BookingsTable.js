@@ -155,7 +155,7 @@ const BookingsTable = props => {
                     <TableCell>{booking.status.name}</TableCell>
                     <TableCell>{booking.price}</TableCell>
                     <TableCell>
-                      <Link href="/bookings/{booking.id}">
+                      <Link href={"/bookings/" + booking.id}>
                         <EditIcon/>
                       </Link>
                     </TableCell>

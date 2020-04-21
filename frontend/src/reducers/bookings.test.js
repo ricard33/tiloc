@@ -11,7 +11,7 @@ describe("Bookings reducers", () => {
     expect(
       reducer({}, {
         type: types.FETCH_BOOKINGS_SUCCESS,
-        bookings: mocked_bookings
+        data: mocked_bookings
       })
     ).toEqual(
       {
@@ -31,7 +31,7 @@ describe("Bookings reducers", () => {
         previous: "other url"
       }, {
         type: types.FETCH_BOOKINGS_SUCCESS,
-        bookings: mocked_bookings
+        data: mocked_bookings
       })
     ).toEqual(
       {

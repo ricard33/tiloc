@@ -9,7 +9,7 @@ import "./assets/scss/index.scss";
 import validators from "./common/validators";
 import Routes from "./Routes";
 import AlertHandler from "./components/alertHandler";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { auth } from "./actions";
 // import 'typeface-roboto';
 
@@ -22,10 +22,11 @@ validate.validators = {
 
 function App() {
   const dispatch = useDispatch();
+  const token = useSelector(store => store.auth.token);
 
   useEffect(() => {
-    dispatch(auth.loadUser());
-  }, [dispatch]);
+    dispatch(auth.loadUser(token));
+  }, [dispatch, token]);
 
   return (
     <ThemeProvider theme={theme}>
