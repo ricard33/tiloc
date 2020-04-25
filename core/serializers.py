@@ -35,6 +35,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username')
 
 
+class OwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Owner
+        fields = '__all__'
+
+
 class LodgingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Lodging

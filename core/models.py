@@ -42,6 +42,7 @@ class Owner(models.Model):
 class Lodging(models.Model):
     active = models.BooleanField(_("active"), default=True)
     name = models.CharField(_("name"), max_length=200)
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     rank = models.IntegerField(_("rank"), )
     address = models.TextField(_("address"), )
     default_price = models.DecimalField(_("daily default price"), max_digits=10, decimal_places=2, help_text=_("Default price for one night"))
