@@ -133,3 +133,4 @@ staticfiles/
 frontend0/
 /webpack-stats.*.json
 /assets/bundles/
+/.idea/shelf/

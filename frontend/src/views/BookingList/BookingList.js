@@ -5,7 +5,9 @@ import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {bookings} from "../../actions";
+import * as selectors from "../../selectors";
 import { useDispatch, useSelector } from "react-redux";
+import orm from "orm";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,8 +25,12 @@ const useStyles = makeStyles(theme => ({
 const BookingList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const allBookings = useSelector(store => store.bookings);
-
+  // const allBookings = useSelector(store => selectors.bookings(store));
+  const allBookings = useSelector(store => {
+    const session = orm.session(store.entities);
+    return session.Booking.all();
+  });
+  const loading = false;
   useEffect(() => {
     dispatch(bookings.fetchBookings());
   }, [dispatch]);
@@ -33,8 +39,8 @@ const BookingList = () => {
     <div className={classes.root}>
       <BookingsToolbar/>
       <div className={classes.content}>
-        <BookingsTable bookings={allBookings.data ||[]}/>
-        <Backdrop className={classes.backdrop} open={allBookings.loading} timeout={0}>
+        <BookingsTable bookings={allBookings.toModelArray() ||[]}/>
+        <Backdrop className={classes.backdrop} open={loading} timeout={0}>
           <CircularProgress color="inherit"/>
         </Backdrop>
       </div>
