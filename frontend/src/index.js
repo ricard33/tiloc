@@ -13,6 +13,7 @@ import rootSaga from './sagas'
 import { createReducer } from 'redux-orm'
 import orm from './orm'
 import * as reducers from './reducers';
+import 'typeface-roboto';
 
 const rootReducer = combineReducers({
   alert: reducers.alert,
