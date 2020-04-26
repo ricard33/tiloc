@@ -8,7 +8,7 @@ from knox.models import AuthToken
 
 from . import models
 from .serializers import CreateUserSerializer, UserSerializer, BookingSerializer, LoginUserSerializer, \
-    BookingStatusSerializer
+    BookingStatusSerializer, LodgingSerializer
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -63,3 +63,8 @@ class BookingViewSet(viewsets.ModelViewSet):
 class BookingStatusViewSet(viewsets.ModelViewSet):
     queryset = models.BookingStatus.objects.all()
     serializer_class = BookingStatusSerializer
+
+
+class LodgingViewSet(viewsets.ModelViewSet):
+    queryset = models.Lodging.objects.all().order_by('name')
+    serializer_class = LodgingSerializer

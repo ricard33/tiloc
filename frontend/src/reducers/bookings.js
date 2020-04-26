@@ -20,7 +20,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         syncing: !state.sync,
-        loading: true,
+        loading: true
       };
     case types.FETCH_BOOKINGS_SUCCESS:
       return {
@@ -31,7 +31,7 @@ export default (state = initialState, action) => {
         error: null,
         data: action.data.results,
         count: action.data.count,
-        query: action.query,
+        query: action.query
       };
     case types.FETCH_BOOKINGS_FAILURE:
       return {

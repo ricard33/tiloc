@@ -5,7 +5,6 @@ import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {bookings} from "../../actions";
-import * as selectors from "../../selectors";
 import { useDispatch, useSelector } from "react-redux";
 import orm from "orm";
 
@@ -26,11 +25,8 @@ const BookingList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   // const allBookings = useSelector(store => selectors.bookings(store));
-  const allBookings = useSelector(store => {
-    const session = orm.session(store.entities);
-    return session.Booking.all();
-  });
-  const loading = false;
+  const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
+  const loading = useSelector(store => store.fetching.bookings.loading);
   useEffect(() => {
     dispatch(bookings.fetchBookings());
   }, [dispatch]);

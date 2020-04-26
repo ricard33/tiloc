@@ -52,12 +52,22 @@ export class Lodging extends Model {
 
   static parse(data) {
 
-    const { Lodging, Owner } = this.session;
+    const { Lodging } = this.session;
     return Lodging.upsert({
       ...data,
       // Not recursive, just an id
       // owner: Owner.parse(data.owner)
     });
+  }
+
+  static reducer(action, Lodging, session) {
+    switch (action.type) {
+      case types.FETCH_LODGINGS_SUCCESS: {
+        action.data.results.forEach(item => Lodging.parse(item));
+        break;
+      }
+      default: {}
+    }
   }
 }
 
@@ -74,6 +84,7 @@ export class Service extends Model {
 Service.modelName = "Service";
 
 export class BookingStatus extends Model {
+  static modelName = "BookingStatus";
   static get field() {
     return {
       id: attr(),
@@ -87,9 +98,17 @@ export class BookingStatus extends Model {
     const { BookingStatus } = this.session;
     return BookingStatus.upsert(data);
   }
-}
 
-BookingStatus.modelName = "BookingStatus";
+  static reducer(action, BookingStatus, session) {
+    switch (action.type) {
+      case types.FETCH_BOOKING_STATUSES_SUCCESS: {
+        action.data.results.forEach(item => BookingStatus.parse(item));
+        break;
+      }
+      default: {}
+    }
+  }
+}
 
 export class BookingChannel extends Model {
   static get field() {
@@ -155,7 +174,7 @@ export class Booking extends Model {
   }
 
   static parse(data) {
-    const { Booking, Lodging, BookingStatus, BookingChannel } = this.session;
+    const { Lodging, BookingStatus, BookingChannel } = this.session;
     let {lodging, status, source, ...bookingProps} = data;
     bookingProps = {
       ...bookingProps,
@@ -172,6 +191,7 @@ export class Booking extends Model {
         action.data.results.forEach(item => Booking.parse(item));
         break;
       }
+      default: {}
     }
   }
 }

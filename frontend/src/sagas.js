@@ -84,5 +84,6 @@ export default function* rootSaga() {
     yield takeEvery(actionTypes.LOGIN_REQUEST, login),
     yield takeEvery(actionTypes.FETCH_BOOKINGS_REQUEST, _fetchData, "/api/booking/"),
     yield takeEvery(actionTypes.FETCH_BOOKING_STATUSES_REQUEST, _fetchData, "/api/booking_status/"),
+    yield takeEvery(actionTypes.FETCH_LODGINGS_REQUEST, _fetchData, "/api/lodging/"),
   ]);
 }
