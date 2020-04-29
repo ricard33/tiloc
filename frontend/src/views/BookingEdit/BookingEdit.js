@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Card, CardContent, CardHeader, Divider, Grid, TextField } from "@material-ui/core";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
@@ -8,12 +8,16 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as actions from "../../actions";
 import * as selectors from "../../selectors";
 import orm from "../../orm";
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
+import Slider from "@material-ui/core/Slider";
+import Input from "@material-ui/core/Input";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import { Contacts as ContactsIcon, NightsStay as NightsStayIcon } from "@material-ui/icons";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -28,19 +32,35 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingEdit = props => {
-  console.log(props);
   const { className } = props;
   const { t } = useTranslation();
   const { id } = useParams();
-  const { register, handleSubmit, errors } = useForm(); // initialise the hook
+  const { register, handleSubmit, control, errors } = useForm(); // initialise the hook
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
-  const booking = useSelector(store => orm.session(store.entities).Booking.withId(id));
+  const bookingInstance = useSelector(store => orm.session(store.entities).Booking.withId(id));
   const loading = useSelector(store => store.fetching.bookings.loading | store.fetching.booking_statuses.loading);
   const allGuests = useSelector(store => selectors.guests(store));
   const dispatch = useDispatch();
   const classes = useStyles();
-  const variant = "filled";
+  const variant = "standard";
+  let statusColor = {};
+  const [booking, setBooking] = useState({});
+
+  if (Object.keys(booking).length === 0 && booking.constructor === Object
+    && bookingInstance && bookingInstance.ref) { // HACK to handle delayed load
+    console.debug("Load state with ", bookingInstance.ref);
+    setBooking(bookingInstance.ref);
+  }
+  // console.log(booking);
+
+  if(bookingStatuses.length > 0 && booking.status){
+    // console.debug(bookingStatuses, booking.status);
+    // console.debug(bookingStatuses.filter(status => status.id === booking.status));
+    statusColor = {
+      background: "#" + bookingStatuses.filter(status => status.id === booking.status)[0].color
+    };
+  }
 
   useEffect(() => {
     dispatch(actions.fetchBookings());
@@ -49,21 +69,51 @@ const BookingEdit = props => {
   }, [dispatch]);
 
 
-  const handleStatusChange = data => {
-    console.log(data);
+  const handleChange = data => {
+    // console.debug(data);
+    console.debug(data.target);
+    switch (data.target.name) {
+      case "status":
+        setBooking({ ...booking, status: parseInt(data.target.value, 10) });
+        break;
+      case "lodging":
+        setBooking({ ...booking, lodging: parseInt(data.target.value, 10) });
+        break;
+      case "existing-guest":
+        const guest = allGuests.filter(guest => guest.name === data.target.value);
+        if (guest) {
+          setBooking({
+            ...booking,
+            guest_name: guest[0].name,
+            guest_contact: guest[0].contact,
+            guest_address: guest[0].address
+          })
+        }
+        break;
+      case "duration":
+        setBooking({ ...booking, duration: Number(data.target.value) });
+        break;
+    }
   };
-  const handleLodgingChange = data => {
-    console.log(data);
+  const handleNightsSliderChange = (event, newValue) => {
+    setBooking({ ...booking, duration: parseInt(newValue, 10) });
   };
-  const handleGuestChange = data => {
-    console.log(data);
-  };
+
+
   const onSubmit = data => {
     console.log(data);
   };
 
+  const marks = [
+    { value: 1, label: '1', },
+    { value: 7, label: '7', },
+    { value: 14, label: '14', },
+    { value: 30, label: '30', },
+    { value: 60, label: '60', },
+    { value: 100, label: '100', },
+  ];
 
-  if(loading || !booking)
+  if (loading || !booking)
     return <p>Loading...</p>;
   return (
     <Card
@@ -80,24 +130,21 @@ const BookingEdit = props => {
             container
             spacing={3}
           >
-            <Grid
-              item
-              md={4}
-              xs={12}
-            >
+            <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-status">{t("Booking status")}</InputLabel>
                 <Select
                   label={t("Booking status")}
                   inputProps={{
+                    id: "booking-status",
                     name: "status",
-                    id: "booking-status"
                   }}
                   margin="dense"
                   native
-                  onChange={handleStatusChange}
+                  onChange={handleChange}
                   ref={register}
-                  value={booking.status.id}
+                  style={statusColor}
+                  value={booking.status}
                 >
                   {bookingStatuses.map(status => (
                     <option key={status.id} value={status.id}>{status.name}</option>
@@ -105,24 +152,20 @@ const BookingEdit = props => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid
-              item
-              md={8}
-              xs={12}
-            >
+            <Grid item sm={8} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-status">{t("Lodging")}</InputLabel>
                 <Select
                   label={t("Lodging")}
                   inputProps={{
+                    id: "booking-lodging",
                     name: "lodging",
-                    id: "booking-lodging"
                   }}
                   margin="dense"
                   native
-                  onChange={handleLodgingChange}
+                  onChange={handleChange}
                   ref={register}
-                  value={booking.lodging.id}
+                  value={booking.lodging}
                 >
                   {lodgings.map(lodging => (
                     <option key={lodging.id} value={lodging.id}>{lodging.name}</option>
@@ -130,16 +173,13 @@ const BookingEdit = props => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
-              <Typography variant="h6" gutterBottom>{t("Guest")}</Typography>
+            <Grid item xs={12}>
+              <Typography gutterBottom variant="h6">{t("Guest")}</Typography>
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
+            <Grid item xs={1}>
+              <ContactsIcon />
+            </Grid>
+            <Grid item xs={11}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
                 <Select
@@ -150,56 +190,105 @@ const BookingEdit = props => {
                   }}
                   margin="dense"
                   native
-                  onChange={handleGuestChange}
+                  onChange={handleChange}
                   ref={register}
                   value={booking.guest_name}
                 >
                   {allGuests.map(guest => (
-                    <option key={guest} value={guest}>{guest}</option>
+                    <option key={guest.name} value={guest.name}>{guest.name}</option>
                   ))}
                 </Select>
+                <FormHelperText>{t("Select an existing guest to automatically fill its information")}</FormHelperText>
               </FormControl>
             </Grid>
-            <Grid
-              item
-              xs={12}
-            >
+            <Grid item xs={12}>
               <TextField
                 fullWidth
-                helperText="Please specify the guest name"
-                label="Guest name"
+                helperText={t("Please specify the guest name")}
+                label={t("Guest name")}
                 margin="dense"
                 name="guestName"
-                // onChange={handleChange}
-                ref={register}
+                onChange={handleChange}
+                inputRef={register}
                 required
                 value={booking.guest_name}
                 variant={variant}
               />
+            </Grid>
+            <Grid item sm={6} xs={12}>
               <TextField
                 fullWidth
-                // helperText="Please specify the guest phone and/or email"
-                label="Phone / email"
+                // helperText={t("Please specify the guest phone and/or email")}
+                label={t("Phone / email")}
                 margin="dense"
                 multiline
                 name="guestContact"
-                // onChange={handleChange}
-                ref={register}
+                onChange={handleChange}
+                inputRef={register}
                 value={booking.guest_contact}
                 variant={variant}
               />
+            </Grid>
+            <Grid item sm={6} xs={12}>
               <TextField
                 fullWidth
-                // helperText="Full guest address"
-                label="Address"
+                // helperText={t("Full guest address")}
+                label={t("Address")}
                 margin="dense"
                 multiline
                 name="guestAddress"
-                // onChange={handleChange}
-                ref={register}
+                onChange={handleChange}
+                inputRef={register}
                 value={booking.guest_address}
                 variant={variant}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography gutterBottom variant="h6">{t("Booking details")}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <div className={classes.root}>
+                <Typography id="input-slider" gutterBottom>
+                  {t("Nights")}
+                </Typography>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item>
+                    <NightsStayIcon />
+                  </Grid>
+                  <Grid item xs>
+                    <Slider
+                      aria-labelledby="continuous-slider"
+                      name="duration-slider"
+                      onChange={handleNightsSliderChange}
+                      step={1}
+                      value={typeof booking.duration === 'number' ? booking.duration : 1}
+                      valueLabelDisplay="auto"
+                      marks={marks}
+                      min={1}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Input
+                      className={classes.input}
+                      onChange={handleChange}
+                      // onBlur={handleNightsBlur}
+                      inputProps={{
+                        step: 1,
+                        min: 1,
+                        max: 100,
+                        type: "number",
+                        "aria-labelledby": "input-slider"
+                      }}
+                      margin="dense"
+                      name="duration"
+                      value={booking.duration}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+            </Grid>
+            <Grid item xs={12}>
+              <input type="submit"/>
             </Grid>
           </Grid>
         </CardContent>

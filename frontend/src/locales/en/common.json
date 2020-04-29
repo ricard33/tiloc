@@ -1,4 +1,15 @@
 {
+  "You can change booking details": "You can change booking details",
   "Modify a booking": "Modify a booking",
-  "Edit booking": "Edit booking"
+  "Booking status": "Booking status",
+  "Lodging": "Lodging",
+  "Guest": "Guest",
+  "Existing guest": "Existing guest",
+  "Select an existing guest to automatically fill its information": "Select an existing guest to automatically fill its information",
+  "Please specify the guest name": "Please specify the guest name",
+  "Guest name": "Guest name",
+  "Phone / email": "Phone / email",
+  "Address": "Address",
+  "Booking details": "Booking details",
+  "Nights": "Nights"
 }

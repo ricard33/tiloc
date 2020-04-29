@@ -2,6 +2,7 @@ import { Model, fk, attr, many } from "redux-orm";
 import * as types from "actions/actionTypes";
 
 export class Owner extends Model {
+  static modelName = "Owner";
   static get fields() {
     return {
       id: attr(),
@@ -31,9 +32,9 @@ export class Owner extends Model {
   }
 }
 
-Owner.modelName = "Owner";
-
 export class Lodging extends Model {
+  static modelName = "Lodging";
+
   static get fields() {
     return {
       id: attr(),
@@ -71,17 +72,13 @@ export class Lodging extends Model {
   }
 }
 
-Lodging.modelName = "Lodging";
-
 export class Category extends Model {
+  static modelName = "Category";
 }
-
-Category.modelName = "Category";
 
 export class Service extends Model {
+  static modelName = "Service";
 }
-
-Service.modelName = "Service";
 
 export class BookingStatus extends Model {
   static modelName = "BookingStatus";
@@ -111,6 +108,7 @@ export class BookingStatus extends Model {
 }
 
 export class BookingChannel extends Model {
+  static modelName = "BookingChannel";
   static get field() {
     return {
       id: attr(),
@@ -126,26 +124,24 @@ export class BookingChannel extends Model {
   }
 }
 
-BookingChannel.modelName = "BookingChannel";
-
 export class Booking extends Model {
   static modelName = "Booking";
 
   static get fields() {
     return {
       id: attr(),
-      lodgingId: fk({
+      lodging: fk({
         to: "Lodging",
         as: "lodging",
         relatedName: "bookings"
       }),
       guest_name: attr(),
       guest_contact: attr(),
-      statusId: fk({
+      status: fk({
         to: BookingStatus,
         as: "status"
       }),
-      sourceId: fk({
+      source: fk({
         to: BookingChannel,
         as: "source",
         relatedName: "bookings"
@@ -178,9 +174,9 @@ export class Booking extends Model {
     let {lodging, status, source, ...bookingProps} = data;
     bookingProps = {
       ...bookingProps,
-      lodgingId: Lodging.parse(lodging),
-      statusId: BookingStatus.parse(status),
-      sourceId: BookingChannel.parse(source)
+      lodging: Lodging.parse(lodging),
+      status: BookingStatus.parse(status),
+      source: BookingChannel.parse(source)
     };
     return this.upsert(bookingProps);
   }
@@ -197,6 +193,7 @@ export class Booking extends Model {
 }
 
 export class BookedService extends Model {
+  static modelName = "BookedService";
   static get field() {
     return {
       id: attr(),
@@ -211,5 +208,3 @@ export class BookedService extends Model {
     return BookedService.upsert(data);
   }
 }
-
-BookedService.modelName = "BookedService";

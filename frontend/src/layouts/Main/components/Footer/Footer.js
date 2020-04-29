@@ -24,10 +24,10 @@ const Footer = props => {
         &copy;{' '}
         <Link
           component="a"
-          href="https://geckosoft.fr/"
+          href="https://gecko-conception.fr/"
           target="_blank"
         >
-          GeckoSoft
+          Gecko Conception
         </Link>
         . 2020
       </Typography>
