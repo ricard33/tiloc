@@ -17,7 +17,19 @@ import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import { Contacts as ContactsIcon, NightsStay as NightsStayIcon } from "@material-ui/icons";
+import {
+  Contacts as ContactsIcon,
+  NightsStay as NightsStayIcon,
+  Forward as ForwardIcon
+} from "@material-ui/icons";
+import { format, parseISO, addDays, differenceInCalendarDays } from "date-fns";
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker
+} from "@material-ui/pickers";
+import { shiftPickerDateToUTCDate, shiftUTCDateToPickerDate } from "../../common/tzUtils";
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,11 +62,14 @@ const BookingEdit = props => {
   if (Object.keys(booking).length === 0 && booking.constructor === Object
     && bookingInstance && bookingInstance.ref) { // HACK to handle delayed load
     console.debug("Load state with ", bookingInstance.ref);
-    setBooking(bookingInstance.ref);
+    setBooking({
+      ...bookingInstance.ref,
+      // begin_date: parseISO()
+    });
   }
   // console.log(booking);
 
-  if(bookingStatuses.length > 0 && booking.status){
+  if (bookingStatuses.length > 0 && booking.status) {
     // console.debug(bookingStatuses, booking.status);
     // console.debug(bookingStatuses.filter(status => status.id === booking.status));
     statusColor = {
@@ -70,7 +85,7 @@ const BookingEdit = props => {
 
 
   const handleChange = data => {
-    // console.debug(data);
+    console.debug(data);
     console.debug(data.target);
     switch (data.target.name) {
       case "status":
@@ -87,30 +102,53 @@ const BookingEdit = props => {
             guest_name: guest[0].name,
             guest_contact: guest[0].contact,
             guest_address: guest[0].address
-          })
+          });
         }
         break;
       case "duration":
-        setBooking({ ...booking, duration: Number(data.target.value) });
+        onDurationChange(data.target.value);
         break;
     }
   };
+
+  function onDurationChange(newValue) {
+    setBooking({
+      ...booking,
+      duration: Number(newValue),
+      end_date: format(addDays(parseISO(booking.begin_date), newValue), "yyyy-MM-dd")
+    });
+  }
+
   const handleNightsSliderChange = (event, newValue) => {
-    setBooking({ ...booking, duration: parseInt(newValue, 10) });
+    onDurationChange(newValue);
   };
 
+  const onDateChange = (newDate, fieldName) => {
+    console.debug(newDate);
+    console.debug(format(newDate, "yyyy-MM-dd"));
+    const duration = fieldName === "begin_date" ?
+      differenceInCalendarDays(parseISO(booking.end_date), newDate)
+      : differenceInCalendarDays(newDate, parseISO(booking.begin_date));
+    setBooking({
+      ...booking,
+      [fieldName]: format(newDate, "yyyy-MM-dd"),
+      duration: duration,
+    });
+  };
+  const handleBeginDateChange = newDate => onDateChange(newDate, "begin_date");
+  const handleEndDateChange = newDate => onDateChange(newDate, "end_date");
 
   const onSubmit = data => {
     console.log(data);
   };
 
   const marks = [
-    { value: 1, label: '1', },
-    { value: 7, label: '7', },
-    { value: 14, label: '14', },
-    { value: 30, label: '30', },
-    { value: 60, label: '60', },
-    { value: 100, label: '100', },
+    { value: 1, label: "1" },
+    { value: 7, label: "7" },
+    { value: 14, label: "14" },
+    { value: 30, label: "30" },
+    { value: 60, label: "60" },
+    { value: 100, label: "100" }
   ];
 
   if (loading || !booking)
@@ -137,7 +175,7 @@ const BookingEdit = props => {
                   label={t("Booking status")}
                   inputProps={{
                     id: "booking-status",
-                    name: "status",
+                    name: "status"
                   }}
                   margin="dense"
                   native
@@ -159,7 +197,7 @@ const BookingEdit = props => {
                   label={t("Lodging")}
                   inputProps={{
                     id: "booking-lodging",
-                    name: "lodging",
+                    name: "lodging"
                   }}
                   margin="dense"
                   native
@@ -177,7 +215,7 @@ const BookingEdit = props => {
               <Typography gutterBottom variant="h6">{t("Guest")}</Typography>
             </Grid>
             <Grid item xs={1}>
-              <ContactsIcon />
+              <ContactsIcon/>
             </Grid>
             <Grid item xs={11}>
               <FormControl className={classes.formControl} variant={variant}>
@@ -247,45 +285,78 @@ const BookingEdit = props => {
               <Typography gutterBottom variant="h6">{t("Booking details")}</Typography>
             </Grid>
             <Grid item xs={12}>
-              <div className={classes.root}>
-                <Typography id="input-slider" gutterBottom>
-                  {t("Nights")}
-                </Typography>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                    <NightsStayIcon />
-                  </Grid>
-                  <Grid item xs>
-                    <Slider
-                      aria-labelledby="continuous-slider"
-                      name="duration-slider"
-                      onChange={handleNightsSliderChange}
-                      step={1}
-                      value={typeof booking.duration === 'number' ? booking.duration : 1}
-                      valueLabelDisplay="auto"
-                      marks={marks}
-                      min={1}
+              <Typography id="input-slider" gutterBottom>
+                {t("Nights")}
+              </Typography>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item>
+                  <NightsStayIcon/>
+                </Grid>
+                <Grid item xs>
+                  <Slider
+                    aria-labelledby="continuous-slider"
+                    name="duration-slider"
+                    onChange={handleNightsSliderChange}
+                    step={1}
+                    value={typeof booking.duration === "number" ? booking.duration : 1}
+                    valueLabelDisplay="on"
+                    marks={marks}
+                    min={1}
+                  />
+                </Grid>
+                <Grid item>
+                  <Input
+                    className={classes.input}
+                    onChange={handleChange}
+                    // onBlur={handleNightsBlur}
+                    inputProps={{
+                      step: 1,
+                      min: 1,
+                      max: 100,
+                      type: "number",
+                      "aria-labelledby": "input-slider"
+                    }}
+                    margin="dense"
+                    name="duration"
+                    value={booking.duration}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Grid container justify="space-around" alignItems="center">
+                  <Grid item sm={5} xs={6}>
+                    <KeyboardDatePicker
+                      format="dd/MM/yyyy"
+                      id="date-picker-inline"
+                      KeyboardButtonProps={{
+                        "aria-label": "arrival date"
+                      }}
+                      label={t("Arrival")}
+                      margin="dense"
+                      onChange={date => handleBeginDateChange(shiftPickerDateToUTCDate(date))}
+                      value={shiftUTCDateToPickerDate(booking.begin_date)}
                     />
                   </Grid>
-                  <Grid item>
-                    <Input
-                      className={classes.input}
-                      onChange={handleChange}
-                      // onBlur={handleNightsBlur}
-                      inputProps={{
-                        step: 1,
-                        min: 1,
-                        max: 100,
-                        type: "number",
-                        "aria-labelledby": "input-slider"
+                  <Grid item sm={2} xs={12}>
+                    <ForwardIcon/>
+                  </Grid>
+                  <Grid item sm={5} xs={6}>
+                    <KeyboardDatePicker
+                      format="dd/MM/yyyy"
+                      id="date-picker-dialog"
+                      KeyboardButtonProps={{
+                        "aria-label": "departure date"
                       }}
+                      label={t("Departure")}
                       margin="dense"
-                      name="duration"
-                      value={booking.duration}
+                      onChange={date => handleEndDateChange(shiftPickerDateToUTCDate(date))}
+                      value={shiftUTCDateToPickerDate(booking.end_date)}
                     />
                   </Grid>
                 </Grid>
-              </div>
+              </MuiPickersUtilsProvider>
             </Grid>
             <Grid item xs={12}>
               <input type="submit"/>

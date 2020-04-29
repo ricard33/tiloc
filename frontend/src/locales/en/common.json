@@ -11,5 +11,7 @@
   "Phone / email": "Phone / email",
   "Address": "Address",
   "Booking details": "Booking details",
-  "Nights": "Nights"
+  "Nights": "Nights",
+  "Arrival": "Arrival",
+  "Departure": "Departure"
 }
