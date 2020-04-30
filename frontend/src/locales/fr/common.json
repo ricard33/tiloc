@@ -1,4 +1,7 @@
 {
+  "default rate": "tarif par défaut",
+  "week": "semaine",
+  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
   "You can change booking details": "Vous pouvez modifier les détails de la réservation",
   "Modify a booking": "Modifier une réservation",
   "Booking status": "Statut de la réservation",
@@ -13,5 +16,10 @@
   "Booking details": "Détails de la réservation",
   "Nights": "Nuits",
   "Arrival": "Arrivée",
-  "Departure": "Depart"
+  "Departure": "Depart",
+  "{{count}} night": "{{count}} nuit",
+  "{{count}} night_plural": "{{count}} nuits",
+  "Daily rate": "Tarif journalier",
+  "Total": "Total",
+  "Flat rate": "Forfait"
 }

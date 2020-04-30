@@ -1,4 +1,7 @@
 {
+  "default rate": "default rate",
+  "week": "week",
+  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "You can change booking details": "You can change booking details",
   "Modify a booking": "Modify a booking",
   "Booking status": "Booking status",
@@ -13,5 +16,10 @@
   "Booking details": "Booking details",
   "Nights": "Nights",
   "Arrival": "Arrival",
-  "Departure": "Departure"
+  "Departure": "Departure",
+  "{{count}} night": "{{count}} night",
+  "{{count}} night_plural": "{{count}} nights",
+  "Daily rate": "Daily rate",
+  "Total": "Total",
+  "Flat rate": "Flat rate"
 }

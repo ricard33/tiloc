@@ -1,5 +1,11 @@
 {
   "Edit booking": "Edit booking",
   "Duration": "Duration",
-  "Details": "Details"
+  "Details": "Details",
+  "nights": "nights",
+  "Price": "Price",
+  "{count} night": "{count} night",
+  "{count} night_plural": "{count} nights",
+  "Daily price": "Daily price",
+  "From {begin_date} to {end_date}: {day_count} x {rate}€ ({rate_name})_plural": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
 }

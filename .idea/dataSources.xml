@@ -17,5 +17,11 @@
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:/Applications/XAMPP/xamppfiles/htdocs/lsai/location3.db</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="location3.db" uuid="0001d262-b722-47eb-94a9-bbb5e3cf954c">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:/Applications/XAMPP/xamppfiles/htdocs/lsai/location3.db</jdbc-url>
+    </data-source>
   </component>
 </project>

@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Card, CardContent, CardHeader, Divider, Grid, TextField } from "@material-ui/core";
 import clsx from "clsx";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -29,6 +29,10 @@ import {
   KeyboardDatePicker
 } from "@material-ui/pickers";
 import { shiftPickerDateToUTCDate, shiftUTCDateToPickerDate } from "../../common/tzUtils";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
+import { computeBookingPrice } from "../../common/priceUtils";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 
 const useStyles = makeStyles(theme => ({
@@ -63,7 +67,7 @@ const BookingEdit = props => {
     && bookingInstance && bookingInstance.ref) { // HACK to handle delayed load
     console.debug("Load state with ", bookingInstance.ref);
     setBooking({
-      ...bookingInstance.ref,
+      ...bookingInstance.ref
       // begin_date: parseISO()
     });
   }
@@ -85,8 +89,9 @@ const BookingEdit = props => {
 
 
   const handleChange = data => {
-    console.debug(data);
-    console.debug(data.target);
+    // console.debug(data);
+    // console.debug(data.target);
+    let value;
     switch (data.target.name) {
       case "status":
         setBooking({ ...booking, status: parseInt(data.target.value, 10) });
@@ -108,14 +113,48 @@ const BookingEdit = props => {
       case "duration":
         onDurationChange(data.target.value);
         break;
+      case "daily-rate":
+        value = Number(data.target.value);
+        setBooking({
+          ...booking,
+          ...computeBookingPrice(booking.begin_date, booking.end_date, value, 0, 0, [])
+        });
+        break;
+      case "price":
+        value = Number(data.target.value);
+        setBooking({
+          ...booking,
+          daily_rate: value / booking.duration,
+          price: value,
+          price_details: undefined,
+          is_flat_rate: true
+        });
+        break;
+      case "flat-rate":
+        if (data.target.checked)
+          setBooking({ ...booking, is_flat_rate: true });
+        else
+          setBooking({
+            ...booking,
+            ...computeBookingPrice(booking.begin_date, booking.end_date, bookingInstance.lodging.daily_rate, 0, 0, []),
+            is_flat_rate: false
+          });
+        break;
+      default:
+        console.warn("Unhandled input:", data.target.name);
     }
   };
 
   function onDurationChange(newValue) {
+    const duration = Number(newValue);
+    const endDate = format(addDays(parseISO(booking.begin_date), duration), "yyyy-MM-dd");
+    const priceObj = booking.is_flat_rate ? { daily_rate: booking.price / duration }
+      : computeBookingPrice(booking.begin_date, endDate, bookingInstance.lodging.daily_rate, 0, 0, []);
     setBooking({
       ...booking,
-      duration: Number(newValue),
-      end_date: format(addDays(parseISO(booking.begin_date), newValue), "yyyy-MM-dd")
+      ...priceObj,
+      duration: duration,
+      end_date: endDate
     });
   }
 
@@ -126,13 +165,17 @@ const BookingEdit = props => {
   const onDateChange = (newDate, fieldName) => {
     console.debug(newDate);
     console.debug(format(newDate, "yyyy-MM-dd"));
-    const duration = fieldName === "begin_date" ?
-      differenceInCalendarDays(parseISO(booking.end_date), newDate)
-      : differenceInCalendarDays(newDate, parseISO(booking.begin_date));
-    setBooking({
+    const newBooking = {
       ...booking,
-      [fieldName]: format(newDate, "yyyy-MM-dd"),
-      duration: duration,
+      [fieldName]: format(newDate, "yyyy-MM-dd")
+    };
+    const duration = differenceInCalendarDays(parseISO(booking.end_date), parseISO(booking.begin_date));
+    const priceObj = booking.is_flat_rate ? { daily_rate: booking.price / duration }
+      : computeBookingPrice(booking.begin_date, booking.end_date, bookingInstance.lodging.daily_rate, 0, 0, []);
+    setBooking({
+      ...newBooking,
+      ...priceObj,
+      duration: duration
     });
   };
   const handleBeginDateChange = newDate => onDateChange(newDate, "begin_date");
@@ -358,6 +401,56 @@ const BookingEdit = props => {
                 </Grid>
               </MuiPickersUtilsProvider>
             </Grid>
+            {/* Price */}
+            <Grid item container xs={12} alignItems="center" justify="space-around">
+              {!booking.is_flat_rate &&
+              <Grid item sm={4} xs={12}>
+                {t("{{count}} night", { count: booking.duration || 0 })}&nbsp;x&nbsp;
+                <TextField
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">€</InputAdornment>
+                  }}
+                  label={t("Daily rate")}
+                  name="daily-rate"
+                  onChange={handleChange}
+                  inputRef={register}
+                  margin="dense"
+                  required
+                  value={booking.daily_rate || ""}
+                  variant={variant}
+                />
+                <span> = </span>
+              </Grid>}
+              <Grid item xs={4}>
+                <TextField
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">€</InputAdornment>
+                  }}
+                  label={t("Total")}
+                  margin="dense"
+                  name="price"
+                  onChange={handleChange}
+                  inputRef={register}
+                  required
+                  value={booking.price}
+                  variant={variant}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <FormControlLabel
+                  control={<Checkbox checked={booking.is_flat_rate} color="primary"/>}
+                  label={t("Flat rate")}
+                  labelPlacement="start"
+                  margin="dense"
+                  name="flat-rate"
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+            {/* number of persons */}
+            {/* options */}
+            {/* statistics */}
+            {/* notes */}
             <Grid item xs={12}>
               <input type="submit"/>
             </Grid>
