@@ -1,31 +1,18 @@
+import "typeface-roboto";
 import React from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
-import { applyMiddleware, createStore, combineReducers, compose } from "redux";
-import createSagaMiddleware from 'redux-saga';
 import * as serviceWorker from "./serviceWorker";
 import App from "./App";
 import { alert } from "./actions";
 import { Provider } from "react-redux";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
-import rootSaga from './sagas'
-import { createReducer } from 'redux-orm'
-import orm from './orm'
-import * as reducers from './reducers';
-import 'typeface-roboto';
+import rootSaga from "./sagas";
+import orm from "./orm";
+import { createFullStore } from "./store";
 
-const rootReducer = combineReducers({
-  alert: reducers.alert,
-  auth: reducers.auth,
-  fetching: reducers.fetching,
-  entities: createReducer(orm),
-})
-
-
-const composeEnhancers = (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
-const sagaMiddleware = createSagaMiddleware()
-const store = createStore(rootReducer, composeEnhancers(applyMiddleware(sagaMiddleware)));
+const { sagaMiddleware, store } = createFullStore(orm);
 
 sagaMiddleware.run(rootSaga);
 

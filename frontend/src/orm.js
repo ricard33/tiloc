@@ -1,12 +1,12 @@
 import { ORM } from "redux-orm";
-import {
-  Owner, Lodging, Category, Service,
-  BookingStatus, BookingChannel, Booking, BookedService
-} from "./models";
+import { createModels } from "./models";
 
 const orm = new ORM({
   stateSelector: state => state.entities
 });
+const { Owner, Lodging, Category, Service,
+  BookingStatus, BookingChannel, Booking, BookedService
+} = createModels();
 orm.register(Owner, Lodging, Category, Service,
   BookingStatus, BookingChannel, Booking, BookedService);
 

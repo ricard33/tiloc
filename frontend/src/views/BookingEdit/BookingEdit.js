@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Card, CardContent, CardHeader, Divider, Grid, TextField } from "@material-ui/core";
 import clsx from "clsx";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -51,7 +51,7 @@ const BookingEdit = props => {
   const { className } = props;
   const { t } = useTranslation();
   const { id } = useParams();
-  const { register, handleSubmit, control, errors } = useForm(); // initialise the hook
+  const { register, handleSubmit, errors } = useForm(); // initialise the hook
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
   const bookingInstance = useSelector(store => orm.session(store.entities).Booking.withId(id));
@@ -215,11 +215,11 @@ const BookingEdit = props => {
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-status">{t("Booking status")}</InputLabel>
                 <Select
-                  label={t("Booking status")}
                   inputProps={{
                     id: "booking-status",
                     name: "status"
                   }}
+                  label={t("Booking status")}
                   margin="dense"
                   native
                   onChange={handleChange}
@@ -237,11 +237,11 @@ const BookingEdit = props => {
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-status">{t("Lodging")}</InputLabel>
                 <Select
-                  label={t("Lodging")}
                   inputProps={{
                     id: "booking-lodging",
                     name: "lodging"
                   }}
+                  label={t("Lodging")}
                   margin="dense"
                   native
                   onChange={handleChange}
@@ -264,11 +264,11 @@ const BookingEdit = props => {
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
                 <Select
-                  label={t("Existing guest")}
                   inputProps={{
                     name: "existing-guest",
                     id: "booking-existing-gest"
                   }}
+                  label={t("Existing guest")}
                   margin="dense"
                   native
                   onChange={handleChange}
@@ -286,11 +286,11 @@ const BookingEdit = props => {
               <TextField
                 fullWidth
                 helperText={t("Please specify the guest name")}
+                inputRef={register}
                 label={t("Guest name")}
                 margin="dense"
                 name="guestName"
                 onChange={handleChange}
-                inputRef={register}
                 required
                 value={booking.guest_name}
                 variant={variant}
@@ -300,12 +300,12 @@ const BookingEdit = props => {
               <TextField
                 fullWidth
                 // helperText={t("Please specify the guest phone and/or email")}
+                inputRef={register}
                 label={t("Phone / email")}
                 margin="dense"
                 multiline
                 name="guestContact"
                 onChange={handleChange}
-                inputRef={register}
                 value={booking.guest_contact}
                 variant={variant}
               />
@@ -314,12 +314,12 @@ const BookingEdit = props => {
               <TextField
                 fullWidth
                 // helperText={t("Full guest address")}
+                inputRef={register}
                 label={t("Address")}
                 margin="dense"
                 multiline
                 name="guestAddress"
                 onChange={handleChange}
-                inputRef={register}
                 value={booking.guest_address}
                 variant={variant}
               />
