@@ -30,6 +30,7 @@ router = routers.DefaultRouter()
 router.register(r'booking', api.BookingViewSet, 'booking')
 router.register(r'booking_status', api.BookingStatusViewSet, 'booking_status')
 router.register(r'lodging', api.LodgingViewSet, 'lodging')
+router.register(r'owner', api.OwnerViewSet, 'owner')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),

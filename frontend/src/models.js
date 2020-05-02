@@ -32,6 +32,17 @@ export const createModels = () => {
       const { Owner } = this.session;
       return Owner.upsert(data);
     }
+
+    static reducer(action, Owner, session) {
+      switch (action.type) {
+        case types.FETCH_OWNERS_SUCCESS: {
+          action.data.results.forEach(item => Owner.parse(item));
+          break;
+        }
+        default: {
+        }
+      }
+    }
   }
 
   const Lodging = class LodgingModel extends Model {

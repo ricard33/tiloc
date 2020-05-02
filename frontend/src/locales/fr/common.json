@@ -1,4 +1,6 @@
 {
+  "Deposit": "Arrhes",
+  "Down payment": "Accompte",
   "default rate": "tarif par défaut",
   "week": "semaine",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
@@ -21,5 +23,7 @@
   "{{count}} night_plural": "{{count}} nuits",
   "Daily rate": "Tarif journalier",
   "Total": "Total",
-  "Flat rate": "Forfait"
+  "Flat rate": "Forfait",
+  "Balance: {{amount}} €": "Solde: {{amount}} €",
+  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
 }

@@ -6,7 +6,5 @@
   "Price": "Price",
   "{count} night": "{count} nuit",
   "{count} night_plural": "{count} nuits",
-  "Daily price": "Tarif journalier",
-  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
-  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
+  "Daily price": "Tarif journalier"
 }

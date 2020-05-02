@@ -11,6 +11,7 @@ import i18n from "./i18n";
 import rootSaga from "./sagas";
 import orm from "./orm";
 import { createFullStore } from "./store";
+import "./index.css";
 
 const { sagaMiddleware, store } = createFullStore(orm);
 

@@ -11,7 +11,6 @@ import Routes from "./Routes";
 import AlertHandler from "./components/alertHandler";
 import { useDispatch, useSelector } from "react-redux";
 import { auth } from "./actions";
-// import 'typeface-roboto';
 
 const browserHistory = createBrowserHistory();
 

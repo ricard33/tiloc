@@ -52,4 +52,5 @@ export default combineReducers({
   'bookings': fetchingReducer(types.FETCH_BOOKINGS),
   'booking_statuses': fetchingReducer(types.FETCH_BOOKING_STATUSES),
   'lodgings': fetchingReducer(types.FETCH_LODGINGS),
+  'owners': fetchingReducer(types.FETCH_OWNERS),
 })

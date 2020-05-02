@@ -33,6 +33,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import { computeBookingPrice } from "../../common/priceUtils";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import { getDepositLabel } from "../../common/ownerPrefsUtils";
 
 
 const useStyles = makeStyles(theme => ({
@@ -44,6 +45,19 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     width: "100%"
+  },
+  flexBoxAlignLeft: {
+    display: "flex",
+    alignItems: "baseline"
+    // justifyContent: "stretch"
+  },
+  flexBoxStretched: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between"
+  },
+  spacer: {
+    flexBasis: "2em"
   }
 }));
 
@@ -62,6 +76,7 @@ const BookingEdit = props => {
   const variant = "standard";
   let statusColor = {};
   const [booking, setBooking] = useState({});
+  const depositPercent = 30; // TODO load this from owner or lodging prefs
 
   if (Object.keys(booking).length === 0 && booking.constructor === Object
     && bookingInstance && bookingInstance.ref) { // HACK to handle delayed load
@@ -85,6 +100,7 @@ const BookingEdit = props => {
     dispatch(actions.fetchBookings());
     dispatch(actions.fetchBookingStatuses());
     dispatch(actions.fetchLodgings());
+    dispatch(actions.fetchOwners());
   }, [dispatch]);
 
 
@@ -117,7 +133,7 @@ const BookingEdit = props => {
         value = Number(data.target.value);
         setBooking({
           ...booking,
-          ...computeBookingPrice(booking.begin_date, booking.end_date, value, 0, 0, [])
+          ...computeBookingPrice(booking.begin_date, booking.end_date, value, 0, 0, [], depositPercent)
         });
         break;
       case "price":
@@ -136,9 +152,22 @@ const BookingEdit = props => {
         else
           setBooking({
             ...booking,
-            ...computeBookingPrice(booking.begin_date, booking.end_date, bookingInstance.lodging.daily_rate, 0, 0, []),
+            ...computeBookingPrice(booking.begin_date, booking.end_date, bookingInstance.lodging.daily_rate, 0, 0, [], depositPercent),
             is_flat_rate: false
           });
+        break;
+      case "deposit":
+        if (!data.target.value)
+          setBooking({ ...booking, deposit: 0 });
+        else {
+          let deposit = Number(data.target.value);
+          if (deposit && deposit >= 0) {
+            if(deposit > booking.price)
+              deposit = booking.price;
+            setBooking({ ...booking, deposit });
+
+          }
+        }
         break;
       default:
         console.warn("Unhandled input:", data.target.name);
@@ -149,7 +178,7 @@ const BookingEdit = props => {
     const duration = Number(newValue);
     const endDate = format(addDays(parseISO(booking.begin_date), duration), "yyyy-MM-dd");
     const priceObj = booking.is_flat_rate ? { daily_rate: booking.price / duration }
-      : computeBookingPrice(booking.begin_date, endDate, bookingInstance.lodging.daily_rate, 0, 0, []);
+      : computeBookingPrice(booking.begin_date, endDate, bookingInstance.lodging.daily_rate, 0, 0, [], depositPercent);
     setBooking({
       ...booking,
       ...priceObj,
@@ -171,7 +200,7 @@ const BookingEdit = props => {
     };
     const duration = differenceInCalendarDays(parseISO(booking.end_date), parseISO(booking.begin_date));
     const priceObj = booking.is_flat_rate ? { daily_rate: booking.price / duration }
-      : computeBookingPrice(booking.begin_date, booking.end_date, bookingInstance.lodging.daily_rate, 0, 0, []);
+      : computeBookingPrice(booking.begin_date, booking.end_date, bookingInstance.lodging.daily_rate, 0, 0, [], depositPercent);
     setBooking({
       ...newBooking,
       ...priceObj,
@@ -402,9 +431,11 @@ const BookingEdit = props => {
               </MuiPickersUtilsProvider>
             </Grid>
             {/* Price */}
-            <Grid item container xs={12} alignItems="center" justify="space-around">
+            <Grid
+              item container xs={12} alignItems="center"
+              justify={!booking.is_flat_rate ? "space-around" : "flex-start"}>
               {!booking.is_flat_rate &&
-              <Grid item sm={4} xs={12}>
+              <Grid item sm={6} xs={12} className={classes.flexBoxStretched}>
                 {t("{{count}} night", { count: booking.duration || 0 })}&nbsp;x&nbsp;
                 <TextField
                   InputProps={{
@@ -419,9 +450,9 @@ const BookingEdit = props => {
                   value={booking.daily_rate || ""}
                   variant={variant}
                 />
-                <span> = </span>
+                =
               </Grid>}
-              <Grid item xs={4}>
+              <Grid item xs={6} className={classes.flexBoxAlignLeft}>
                 <TextField
                   InputProps={{
                     endAdornment: <InputAdornment position="end">€</InputAdornment>
@@ -435,8 +466,7 @@ const BookingEdit = props => {
                   value={booking.price}
                   variant={variant}
                 />
-              </Grid>
-              <Grid item xs={2}>
+                <div className={classes.spacer}/>
                 <FormControlLabel
                   control={<Checkbox checked={booking.is_flat_rate} color="primary"/>}
                   label={t("Flat rate")}
@@ -446,6 +476,34 @@ const BookingEdit = props => {
                   onChange={handleChange}
                 />
               </Grid>
+            </Grid>
+            <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+              <TextField
+                error={!!errors.deposit}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                  type: "number"
+                }}
+                inputProps={{ type: "number" }}
+                inputRef={register({
+                  min: 0, max: booking.price,
+                  validate: {
+                    positive: value => parseInt(value, 10) > 0,
+                    lessThanTen: value => parseInt(value, 10) < 10
+                  }
+                })}
+                label={getDepositLabel(t, bookingInstance && bookingInstance.lodging && bookingInstance.lodging.owner && bookingInstance.lodging.owner.deposit_label) || t("Deposit")}
+                margin="dense"
+                multiline
+                name="deposit"
+                onChange={handleChange}
+                value={booking.deposit}
+                variant={variant}
+              />
+              <div className={classes.spacer}/>
+              <Typography>
+                {booking.price && booking.deposit && t("Balance: {{amount}} €", { amount: booking.price - booking.deposit })}
+              </Typography>
             </Grid>
             {/* number of persons */}
             {/* options */}

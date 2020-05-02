@@ -30,6 +30,7 @@ i18n
       },
     },
     // have a common namespace used around the full app
+    nsSeparator: '',
     ns: ["common"],
     defaultNS: "common"
   });

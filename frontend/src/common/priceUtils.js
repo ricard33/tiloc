@@ -1,12 +1,15 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
 
-export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, weekRate, seasonalRates=[]) => {
+export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, weekRate, seasonalRates=[],
+  depositPercent) => {
   // TODO compute price using seasonal rates
   const duration = differenceInCalendarDays(parseISO(endDate), parseISO(beginDate));
   const isWeekRate = weekRate && duration >= 7;
   const rate = isWeekRate ? weekRate / 7 : dailyRate;
+  const price = rate * duration;
   return {
-    price: rate * duration,
+    price: price,
+    deposit: Math.round(price * depositPercent / 100),
     daily_rate: rate,
     price_details: [
       {
@@ -18,4 +21,8 @@ export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, 
       }
     ]
   }
+}
+
+export const computeDeposit = (price, percent, rounding) => {
+
 }
