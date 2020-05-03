@@ -29,6 +29,7 @@ from location.serve_static_file import serve_static_file
 router = routers.DefaultRouter()
 router.register(r'booking', api.BookingViewSet, 'booking')
 router.register(r'booking_status', api.BookingStatusViewSet, 'booking_status')
+router.register(r'booking_channel', api.BookingChannelViewSet, 'booking_channel')
 router.register(r'lodging', api.LodgingViewSet, 'lodging')
 router.register(r'owner', api.OwnerViewSet, 'owner')
 

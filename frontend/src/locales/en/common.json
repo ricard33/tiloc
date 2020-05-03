@@ -24,5 +24,10 @@
   "Daily rate": "Daily rate",
   "Total": "Total",
   "Flat rate": "Flat rate",
-  "Balance: {{amount}} €": "Balance: {{amount}} €"
+  "Balance: {{amount}} €": "Balance: {{amount}} €",
+  "Adults": "Adults",
+  "Children": "Children",
+  "Babies": "Babies",
+  "Statistics": "Statistics",
+  "Further information": "Further information"
 }

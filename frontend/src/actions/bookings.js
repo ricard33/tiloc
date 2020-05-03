@@ -10,3 +10,9 @@ export function fetchBookingStatuses() {
     type: types.FETCH_BOOKING_STATUSES_REQUEST
   };
 }
+
+export function fetchBookingChannels() {
+  return {
+    type: types.FETCH_BOOKING_CHANNELS_REQUEST
+  };
+}

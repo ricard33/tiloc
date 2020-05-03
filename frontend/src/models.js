@@ -139,6 +139,17 @@ export const createModels = () => {
         return BookingChannel.upsert(data);
       }
     }
+
+    static reducer(action, BookingChannel, session) {
+      switch (action.type) {
+        case types.FETCH_BOOKING_CHANNELS_SUCCESS: {
+          action.data.results.forEach(item => BookingChannel.parse(item));
+          break;
+        }
+        default: {
+        }
+      }
+    }
   }
 
   const Booking = class BookingModel extends Model {

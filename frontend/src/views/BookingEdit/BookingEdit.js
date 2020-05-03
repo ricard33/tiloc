@@ -67,6 +67,7 @@ const BookingEdit = props => {
   const { id } = useParams();
   const { register, handleSubmit, errors } = useForm(); // initialise the hook
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
+  const bookingChannels = useSelector(store => selectors.bookingChannels(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
   const bookingInstance = useSelector(store => orm.session(store.entities).Booking.withId(id));
   const loading = useSelector(store => store.fetching.bookings.loading | store.fetching.booking_statuses.loading);
@@ -83,7 +84,6 @@ const BookingEdit = props => {
     console.debug("Load state with ", bookingInstance.ref);
     setBooking({
       ...bookingInstance.ref
-      // begin_date: parseISO()
     });
   }
   // console.log(booking);
@@ -99,6 +99,7 @@ const BookingEdit = props => {
   useEffect(() => {
     dispatch(actions.fetchBookings());
     dispatch(actions.fetchBookingStatuses());
+    dispatch(actions.fetchBookingChannels());
     dispatch(actions.fetchLodgings());
     dispatch(actions.fetchOwners());
   }, [dispatch]);
@@ -107,15 +108,16 @@ const BookingEdit = props => {
   const handleChange = data => {
     // console.debug(data);
     // console.debug(data.target);
-    let value;
+    let value = data.target.value;
     switch (data.target.name) {
       case "status":
-        setBooking({ ...booking, status: parseInt(data.target.value, 10) });
+        setBooking({ ...booking, status: Number(data.target.value) });
         break;
       case "lodging":
-        setBooking({ ...booking, lodging: parseInt(data.target.value, 10) });
+        setBooking({ ...booking, lodging: Number(data.target.value) });
         break;
       case "existing-guest":
+        console.log('existing-guest');
         const guest = allGuests.filter(guest => guest.name === data.target.value);
         if (guest) {
           setBooking({
@@ -125,6 +127,12 @@ const BookingEdit = props => {
             guest_address: guest[0].address
           });
         }
+        break;
+      case "guest_name":
+      case "guest_contact":
+      case "guest_address":
+      case "info":
+        setBooking({ ...booking, [data.target.name]: data.target.value });
         break;
       case "duration":
         onDurationChange(data.target.value);
@@ -168,6 +176,15 @@ const BookingEdit = props => {
 
           }
         }
+        break;
+      case "adults":
+      case "children":
+      case "babies":
+        setBooking({ ...booking, [data.target.name]: Number(data.target.value) });
+        break;
+      case "source":
+        value = Number(data.target.value) > 0 ? data.target.value : null;
+        setBooking({ ...booking, [data.target.name]: Number(data.target.value) });
         break;
       default:
         console.warn("Unhandled input:", data.target.name);
@@ -318,7 +335,7 @@ const BookingEdit = props => {
                 inputRef={register}
                 label={t("Guest name")}
                 margin="dense"
-                name="guestName"
+                name="guest_name"
                 onChange={handleChange}
                 required
                 value={booking.guest_name}
@@ -333,7 +350,7 @@ const BookingEdit = props => {
                 label={t("Phone / email")}
                 margin="dense"
                 multiline
-                name="guestContact"
+                name="guest_contact"
                 onChange={handleChange}
                 value={booking.guest_contact}
                 variant={variant}
@@ -347,7 +364,7 @@ const BookingEdit = props => {
                 label={t("Address")}
                 margin="dense"
                 multiline
-                name="guestAddress"
+                name="guest_address"
                 onChange={handleChange}
                 value={booking.guest_address}
                 variant={variant}
@@ -487,10 +504,6 @@ const BookingEdit = props => {
                 inputProps={{ type: "number" }}
                 inputRef={register({
                   min: 0, max: booking.price,
-                  validate: {
-                    positive: value => parseInt(value, 10) > 0,
-                    lessThanTen: value => parseInt(value, 10) < 10
-                  }
                 })}
                 label={getDepositLabel(t, bookingInstance && bookingInstance.lodging && bookingInstance.lodging.owner && bookingInstance.lodging.owner.deposit_label) || t("Deposit")}
                 margin="dense"
@@ -506,9 +519,108 @@ const BookingEdit = props => {
               </Typography>
             </Grid>
             {/* number of persons */}
+            <Grid item xs={4}>
+              <FormControl className={classes.formControl} variant={variant}>
+                <InputLabel htmlFor="booking-status">{t("Adults")}</InputLabel>
+                <Select
+                  inputProps={{
+                    id: "adults",
+                    name: "adults"
+                  }}
+                  label={t("Adults")}
+                  margin="dense"
+                  native
+                  onChange={handleChange}
+                  ref={register}
+                  value={booking.adults}
+                >
+                  {[...Array(10).keys()].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl className={classes.formControl} variant={variant}>
+                <InputLabel htmlFor="booking-status">{t("Children")}</InputLabel>
+                <Select
+                  inputProps={{
+                    id: "children",
+                    name: "children"
+                  }}
+                  label={t("Children")}
+                  margin="dense"
+                  native
+                  onChange={handleChange}
+                  ref={register}
+                  value={booking.children}
+                >
+                  {[...Array(10).keys()].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl className={classes.formControl} variant={variant}>
+                <InputLabel htmlFor="booking-status">{t("Babies")}</InputLabel>
+                <Select
+                  inputProps={{
+                    id: "babies",
+                    name: "babies"
+                  }}
+                  label={t("Babies")}
+                  margin="dense"
+                  native
+                  onChange={handleChange}
+                  ref={register}
+                  value={booking.babies}
+                >
+                  {[...Array(10).keys()].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
             {/* options */}
             {/* statistics */}
+            <Grid item xs={12}>
+              <FormControl className={classes.formControl} variant={variant}>
+                <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
+                <Select
+                  inputProps={{
+                    id: "booking-source",
+                    name: "source"
+                  }}
+                  label={t("Statistics")}
+                  margin="dense"
+                  native
+                  onChange={handleChange}
+                  ref={register}
+                  value={booking.source || 0}
+                >
+                  <option key={0} value="">-</option>
+                  {bookingChannels.map(channel => (
+                    <option key={channel.id} value={channel.id}>{channel.name}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
             {/* notes */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                inputRef={register}
+                label={t("Further information")}
+                margin="dense"
+                multiline
+                rows={4}
+                name="info"
+                onChange={handleChange}
+                value={booking.info}
+                variant={variant}
+              />
+            </Grid>
             <Grid item xs={12}>
               <input type="submit"/>
             </Grid>

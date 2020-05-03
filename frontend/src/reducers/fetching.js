@@ -51,6 +51,7 @@ function fetchingReducer(actionBaseName) {
 export default combineReducers({
   'bookings': fetchingReducer(types.FETCH_BOOKINGS),
   'booking_statuses': fetchingReducer(types.FETCH_BOOKING_STATUSES),
+  'booking_channels': fetchingReducer(types.FETCH_BOOKING_CHANNELS),
   'lodgings': fetchingReducer(types.FETCH_LODGINGS),
   'owners': fetchingReducer(types.FETCH_OWNERS),
 })

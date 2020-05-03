@@ -25,5 +25,10 @@
   "Total": "Total",
   "Flat rate": "Forfait",
   "Balance: {{amount}} €": "Solde: {{amount}} €",
+  "Adults": "Adultes",
+  "Children": "Enfants",
+  "Babies": "Bébés",
+  "Statistics": "Statistiques",
+  "Further information": "Informations complémentaires",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
 }

@@ -53,11 +53,20 @@ class BookingStatusSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class BookingChannelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.BookingChannel
+        fields = '__all__'
+
+
 class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer()
     lodging = LodgingSerializer()
+    source = BookingChannelSerializer()
 
     class Meta:
         model = models.Booking
         fields = '__all__'
+
+
 
