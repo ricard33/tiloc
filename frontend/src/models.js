@@ -43,7 +43,7 @@ export const createModels = () => {
         }
       }
     }
-  }
+  };
 
   const Lodging = class LodgingModel extends Model {
     static modelName = "Lodging";
@@ -84,15 +84,15 @@ export const createModels = () => {
         }
       }
     }
-  }
+  };
 
   const Category = class CategoryModel extends Model {
     static modelName = "Category";
-  }
+  };
 
   const Service = class ServiceModel extends Model {
     static modelName = "Service";
-  }
+  };
 
   const BookingStatus = class BookingStatusModel extends Model {
     static modelName = "BookingStatus";
@@ -121,7 +121,7 @@ export const createModels = () => {
         }
       }
     }
-  }
+  };
 
   const BookingChannel = class BookingChannelModel extends Model {
     static modelName = "BookingChannel";
@@ -150,7 +150,7 @@ export const createModels = () => {
         }
       }
     }
-  }
+  };
 
   const Booking = class BookingModel extends Model {
     static modelName = "Booking";
@@ -215,11 +215,16 @@ export const createModels = () => {
           action.data.results.forEach(item => Booking.parse(item));
           break;
         }
+        case types.SUCCESS(types.UPDATE_BOOKING): {
+          let booking = Booking.withId(action.data.id);
+          booking.update(action.data);
+          break;
+        }
         default: {
         }
       }
     }
-  }
+  };
 
   const BookedService = class BookedServiceModel extends Model {
     static modelName = "BookedService";
@@ -237,7 +242,7 @@ export const createModels = () => {
       const { BookedService } = this.session;
       return BookedService.upsert(data);
     }
-  }
+  };
 
   return {
     Owner, Lodging, Category, Service,

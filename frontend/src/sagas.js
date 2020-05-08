@@ -64,13 +64,34 @@ function* _fetchData(path, action) {
     const offset = 0, limit = null; // not yet used
     const response = yield call(axios.get, path);
     yield put({
-      type: types[actionBaseName + "_SUCCESS"],
+      type: types.SUCCESS(actionBaseName),
       data: response.data,
       query: {offset, limit}
     });
   } catch (error) {
     yield put({
-      type: types[actionBaseName + "_FAILURE"],
+      type: types.FAILURE(actionBaseName),
+      error
+    });
+  }
+}
+
+function* _updateData(path, action) {
+  if(!action.type.endsWith("_REQUEST"))
+    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
+  const actionBaseName = action.type.slice(0, -8);
+  try {
+    const response = yield call(axios.put, path + action.id + "/", action.data);
+    yield put({
+      type: types.SUCCESS(actionBaseName),
+      data: response.data,
+    });
+    if(action.callback) {
+      yield call(action.callback);
+    }
+  } catch (error) {
+    yield put({
+      type: types.FAILURE(actionBaseName),
       error
     });
   }
@@ -83,6 +104,7 @@ export default function* rootSaga() {
     yield takeEvery(actionTypes.USER_LOADING, loadUser),
     yield takeEvery(actionTypes.LOGIN_REQUEST, login),
     yield takeEvery(actionTypes.FETCH_BOOKINGS_REQUEST, _fetchData, "/api/booking/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_BOOKING), _updateData, "/api/booking/"),
     yield takeEvery(actionTypes.FETCH_BOOKING_STATUSES_REQUEST, _fetchData, "/api/booking_status/"),
     yield takeEvery(actionTypes.FETCH_BOOKING_CHANNELS_REQUEST, _fetchData, "/api/booking_channel/"),
     yield takeEvery(actionTypes.FETCH_LODGINGS_REQUEST, _fetchData, "/api/lodging/"),

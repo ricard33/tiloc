@@ -8,7 +8,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import * as actions from "../../actions";
 import * as selectors from "../../selectors";
 import orm from "../../orm";
@@ -65,6 +65,7 @@ const BookingEdit = props => {
   const { className } = props;
   const { t } = useTranslation();
   const { id } = useParams();
+  const history = useHistory();
   const { register, handleSubmit, errors } = useForm(); // initialise the hook
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const bookingChannels = useSelector(store => selectors.bookingChannels(store));
@@ -131,7 +132,7 @@ const BookingEdit = props => {
       case "guest_name":
       case "guest_contact":
       case "guest_address":
-      case "info":
+      case "special_conditions":
         setBooking({ ...booking, [data.target.name]: data.target.value });
         break;
       case "duration":
@@ -228,7 +229,13 @@ const BookingEdit = props => {
   const handleEndDateChange = newDate => onDateChange(newDate, "end_date");
 
   const onSubmit = data => {
-    console.log(data);
+    // console.log("Submit: ", data);
+    dispatch(actions.updateBooking({
+      ...booking,
+      ...data,
+    }, () => {
+      history.goBack();
+    }));
   };
 
   const marks = [
@@ -615,9 +622,9 @@ const BookingEdit = props => {
                 margin="dense"
                 multiline
                 rows={4}
-                name="info"
+                name="special_conditions"
                 onChange={handleChange}
-                value={booking.info}
+                value={booking.special_conditions}
                 variant={variant}
               />
             </Grid>

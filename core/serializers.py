@@ -60,13 +60,15 @@ class BookingChannelSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    status = BookingStatusSerializer()
-    lodging = LodgingSerializer()
-    source = BookingChannelSerializer()
+    status = BookingStatusSerializer(read_only=True)
+    status_id = serializers.PrimaryKeyRelatedField(source='status', queryset=models.BookingStatus.objects.all())
+    lodging = LodgingSerializer(read_only=True)
+    lodging_id = serializers.PrimaryKeyRelatedField(source='lodging', queryset=models.Lodging.objects.all())
+    source = BookingChannelSerializer(read_only=True)
+    source_id = serializers.PrimaryKeyRelatedField(source='source', queryset=models.BookingChannel.objects.all(),
+                                                   required=False, allow_null=True)
 
     class Meta:
         model = models.Booking
         fields = '__all__'
-
-
 
