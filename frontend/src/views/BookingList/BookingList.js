@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import BookingsTable from "./components/BookingsTable";
 import BookingsToolbar from "./components/BookingsToolbar/BookingsToolbar";
 import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import {bookings} from "../../actions";
+import { bookings } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import orm from "orm";
 
@@ -27,15 +27,25 @@ const BookingList = () => {
   // const allBookings = useSelector(store => selectors.bookings(store));
   const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
   const loading = useSelector(store => store.fetching.bookings.loading);
+  const [ selected, setSelected ] = useState([]);
+  const numSelected = selected.length;
+
   useEffect(() => {
     dispatch(bookings.fetchBookings());
   }, [dispatch]);
 
+  const onSelectionChange = (newSelection) => {
+    setSelected(newSelection);
+  };
+
   return (
     <div className={classes.root}>
-      <BookingsToolbar/>
+      <BookingsToolbar numSelected={numSelected}/>
       <div className={classes.content}>
-        <BookingsTable bookings={allBookings.toModelArray() ||[]}/>
+        <BookingsTable
+          bookings={allBookings.toModelArray() || []}
+          onSelectionChange={onSelectionChange}
+        />
         <Backdrop className={classes.backdrop} open={loading} timeout={0}>
           <CircularProgress color="inherit"/>
         </Backdrop>

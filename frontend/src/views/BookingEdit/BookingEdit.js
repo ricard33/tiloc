@@ -517,7 +517,7 @@ const BookingEdit = props => {
                 multiline
                 name="deposit"
                 onChange={handleChange}
-                value={booking.deposit}
+                value={booking.deposit || ""}
                 variant={variant}
               />
               <div className={classes.spacer}/>
@@ -624,7 +624,7 @@ const BookingEdit = props => {
                 rows={4}
                 name="special_conditions"
                 onChange={handleChange}
-                value={booking.special_conditions}
+                value={booking.special_conditions || ""}
                 variant={variant}
               />
             </Grid>

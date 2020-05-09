@@ -1,6 +1,7 @@
 {
   "Deposit": "Arrhes",
   "Down payment": "Accompte",
+  "Sort": "Trier",
   "default rate": "tarif par défaut",
   "week": "semaine",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
@@ -30,5 +31,15 @@
   "Babies": "Bébés",
   "Statistics": "Statistiques",
   "Further information": "Informations complémentaires",
+  "From": "Depuis le",
+  "To": "Jusqu'au",
+  "Status": "Statut",
+  "Price": "Prix",
+  "Actions": "Actions",
+  "{{count}} selected": "{{count}} sélectionné",
+  "{{count}} selected_plural": "{{count}} sélectionnés",
+  "Bookings": "Réservations",
+  "Search booking": "Rechercher une réservation",
+  "Add booking": "Ajouter une réservation",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
 }

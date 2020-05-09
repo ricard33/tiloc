@@ -1,6 +1,7 @@
 {
   "Deposit": "Deposit",
   "Down payment": "Down payment",
+  "Sort": "Sort",
   "default rate": "default rate",
   "week": "week",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
@@ -29,5 +30,15 @@
   "Children": "Children",
   "Babies": "Babies",
   "Statistics": "Statistics",
-  "Further information": "Further information"
+  "Further information": "Further information",
+  "From": "From",
+  "To": "To",
+  "Status": "Status",
+  "Price": "Price",
+  "Actions": "Actions",
+  "{{count}} selected": "{{count}} selected",
+  "{{count}} selected_plural": "{{count}} selected",
+  "Bookings": "Bookings",
+  "Search booking": "Search booking",
+  "Add booking": "Add booking"
 }

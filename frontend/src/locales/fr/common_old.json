@@ -3,8 +3,9 @@
   "Duration": "Durée",
   "Details": "Détails",
   "nights": "nuits",
-  "Price": "Price",
   "{count} night": "{count} nuit",
   "{count} night_plural": "{count} nuits",
-  "Daily price": "Tarif journalier"
+  "Daily price": "Tarif journalier",
+  "{count} selected": "{count} sélectionné",
+  "{count} selected_plural": "{count} sélectionnés"
 }
