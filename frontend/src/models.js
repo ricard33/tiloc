@@ -216,8 +216,9 @@ export const createModels = () => {
           break;
         }
         case types.SUCCESS(types.UPDATE_BOOKING): {
-          let booking = Booking.withId(action.data.id);
-          booking.update(action.data);
+          // let booking = Booking.withId(action.data.id);
+          // booking.update(action.data);
+          Booking.parse(action.data);
           break;
         }
         default: {

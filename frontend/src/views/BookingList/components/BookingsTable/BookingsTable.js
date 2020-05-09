@@ -10,7 +10,6 @@ import {
   CardContent,
   Checkbox,
   Table,
-  Link,
   TableBody,
   TableCell,
   TableHead,
@@ -19,6 +18,7 @@ import {
   TablePagination
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -155,7 +155,7 @@ const BookingsTable = props => {
                     <TableCell>{booking.status.name}</TableCell>
                     <TableCell>{booking.price}</TableCell>
                     <TableCell>
-                      <Link href={"/bookings/" + booking.id}>
+                      <Link to={"/bookings/" + booking.id}>
                         <EditIcon/>
                       </Link>
                     </TableCell>
