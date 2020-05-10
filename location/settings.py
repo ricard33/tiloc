@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.forms',
     'rest_framework',
+    'import_export',
     'knox',
     # 'legacy',
     'core',
@@ -183,6 +184,8 @@ WEBPACK_LOADER = {
         'STATS_FILE':         os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
     }
 }
+
+IMPORT_EXPORT_USE_TRANSACTIONS=True
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

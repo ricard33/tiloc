@@ -70,8 +70,8 @@ EnhancedTableHead.propTypes = {
     numeric: PropTypes.bool,
     disablePadding: PropTypes.bool,
     label: PropTypes.string
-  })),
-  numSelected: PropTypes.number,
+  })).isRequired,
+  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func,
   onSelectAllClick: PropTypes.func,
   order: PropTypes.oneOf(["asc", "desc"]),

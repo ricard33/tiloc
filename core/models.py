@@ -15,7 +15,7 @@ class Owner(models.Model):
         QUITTANCE = 'quittance', _('Quittance')
 
     active = models.BooleanField(_("active"), default=True)
-    name = models.CharField(_("name"), max_length=200)
+    name = models.CharField(_("name"), max_length=200, unique=True)
     email = models.EmailField(_("email"))
     phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
     contact = models.TextField(_("contact"), blank=True, null=True, help_text=_("Phone number and email as displayed in contracts, invoices, etc..."))
@@ -41,7 +41,7 @@ class Owner(models.Model):
 
 class Lodging(models.Model):
     active = models.BooleanField(_("active"), default=True)
-    name = models.CharField(_("name"), max_length=200)
+    name = models.CharField(_("name"), max_length=200, unique=True)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     rank = models.IntegerField(_("rank"), )
     address = models.TextField(_("address"), )

@@ -1,10 +1,13 @@
 {
   "Deposit": "Arrhes",
   "Down payment": "Accompte",
+  "Importing bookings": "Importation des réservations",
   "Sort": "Trier",
   "default rate": "tarif par défaut",
   "week": "semaine",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
+  "Upload": "Charger",
+  "Upload Files": "Fichiers à charger",
   "You can change booking details": "Vous pouvez modifier les détails de la réservation",
   "Modify a booking": "Modifier une réservation",
   "Booking status": "Statut de la réservation",

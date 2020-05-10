@@ -1,10 +1,13 @@
 {
   "Deposit": "Deposit",
   "Down payment": "Down payment",
+  "Importing bookings": "Importing bookings",
   "Sort": "Sort",
   "default rate": "default rate",
   "week": "week",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
+  "Upload": "Upload",
+  "Upload Files": "Upload Files",
   "You can change booking details": "You can change booking details",
   "Modify a booking": "Modify a booking",
   "Booking status": "Booking status",

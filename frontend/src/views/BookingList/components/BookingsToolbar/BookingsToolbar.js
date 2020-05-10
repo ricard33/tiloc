@@ -1,10 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import clsx from "clsx";
 import { makeStyles } from "@material-ui/styles";
 import { Button, Toolbar } from "@material-ui/core";
-import { SearchInput } from "components";
+import { SearchInput, BookingsImportDialog } from "components";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import { useTranslation } from "react-i18next";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -57,7 +56,16 @@ const BookingsToolbar = props => {
   const { className, numSelected, ...rest } = props;
 
   const classes = useStyles();
+  const [openImport, setOpenImport] = React.useState(false);
   const { t } = useTranslation();
+
+  const handleClickOpen = () => {
+    setOpenImport(true);
+  };
+
+  const handleCloseImport = (value) => {
+    setOpenImport(false);
+  };
 
   return (
     <Toolbar
@@ -85,8 +93,13 @@ const BookingsToolbar = props => {
       </div>
       <span className={classes.spacer}/>
       <div className={classes.actions}>
-        <Button className={classes.importButton}>Import</Button>
-        <Button className={classes.exportButton}>Export</Button>
+        <Button
+          className={classes.importButton}
+          onClick={handleClickOpen}
+          disabled
+        >
+          Import</Button>
+        <Button className={classes.exportButton} disabled>Export</Button>
         <Button
           color="primary"
           variant="contained"
@@ -107,6 +120,7 @@ const BookingsToolbar = props => {
           </Tooltip>
         )}
       </div>
+      <BookingsImportDialog url="something" open={openImport} onClose={handleCloseImport} />
     </Toolbar>
   );
 };
