@@ -5,7 +5,6 @@ import { startOfMonth } from 'date-fns'
 import { BookingScheduler } from "./components";
 import { bookings as bookingsActions } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
-import orm from "../../orm";
 import * as selectors from "../../selectors";
 
 const useStyles = makeStyles(theme => ({

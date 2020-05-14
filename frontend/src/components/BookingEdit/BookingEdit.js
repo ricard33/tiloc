@@ -19,7 +19,8 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import {
   Contacts as ContactsIcon,
   NightsStay as NightsStayIcon,
-  Forward as ForwardIcon
+  Forward as ForwardIcon,
+  Save as SaveIcon
 } from "@material-ui/icons";
 import { format, parseISO, addDays, differenceInCalendarDays } from "date-fns";
 import DateFnsUtils from "@date-io/date-fns";
@@ -33,7 +34,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import { computeBookingPrice } from "../../common/priceUtils";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { getDepositLabel } from "../../common/ownerPrefsUtils";
-import { guests } from "../../selectors";
+import Button from "@material-ui/core/Button";
 
 
 const useStyles = makeStyles(theme => ({
@@ -58,6 +59,9 @@ const useStyles = makeStyles(theme => ({
   },
   spacer: {
     flexBasis: "2em"
+  },
+  button:{
+    margin: theme.spacing(1),
   }
 }));
 
@@ -228,6 +232,10 @@ const BookingEdit = props => {
   const handleBeginDateChange = newDate => onDateChange(newDate, "begin_date");
   const handleEndDateChange = newDate => onDateChange(newDate, "end_date");
 
+  const onCancel = () => {
+    onClose();
+  }
+
   const onSubmit = data => {
     // console.log("Submit: ", data);
     const submitteBooking = {
@@ -256,12 +264,6 @@ const BookingEdit = props => {
       className={clsx(classes.root, className)}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/*<CardHeader*/}
-        {/*  subheader={t("You can change booking details")}*/}
-        {/*  title={t("Modify a booking")}*/}
-        {/*/>*/}
-        {/*<Divider/>*/}
-        {/*<CardContent>*/}
         <Grid
           container
           spacing={3}
@@ -630,11 +632,17 @@ const BookingEdit = props => {
               variant={variant}
             />
           </Grid>
-          <Grid item xs={12}>
-            <input type="submit"/>
+          <Grid item xs={12} className={classes.flexBoxStretched}>
+            <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+            <div className={classes.spacer}/>
+            <Button
+              type="submit"
+              color="primary"
+              className={classes.button}
+              startIcon={<SaveIcon/>}
+            >{t("Save")}</Button>
           </Grid>
         </Grid>
-        {/*</CardContent>*/}
       </form>
     </Card>
   );

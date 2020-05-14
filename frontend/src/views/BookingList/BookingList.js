@@ -33,7 +33,7 @@ const BookingList = () => {
   // const allBookings = useSelector(store => selectors.bookings(store));
   const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
   const loading = useSelector(store => store.fetching.bookings.loading);
-  const [ selected, setSelected ] = useState([]);
+  const [selected, setSelected] = useState([]);
   const [editBooking, setEditBooking] = useState(null);
   const numSelected = selected.length;
 
@@ -51,7 +51,7 @@ const BookingList = () => {
 
   const handleCloseEdit = () => {
     setEditBooking(null);
-  }
+  };
 
   return (
     <div className={classes.root}>
@@ -66,13 +66,19 @@ const BookingList = () => {
           <CircularProgress color="inherit"/>
         </Backdrop>
       </div>
-      <Dialog onClose={handleCloseEdit} aria-labelledby="simple-dialog-title" open={!!editBooking}>
+      <Dialog
+        onClose={handleCloseEdit}
+        aria-labelledby="simple-dialog-title"
+        open={!!editBooking}
+        maxWidth="lg"
+        fullWidth
+      >
         <DialogTitle id="simple-dialog-title">{t("Modify a booking")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t("You can change booking details")}
           </DialogContentText>
-          <BookingEdit bookingInstance={editBooking} onClose={handleCloseEdit} />
+          <BookingEdit bookingInstance={editBooking} onClose={handleCloseEdit}/>
         </DialogContent>
       </Dialog>
     </div>

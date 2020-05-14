@@ -154,6 +154,7 @@ class UploadClass extends Component {
 }
 
 UploadClass.propTypes = {
+  t: PropTypes.func,
   uploadLabel: PropTypes.string,
   url: PropTypes.string.isRequired,
 }
