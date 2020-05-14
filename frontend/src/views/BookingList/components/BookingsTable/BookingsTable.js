@@ -12,15 +12,14 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
   Typography,
   TablePagination
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
-import { useHistory, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import EnhancedTableHead from "components/EnhancedTableHead";
+import { EnhancedTableHead } from "components";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -43,11 +42,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingsTable = props => {
-  const { className, bookings, onSelectionChange, ...rest } = props;
+  const { className, bookings, onEdit, onSelectionChange, ...rest } = props;
 
   const { t } = useTranslation();
   const classes = useStyles();
-  const history = useHistory();
   const [selectedBookings, setSelectedUsers] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
@@ -97,8 +95,9 @@ const BookingsTable = props => {
     setRowsPerPage(event.target.value);
   };
 
-  function handleRowClick(event, id) {
-    history.push("/bookings/" + id);
+  function handleRowClick(event, booking) {
+    // history.push("/bookings/" + id);
+    onEdit && onEdit(booking);
   }
 
   const isSelected = id => selectedBookings.indexOf(id) !== -1;
@@ -177,7 +176,7 @@ const BookingsTable = props => {
                       role="checkbox"
                       aria-checked={isSelected(booking.id)}
                       tabIndex={-1}
-                      onClick={event => handleRowClick(event, booking.id)}
+                      onClick={event => handleRowClick(event, booking)}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
@@ -204,9 +203,9 @@ const BookingsTable = props => {
                       <TableCell>{booking.status.name}</TableCell>
                       <TableCell>{booking.price}</TableCell>
                       <TableCell>
-                        <Link to={"/bookings/" + booking.id}>
+                        {onEdit && (<Button onClick={event => handleRowClick(event, booking)}>
                           <EditIcon/>
-                        </Link>
+                        </Button>)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -233,6 +232,7 @@ const BookingsTable = props => {
 BookingsTable.propTypes = {
   bookings: PropTypes.array.isRequired,
   className: PropTypes.string,
+  onEdit: PropTypes.func,
   onSelectionChange: PropTypes.func
 };
 

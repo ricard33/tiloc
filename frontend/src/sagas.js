@@ -88,7 +88,7 @@ function* _updateData(path, action) {
       data: response.data,
     });
     if(action.callback) {
-      yield call(action.callback);
+      yield call(action.callback, response.data);
     }
   } catch (error) {
     yield put({

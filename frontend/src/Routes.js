@@ -5,7 +5,7 @@ import { RouteWithLayout } from "./components";
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
 import {
-  BookingEdit,
+  // BookingEdit,
   BookingList as BookingView,
   Planning as PlanningView,
   Dashboard as DashboardView,
@@ -44,12 +44,12 @@ const Routes = () => {
         layout={MainLayout}
         path="/bookings"
       />
-      <RouteWithLayout
-        component={BookingEdit}
-        exact
-        layout={MainLayout}
-        path="/bookings/:id"
-      />
+      {/*<RouteWithLayout*/}
+      {/*  component={BookingEdit}*/}
+      {/*  exact*/}
+      {/*  layout={MainLayout}*/}
+      {/*  path="/bookings/:id"*/}
+      {/*/>*/}
       <RouteWithLayout
         component={NotFoundView}
         exact
