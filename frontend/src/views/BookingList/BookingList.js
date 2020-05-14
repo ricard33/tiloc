@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import BookingsTable from "./components/BookingsTable";
-import BookingsToolbar from "./components/BookingsToolbar/BookingsToolbar";
+import { BookingsTable, BookingsToolbar } from "./components";
 import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";

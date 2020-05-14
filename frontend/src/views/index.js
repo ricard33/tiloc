@@ -1,5 +1,6 @@
 export { default as NotFound } from './NotFound';
 export { default as Dashboard } from './Dashboard';
+export { default as Planning } from './Planning';
 export { default as BookingList } from './BookingList';
 export { default as BookingEdit } from './BookingEdit';
 // export { default as Icons } from './Icons';

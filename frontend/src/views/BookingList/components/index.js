@@ -1,2 +1,2 @@
-export { default as UsersTable } from './BookingsTable';
-export { default as UsersToolbar } from './BookingsToolbar';
+export { default as BookingsTable } from './BookingsTable';
+export { default as BookingsToolbar } from './BookingsToolbar';
