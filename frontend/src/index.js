@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 import * as serviceWorker from "./serviceWorker";
 import App from "./App";
-import { alert } from "./actions";
+import { alert, auth as authActions } from "./actions";
 import { Provider } from "react-redux";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
@@ -12,8 +12,10 @@ import rootSaga from "./sagas";
 import orm from "./orm";
 import { createFullStore } from "./store";
 import "./index.css";
+import { createBrowserHistory } from "history";
 
 const { sagaMiddleware, store } = createFullStore(orm);
+const browserHistory = createBrowserHistory();
 
 sagaMiddleware.run(rootSaga);
 
@@ -49,6 +51,13 @@ axios.interceptors.response.use(
         store.dispatch(alert.loadErrors(error.response.data.detail, error));
       else
         store.dispatch(alert.loadErrors("Server error", error));
+      if (error.response.status === 401){
+        const location = {...browserHistory.location};
+        store.dispatch(authActions.tokenExpired())
+        console.warn("Push to /login from", location);
+        browserHistory.push("/login", {from: location});
+      }
+
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -68,7 +77,7 @@ axios.interceptors.response.use(
 ReactDOM.render(
   <Provider store={store}>
     <I18nextProvider i18n={i18n}>
-      <App/>
+      <App history={browserHistory}/>
     </I18nextProvider>
   </Provider>,
   document.getElementById("root"));

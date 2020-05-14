@@ -36,13 +36,14 @@ function loginFromApi(username, password) {
 }
 
 function* login(action) {
-  const { username, password } = action;
+  const { username, password, callback } = action;
 
   const res = yield call(loginFromApi, username, password);
 
   try {
     if (res.status === 200) {
       yield put({ type: actionTypes.LOGIN_SUCCESSFUL, data: res.data });
+      yield call(callback);
     } else if (res.status === 403 || res.status === 401) {
       yield put({ type: actionTypes.AUTHENTICATION_ERROR, data: res.data });
       throw res.data;

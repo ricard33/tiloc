@@ -8,6 +8,7 @@ export const LOGIN_SUCCESSFUL = "LOGIN_SUCCESSFUL";
 export const AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR";
 export const LOGIN_FAILED = "LOGIN_FAILED";
 export const LOGOUT_SUCCESSFUL = "LOGOUT_SUCCESSFUL";
+export const AUTH_TOKEN_EXPIRED = "AUTH_TOKEN_EXPIRED";
 
 // generic actions
 export const REQUEST = name => name + "_REQUEST";

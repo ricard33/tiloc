@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link as RouterLink, Redirect, withRouter } from "react-router-dom";
+import { Link as RouterLink, Redirect, withRouter, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from 'prop-types';
 import validate from 'validate.js';
@@ -131,7 +131,8 @@ const SignIn = props => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(store => store.auth.isAuthenticated);
   const classes = useStyles();
-
+  let location = useLocation();
+  let { from } = location.state || { from: { pathname: "/" } };
   const [formState, setFormState] = useState({
     isValid: false,
     values: {},
@@ -174,7 +175,11 @@ const SignIn = props => {
 
   const handleSignIn = event => {
     event.preventDefault();
-    dispatch(auth.login(formState.values.email, formState.values.password));
+    dispatch(auth.login(formState.values.email, formState.values.password,
+      () => {
+        console.debug("Redirect to", from);
+        history.replace(from);
+      }));
     // history.push('/');
   };
 

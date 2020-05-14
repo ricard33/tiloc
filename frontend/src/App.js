@@ -1,25 +1,24 @@
 import React, { useEffect } from "react";
 import { Router } from "react-router-dom";
-import { createBrowserHistory } from "history";
 import { ThemeProvider } from "@material-ui/styles";
 import validate from "validate.js";
-import theme from "./theme";
 import "react-perfect-scrollbar/dist/css/styles.css";
+import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
+import { auth } from "./actions";
 import "./assets/scss/index.scss";
+import AlertHandler from "./components/alertHandler";
 import validators from "./common/validators";
 import Routes from "./Routes";
-import AlertHandler from "./components/alertHandler";
-import { useDispatch, useSelector } from "react-redux";
-import { auth } from "./actions";
+import theme from "./theme";
 
-const browserHistory = createBrowserHistory();
 
 validate.validators = {
   ...validate.validators,
   ...validators
 };
 
-function App() {
+function App(props) {
   const dispatch = useDispatch();
   const token = useSelector(store => store.auth.token);
 
@@ -29,7 +28,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router history={browserHistory}>
+      <Router history={props.history}>
         <Routes/>
       </Router>
       <AlertHandler />
@@ -37,4 +36,7 @@ function App() {
   );
 }
 
+App.propTypes = {
+  history: PropTypes.object.isRequired
+};
 export default App;
