@@ -11,16 +11,16 @@
   font-size: 16px;
 }
 
-.Highlight {
+.Dropzone .Highlight {
   background-color: rgb(188, 185, 236);
 }
 
-.Icon {
+.Dropzone .Icon {
   opacity: 0.3;
   height: 64px;
   width: 64px;
 }
 
-.FileInput {
+.Dropzone .FileInput {
   display: none;
 }

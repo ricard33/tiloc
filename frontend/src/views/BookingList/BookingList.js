@@ -34,7 +34,7 @@ const BookingList = () => {
   const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
   const loading = useSelector(store => store.fetching.bookings.loading);
   const [selected, setSelected] = useState([]);
-  const [editBooking, setEditBooking] = useState(null);
+  const [editBookingId, setEditBookingId] = useState(null);
   const numSelected = selected.length;
 
   useEffect(() => {
@@ -46,11 +46,11 @@ const BookingList = () => {
   };
 
   const onEditBooking = (booking) => {
-    setEditBooking(booking);
+    setEditBookingId(booking.id);
   };
 
   const handleCloseEdit = () => {
-    setEditBooking(null);
+    setEditBookingId(null);
   };
 
   return (
@@ -69,7 +69,7 @@ const BookingList = () => {
       <Dialog
         onClose={handleCloseEdit}
         aria-labelledby="simple-dialog-title"
-        open={!!editBooking}
+        open={!!editBookingId}
         maxWidth="lg"
         fullWidth
       >
@@ -78,7 +78,7 @@ const BookingList = () => {
           <DialogContentText>
             {t("You can change booking details")}
           </DialogContentText>
-          <BookingEdit bookingInstance={editBooking} onClose={handleCloseEdit}/>
+          <BookingEdit bookingId={editBookingId} onClose={handleCloseEdit}/>
         </DialogContent>
       </Dialog>
     </div>

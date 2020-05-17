@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { useParams, useHistory } from "react-router-dom";
 import * as actions from "../../actions";
 import * as selectors from "../../selectors";
+import orm from "../../orm";
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
@@ -31,7 +32,7 @@ import {
 import { shiftPickerDateToUTCDate, shiftUTCDateToPickerDate } from "../../common/tzUtils";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
-import { computeBookingPrice } from "../../common/priceUtils";
+import { computeBookingPrice, DecimalPrecision } from "../../common/priceUtils";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { getDepositLabel } from "../../common/ownerPrefsUtils";
 import Button from "@material-ui/core/Button";
@@ -66,7 +67,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingEdit = props => {
-  const { className, bookingInstance, onClose } = props;
+  const { className, bookingId, onClose } = props;
   const { t } = useTranslation();
   // const { id } = useParams();
   // const history = useHistory();
@@ -74,7 +75,7 @@ const BookingEdit = props => {
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const bookingChannels = useSelector(store => selectors.bookingChannels(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
-  // const bookingInstance = useSelector(store => orm.session(store.entities).Booking.withId(id));
+  const bookingInstance = useSelector(store => orm.session(store.entities).Booking.withId(bookingId));
   const loading = useSelector(store => store.fetching.bookings.loading | store.fetching.booking_statuses.loading);
   const allGuests = useSelector(store => selectors.guests(store));
   const dispatch = useDispatch();
@@ -84,6 +85,7 @@ const BookingEdit = props => {
   const [booking, setBooking] = useState({});
   const depositPercent = 30; // TODO load this from owner or lodging prefs
 
+  console.debug("bookingInstance", bookingInstance);
   if (Object.keys(booking).length === 0 && booking.constructor === Object
     && bookingInstance && bookingInstance.ref) { // HACK to handle delayed load
     console.debug("Load state with ", bookingInstance.ref);
@@ -153,7 +155,7 @@ const BookingEdit = props => {
         value = Number(data.target.value);
         setBooking({
           ...booking,
-          daily_rate: value / booking.duration,
+          daily_rate: DecimalPrecision.round(value / booking.duration),
           price: value,
           price_details: undefined,
           is_flat_rate: true
@@ -437,6 +439,8 @@ const BookingEdit = props => {
                     margin="dense"
                     onChange={date => handleBeginDateChange(shiftPickerDateToUTCDate(date))}
                     value={shiftUTCDateToPickerDate(booking.begin_date)}
+                    autoOk
+                    variant="inline"
                   />
                 </Grid>
                 <Grid item sm={2} xs={12}>
@@ -649,7 +653,7 @@ const BookingEdit = props => {
 };
 
 BookingEdit.propTypes = {
-  bookingInstance: PropTypes.object,
+  bookingId: PropTypes.number,
   className: PropTypes.string,
   onClose: PropTypes.func.isRequired
 };

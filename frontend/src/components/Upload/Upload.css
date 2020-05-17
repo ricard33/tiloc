@@ -7,7 +7,7 @@
   overflow: hidden;
 }
 
-.Content {
+.Upload .Content {
   display: flex;
   flex-direction: row;
   padding-top: 16px;
@@ -15,7 +15,7 @@
   width: 100%;
 }
 
-.Files {
+.Upload .Files {
   margin-left: 32px;
   align-items: flex-start;
   justify-items: flex-start;
@@ -23,7 +23,7 @@
   overflow-y: auto;
 }
 
-.Actions {
+.Upload .Actions {
   display: flex;
   flex: 1;
   width: 100%;
@@ -32,18 +32,18 @@
   margin-top: 32px;
 }
 
-.Title {
+.Upload .Title {
   margin-bottom: 32px;
   color: #555;
 }
 
-.Filename {
+.Upload .Filename {
   margin-bottom: 8px;
   font-size: 16px;
   color: #555;
 }
 
-.Row {
+.Upload .Row {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -54,19 +54,19 @@
   box-sizing: border-box;
 }
 
-.CheckIcon {
+.Upload .CheckIcon {
   opacity: 0.5;
   margin-left: 32px;
 }
 
-.ProgressWrapper {
+.Upload .ProgressWrapper {
   display: flex;
   flex: 1;
   flex-direction: row;
   align-items: center;
 }
 
-button {
+.Upload button {
   font-family: "Roboto medium", sans-serif;
   font-size: 14px;
   display: inline-block;
@@ -91,7 +91,7 @@ button {
   outline: 0;
 }
 
-button:disabled {
+.Upload button:disabled {
   background: rgb(189, 189, 189);
   cursor: default;
 }

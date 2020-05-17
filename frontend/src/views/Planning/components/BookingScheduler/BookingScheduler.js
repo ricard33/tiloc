@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Timeline, { DateHeader, SidebarHeader, TimelineHeaders } from "react-calendar-timeline";
 import "react-calendar-timeline/lib/Timeline.css";
 import moment from "moment";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import { I18nextProvider } from "react-i18next";
-import { Provider } from "react-redux";
 import { startOfMonth } from "date-fns";
-import { format, parseISO, addDays, differenceInCalendarDays } from "date-fns";
 import { makeStyles } from "@material-ui/styles";
-import { Tooltip } from "components";
+import { Tooltip, HtmlTooltip, BookingQuickView } from "components";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -52,7 +49,10 @@ const timeSteps = {
 };
 
 const BookingScheduler = props => {
-  const { bookings, lodgings, beginDate, statuses } = props;
+  const {
+    bookings, lodgings, beginDate, statuses,
+    onOpenBooking, onCreateBooking
+  } = props;
   const classes = useStyles();
   const groups = lodgings.map(lodging => ({
     id: lodging.id,
@@ -67,11 +67,13 @@ const BookingScheduler = props => {
     end: moment(beginDate).add(1, "month")
   });
   const [collapsed, setCollapsed] = useState(false);
-  console.log(visibleTime);
+  // console.log(visibleTime);
   const items = bookings.map(booking => ({
     id: booking.id,
-    group: booking.lodging,
+    group: booking.lodging_id,
     title: booking.guest_name,
+    status: booking.status,
+    lodging: booking.lodging,
     start_time: moment(booking.begin_date).valueOf(),
     // startTime: moment().add(-5, "day").valueOf(),
     end_time: moment(booking.end_date).valueOf(),
@@ -88,33 +90,18 @@ const BookingScheduler = props => {
       },
       className: "weekend",
       style: {
-        background: "#" + getStatus(booking.status_id).color
+        background: "#" + booking.status.color
       }
-    }
+    },
+    booking
   }));
 
-  items && console.debug(items[0]);
-  console.debug(statuses);
+  // bookings && console.debug(bookings[0]);
+  // items && console.debug(items[0]);
+  // console.debug(statuses);
 
   function getStatus(statusId) {
-    const r = statuses.filter(s => s.id === statusId)[0];
-    return r;
-    // return {color: "red"}
-  }
-
-  function prevClick(event) {
-    console.debug("[prevClick]");
-
-  }
-
-  function nextClick(event) {
-    console.debug("[nextClick]");
-
-  }
-
-  function onSelectDate(event) {
-    console.debug("[onSelectDate]");
-
+    return statuses.filter(s => s.id === statusId)[0];
   }
 
   function onViewChange(event) {
@@ -122,21 +109,17 @@ const BookingScheduler = props => {
 
   }
 
-  function eventClicked(event) {
+  function eventClicked(bookingId) {
     console.debug("[eventClicked]");
+    onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
+  }
+
+  function onCanvasClick(groupId, time) {
+    console.debug("[canvasClicked]");
+    onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0]);
   }
 
   window.setTimeout(() => window.dispatchEvent(new Event("resize")));
-
-  const collapseButton = () => (
-    <button
-      onClick={() => {
-        setCollapsed(!collapsed);
-      }}
-    >
-      {collapsed ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
-    </button>
-  );
 
   return (
     <div className={classes.root}>
@@ -147,8 +130,11 @@ const BookingScheduler = props => {
         defaultTimeStart={visibleTime.start}
         defaultTimeEnd={visibleTime.end}
         // onTimeChange={onTimeChange}
+        onItemClick={eventClicked}
+        onCanvasClick={onCanvasClick}
         minZoom={14 * 86400 * 1000}
         canResize={"both"}
+        dragSnap={24 * 60 * 60 * 1000}
         // useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 150}
@@ -158,6 +144,30 @@ const BookingScheduler = props => {
             <Tooltip title={group.tip}>
               <span className={classes.lodging}>{group.title}</span>
             </Tooltip>
+          );
+        }}
+        itemRenderer={({
+          item,
+          itemContext,
+          getItemProps,
+          getResizeProps
+        }) => {
+          const { title, ...itemProps} = getItemProps(item.itemProps); // remove the title props
+          const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
+          return (
+            <HtmlTooltip title={<BookingQuickView booking={item.booking} />}>
+              <div {...itemProps}>
+                {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
+
+                <div
+                  className="rct-item-content"
+                  style={{ maxHeight: `${itemContext.dimensions.height}` }}
+                >
+                  {itemContext.title}
+                </div>
+                {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
+              </div>
+            </HtmlTooltip>
           );
         }}
       >
@@ -192,6 +202,8 @@ BookingScheduler.propTypes = {
   beginDate: PropTypes.instanceOf(Date),
   bookings: PropTypes.array.isRequired,
   lodgings: PropTypes.array.isRequired,
+  onCreateBooking: PropTypes.func,
+  onOpenBooking: PropTypes.func,
   statuses: PropTypes.array.isRequired
 };
 
