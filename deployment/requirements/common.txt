@@ -4,6 +4,7 @@ django-grappelli
 django-heroku
 django-import-export
 django-rest-knox
+django-webpack-loader
 gunicorn
 Pillow
 django-constance[redis]
