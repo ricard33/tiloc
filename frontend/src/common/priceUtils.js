@@ -36,7 +36,7 @@ export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, 
   // TODO compute price using seasonal rates
   const duration = differenceInCalendarDays(parseISO(endDate), parseISO(beginDate));
   const isWeekRate = weekRate && duration >= 7;
-  const rate = isWeekRate ? weekRate / 7 : dailyRate;
+  const rate = isWeekRate ? Number(weekRate) / 7 : Number(dailyRate);
   const price = rate * duration;
   return {
     price: DecimalPrecision.round(price),

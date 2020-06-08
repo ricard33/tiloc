@@ -6,12 +6,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { bookings } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import orm from "orm";
-import { BookingEdit } from "components";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import { useTranslation } from "react-i18next";
-import DialogContentText from "@material-ui/core/DialogContentText";
+// import { useTranslation } from "react-i18next";
+import { BookingDialog } from "../../components";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,12 +25,12 @@ const useStyles = makeStyles(theme => ({
 const BookingList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   // const allBookings = useSelector(store => selectors.bookings(store));
   const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
   const loading = useSelector(store => store.fetching.bookings.loading);
   const [selected, setSelected] = useState([]);
-  const [editBookingId, setEditBookingId] = useState(null);
+  const [editBooking, setEditBooking] = useState(null);
   const numSelected = selected.length;
 
   useEffect(() => {
@@ -46,11 +42,11 @@ const BookingList = () => {
   };
 
   const onEditBooking = (booking) => {
-    setEditBookingId(booking.id);
+    setEditBooking(booking.ref);
   };
 
   const handleCloseEdit = () => {
-    setEditBookingId(null);
+    setEditBooking(null);
   };
 
   return (
@@ -66,21 +62,10 @@ const BookingList = () => {
           <CircularProgress color="inherit"/>
         </Backdrop>
       </div>
-      <Dialog
+      <BookingDialog
+        booking={editBooking}
         onClose={handleCloseEdit}
-        aria-labelledby="simple-dialog-title"
-        open={!!editBookingId}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogTitle id="simple-dialog-title">{t("Modify a booking")}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("You can change booking details")}
-          </DialogContentText>
-          <BookingEdit bookingId={editBookingId} onClose={handleCloseEdit}/>
-        </DialogContent>
-      </Dialog>
+      />
     </div>
   );
 };

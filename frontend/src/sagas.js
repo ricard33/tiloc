@@ -70,6 +70,7 @@ function* _fetchData(path, action) {
       query: {offset, limit}
     });
   } catch (error) {
+    console.error(types.FAILURE(actionBaseName), error);
     yield put({
       type: types.FAILURE(actionBaseName),
       error
@@ -91,6 +92,7 @@ function* _updateData(path, action) {
       yield call(action.callback, response.data);
     }
   } catch (error) {
+    console.error(types.FAILURE(actionBaseName), error);
     yield put({
       type: types.FAILURE(actionBaseName),
       error

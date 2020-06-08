@@ -29,11 +29,11 @@ const BookingQuickView = props => {
       </div>
       <div id="qv_begin">
         <span className={classes.label}>{t("From:")}</span>&nbsp;
-        <span className={classes.value}>{moment(booking.begin_date).format("LLLL")}</span>
+        <span className={classes.value}>{moment(booking.begin_date).format("dddd LL")}</span>
       </div>
       <div id="qv_end">
         <span className={classes.label}>{t("To:")}</span>&nbsp;
-        <span className={classes.value}>{moment(booking.end_date).format("LLLL")}</span>
+        <span className={classes.value}>{moment(booking.end_date).format("dddd LL")}</span>
       </div>
       <div id="qv_nights">
         <span className={classes.label}>{t("Nights:")}</span>&nbsp;
@@ -81,7 +81,7 @@ BookingQuickView.propTypes = {
     begin_date: PropTypes.string,
     end_date: PropTypes.string,
     duration: PropTypes.number,
-    price: PropTypes.number,
+    price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     adults: PropTypes.number,
     children: PropTypes.number,
     babies: PropTypes.number,

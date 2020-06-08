@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import Timeline, { DateHeader, SidebarHeader, TimelineHeaders } from "react-calendar-timeline";
+import Timeline, {
+  CursorMarker,
+  DateHeader,
+  SidebarHeader,
+  TimelineHeaders,
+  TimelineMarkers,
+  TodayMarker
+} from "react-calendar-timeline";
 import "react-calendar-timeline/lib/Timeline.css";
 import moment from "moment";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -88,9 +95,9 @@ const BookingScheduler = props => {
       onDoubleClick: () => {
         console.log("You clicked double!");
       },
-      className: "weekend",
       style: {
-        background: "#" + booking.status.color
+        background: "#" + booking.status.color,
+        color: "black"
       }
     },
     booking
@@ -110,13 +117,11 @@ const BookingScheduler = props => {
   }
 
   function eventClicked(bookingId) {
-    console.debug("[eventClicked]");
     onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function onCanvasClick(groupId, time) {
-    console.debug("[canvasClicked]");
-    onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0]);
+    onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0], new Date(time));
   }
 
   window.setTimeout(() => window.dispatchEvent(new Event("resize")));
@@ -135,7 +140,7 @@ const BookingScheduler = props => {
         minZoom={14 * 86400 * 1000}
         canResize={"both"}
         dragSnap={24 * 60 * 60 * 1000}
-        // useResizeHandle
+        useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 150}
         sidebarContent={<div>Above The Left</div>}
@@ -152,10 +157,10 @@ const BookingScheduler = props => {
           getItemProps,
           getResizeProps
         }) => {
-          const { title, ...itemProps} = getItemProps(item.itemProps); // remove the title props
+          const { title, ...itemProps } = getItemProps(item.itemProps); // remove the title props
           const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
           return (
-            <HtmlTooltip title={<BookingQuickView booking={item.booking} />}>
+            <HtmlTooltip title={<BookingQuickView booking={item.booking}/>}>
               <div {...itemProps}>
                 {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
@@ -189,6 +194,14 @@ const BookingScheduler = props => {
           <DateHeader unit="primaryHeader"/>
           <DateHeader/>
         </TimelineHeaders>
+        <TimelineMarkers>
+          <TodayMarker>
+            {({ styles, date }) =>
+              <div style={{...styles, backgroundColor: 'red'}}/>
+            }
+          </TodayMarker>
+          <CursorMarker/>
+        </TimelineMarkers>
       </Timeline>
     </div>
   );

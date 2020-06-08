@@ -32,7 +32,11 @@ export function createTestSessionWithData(customORM) {
 export const populateOrmStore = (session) => {
   let lodging = session.Lodging.create({
     id: 1,
-    owner: session.Owner.create({ id: 1 })
+    name: "Lovely place",
+    owner: session.Owner.create({
+      id: 1,
+      name: "John DOE"
+    })
   });
   session.Booking.create({
     id: 1,

@@ -8,5 +8,8 @@
   "Daily price": "Daily price",
   "From {begin_date} to {end_date}: {day_count} x {rate}€ ({rate_name})_plural": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "{count} selected": "{count} selected",
-  "{count} selected_plural": "{count} selected"
+  "{count} selected_plural": "{count} selected",
+  "You can create a new booking": "You can create a new booking",
+  "Please specify the guest name": "Please specify the guest name",
+  "Guest name": "Guest name"
 }

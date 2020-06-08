@@ -11,6 +11,10 @@ import AlertHandler from "./components/alertHandler";
 import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
+import moment from "moment";
+// import 'moment/min/moment-with-locales';
+import localization from 'moment/locale/fr';
+import * as actions from "./actions";
 
 
 validate.validators = {
@@ -21,9 +25,12 @@ validate.validators = {
 function App(props) {
   const dispatch = useDispatch();
   const token = useSelector(store => store.auth.token);
+  moment.updateLocale('fr', localization);
+  moment.locale('fr');
 
   useEffect(() => {
     dispatch(auth.loadUser(token));
+    dispatch(actions.fetchOwners());
   }, [dispatch, token]);
 
   return (

@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/styles";
 import { startOfMonth } from 'date-fns'
 import { BookingScheduler } from "./components";
-import { bookings as bookingsActions } from "../../actions";
+import { bookings as bookingsActions, lodgings as lodgingsActions } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import * as selectors from "../../selectors";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import { BookingEdit } from "../../components";
 import { useTranslation } from "react-i18next";
+import moment from "moment";
+import { BookingDialog } from "../../components";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,25 +31,36 @@ const Planning = props => {
   const bookings = useSelector(store => selectors.bookings(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
-  const loading = useSelector(store => store.fetching.bookings.loading);
   const [ selected, setSelected ] = useState([]);
-  const [editBookingId, setEditBookingId] = useState(null);
+  const [editBooking, setEditBooking] = useState(null);
   const numSelected = selected.length;
 
   // const bookings = allBookings.toModelArray();
 
   useEffect(() => {
     dispatch(bookingsActions.fetchBookings());
-    // dispatch(bookingsActions.fetchBookingStatuses());
+    dispatch(bookingsActions.fetchBookingStatuses());
+    dispatch(lodgingsActions.fetchLodgings());
   }, [dispatch]);
 
   const onEditBooking = (booking) => {
     console.debug("EDIT ", booking.id);
-    setEditBookingId(booking.id);
+    setEditBooking(booking);
+  };
+
+  const onCreateBooking = (lodging, begin_date) => {
+    console.debug("CREATE ", lodging.id, begin_date);
+    const duration = 7;
+    setEditBooking({
+      lodging_id: lodging.id,
+      begin_date: moment(begin_date).format("YYYY-MM-DD"),
+      // end_date: moment(begin_date).add(duration, "days").format("YYYY-MM-DD"),
+      // duration: duration,
+    });
   };
 
   const handleCloseEdit = () => {
-    setEditBookingId(null);
+    setEditBooking(null);
   };
 
   const bookings2 = bookings.map(booking => ({
@@ -70,23 +77,14 @@ const Planning = props => {
         lodgings={lodgings}
         beginDate={beginDate}
         statuses={bookingStatuses}
+        onCreateBooking={onCreateBooking}
         onOpenBooking={onEditBooking}
       />
-      <Dialog
+      <BookingDialog
+        booking={editBooking}
         onClose={handleCloseEdit}
-        aria-labelledby="simple-dialog-title"
-        open={!!editBookingId}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogTitle id="simple-dialog-title">{t("Modify a booking")}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("You can change booking details")}
-          </DialogContentText>
-          <BookingEdit bookingId={editBookingId} onClose={handleCloseEdit}/>
-        </DialogContent>
-      </Dialog>
+        // open={!!editBooking || newBooking}
+      />
     </div>
   );
 };
