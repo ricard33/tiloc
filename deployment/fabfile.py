@@ -1,0 +1,328 @@
+import glob
+import os
+from datetime import datetime
+
+from fabric import Connection, task
+from invoke import Exit, Failure
+
+from patchwork.transfers import rsync
+from  patchwork import files
+
+# c = Connection('ssh-crd.alwaysdata.net')
+FAB_PATH = os.path.dirname(os.path.abspath(__file__))
+WORKSPACE = os.path.normpath(os.path.join(FAB_PATH, ".."))
+TARGET_PATH = '~/www/location/'
+
+API_KEY = "a75560e79fd94a65a0c0dee798848aa0"
+ACCOUNT = "crd"
+SITE_ID = "590959"
+
+@task
+def disk_free(c):
+    uname = c.run('uname -s', hide=True)
+    if 'Linux' in uname.stdout:
+        command = "df -h / | tail -n1 | awk '{print $5}'"
+        free = c.run(command, hide=True).stdout.strip()
+        print(free)
+        return free
+    err = "No idea how to get disk space on {}!".format(uname)
+    raise Exit(err)
+
+
+def get_most_recent_modified(path):
+    list_of_files = glob.glob(path, recursive=True)  # * means all if need specific format then *.csv
+    latest_file = max(list_of_files, key=os.path.getctime)
+    print(latest_file, os.path.getctime(latest_file))
+    return latest_file, os.path.getctime(latest_file)
+
+
+def write_version_properties(version):
+    with open(os.path.join(WORKSPACE, 'location', 'version.properties'), "wt") as f:
+        f.write("VERSION=%s\n" % version)
+
+
+@task
+def get_version(c):
+    # Get the version using "git describe".
+    cmd = 'git describe --tags --match [0-9]*'
+    try:
+        version = c.local(cmd).stdout.strip()
+    except Failure:
+        print('Unable to get version number from git tags')
+        raise
+
+    # PEP 386 compatibility
+    if '-' in version:
+        version = '.post'.join(version.split('-')[:2])
+
+    # Don't declare a version "dirty" merely because a time stamp has
+    # changed. If it is dirty, append a ".dev1" suffix to indicate a
+    # development revision after the release.
+    c.local('git status', hide='both')
+
+    cmd = 'git diff-index --name-only HEAD'
+    try:
+        dirty = c.local(cmd, hide=True).stdout.strip()
+    except Failure:
+        print('Unable to get git index status')
+        raise
+
+    if dirty != '':
+        version += '.dev1'
+
+    return version
+
+
+@task
+def prepare_python_env(c):
+    with c.cd(WORKSPACE):
+        c.run('pip install pip -U')
+        c.run('pip install -U -r deployment/requirements/dev.txt')
+
+
+@task
+def build_python(c):
+    with c.cd(WORKSPACE):
+        # subprocess.check_call('find . -name "*.py[co]" -delete')
+        # subprocess.check_call(['python', 'deployment/compile.py', '-c'], cwd=WORKSPACE)
+        c.run('python deployment/compile.py -c')
+
+        c.run('python manage.py migrate --noinput')
+        c.run('python manage.py compilemessages --no-color')
+        # subprocess.check_call(['python', 'manage.py', 'migrate', '--noinput'], cwd=WORKSPACE)
+        # subprocess.check_call(['python', 'manage.py', 'compilemessages', '--no-color'], cwd=WORKSPACE)
+
+
+@task
+def build(c):
+    version = get_version(c)
+    write_version_properties(version)
+    build_python(c)
+    build_frontend(c)
+    # build_package()
+
+
+@task
+def prepare_frontend_env(c):
+    with c.cd(os.path.join(WORKSPACE, 'frontend')):
+        c.local('yarn install --pure-lockfile')
+        c.local('npm rebuild node-sass')
+
+
+@task
+def build_frontend(c, only_sources=False):
+    if not only_sources:
+        prepare_frontend_env(c)
+    with c.cd(os.path.join(WORKSPACE, 'frontend')):
+        c.local('yarn run build')
+        # c.local('yarn run test')
+
+
+@task
+def test(c):
+    run_python_tests(c)
+    run_frontend_tests(c)
+
+
+@task
+def run_python_tests(c):
+    # with settings(user=APIDAE_USER):
+    with c.cd(WORKSPACE):
+        c.local('coverage run --source=. manage.py test')
+        c.local('coverage report')
+
+
+@task
+def run_frontend_tests(c):
+    # with settings(user=APIDAE_USER):
+    with c.cd(os.path.join(WORKSPACE, 'frontend')):
+        c.local('yarn run test')
+
+
+# @task
+# def build_package():
+#     with lcd(os.path.join(WORKSPACE)):
+#         subprocess.check_call(['find', '.', '-name', '"*.py[co]"', '-delete'], cwd=WORKSPACE)
+#         subprocess.check_call(['python', 'deployment/compile.py', '-c'], cwd=WORKSPACE)
+#
+#         for fname in glob.glob(os.path.join(WORKSPACE, "build_apidae-*.tar.gz")):
+#             os.remove(fname)
+#         archive_name = 'build_location-%(VERSION)s.tar.gz' % {'VERSION': get_version()}
+#         subprocess.check_call(['tar', '-czf', archive_name,
+#                                # '--exclude=frontend/static_src',
+#                                'app', 'assets', 'authentication', 'config/logging-location.default.py', 'core',
+#                                'legacy', 'locale', 'location', 'templates', 'static', 'manage.py',
+#                                'requirements.txt', 'deployment',
+#                                ],
+#                               cwd=WORKSPACE)
+#         puts("Archive '%s' created" % archive_name)
+
+
+def compile_python_files(c):
+    with c.cd(TARGET_PATH):
+        c.run("python -O deployment/compile.py")
+
+
+@task
+def sync_sources(c, test_only=False):
+    if get_most_recent_modified(os.path.join(WORKSPACE, 'frontend', '**', '*.*'))[1] > \
+            get_most_recent_modified(os.path.join(WORKSPACE, 'assets', '**', '*.*'))[1]:
+        build_frontend(c, only_sources=True)
+
+    rsync(c,
+          WORKSPACE + "/",
+          TARGET_PATH,
+          delete=True,
+          rsync_opts='-ci --filter=". %s"' % os.path.join(FAB_PATH, "rsync_filter") + (
+                  test_only and " --dry-run" or ""),
+          )
+
+
+def clean_compiled_files(c):
+    # cleanup *.pyc / *.pyo files
+    with c.cd(TARGET_PATH):
+        c.run("python deployment/compile.py -c")
+
+
+@task
+def empty_folder(c):
+    # with settings(warn_only=True, user=APIDAE_USER):
+    with c.cd(TARGET_PATH):
+        c.run('find . -type f -name \'*.tar.gz\' | xargs rm -rf')
+        c.run(
+            'rm -rf app assets authentication core deployment frontend legacy locale location static staticfiles templates ')
+
+
+# def untar_archive():
+#     tar_gz_build_files = glob.glob(os.path.join(WORKSPACE, 'build_apidae-*.tar.gz'))
+#     if not len(tar_gz_build_files):
+#         raise IOError("Can't find Archive!")
+#     tar_gz_build_file = tar_gz_build_files[0]
+#     tar_gz_file_name = tar_gz_build_file.split(os.path.sep)[-1]
+#
+#     with cd(TARGET_PATH):
+#         put(tar_gz_build_file, TARGET_PATH)
+#         run('tar -xzvf ' + tar_gz_file_name)
+#
+#
+@task
+def deploy_location(c):
+    c.run("mkdir -p %s" % TARGET_PATH)
+    sync_sources(c)
+    clean_compiled_files(c)
+    # compile_python_files(c)
+
+    with c.cd(TARGET_PATH):
+        if files.exists(c, ".env/bin/python") and not c.run('.env/bin/python -V').stdout.strip().startswith('Python 3.7'):
+            c.run("rm -rf .env")
+        if not files.exists(c, ".env/bin/python"):
+            print("create virtual env")
+            c.run("python3.7 -m venv .env")
+
+        c.run('rm -rf www/static')
+        with c.prefix('. .env/bin/activate'):
+            c.run('pip install pip --upgrade')
+            c.run('pip install -r requirements.txt --upgrade')
+            c.run('python manage.py migrate --noinput')
+            # run('python manage.py compilemessages --no-color')
+            c.run('python manage.py collectstatic --noinput')
+
+
+# @task
+# def load_initial_data():
+#     with settings(user=APIDAE_USER),\
+#          cd(TARGET_PATH):
+#         with prefix('. .env/bin/activate'):
+#             run("python ./manage.py loaddata deployment/fixtures/initial_data.json")
+#             run('python manage.py createsuperuser')
+
+
+@task
+def create_superuser(c):
+    with c.cd(TARGET_PATH):
+        with c.prefix('. .env/bin/activate'):
+            c.run('python manage.py createsuperuser', pty=True)
+
+
+# @task
+# def rsync_deploy():
+#     stop()
+#
+#     nginx_setup()
+#     create_supervisord_config()
+#
+#     deploy_gestion(with_rsync=True)
+#
+#     start()
+#
+#
+
+@task
+def restart(c):
+    c.local("curl --basic --user \"%(API_KEY)s account=%(ACCOUNT)s:\" --data ''"
+            " --request POST https://api.alwaysdata.com/v1/site/%(SITE_ID)s/restart/"
+            % {'API_KEY': API_KEY, 'ACCOUNT': ACCOUNT, 'SITE_ID': SITE_ID})
+
+
+@task(default=True)
+def deploy(c):
+    deploy_location(c)
+    restart(c)
+
+
+@task
+def dump_db(c):
+    with c.cd(TARGET_PATH):
+        with c.prefix('. .env/bin/activate'):
+            fname = 'dump-%s.json' % datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+            c.run('python manage.py dumpdata > %s' % fname)
+            c.get(fname)
+
+
+@task
+def load_db(c, fname):
+    if os.path.exists(fname):
+        with c.cd(TARGET_PATH), \
+             c.prefix('. .env/bin/activate'):
+            c.put(fname, TARGET_PATH)
+            c.run('python manage.py loaddata %s' % fname)
+
+
+# @task
+# def create_supervisord_config():
+#     """
+#     create the supervisord config files for Apidae jobs
+#     @return:
+#     """
+#     with settings(user='root'):
+#         put(os.path.join(WORKSPACE, 'deployment', 'supervisord', 'apidae.conf'), "/etc/supervisor/conf.d/")
+#         put(os.path.join(WORKSPACE, 'deployment', 'supervisord', 'celery.conf'), "/etc/supervisor/conf.d/")
+#         put(os.path.join(WORKSPACE, 'deployment', 'supervisord', 'celerybeat.conf'), "/etc/supervisor/conf.d/")
+#         run('mkdir -p /var/log/celery/')
+#
+#         run("supervisorctl reread")
+#         run("supervisorctl update")
+#
+#
+# @task
+# def nginx_setup():
+#     """
+#     Configure NGINX for use with Apidae
+#     """
+#     with settings(user='root'):
+#         # upload_template(os.path.join(WORKSPACE, 'deployment', 'nginx', 'nginx.conf'), '/etc/nginx/nginx.conf')
+#         upload_template(os.path.join(WORKSPACE, 'deployment', 'nginx', 'default'),
+#                         '/etc/nginx/sites-available/default',
+#                         context={
+#                             'IP': env.host
+#                         },
+#                         backup=False,
+#                         )
+#         run('service nginx restart')
+#
+# @task
+# def pip_freeze():
+#     with settings(user=APIDAE_USER),\
+#          cd(TARGET_PATH):
+#         with prefix('. .env/bin/activate'):
+#             run("pip freeze")

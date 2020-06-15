@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="51128f3c-4e38-46b5-a080-98ad2bda24dd" name="alwaysdata" url="http://crd.alwaysdata.net/location">
+        <fileTransfer rootFolder="/home/crd/www/location" accessType="SFTP" host="ssh-crd.alwaysdata.net" port="22" sshConfigId="63ed8bb4-7707-407a-8eaa-fe2cab88a6b3" sshConfig="crd@ssh-crd.alwaysdata.net:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

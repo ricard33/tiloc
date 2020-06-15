@@ -9,3 +9,5 @@ gunicorn
 Pillow
 django-constance[redis]
 requests
+smartconfigparser
+my-django-tweaks

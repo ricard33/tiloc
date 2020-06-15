@@ -134,3 +134,4 @@ frontend0/
 /webpack-stats.*.json
 /assets/bundles/
 /.idea/shelf/
+/config/config.ini

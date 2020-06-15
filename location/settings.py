@@ -9,26 +9,56 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import logging
 import os
+import sys
 
-import django_heroku
+from my_django_tweaks.logging_config import configure_logging
+from smartconfigparser import Config
+
+# import django_heroku
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(BASE_DIR, 'config')
+os.makedirs(CONFIG_DIR, exist_ok=True)
+CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.ini')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
+config = Config()
+config.read(CONFIG_FILE)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
+LOG_DIR = os.path.join(BASE_DIR, 'log')
+os.makedirs(LOG_DIR, exist_ok=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')
+UNITTEST = 'test' in sys.argv
+
+LOGGING_CONFIG = None  # disable log configuration by Django
+DEFAULT_LOG_FORMAT='%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
+
+configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, False)
+
+if ENV not in ['dev', 'prod']:
+    logging.critical('Bad value for APP_ENV environment settings: %s', ENV)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+try:
+    SECRET_KEY = config.get('APP', 'SECRET_KEY')  # '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
+except:
+    print('SECRET_KEY not found! Generating a new one...', file=sys.stderr)
+    import random
+
+    SECRET_KEY = "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$^&*(-_=+)") for i in range(50)])
+    config.set('APP', 'SECRET_KEY', SECRET_KEY)
+    f = open(CONFIG_FILE, 'wt')
+    config.write(f)
+    f.close()
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS.extend(config.getlist('SECURITY', 'ALLOWED_HOSTS', []))
 
 # Application definition
 
@@ -94,8 +124,12 @@ WSGI_APPLICATION = 'location.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':   os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': config.get('DATABASE', 'engine', 'django.db.backends.sqlite3'),
+        'HOST': config.get('DATABASE', 'host', ''),
+        'PORT': config.getint('DATABASE', 'port', 5432),
+        'NAME': config.get('DATABASE', 'name', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': config.get('DATABASE', 'user', 'location'),
+        'PASSWORD': config.get('DATABASE', 'password', ''),
     },
     # 'legacy': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -155,9 +189,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Extra lookup directories for collectstatic to find static files
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-)
+]
+if ENV == 'prod':
+    STATICFILES_DIRS.append(os.path.join(BASE_DIR, "assets"))
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -181,11 +217,11 @@ GRAPPELLI_ADMIN_TITLE = _("Tourism Location")
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME':    'bundles/',
-        'STATS_FILE':         os.path.join(BASE_DIR, 'webpack-stats.dev.json'),
+        'STATS_FILE':         os.path.join(BASE_DIR, 'webpack-stats.%s.json' % ENV),
     }
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS=True
 
 # Activate Django-Heroku.
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
