@@ -11,5 +11,7 @@
   "{count} selected_plural": "{count} selected",
   "You can create a new booking": "You can create a new booking",
   "Please specify the guest name": "Please specify the guest name",
-  "Guest name": "Guest name"
+  "Guest name": "Guest name",
+  "You can change booking details": "You can change booking details",
+  "Account": "Account"
 }

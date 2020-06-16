@@ -47,7 +47,13 @@
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "Upload": "Upload",
   "Upload Files": "Upload Files",
-  "You can change booking details": "You can change booking details",
+  "Dashboard": "Dashboard",
+  "Planning": "Planning",
+  "Bookings": "Bookings",
+  "Prices": "Prices",
+  "Contacts": "Contacts",
+  "My account": "My account",
+  "Settings": "Settings",
   "From": "From",
   "To": "To",
   "Status": "Status",
@@ -55,7 +61,6 @@
   "Actions": "Actions",
   "{{count}} selected": "{{count}} selected",
   "{{count}} selected_plural": "{{count}} selected",
-  "Bookings": "Bookings",
   "Search booking": "Search booking",
   "Add booking": "Add booking"
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
-import { Divider, Drawer } from '@material-ui/core';
+import { Drawer } from '@material-ui/core';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import GroupIcon from '@material-ui/icons/Group';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
@@ -11,11 +11,12 @@ import CalendarIcon from '@material-ui/icons/CalendarToday';
 import ListIcon from '@material-ui/icons/List';
 import MoneyIcon from '@material-ui/icons/AttachMoney';
 
-import { Profile, SidebarNav, UpgradePlan } from './components';
+import { SidebarNav } from './components';
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
   drawer: {
-    width: 240,
+    width: 160,
     [theme.breakpoints.up('md')]: {
       marginTop: 64,
       height: 'calc(100% - 64px)'
@@ -40,40 +41,41 @@ const Sidebar = props => {
   const { open, variant, onClose, className, ...rest } = props;
 
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const pages = [
     {
-      title: 'Dashboard',
+      title: t('Dashboard'),
       href: '/dashboard',
       icon: <DashboardIcon />
     },
     {
-      title: 'Planning',
+      title: t('Planning'),
       href: '/planning',
       icon: <CalendarIcon />
     },
     {
-      title: 'Bookings',
+      title: t('Bookings'),
       href: '/bookings',
       icon: <ListIcon />
     },
     {
-      title: 'Prices',
+      title: t('Prices'),
       href: '/prices',
       icon: <MoneyIcon />
     },
     {
-      title: 'Contacts',
+      title: t('Contacts'),
       href: '/contacts',
       icon: <GroupIcon />
     },
     {
-      title: 'Account',
+      title: t('My account'),
       href: '/account',
       icon: <AccountBoxIcon />
     },
     {
-      title: 'Settings',
+      title: t('Settings'),
       href: '/settings',
       icon: <SettingsIcon />
     }
@@ -91,13 +93,13 @@ const Sidebar = props => {
         {...rest}
         className={clsx(classes.root, className)}
       >
-        <Profile />
-        <Divider className={classes.divider} />
+        {/*<Profile />*/}
+        {/*<Divider className={classes.divider} />*/}
         <SidebarNav
           className={classes.nav}
           pages={pages}
         />
-        <UpgradePlan />
+        {/*<UpgradePlan />*/}
       </div>
     </Drawer>
   );

@@ -143,6 +143,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
     "react-app-polyfill": "^1.0.6",
+    "react-awesome-gravatar": "^2.0.3",
     "react-calendar-timeline": "^0.26.7",
     "react-chartjs-2": "^2.9.0",
     "react-dev-utils": "^10.2.0",

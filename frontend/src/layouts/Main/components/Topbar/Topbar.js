@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { AppBar, Toolbar, Badge, Hidden, IconButton } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
-import InputIcon from '@material-ui/icons/Input';
-import LogoWhiteImg from 'assets/images/logos/logo--white.svg';
+import React, { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import clsx from "clsx";
+import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/styles";
+import { AppBar, Toolbar, Badge, Hidden, IconButton, Avatar } from "@material-ui/core";
+import MenuIcon from "@material-ui/icons/Menu";
+import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
+import InputIcon from "@material-ui/icons/Input";
+import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import LogoWhiteImg from "assets/images/logos/logo--white.svg";
+import { useSelector } from "react-redux";
+import { getGravatarUrl } from "react-awesome-gravatar";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    boxShadow: 'none'
+    boxShadow: "none"
   },
   flexGrow: {
     flexGrow: 1
@@ -26,7 +34,22 @@ const Topbar = props => {
 
   const classes = useStyles();
 
+  const { t } = useTranslation();
   const [notifications] = useState([]);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const user = useSelector(store => store.auth.user);
+
+  const avatar = getGravatarUrl(user.email, {
+    default: "mp"
+  });
+
+  const handleClickUser = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <AppBar
@@ -40,7 +63,7 @@ const Topbar = props => {
             src={LogoWhiteImg}
           />
         </RouterLink>
-        <div className={classes.flexGrow} />
+        <div className={classes.flexGrow}/>
         <Hidden smDown>
           <IconButton color="inherit">
             <Badge
@@ -48,22 +71,55 @@ const Topbar = props => {
               color="primary"
               variant="dot"
             >
-              <NotificationsIcon />
+              <NotificationsIcon/>
             </Badge>
           </IconButton>
-          <IconButton
-            className={classes.signOutButton}
-            color="inherit"
+          <Avatar
+            alt="Person"
+            className={classes.avatar}
+            component={IconButton}
+            src={avatar}
+            aria-controls="user-menu"
+            aria-haspopup="true"
+            onClick={handleClickUser}
+          />
+          <Menu
+            id="user-menu"
+            anchorEl={anchorEl}
+            elevation={0}
+            getContentAnchorEl={null}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleCloseUserMenu}
           >
-            <InputIcon />
-          </IconButton>
+            <MenuItem>
+              <ListItemIcon>
+                <AccountBoxIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("My account")} />
+            </MenuItem>
+            <MenuItem>
+              <ListItemIcon>
+                <InputIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Logout")} />
+            </MenuItem>
+          </Menu>
         </Hidden>
         <Hidden mdUp>
           <IconButton
             color="inherit"
             onClick={onSidebarOpen}
           >
-            <MenuIcon />
+            <MenuIcon/>
           </IconButton>
         </Hidden>
       </Toolbar>

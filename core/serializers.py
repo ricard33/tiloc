@@ -30,9 +30,14 @@ class LoginUserSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'username')
+        fields = ('id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
+
+    def get_full_name(self, user):
+        return user.get_full_name()
 
 
 class OwnerSerializer(serializers.ModelSerializer):
