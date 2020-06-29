@@ -114,7 +114,9 @@ def build_frontend(c, only_sources=False):
     if not only_sources:
         prepare_frontend_env(c)
     with c.cd(os.path.join(WORKSPACE, 'frontend')):
-        c.local('yarn run build')
+        # print(os.environ)
+        # c.local('env', replace_env=False)
+        c.local('yarn run build', replace_env=False)
         # c.local('yarn run test')
 
 

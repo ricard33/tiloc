@@ -34,7 +34,11 @@ export const DecimalPrecision = {
 export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, weekRate, seasonalRates = [],
   depositPercent) => {
   // TODO compute price using seasonal rates
-  const duration = differenceInCalendarDays(parseISO(endDate), parseISO(beginDate));
+  if(typeof beginDate === "string")
+    beginDate = parseISO(beginDate);
+  if(typeof endDate === "string")
+    endDate = parseISO(endDate);
+  const duration = differenceInCalendarDays(endDate, beginDate);
   const isWeekRate = weekRate && duration >= 7;
   const rate = isWeekRate ? Number(weekRate) / 7 : Number(dailyRate);
   const price = rate * duration;

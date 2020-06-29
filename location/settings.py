@@ -192,8 +192,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-if ENV == 'prod':
-    STATICFILES_DIRS.append(os.path.join(BASE_DIR, "assets"))
+PROD_ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+if os.path.exists(PROD_ASSETS_DIR):
+    STATICFILES_DIRS.append(PROD_ASSETS_DIR)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

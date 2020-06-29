@@ -215,10 +215,17 @@ export const createModels = () => {
           action.data.results.forEach(item => Booking.parse(item));
           break;
         }
+        case types.SUCCESS(types.CREATE_BOOKING):
         case types.SUCCESS(types.UPDATE_BOOKING): {
           // let booking = Booking.withId(action.data.id);
           // booking.update(action.data);
           Booking.parse(action.data);
+          break;
+        }
+        case types.SUCCESS(types.DELETE_BOOKING): {
+          console.debug("action", action);
+          let booking = Booking.withId(action.id);
+          booking.delete();
           break;
         }
         default: {

@@ -13,5 +13,7 @@
   "Please specify the guest name": "Please specify the guest name",
   "Guest name": "Guest name",
   "You can change booking details": "You can change booking details",
-  "Account": "Account"
+  "Account": "Account",
+  "Deposit can't be negative": "Deposit can't be negative",
+  "Deposit can't be higher than price": "Deposit can't be higher than price"
 }

@@ -1,4 +1,3 @@
-export { default as BookingEdit } from './BookingEdit';
 export { default as BookingDialog } from './BookingDialog';
 export { default as BookingsImportDialog } from './BookingsImportDialog';
 export { default as EnhancedTableHead } from './EnhancedTableHead';

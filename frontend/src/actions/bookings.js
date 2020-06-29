@@ -6,6 +6,16 @@ export function fetchBookings() {
   };
 }
 
+export function createBooking(booking, callback) {
+  return {
+    type: types.REQUEST(types.CREATE_BOOKING),
+    data: {
+      ...booking,
+    },
+    callback
+  };
+}
+
 export function updateBooking(booking, callback) {
   return {
     type: types.REQUEST(types.UPDATE_BOOKING),
@@ -13,6 +23,14 @@ export function updateBooking(booking, callback) {
     data: {
       ...booking,
     },
+    callback
+  };
+}
+
+export function deleteBooking(booking_id, callback) {
+  return {
+    type: types.REQUEST(types.DELETE_BOOKING),
+    id: booking_id,
     callback
   };
 }

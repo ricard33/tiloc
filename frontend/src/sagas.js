@@ -78,6 +78,28 @@ function* _fetchData(path, action) {
   }
 }
 
+function* _createData(path, action) {
+  if(!action.type.endsWith("_REQUEST"))
+    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
+  const actionBaseName = action.type.slice(0, -8);
+  try {
+    const response = yield call(axios.post, path, action.data);
+    yield put({
+      type: types.SUCCESS(actionBaseName),
+      data: response.data,
+    });
+    if(action.callback) {
+      yield call(action.callback, response.data);
+    }
+  } catch (error) {
+    console.error(types.FAILURE(actionBaseName), error);
+    yield put({
+      type: types.FAILURE(actionBaseName),
+      error
+    });
+  }
+}
+
 function* _updateData(path, action) {
   if(!action.type.endsWith("_REQUEST"))
     throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
@@ -100,6 +122,28 @@ function* _updateData(path, action) {
   }
 }
 
+function* _deleteData(path, action) {
+  if(!action.type.endsWith("_REQUEST"))
+    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
+  const actionBaseName = action.type.slice(0, -8);
+  try {
+    const response = yield call(axios.delete, path + action.id + "/");
+    yield put({
+      type: types.SUCCESS(actionBaseName),
+      id: action.id,
+    });
+    if(action.callback) {
+      yield call(action.callback, response.data);
+    }
+  } catch (error) {
+    console.error(types.FAILURE(actionBaseName), error);
+    yield put({
+      type: types.FAILURE(actionBaseName),
+      error
+    });
+  }
+}
+
 // notice how we now only export the rootSaga
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
@@ -107,7 +151,9 @@ export default function* rootSaga() {
     yield takeEvery(actionTypes.USER_LOADING, loadUser),
     yield takeEvery(actionTypes.LOGIN_REQUEST, login),
     yield takeEvery(actionTypes.FETCH_BOOKINGS_REQUEST, _fetchData, "/api/booking/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_BOOKING), _createData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_BOOKING), _updateData, "/api/booking/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_BOOKING), _deleteData, "/api/booking/"),
     yield takeEvery(actionTypes.FETCH_BOOKING_STATUSES_REQUEST, _fetchData, "/api/booking_status/"),
     yield takeEvery(actionTypes.FETCH_BOOKING_CHANNELS_REQUEST, _fetchData, "/api/booking_channel/"),
     yield takeEvery(actionTypes.FETCH_LODGINGS_REQUEST, _fetchData, "/api/lodging/"),

@@ -30,6 +30,7 @@ const Planning = props => {
   // const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
   const bookings = useSelector(store => selectors.bookings(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
+  const bookingChannels = useSelector(store => selectors.bookingChannels(store));
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const [ selected, setSelected ] = useState([]);
   const [editBooking, setEditBooking] = useState(null);
@@ -40,6 +41,7 @@ const Planning = props => {
   useEffect(() => {
     dispatch(bookingsActions.fetchBookings());
     dispatch(bookingsActions.fetchBookingStatuses());
+    dispatch(bookingsActions.fetchBookingChannels());
     dispatch(lodgingsActions.fetchLodgings());
   }, [dispatch]);
 
@@ -49,11 +51,11 @@ const Planning = props => {
   };
 
   const onCreateBooking = (lodging, begin_date) => {
-    console.debug("CREATE ", lodging.id, begin_date);
+    console.debug("CREATE ", lodging.id, begin_date.toISOString());
     const duration = 7;
     setEditBooking({
       lodging_id: lodging.id,
-      begin_date: moment(begin_date).format("YYYY-MM-DD"),
+      begin_date: moment(begin_date).toISOString().substr(0, 10),
       // end_date: moment(begin_date).add(duration, "days").format("YYYY-MM-DD"),
       // duration: duration,
     });
@@ -67,6 +69,7 @@ const Planning = props => {
     ...booking,
     status: bookingStatuses.filter(s => s.id === booking.status_id)[0],
     lodging: lodgings.filter(l => l.id === booking.lodging_id)[0],
+    source: booking.source_id ? bookingChannels.filter(c => c.id === booking.source_id)[0] : undefined,
   }));
 
   return (
@@ -80,11 +83,11 @@ const Planning = props => {
         onCreateBooking={onCreateBooking}
         onOpenBooking={onEditBooking}
       />
-      <BookingDialog
+      {editBooking && <BookingDialog
         booking={editBooking}
         onClose={handleCloseEdit}
         // open={!!editBooking || newBooking}
-      />
+      />}
     </div>
   );
 };
