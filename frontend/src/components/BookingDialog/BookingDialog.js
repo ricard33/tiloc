@@ -38,6 +38,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
+import useWindowDimensions from "../../common/windowDimensions";
 
 
 const useStyles = makeStyles(theme => ({
@@ -81,6 +82,7 @@ const useStyles = makeStyles(theme => ({
 const BookingDialog = props => {
   const { className, booking, onClose } = props;
   const classes = useStyles();
+  const { height, width } = useWindowDimensions();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
@@ -346,7 +348,7 @@ const BookingDialog = props => {
       aria-labelledby="simple-dialog-title"
       open={!!booking}
       maxWidth="sm"
-      // fullWidth
+      fullScreen={width <= 600}
     >
       <DialogTitle id="simple-dialog-title">
         {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
@@ -358,7 +360,6 @@ const BookingDialog = props => {
         {/*</DialogContentText>*/}
         {booking &&
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/*<BookingEdit booking={booking} form={form}/>*/}
           <Grid
             container
             spacing={1}
@@ -590,7 +591,7 @@ const BookingDialog = props => {
                 =
                 <div className={classes.spacer}/>
               </Grid>}
-              <Grid item xs={6} className={classes.flexBoxAlignLeft}>
+              <Grid item sm={6} xs={12} className={classes.flexBoxAlignLeft}>
                 <TextField
                   InputProps={{
                     endAdornment: <InputAdornment position="end">€</InputAdornment>,
