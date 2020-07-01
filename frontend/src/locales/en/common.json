@@ -5,6 +5,7 @@
   "Add a booking": "Add a booking",
   "Booking status": "Booking status",
   "Lodging": "Lodging",
+  "Cancellation / Waiting": "Cancellation / Waiting",
   "Guest": "Guest",
   "Existing guest": "Existing guest",
   "-- Choose --": "-- Choose --",
@@ -67,5 +68,6 @@
   "{{count}} selected": "{{count}} selected",
   "{{count}} selected_plural": "{{count}} selected",
   "Search booking": "Search booking",
-  "Add booking": "Add booking"
+  "Add booking": "Add booking",
+  "Holidays": "Holidays"
 }

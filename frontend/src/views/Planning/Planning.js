@@ -51,14 +51,13 @@ const Planning = props => {
   };
 
   const onCreateBooking = (lodging, begin_date) => {
-    console.debug("CREATE ", lodging.id, begin_date.toISOString());
-    const duration = 7;
-    setEditBooking({
-      lodging_id: lodging.id,
-      begin_date: moment(begin_date).toISOString().substr(0, 10),
-      // end_date: moment(begin_date).add(duration, "days").format("YYYY-MM-DD"),
-      // duration: duration,
-    });
+    console.debug("CREATE ", lodging ? lodging.id : null, begin_date.toISOString());
+    if(lodging) {
+      setEditBooking({
+        lodging_id: lodging.id,
+        begin_date: moment(begin_date).toISOString().substr(0, 10),
+      });
+    }
   };
 
   const handleCloseEdit = () => {

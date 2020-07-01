@@ -120,7 +120,7 @@ class Booking(models.Model):
         HALF = 'half', _('Half board')
         FULL = 'full', _('Full board')
 
-    lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
+    lodging = models.ForeignKey(Lodging, blank=True, null=True, on_delete=models.SET_NULL)
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
     guest_address = models.TextField(_("guest address"), blank=True, null=True)

@@ -13,7 +13,7 @@ export function isoDateValidation() {
 
 export const bookingType = PropTypes.shape({
   id: PropTypes.number,
-  lodging_id: PropTypes.number.isRequired,
+  lodging_id: PropTypes.number,
   guest_name: PropTypes.string,
   guest_contact: PropTypes.string,
   status_id: PropTypes.number,

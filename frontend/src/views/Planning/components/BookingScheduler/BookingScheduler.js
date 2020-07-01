@@ -15,6 +15,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { startOfMonth } from "date-fns";
 import { makeStyles } from "@material-ui/styles";
 import { Tooltip, HtmlTooltip, BookingQuickView } from "components";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -29,6 +30,11 @@ const useStyles = makeStyles(theme => ({
   },
   lodging: {
     textOverflow: "ellipsis"
+  },
+  groupSeparator: {
+  },
+  specialGroup: {
+    fontWeight: "bold",
   }
 }));
 
@@ -61,30 +67,55 @@ const BookingScheduler = props => {
     onOpenBooking, onCreateBooking
   } = props;
   const classes = useStyles();
-  const groups = lodgings.map(lodging => ({
-    id: lodging.id,
-    title: lodging.name,
-    rightTitle: "title in the right sidebar",
-    stackItems: false,
-    tip: lodging.name
-    // height?: 30
-  }));
   const [visibleTime, setVisibleTime] = useState({
     start: moment(beginDate),
     end: moment(beginDate).add(1, "month")
   });
   const [collapsed, setCollapsed] = useState(false);
-  // console.log(visibleTime);
+  const { t } = useTranslation();
+
+  let groups = lodgings.map(lodging => ({
+    id: lodging.id,
+    title: lodging.name,
+    // rightTitle: "title in the right sidebar",
+    stackItems: false,
+    tip: lodging.name,
+    className: classes.lodging,
+    // height?: 30
+  }));
+
+  groups.push({
+    id: -1,
+    title: "",
+    tip: "",
+    stackItems: false,
+    className: classes.groupSeparator,
+    height: 10
+  });
+  groups.push({
+    id: -2,
+    title: t("Holidays"),
+    tip: t("Holidays"),
+    stackItems: true,
+    className: classes.specialGroup,
+    // height: 25
+  });
+  groups.push({
+    id: -3,
+    title: t("Cancellation / Waiting"),
+    tip: t("Cancellation / Waiting"),
+    stackItems: true,
+    className: classes.specialGroup,
+    // height: 25
+  });
+
   const items = bookings.map(booking => ({
     id: booking.id,
-    group: booking.lodging_id,
+    group: booking.lodging_id > 0 ? booking.lodging_id : -3,
     title: booking.guest_name,
     status: booking.status,
-    lodging: booking.lodging,
     start_time: moment(booking.begin_date).add(12, "hours").valueOf(),
-    // startTime: moment().add(-5, "day").valueOf(),
     end_time: moment(booking.end_date).add(12, "hours").valueOf(),
-    // endTime: moment().add(15, "day").valueOf(),
     canMove: true,
     canResize: true,
     canChangeGroup: true,
@@ -147,7 +178,7 @@ const BookingScheduler = props => {
         groupRenderer={({ group }) => {
           return (
             <Tooltip title={group.tip}>
-              <span className={classes.lodging}>{group.title}</span>
+              <span className={group.className}>{group.title}</span>
             </Tooltip>
           );
         }}

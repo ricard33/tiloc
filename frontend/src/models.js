@@ -202,9 +202,9 @@ export const createModels = () => {
       let { lodging, status, source, ...bookingProps } = data;
       bookingProps = {
         ...bookingProps,
-        lodging: Lodging.parse(lodging),
+        lodging: lodging ? Lodging.parse(lodging) : null,
         status: BookingStatus.parse(status),
-        source: BookingChannel.parse(source)
+        source: source ? BookingChannel.parse(source) : null
       };
       return this.upsert(bookingProps);
     }

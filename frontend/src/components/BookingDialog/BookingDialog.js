@@ -154,6 +154,8 @@ const BookingDialog = props => {
         initialState.status_id = bookingStatuses[0].id;
         initialState.status = bookingStatuses[0];
       }
+      if (initialState.lodging_id === null)
+        initialState.lodging_id = 0;
       initialState.guest_contact = booking.guest_contact || "";
       initialState.guest_address = booking.guest_address || "";
       initialState.begin_date = parseISO(booking.begin_date || format(new Date(), "yyyy-MM-yy"));
@@ -187,12 +189,17 @@ const BookingDialog = props => {
       }
       case "lodging_id": {
         const formValues = getValues();
-        lodging = lodgings.filter(x => x.id === Number(data.target.value))[0];
-        if(!isFlatRate && formValues.daily_rate !== lodging.daily_rate){
-          const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
-          setValue(objectToValuesArray(priceObj));
+        value = Number(data.target.value);
+        if(value > 0) {
+          lodging = lodgings.filter(x => x.id === value)[0];
+          if(!isFlatRate && formValues.daily_rate !== lodging.daily_rate){
+            const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
+            setValue(objectToValuesArray(priceObj));
+          }
         }
-        return data.target.value;
+        else
+          lodging = null;
+        return value;
       }
       case "existing-guest":
         const guest = allGuests.filter(guest => guest.name === data.target.value);
@@ -230,7 +237,7 @@ const BookingDialog = props => {
           return true;
         else {
           const formValues = getValues();
-          const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
+          const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
           setValue(objectToValuesArray(priceObj));
           // setBalance(priceObj.price - priceObj.deposit);
           // setValue('is_flat_rate', false);
@@ -272,7 +279,7 @@ const BookingDialog = props => {
     const duration = Number(newValue);
     const endDate = addDays(formValues.begin_date, duration);
     const priceObj = formValues.is_flat_rate ? { daily_rate: formValues.price / duration }
-      : computeBookingPrice(formValues.begin_date, endDate, lodging.daily_rate, 0, 0, [], depositPercent);
+      : computeBookingPrice(formValues.begin_date, endDate, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
     setValue(objectToValuesArray(priceObj));
     setValue([{ end_date: endDate }]);
     return duration;
@@ -299,7 +306,7 @@ const BookingDialog = props => {
     };
     const duration = differenceInCalendarDays(newBooking.end_date, newBooking.begin_date);
     const priceObj = newBooking.is_flat_rate ? { daily_rate: newBooking.price / duration }
-      : computeBookingPrice(newBooking.begin_date, newBooking.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
+      : computeBookingPrice(newBooking.begin_date, newBooking.end_date, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
     setValue([
       ...objectToValuesArray(priceObj),
       { duration: duration }
@@ -332,7 +339,8 @@ const BookingDialog = props => {
       // ...booking,  // Remove it and put in hidden fields missing values
       ...data,
       begin_date: data.begin_date.toISOString().substr(0, 10),
-      end_date: data.end_date.toISOString().substr(0, 10)
+      end_date: data.end_date.toISOString().substr(0, 10),
+      lodging_id: data.lodging_id > 0 ? data.lodging_id : null
     };
     const action = booking.id ? actions.updateBooking : actions.createBooking;
     dispatch(action(submittedBooking, () => {
@@ -407,6 +415,8 @@ const BookingDialog = props => {
                   {lodgings.map(lodging => (
                     <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
                   ))}
+                  <MenuItem value="" disabled>---</MenuItem>
+                  <MenuItem value="0">{t("Cancellation / Waiting")}</MenuItem>
                 </Controller>
               </FormControl>
             </Grid>

@@ -25,7 +25,7 @@ const BookingQuickView = props => {
       </div>
       <div id="qv_lodging">
         <span className={classes.label}>{t("Lodging:")}</span>&nbsp;
-        <span className={classes.value}>{booking.lodging.name}</span>
+        <span className={classes.value}>{booking.lodging ? booking.lodging.name : t("Cancellation / Waiting")}</span>
       </div>
       <div id="qv_begin">
         <span className={classes.label}>{t("From:")}</span>&nbsp;

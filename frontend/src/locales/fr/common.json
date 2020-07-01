@@ -5,6 +5,7 @@
   "Add a booking": "Ajouter une réservation",
   "Booking status": "Statut de la réservation",
   "Lodging": "Logement",
+  "Cancellation / Waiting": "Annulation / En attente",
   "Guest": "Locataire",
   "Existing guest": "Locataire existant",
   "-- Choose --": "-- Choisir --",
@@ -68,5 +69,6 @@
   "{{count}} selected_plural": "{{count}} sélectionnés",
   "Search booking": "Rechercher une réservation",
   "Add booking": "Ajouter une réservation",
+  "Holidays": "Vacances",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
 }
