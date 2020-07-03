@@ -78,7 +78,7 @@ const BookingScheduler = props => {
     id: lodging.id,
     title: lodging.name,
     // rightTitle: "title in the right sidebar",
-    stackItems: false,
+    stackItems: true,
     tip: lodging.name,
     className: classes.lodging,
     // height?: 30
@@ -107,6 +107,21 @@ const BookingScheduler = props => {
     stackItems: true,
     className: classes.specialGroup,
     // height: 25
+  });
+  groups.push({
+    id: -4,
+    title: "",
+    tip: "",
+    stackItems: false,
+    className: classes.groupSeparator,
+    height: 10
+  });
+  groups.push({
+    id: -5,
+    title: t("Pricing"),
+    tip: t("Pricing"),
+    stackItems: true,
+    className: classes.specialGroup,
   });
 
   const items = bookings.map(booking => ({
@@ -171,6 +186,7 @@ const BookingScheduler = props => {
         minZoom={14 * 86400 * 1000}
         canResize={"both"}
         dragSnap={24 * 60 * 60 * 1000}
+        stackItems={true}
         useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 150}

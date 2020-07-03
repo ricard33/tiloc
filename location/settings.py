@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'import_export',
     'knox',
+    'django_cron',
     # 'legacy',
     'core',
     'app',
@@ -222,7 +223,12 @@ WEBPACK_LOADER = {
     }
 }
 
-IMPORT_EXPORT_USE_TRANSACTIONS=True
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+CRON_CLASSES = [
+    "core.cron.SyncBookingsJob",
+    # ...
+]
 
 # Activate Django-Heroku.
 # django_heroku.settings(locals())

@@ -19,6 +19,15 @@ class BookingStatusAdmin(ImportExportModelAdmin):
     list_editable = ('name', 'color', 'rank')
 
 
+class BookingChannelAdmin(ImportExportModelAdmin):
+    list_display = ('name', 'default_booking_status')
+
+
+class BookingChannelSyncAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'channel', 'lodging', 'source_url', 'active', 'last_sync')
+    list_display_links = ( 'channel', 'lodging')
+
+
 class LodgingAdmin(ImportExportModelAdmin):
     list_display = ('id', 'name', 'owner', 'rank', 'active', 'capacity')
 
@@ -28,13 +37,34 @@ class OwnerAdmin(ImportExportModelAdmin):
     list_display_links = ( 'name', )
 
 
+class HolidaysAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'name', 'begin_date', 'end_date')
+    list_display_links = ( 'name', )
+
+
+class PricingAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'name', 'daily_rate', 'weekend_rate', 'weekly_rate', 'minimum_stay', 'included_guests',
+                    'supplement_per_additional_guest')
+    list_display_links = ( 'name', )
+    list_editable = ('daily_rate', 'weekend_rate', 'weekly_rate', 'minimum_stay', 'included_guests',
+                     'supplement_per_additional_guest')
+
+
+class SeasonalVariationAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'pricing', 'name', 'begin_date', 'end_date',
+                    'daily_rate', 'weekend_rate', 'weekly_rate', 'minimum_stay')
+    list_display_links = ( 'name', )
+
+
 admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.Service)
 admin.site.register(models.Lodging, LodgingAdmin)
 admin.site.register(models.Category)
 admin.site.register(models.Owner, OwnerAdmin)
-admin.site.register(models.BookingChannel)
+admin.site.register(models.BookingChannel, BookingChannelAdmin)
+admin.site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
 admin.site.register(models.BookingStatus, BookingStatusAdmin)
 admin.site.register(models.BookedService)
-
-
+admin.site.register(models.Holidays, HolidaysAdmin)
+admin.site.register(models.Pricing, PricingAdmin)
+admin.site.register(models.SeasonalVariation, SeasonalVariationAdmin)

@@ -105,12 +105,22 @@ class BookingStatus(models.Model):
 class BookingChannel(models.Model):
     """Where does the booking come from, for reports"""
     name = models.CharField(_("name"), max_length=100)
+    default_booking_status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Booking channel")
 
     def __str__(self):
         return self.name
+
+
+class BookingChannelSync(models.Model):
+    """Take care about calendar synchronisation with external booking platforms"""
+    channel = models.ForeignKey(BookingChannel, on_delete=models.CASCADE)
+    lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
+    source_url = models.URLField(_("Source URL"))
+    active = models.BooleanField(_("active"), default=True)
+    last_sync = models.DateTimeField(blank=True, null=True)
 
 
 class Booking(models.Model):
@@ -126,6 +136,7 @@ class Booking(models.Model):
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
     status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT)
     source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT, blank=True, null=True)
+    source_uid = models.CharField(_("channel UID"), max_length=256, null=True, blank=True, help_text=_('UID on source channel'))
     begin_date = models.DateField(_("begin date"), )
     end_date = models.DateField(_("end date"), )
     duration = models.PositiveSmallIntegerField(_("duration"), )
@@ -162,3 +173,34 @@ class BookedService(models.Model):
 
     class Meta:
         verbose_name = _("Booking service")
+
+
+class Holidays(models.Model):
+    name = models.CharField(_("name"), max_length=256)
+    begin_date = models.DateField(_("begin date"), )
+    end_date = models.DateField(_("end date"), )
+
+    class Meta:
+        verbose_name_plural = _("holidays")
+
+
+class Pricing(models.Model): # or RatePlan
+    name = models.CharField(_("name"), max_length=256)
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
+    included_guests = models.PositiveSmallIntegerField(_("Number of guests included in the price"))
+    supplement_per_additional_guest = models.PositiveSmallIntegerField(_('Supplement per night and per aditional guest'))
+    info = models.TextField(_("info"), blank=True, null=True)
+
+
+class SeasonalVariation(models.Model):
+    pricing = models.ForeignKey(Pricing, on_delete=models.CASCADE)
+    name = models.CharField(_("name"), max_length=256)
+    begin_date = models.DateField(_("begin date"), )
+    end_date = models.DateField(_("end date"), )
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))

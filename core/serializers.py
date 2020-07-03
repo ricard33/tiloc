@@ -64,6 +64,12 @@ class BookingChannelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class BookingChannelSyncSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.BookingChannelSync
+        fields = '__all__'
+
+
 class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(source='status', queryset=models.BookingStatus.objects.all())
@@ -78,3 +84,20 @@ class BookingSerializer(serializers.ModelSerializer):
         model = models.Booking
         fields = '__all__'
 
+
+class HolidaysSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Holidays
+        fields = '__all__'
+
+
+class PricingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Pricing
+        fields = '__all__'
+
+
+class SeasonalVariationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SeasonalVariation
+        fields = '__all__'

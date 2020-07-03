@@ -8,7 +8,8 @@ from knox.models import AuthToken
 
 from . import models
 from .serializers import CreateUserSerializer, UserSerializer, BookingSerializer, LoginUserSerializer, \
-    BookingStatusSerializer, LodgingSerializer, OwnerSerializer, BookingChannelSerializer
+    BookingStatusSerializer, LodgingSerializer, OwnerSerializer, BookingChannelSerializer, HolidaysSerializer, \
+    PricingSerializer, SeasonalVariationSerializer, BookingChannelSyncSerializer
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -70,6 +71,11 @@ class BookingChannelViewSet(viewsets.ModelViewSet):
     serializer_class = BookingChannelSerializer
 
 
+class BookingChannelSyncViewSet(viewsets.ModelViewSet):
+    queryset = models.BookingChannelSync.objects.all()
+    serializer_class = BookingChannelSyncSerializer
+
+
 class LodgingViewSet(viewsets.ModelViewSet):
     queryset = models.Lodging.objects.all().order_by('name')
     serializer_class = LodgingSerializer
@@ -78,3 +84,18 @@ class LodgingViewSet(viewsets.ModelViewSet):
 class OwnerViewSet(viewsets.ModelViewSet):
     queryset = models.Owner.objects.all().order_by('name')
     serializer_class = OwnerSerializer
+
+
+class HolidaysViewSet(viewsets.ModelViewSet):
+    queryset = models.Holidays.objects.all().order_by('begin_date')
+    serializer_class = HolidaysSerializer
+
+
+class PricingViewSet(viewsets.ModelViewSet):
+    queryset = models.Pricing.objects.all().order_by('name')
+    serializer_class = PricingSerializer
+
+
+class SeasonalVariationViewSet(viewsets.ModelViewSet):
+    queryset = models.SeasonalVariation.objects.all().order_by('begin_date')
+    serializer_class = SeasonalVariationSerializer

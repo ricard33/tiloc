@@ -1,5 +1,6 @@
 django
 djangorestframework
+django-cron
 django-grappelli
 django-heroku
 django-import-export
@@ -11,3 +12,6 @@ django-constance[redis]
 requests
 smartconfigparser
 my-django-tweaks
+ics
+arrow~=0.15.7
+invoke~=1.4.1
