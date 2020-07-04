@@ -24,7 +24,7 @@ class BookingChannelAdmin(ImportExportModelAdmin):
 
 
 class BookingChannelSyncAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'channel', 'lodging', 'source_url', 'active', 'last_sync')
+    list_display = ('id', 'channel', 'lodging', 'source_url', 'active', 'last_import', 'last_export')
     list_display_links = ( 'channel', 'lodging')
 
 

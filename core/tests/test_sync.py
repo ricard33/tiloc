@@ -2,6 +2,8 @@ import arrow
 from django.test import TestCase
 
 # Create your tests here.
+from ics import Calendar
+
 from core import models
 from core.sync import synchronize_bookings
 from core.tests import factories
@@ -94,7 +96,7 @@ class SyncBookingsTestCase(TestCase):
     def test_airbnb_simple_sync(self):
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
-        self.assertIsNotNone(self.sync.last_sync)
+        self.assertIsNotNone(self.sync.last_import)
 
     def test_sync_twice(self):
         synchronize_bookings(self.sync, airbnb_ical)
@@ -116,3 +118,39 @@ class SyncBookingsTestCase(TestCase):
         factories.BookingFactory(lodging=self.lodging, begin_date=arrow.get("20200802").date(), end_date=arrow.get("20200812").date())
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
+
+
+class ExportCalendarTestCase(TestCase):
+    def setUp(self) -> None:
+        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+            factories.BookingStatusFactory(name=name)
+        self.lodging = factories.LodgingFactory()
+
+    def test_simple_export(self):
+        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r['content-type'], "text/calendar")
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)
+        e = c.events.pop()
+        self.assertEqual(e.name, "Cédric")
+
+    def test_event_uid_are_reliable(self):
+        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        c = Calendar(r.content.decode())
+        e1 = c.events.pop()
+        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        c = Calendar(r.content.decode())
+        e2 = c.events.pop()
+        self.assertEqual(e1.uid, e2.uid)
+
+    def test_exclude_bookings_from_requesting_channel(self):
+        channel = factories.BookingChannelFactory(name="airbnb")
+        sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
+        factories.BookingFactory(lodging=self.lodging, source=channel)
+        factories.BookingFactory(lodging=self.lodging)
+        r = self.client.get('/calendar/%s/?s=%d' % (self.lodging.uid, sync.id))
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)

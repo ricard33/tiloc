@@ -55,7 +55,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                                       duration=(event.end.date()-event.end.date()).days,
                                       price=0
                                       )
-    sync.last_sync = arrow.utcnow().datetime
+    sync.last_import = arrow.utcnow().datetime
     sync.save()
 
 

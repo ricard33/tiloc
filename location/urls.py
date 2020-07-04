@@ -22,7 +22,7 @@ from django.urls import path
 from django.views.decorators.cache import never_cache
 from rest_framework import routers
 
-from core import api
+from core import api, views
 from core.views import IndexPage
 from location.serve_static_file import serve_static_file
 
@@ -44,6 +44,9 @@ urlpatterns = [
     url("^api/auth/login/$", api.LoginAPI.as_view()),
     url("^api/auth/user/$", api.UserAPI.as_view()),
     url(r'^api/auth/', include('knox.urls')),
+
+    path(r'calendar/<uuid:uid>/', views.export_calendar),
+
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
     path("", include("authentication.urls")),

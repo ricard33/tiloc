@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -40,6 +42,7 @@ class Owner(models.Model):
 
 
 class Lodging(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, unique=True)
     active = models.BooleanField(_("active"), default=True)
     name = models.CharField(_("name"), max_length=200, unique=True)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
@@ -120,7 +123,8 @@ class BookingChannelSync(models.Model):
     lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
     source_url = models.URLField(_("Source URL"))
     active = models.BooleanField(_("active"), default=True)
-    last_sync = models.DateTimeField(blank=True, null=True)
+    last_import = models.DateTimeField(blank=True, null=True, help_text=_("Last time we imported remote calendar from channel."))
+    last_export = models.DateTimeField(blank=True, null=True, help_text=_("Last time the calendar has been successfully requested by remote channel."))
 
 
 class Booking(models.Model):
@@ -130,6 +134,7 @@ class Booking(models.Model):
         HALF = 'half', _('Half board')
         FULL = 'full', _('Full board')
 
+    uid = models.UUIDField(default=uuid.uuid4, unique=True)
     lodging = models.ForeignKey(Lodging, blank=True, null=True, on_delete=models.SET_NULL)
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
