@@ -2,7 +2,7 @@ import logging
 
 import arrow
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -54,7 +54,6 @@ def export_calendar(request, uid):
 
 
 @api_view(['GET',])
-@permission_classes((IsAuthenticated,))
 def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')
@@ -83,3 +82,18 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
         data[k]['rate'] = round(data[k]['days'] / data[k]['capacity'] * 100)
         sorted_data.append(data[k])
     return Response(sorted_data)
+
+
+@api_view(['GET',])
+def channel_distribution(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
+    begin = arrow.get(begin).floor('month')
+    end = arrow.get(end).ceil('month')
+    data = []
+    dates_range = [begin.date(), end.date()]
+    booking_count = Count('booking',
+                          filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
+                                 & Q(booking__lodging__isnull=False))
+    channels = models.BookingChannel.objects.annotate(booking_count=booking_count)
+    for row in channels:
+        data.append({'channel': row.name, 'count': row.booking_count})
+    return Response(data)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
@@ -15,6 +15,10 @@ import LaptopMacIcon from '@material-ui/icons/LaptopMac';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import TabletMacIcon from '@material-ui/icons/TabletMac';
+import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
+import palette from "../../../../theme/palette";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -38,13 +42,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const UsersByDevice = props => {
+const ChannelsDistribution = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
+  const [data, setData] = useState({});
+  const [loaded, setLoaded] = useState(false);
 
-  const data = {
+  const data0 = {
     datasets: [
       {
         data: [63, 15, 22],
@@ -63,7 +71,7 @@ const UsersByDevice = props => {
 
   const options = {
     legend: {
-      display: false
+      display: true
     },
     responsive: true,
     maintainAspectRatio: false,
@@ -104,6 +112,33 @@ const UsersByDevice = props => {
     }
   ];
 
+
+  useEffect(() => {
+    axios.get("stats/channel_distribution/")
+      .then(response => {
+        // console.debug(response);
+        setData({
+          labels: response.data.map(e => e.channel),
+          datasets: [
+            {
+              label: t("Channels distribution"),
+              backgroundColor: [
+                "red", "green", "yellow", "grey", "blue", "orange", "purple"
+              ],
+              borderWidth: 8,
+              borderColor: theme.palette.white,
+              hoverBorderColor: theme.palette.white,
+              data: response.data.map(e => e.count)
+            }
+          ]
+        });
+        setLoaded(true)
+      })
+      .catch(() => {
+        setLoaded(true);
+      });
+  }, [dispatch]);
+
   return (
     <Card
       {...rest}
@@ -115,7 +150,7 @@ const UsersByDevice = props => {
             <RefreshIcon />
           </IconButton>
         }
-        title="Users By Device"
+        title={t("Channels distribution")}
       />
       <Divider />
       <CardContent>
@@ -125,30 +160,30 @@ const UsersByDevice = props => {
             options={options}
           />
         </div>
-        <div className={classes.stats}>
-          {devices.map(device => (
-            <div
-              className={classes.device}
-              key={device.title}
-            >
-              <span className={classes.deviceIcon}>{device.icon}</span>
-              <Typography variant="body1">{device.title}</Typography>
-              <Typography
-                style={{ color: device.color }}
-                variant="h2"
-              >
-                {device.value}%
-              </Typography>
-            </div>
-          ))}
-        </div>
+        {/*<div className={classes.stats}>*/}
+        {/*  {devices.map(device => (*/}
+        {/*    <div*/}
+        {/*      className={classes.device}*/}
+        {/*      key={device.title}*/}
+        {/*    >*/}
+        {/*      <span className={classes.deviceIcon}>{device.icon}</span>*/}
+        {/*      <Typography variant="body1">{device.title}</Typography>*/}
+        {/*      <Typography*/}
+        {/*        style={{ color: device.color }}*/}
+        {/*        variant="h2"*/}
+        {/*      >*/}
+        {/*        {device.value}%*/}
+        {/*      </Typography>*/}
+        {/*    </div>*/}
+        {/*  ))}*/}
+        {/*</div>*/}
       </CardContent>
     </Card>
   );
 };
 
-UsersByDevice.propTypes = {
+ChannelsDistribution.propTypes = {
   className: PropTypes.string
 };
 
-export default UsersByDevice;
+export default ChannelsDistribution;

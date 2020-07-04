@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const LatestSales = props => {
+const FillingRate = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
@@ -106,8 +106,8 @@ const LatestSales = props => {
   );
 };
 
-LatestSales.propTypes = {
+FillingRate.propTypes = {
   className: PropTypes.string
 };
 
-export default LatestSales;
+export default FillingRate;

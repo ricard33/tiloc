@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import logging
 import os
 import sys
+from datetime import timedelta
 
 from my_django_tweaks.logging_config import configure_logging
 from smartconfigparser import Config
@@ -200,13 +201,22 @@ if os.path.exists(PROD_ASSETS_DIR):
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'knox.auth.TokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.SessionAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE':                100
+}
+
+REST_KNOX = {
+  'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'
+                           or 'cryptography.hazmat.primitives.hashes.SHA512',
+  # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+  'TOKEN_TTL': timedelta(days=30),
+  # 'TOKEN_LIMIT_PER_USER': None,
+  'AUTO_REFRESH': True,
 }
 
 APP_NAME = _("My Rentals")

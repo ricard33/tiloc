@@ -48,6 +48,8 @@ urlpatterns = [
     path(r'calendar/<uuid:uid>/', views.export_calendar),
     path(r'stats/filling_rate/', views.filling_rate),
     path(r'stats/filling_rate/<str:begin>/<str:end>/', views.filling_rate),
+    path(r'stats/channel_distribution/', views.channel_distribution),
+    path(r'stats/channel_distribution/<str:begin>/<str:end>/', views.channel_distribution),
 
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
