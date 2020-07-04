@@ -85,7 +85,6 @@ const Planning = props => {
       {editBooking && <BookingDialog
         booking={editBooking}
         onClose={handleCloseEdit}
-        // open={!!editBooking || newBooking}
       />}
     </div>
   );

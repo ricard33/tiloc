@@ -62,10 +62,10 @@ const BookingList = () => {
           <CircularProgress color="inherit"/>
         </Backdrop>
       </div>
-      <BookingDialog
+      {editBooking && <BookingDialog
         booking={editBooking}
         onClose={handleCloseEdit}
-      />
+      />}
     </div>
   );
 };
