@@ -102,6 +102,7 @@ const BookingDialog = props => {
     { value: 100, label: "100" }
   ];
 
+  bookingStatuses.sort((a, b) => a.rank - b.rank);
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
