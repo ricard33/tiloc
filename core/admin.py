@@ -1,5 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
+from django.utils.translation import gettext_lazy as _
 
 from core import models
 from .imp_exp_resources import *
@@ -10,8 +11,13 @@ class BookingAdmin(ImportExportModelAdmin):
         'id', 'lodging', 'status',
         'guest_name',
         'begin_date', 'end_date', 'duration', 'adults', 'children', 'babies',
-        'price', 'is_flat_rate', 'deposit')
+        'price', 'is_flat_rate', 'deposit', 'source', 'source_uid_')
+    list_filter = ('lodging', 'status', 'begin_date', 'source')
     resource_class = BookingResource
+
+    def source_uid_(self, obj: models.Booking):
+        return obj.source_uid and "%s..." % obj.source_uid[0:5]
+    source_uid_.short_description = _("Channel UID")
 
 
 class BookingStatusAdmin(ImportExportModelAdmin):

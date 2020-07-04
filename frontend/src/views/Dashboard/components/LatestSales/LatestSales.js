@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import clsx from 'clsx';
+import axios from "axios";
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 import { makeStyles } from '@material-ui/styles';
@@ -14,7 +15,10 @@ import {
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-import { data, options } from './chart';
+import { options } from './chart';
+import { useDispatch } from "react-redux";
+import palette from "../../../../theme/palette";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -31,6 +35,37 @@ const LatestSales = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
+  const [data, setData] = useState({});
+  const [loaded, setLoaded] = useState(false);
+
+  // console.debug(data);
+
+  useEffect(() => {
+    axios.get("stats/filling_rate/")
+      .then(response => {
+        // console.debug(response);
+        setData({
+          labels: response.data.map(e => e.date),
+          datasets: [
+            {
+              label: t("Filling rate"),
+              backgroundColor: palette.primary.main,
+              barThickness: 12,
+              maxBarThickness: 10,
+              barPercentage: 0.5,
+              categoryPercentage: 0.5,
+              data: response.data.map(e => e.rate)
+            }
+          ]
+        });
+        setLoaded(true)
+      })
+      .catch(() => {
+        setLoaded(true);
+      });
+  }, [dispatch]);
 
   return (
     <Card
@@ -43,18 +78,18 @@ const LatestSales = props => {
             size="small"
             variant="text"
           >
-            Last 7 days <ArrowDropDownIcon />
+            {t("Last year")} <ArrowDropDownIcon />
           </Button>
         }
-        title="Latest Sales"
+        title={t("Filling rate")}
       />
       <Divider />
       <CardContent>
         <div className={classes.chartContainer}>
-          <Bar
+          {loaded && <Bar
             data={data}
             options={options}
-          />
+          />}
         </div>
       </CardContent>
       <Divider />

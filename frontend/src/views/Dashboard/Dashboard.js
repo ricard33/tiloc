@@ -28,42 +28,42 @@ const Dashboard = () => {
         container
         spacing={4}
       >
-        <Grid
-          item
-          lg={3}
-          sm={6}
-          xl={3}
-          xs={12}
-        >
-          <Budget />
-        </Grid>
-        <Grid
-          item
-          lg={3}
-          sm={6}
-          xl={3}
-          xs={12}
-        >
-          <TotalUsers />
-        </Grid>
-        <Grid
-          item
-          lg={3}
-          sm={6}
-          xl={3}
-          xs={12}
-        >
-          <TasksProgress />
-        </Grid>
-        <Grid
-          item
-          lg={3}
-          sm={6}
-          xl={3}
-          xs={12}
-        >
-          <TotalProfit />
-        </Grid>
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  lg={3}*/}
+        {/*  sm={6}*/}
+        {/*  xl={3}*/}
+        {/*  xs={12}*/}
+        {/*>*/}
+        {/*  <Budget />*/}
+        {/*</Grid>*/}
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  lg={3}*/}
+        {/*  sm={6}*/}
+        {/*  xl={3}*/}
+        {/*  xs={12}*/}
+        {/*>*/}
+        {/*  <TotalUsers />*/}
+        {/*</Grid>*/}
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  lg={3}*/}
+        {/*  sm={6}*/}
+        {/*  xl={3}*/}
+        {/*  xs={12}*/}
+        {/*>*/}
+        {/*  <TasksProgress />*/}
+        {/*</Grid>*/}
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  lg={3}*/}
+        {/*  sm={6}*/}
+        {/*  xl={3}*/}
+        {/*  xs={12}*/}
+        {/*>*/}
+        {/*  <TotalProfit />*/}
+        {/*</Grid>*/}
         <Grid
           item
           lg={8}

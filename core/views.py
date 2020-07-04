@@ -2,11 +2,15 @@ import logging
 
 import arrow
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from ics import Calendar, Event
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from core import models
 
@@ -47,3 +51,35 @@ def export_calendar(request, uid):
     response = HttpResponse(c, content_type="text/calendar")
     response['Content-Disposition'] = 'attachment; filename="{}"'.format("%s.ics" % uid)
     return response
+
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticated,))
+def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
+    begin = arrow.get(begin).floor('month')
+    end = arrow.get(end).ceil('month')
+    data = {}
+    dates_range = [begin.date(), end.date()]
+    bookings = models.Booking.objects.filter(Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
+                                             lodging__isnull=False)
+    lodging_count = models.Lodging.objects.filter(active=True).count()
+    for booking in bookings:
+        print("Booking: %s -> %s" % (booking.begin_date, booking.end_date))
+        for d1, d2 in arrow.Arrow.interval('month', begin.floor('month'), end.ceil('month')):
+            days_in_month = d2.day
+            d2 = d2.floor('day').shift(days=1)
+            month = d1.format(fmt='YYYY-MM')
+            print(min(d2, arrow.get(booking.end_date)), max(d1, arrow.get(booking.begin_date)))
+            delta = (min(d2, arrow.get(booking.end_date)) - max(d1, arrow.get(booking.begin_date))).days
+            print(d1, d2, delta)
+            value = data.setdefault(month, {'date': month, 'days': 0, 'capacity': days_in_month * lodging_count})
+            if delta > 0:
+                value['days'] = value['days'] + delta
+
+    keys = list(data.keys())
+    keys.sort()
+    sorted_data = []
+    for k in keys:
+        data[k]['rate'] = round(data[k]['days'] / data[k]['capacity'] * 100)
+        sorted_data.append(data[k])
+    return Response(sorted_data)

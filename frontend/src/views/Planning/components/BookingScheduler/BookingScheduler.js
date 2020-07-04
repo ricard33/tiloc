@@ -74,6 +74,7 @@ const BookingScheduler = props => {
   const [collapsed, setCollapsed] = useState(false);
   const { t } = useTranslation();
 
+  lodgings.sort((a, b) => a.rank - b.rank);
   let groups = lodgings.map(lodging => ({
     id: lodging.id,
     title: lodging.name,

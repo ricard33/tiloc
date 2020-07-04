@@ -46,6 +46,8 @@ urlpatterns = [
     url(r'^api/auth/', include('knox.urls')),
 
     path(r'calendar/<uuid:uid>/', views.export_calendar),
+    path(r'stats/filling_rate/', views.filling_rate),
+    path(r'stats/filling_rate/<str:begin>/<str:end>/', views.filling_rate),
 
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
