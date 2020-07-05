@@ -15,7 +15,7 @@ import {
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-import { options } from './chart';
+import { get_options } from './chart';
 import { useDispatch } from "react-redux";
 import palette from "../../../../theme/palette";
 import { useTranslation } from "react-i18next";
@@ -51,13 +51,25 @@ const FillingRate = props => {
           datasets: [
             {
               label: t("Filling rate"),
+              yAxisID: "y-axis-filling-rate",
               backgroundColor: palette.primary.main,
-              barThickness: 12,
+              // barThickness: 12,
               maxBarThickness: 10,
-              barPercentage: 0.5,
-              categoryPercentage: 0.5,
-              data: response.data.map(e => e.rate)
-            }
+              // barPercentage: 0.5,
+              // categoryPercentage: 0.5,
+              data: response.data.map(e => e.rate),
+              order: 2
+            },
+            {
+              label: t("Turnover"),
+              yAxisID: "y-axis-turnover",
+              backgroundColor: palette.warning.main,
+              borderColor: palette.warning.main,
+              type: "line",
+              fill: false,
+              data: response.data.map(e => e.turnover),
+              order: 1
+            },
           ]
         });
         setLoaded(true)
@@ -73,14 +85,14 @@ const FillingRate = props => {
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        action={
-          <Button
-            size="small"
-            variant="text"
-          >
-            {t("Last year")} <ArrowDropDownIcon />
-          </Button>
-        }
+        // action={
+        //   <Button
+        //     size="small"
+        //     variant="text"
+        //   >
+        //     {t("Last year")} <ArrowDropDownIcon />
+        //   </Button>
+        // }
         title={t("Filling rate")}
       />
       <Divider />
@@ -88,7 +100,7 @@ const FillingRate = props => {
         <div className={classes.chartContainer}>
           {loaded && <Bar
             data={data}
-            options={options}
+            options={get_options()}
           />}
         </div>
       </CardContent>

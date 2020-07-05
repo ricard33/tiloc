@@ -69,6 +69,10 @@
   "{{count}} selected_plural": "{{count}} sélectionnés",
   "Search booking": "Rechercher une réservation",
   "Add booking": "Ajouter une réservation",
+  "Origin of bookings": "Provenance des réservations",
+  "Filling rate": "Taux de remplissage",
+  "Turnover": "Chiffre d'affaire",
+  "Last year": "L'année dernière",
   "Holidays": "Vacances",
   "Pricing": "Tarifs",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"

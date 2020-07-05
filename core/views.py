@@ -63,17 +63,16 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
                                              lodging__isnull=False)
     lodging_count = models.Lodging.objects.filter(active=True).count()
     for booking in bookings:
-        print("Booking: %s -> %s" % (booking.begin_date, booking.end_date))
         for d1, d2 in arrow.Arrow.interval('month', begin.floor('month'), end.ceil('month')):
             days_in_month = d2.day
             d2 = d2.floor('day').shift(days=1)
             month = d1.format(fmt='YYYY-MM')
-            print(min(d2, arrow.get(booking.end_date)), max(d1, arrow.get(booking.begin_date)))
             delta = (min(d2, arrow.get(booking.end_date)) - max(d1, arrow.get(booking.begin_date))).days
-            print(d1, d2, delta)
-            value = data.setdefault(month, {'date': month, 'days': 0, 'capacity': days_in_month * lodging_count})
+            value = data.setdefault(month, {'date': month, 'days': 0, 'turnover': 0, 'capacity': days_in_month * lodging_count})
             if delta > 0:
                 value['days'] = value['days'] + delta
+                if booking.duration> 0:
+                    value['turnover'] = value['turnover'] + delta * booking.price / booking.duration
 
     keys = list(data.keys())
     keys.sort()

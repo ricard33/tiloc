@@ -13,6 +13,9 @@ i18n
   .init({
     debug: true,
     lng: "fr",
+    whitelist: ["fr", "en"],
+    nonExplicitWhitelist: true,
+    load: "languageOnly",
     fallbackLng: "en", // use en if detected lng is not available
     // saveMissing: true, // send not translated keys to endpoint
     keySeparator: false, // we do not use keys in form messages.welcome

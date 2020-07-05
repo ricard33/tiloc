@@ -80,7 +80,7 @@ const ChannelsDistribution = props => {
     layout: { padding: 0 },
     tooltips: {
       enabled: true,
-      mode: 'index',
+      // mode: 'index',
       intersect: false,
       borderWidth: 1,
       borderColor: theme.palette.divider,
@@ -121,7 +121,7 @@ const ChannelsDistribution = props => {
           labels: response.data.map(e => e.channel),
           datasets: [
             {
-              label: t("Channels distribution"),
+              label: t("Origin of bookings"),
               backgroundColor: [
                 "red", "green", "yellow", "grey", "blue", "orange", "purple"
               ],
@@ -150,7 +150,7 @@ const ChannelsDistribution = props => {
             <RefreshIcon />
           </IconButton>
         }
-        title={t("Channels distribution")}
+        title={t("Origin of bookings")}
       />
       <Divider />
       <CardContent>

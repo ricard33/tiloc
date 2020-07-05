@@ -69,6 +69,10 @@
   "{{count}} selected_plural": "{{count}} selected",
   "Search booking": "Search booking",
   "Add booking": "Add booking",
+  "Origin of bookings": "Origin of bookings",
+  "Filling rate": "Filling rate",
+  "Turnover": "Turnover",
+  "Last year": "Last year",
   "Holidays": "Holidays",
   "Pricing": "Pricing"
 }

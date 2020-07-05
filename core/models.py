@@ -112,6 +112,7 @@ class BookingChannel(models.Model):
 
     class Meta:
         verbose_name = _("Booking channel")
+        ordering = ['name']
 
     def __str__(self):
         return self.name
