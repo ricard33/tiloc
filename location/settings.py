@@ -40,7 +40,7 @@ UNITTEST = 'test' in sys.argv
 LOGGING_CONFIG = None  # disable log configuration by Django
 DEFAULT_LOG_FORMAT='%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
 
-configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, False)
+configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
 
 if ENV not in ['dev', 'prod']:
     logging.critical('Bad value for APP_ENV environment settings: %s', ENV)

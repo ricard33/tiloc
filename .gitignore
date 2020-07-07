@@ -135,3 +135,4 @@ frontend0/
 /assets/bundles/
 /.idea/shelf/
 /config/config.ini
+.DS_Store

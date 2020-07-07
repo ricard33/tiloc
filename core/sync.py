@@ -31,7 +31,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             continue
 
         if event.uid and models.Booking.objects.filter(lodging=lodging, source_uid=event.uid).exists():
-            logger.debug("Ignoring existing event [%s%s]", event)
+            logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.name)
             continue
 
         same_bookings = models.Booking.objects.filter(lodging=lodging, source_uid__isnull=True,
@@ -39,12 +39,12 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
 
         if same_bookings.exists():
             booking = same_bookings.first()
-            logger.info("Found booking with same dates for event [%s]", event)
+            logger.info("Found booking with same dates for event [%s -> %s: %s]", event.begin, event.end, event.name)
             booking.source_uid = event.uid
             booking.save()
             continue
 
-        logger.debug("Creating booking for event [%s]", event)
+        logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.name)
         models.Booking.objects.create(lodging=lodging,
                                       source=channel,
                                       source_uid=event.uid,
@@ -52,7 +52,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                                       status=channel.default_booking_status or models.BookingStatus.objects.first(),
                                       begin_date=event.begin.date(),
                                       end_date=event.end.date(),
-                                      duration=(event.end.date()-event.end.date()).days,
+                                      duration=(event.end.date()-event.begin.date()).days,
                                       price=0
                                       )
     sync.last_import = arrow.utcnow().datetime
