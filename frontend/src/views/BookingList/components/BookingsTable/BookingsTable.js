@@ -198,7 +198,7 @@ const BookingsTable = props => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {booking.lodging.name}
+                        {booking.lodging ? booking.lodging.name : ""}
                       </TableCell>
                       <TableCell>{booking.status.name}</TableCell>
                       <TableCell>{booking.price}</TableCell>
