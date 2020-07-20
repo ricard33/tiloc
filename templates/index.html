@@ -1,15 +1,24 @@
 {% load render_bundle from webpack_loader %}
 {% load settings %}
+{% load static %}
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" href="{% static "favicon.ico" %}"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="theme-color" content="#000000"/>
+    <meta
+        name="description"
+        content="Ti Loc apps"
+    />
+    <link rel="apple-touch-icon" href="{% static "apple-touch-icon.png" %}"/>
+    <link rel="manifest" href="{% static "manifest.json" %}"/>
     <title>{% settings_value "APP_NAME" %}</title>
-  </head>
-  <body>
-    <div id="root">
-    </div>
-      {% render_bundle 'main' %}
-  </body>
+</head>
+<body>
+<div id="root">
+</div>
+{% render_bundle 'main' %}
+</body>
 </html>
