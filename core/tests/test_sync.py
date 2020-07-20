@@ -136,6 +136,12 @@ class ExportCalendarTestCase(TestCase):
         e = c.events.pop()
         self.assertEqual(e.name, "Cédric")
 
+    def test_secondary_export_url(self):
+        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        r = self.client.get('/calendar/%s.ics' % self.lodging.uid)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r['content-type'], "text/calendar")
+
     def test_event_uid_are_reliable(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
         r = self.client.get('/calendar/%s/' % self.lodging.uid)
@@ -154,3 +160,34 @@ class ExportCalendarTestCase(TestCase):
         r = self.client.get('/calendar/%s/?s=%d' % (self.lodging.uid, sync.id))
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
+
+
+class ExportFullPlanningTestCase(TestCase):
+    def setUp(self) -> None:
+        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+            factories.BookingStatusFactory(name=name)
+        self.lodging1 = factories.LodgingFactory()
+        self.lodging2 = factories.LodgingFactory()
+        factories.BookingFactory(lodging=self.lodging1, guest_name="Cédric")
+        factories.BookingFactory(lodging=self.lodging2, guest_name="Daniel")
+
+    def test_full_export_by_admin(self):
+        admin = factories.AdminFactory()
+        self.client.force_login(admin)
+        r = self.client.get('/full_planning/')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r['content-type'], "text/calendar")
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 2)
+
+    def test_owner_export(self):
+        admin = factories.AdminFactory()
+        self.client.force_login(admin)
+        r = self.client.get('/full_planning/%d/' % self.lodging1.owner_id)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r['content-type'], "text/calendar")
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)
+        e = c.events.pop()
+        self.assertEqual(e.name, "Cédric")
+

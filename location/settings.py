@@ -201,7 +201,7 @@ if os.path.exists(PROD_ASSETS_DIR):
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'knox.auth.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication'
+        # 'rest_framework.authentication.SessionAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

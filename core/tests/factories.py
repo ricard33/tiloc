@@ -2,7 +2,21 @@ import random
 
 import factory
 import arrow
+from django.contrib.auth import get_user_model
+
 from core import models
+
+
+class UserFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = get_user_model()
+
+    username = factory.Faker('email')
+    email = factory.Faker('email')
+
+
+class AdminFactory(UserFactory):
+    is_superuser = True
 
 
 class OwnerFactory(factory.DjangoModelFactory):

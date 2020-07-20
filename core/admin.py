@@ -1,6 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from django.utils.translation import gettext_lazy as _
+from rest_framework.reverse import reverse
 
 from core import models
 from .imp_exp_resources import *
@@ -30,8 +31,17 @@ class BookingChannelAdmin(ImportExportModelAdmin):
 
 
 class BookingChannelSyncAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'channel', 'lodging', 'source_url', 'active', 'last_import', 'last_export')
+    list_display = ('id', 'channel', 'lodging', 'source_url', 'url_for_remote', 'active', 'last_import', 'last_export')
     list_display_links = ( 'channel', 'lodging')
+
+    def get_queryset(self, request):
+        qs = super(BookingChannelSyncAdmin, self).get_queryset(request)
+        self.request = request
+        return qs
+
+    def url_for_remote(self, obj):
+        return reverse('calendar_sync', kwargs={'uid': obj.lodging.uid},
+                       request=self.request) + '?s=%d' % obj.id
 
 
 class LodgingAdmin(ImportExportModelAdmin):

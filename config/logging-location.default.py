@@ -59,6 +59,10 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'django.utils.autoreload': {
+            'level': 'INFO',
+            'propagate': True,
+        },
         'django.template': {
             'level': 'INFO',
         },

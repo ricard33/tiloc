@@ -1,6 +1,7 @@
 import logging
 
 import arrow
+from django.contrib.auth import authenticate
 from django.db import transaction
 from django.db.models import Q, Count
 from django.http import Http404, HttpResponse
@@ -50,6 +51,46 @@ def export_calendar(request, uid):
         c.events.add(e)
     response = HttpResponse(c, content_type="text/calendar")
     response['Content-Disposition'] = 'attachment; filename="{}"'.format("%s.ics" % uid)
+    return response
+
+
+@transaction.atomic
+def export_full_planning(request, owner_id=None):
+    user = None
+    if not request.user.is_authenticated:
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        if auth_header:
+            token_type, _, credentials = auth_header.partition(' ')
+            import base64
+            username, password = base64.b64decode(credentials).decode().split(':', 1)
+            user = authenticate(request, username=username, password=password)
+        if not user:
+            r = HttpResponse(status=401)
+            r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
+            return r
+    owner = owner_id and get_object_or_404(models.Owner, id=owner_id) or None
+    if owner and owner_id != request.user.id and not request.user.is_superuser:
+        raise Http404('No owner matches the given query.')
+
+    qs = models.Booking.objects.all()
+    if owner:
+        qs = qs.filter(lodging__owner=owner)
+        logger.info("Full planning requested for owner [%s]", owner.name)
+    else:
+        logger.info("Full planning requested")
+
+    c = Calendar(creator="-//Gecko Conception//Location")
+    for booking in qs.order_by('begin_date', 'lodging__rank'):
+        e = Event()
+        e.uid = str(booking.uid)
+        e.name = booking.guest_name
+        e.begin = booking.begin_date
+        e.end = booking.end_date
+        e.description = booking.special_conditions
+        e.make_all_day()
+        c.events.add(e)
+    response = HttpResponse(c, content_type="text/calendar")
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format("planning.ics")
     return response
 
 
