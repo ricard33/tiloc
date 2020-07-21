@@ -161,6 +161,17 @@ class ExportCalendarTestCase(TestCase):
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
 
+    def test_booking_dates(self):
+        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric",
+                                 begin_date=arrow.get("20200802").date(), end_date=arrow.get("20200812").date())
+        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        self.assertEqual(r.status_code, 200)
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)
+        e = c.events.pop()
+        self.assertEqual(e.begin.date(), arrow.get("20200802").date())
+        self.assertEqual(e.end, arrow.get("20200812"))
+
 
 class ExportFullPlanningTestCase(TestCase):
     def setUp(self) -> None:

@@ -46,7 +46,7 @@ def export_calendar(request, uid):
         e.uid = str(booking.uid)
         e.name = booking.guest_name.split()[0]  # only first word (= first name)
         e.begin = booking.begin_date
-        e.end = booking.end_date
+        e.end = arrow.get(booking.end_date).shift(days=-1)  # make_all_day() will add 1 day
         e.make_all_day()
         c.events.add(e)
     response = HttpResponse(c, content_type="text/calendar")
@@ -72,7 +72,7 @@ def export_full_planning(request, owner_id=None):
     if owner and owner_id != request.user.id and not request.user.is_superuser:
         raise Http404('No owner matches the given query.')
 
-    qs = models.Booking.objects.all()
+    qs = models.Booking.objects.filter(lodging__isnull=False)
     if owner:
         qs = qs.filter(lodging__owner=owner)
         logger.info("Full planning requested for owner [%s]", owner.name)
@@ -84,6 +84,7 @@ def export_full_planning(request, owner_id=None):
         e = Event()
         e.uid = str(booking.uid)
         e.name = booking.guest_name
+        e.location = booking.lodging.name
         e.begin = booking.begin_date
         e.end = booking.end_date
         e.description = booking.special_conditions
