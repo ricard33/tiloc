@@ -131,7 +131,7 @@ const BookingScheduler = props => {
     title: booking.guest_name,
     status: booking.status,
     start_time: moment(booking.begin_date).add(12, "hours").valueOf(),
-    end_time: moment(booking.end_date).add(12, "hours").valueOf(),
+    end_time: moment(booking.end_date).add(6, "hours").valueOf(),
     canMove: true,
     canResize: true,
     canChangeGroup: true,
