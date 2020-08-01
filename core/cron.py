@@ -4,7 +4,7 @@ from time import time
 from django_cron import CronJobBase, Schedule
 
 from core import models
-from core.sync import synchronize_bookings, retrieve_and_synchronize_bookings
+from core.sync import retrieve_and_synchronize_bookings
 
 logger = logging.getLogger("cron")
 

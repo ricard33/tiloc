@@ -14,11 +14,10 @@ import os
 import sys
 from datetime import timedelta
 
-from my_django_tweaks.logging_config import configure_logging
-from smartconfigparser import Config
-
 # import django_heroku
 from django.utils.translation import gettext_lazy as _
+from my_django_tweaks.logging_config import configure_logging
+from smartconfigparser import Config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

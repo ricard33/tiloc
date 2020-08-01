@@ -1,7 +1,7 @@
 import random
 
-import factory
 import arrow
+import factory
 from django.contrib.auth import get_user_model
 
 from core import models

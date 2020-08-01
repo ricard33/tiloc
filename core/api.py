@@ -1,15 +1,15 @@
 from django.contrib.auth import authenticate
 from django.db import transaction
-from rest_framework import viewsets, permissions, generics
+from knox.models import AuthToken
+from rest_framework import generics, permissions, viewsets
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
-from knox.models import AuthToken
-
 from . import models
-from .serializers import CreateUserSerializer, UserSerializer, BookingSerializer, LoginUserSerializer, \
-    BookingStatusSerializer, LodgingSerializer, OwnerSerializer, BookingChannelSerializer, HolidaysSerializer, \
-    PricingSerializer, SeasonalVariationSerializer, BookingChannelSyncSerializer
+from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
+                          BookingStatusSerializer, CreateUserSerializer, HolidaysSerializer, LodgingSerializer,
+                          LoginUserSerializer, OwnerSerializer, PricingSerializer, SeasonalVariationSerializer,
+                          UserSerializer)
 
 
 class RegistrationAPI(generics.GenericAPIView):

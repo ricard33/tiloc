@@ -1,6 +1,5 @@
-import sys
-
 import os
+import sys
 
 LOG_FOLDER = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'log'))
 LOGGING = {

@@ -2,7 +2,7 @@
 
 from django.contrib.auth import authenticate, login
 # Create your views here.
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 
 from .forms import LoginForm, SignUpForm
 

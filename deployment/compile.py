@@ -1,6 +1,8 @@
-import os, sys, re
-from os.path import getsize, join
+import os
 import py_compile
+import re
+import sys
+from os.path import join
 
 base_dirs = map(lambda x: join(".", x), ('core', 'django_auth_ldap', ))
 verbose = '-v' in sys.argv
@@ -41,7 +43,7 @@ def compile_python(base_dir):
                 except Exception:
                     if verbose:
                         print("ERROR: %s" % str(Exception))
-                    print >> sys.stderr, "ERROR compiling '%s': %s" % (fullpath, str(Exception))
+                    print("ERROR compiling '%s': %s" % (fullpath, str(Exception)), file=sys.stderr)
                     errors.append((fullpath, Exception))
         for d in excludes:
             if d in dirs:

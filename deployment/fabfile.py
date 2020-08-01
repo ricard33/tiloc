@@ -2,11 +2,10 @@ import glob
 import os
 from datetime import datetime
 
-from fabric import Connection, task
+from fabric import task
 from invoke import Exit, Failure
-
+from patchwork import files
 from patchwork.transfers import rsync
-from  patchwork import files
 
 # c = Connection('ssh-crd.alwaysdata.net')
 FAB_PATH = os.path.dirname(os.path.abspath(__file__))

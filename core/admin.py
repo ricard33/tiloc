@@ -1,10 +1,10 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
 from django.utils.translation import gettext_lazy as _
+from import_export.admin import ImportExportModelAdmin
 from rest_framework.reverse import reverse
 
 from core import models
-from .imp_exp_resources import BookingResource
+from core.imp_exp_resources import BookingResource
 
 
 class BookingAdmin(ImportExportModelAdmin):

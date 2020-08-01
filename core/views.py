@@ -3,14 +3,13 @@ import logging
 import arrow
 from django.contrib.auth import authenticate
 from django.db import transaction
-from django.db.models import Q, Count
+from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from ics import Calendar, Event
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from core import models

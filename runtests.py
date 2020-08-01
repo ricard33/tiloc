@@ -16,8 +16,7 @@ PYTEST_ARGS = {
 
 FLAKE8_ARGS = ['app', 'core', 'legacy', 'location',]
 
-ISORT_ARGS = ['--check-only', '-o' 'uritemplate', '-p', '.', '-m', '0', '-w', '120',
-              '--fas', '--ds']
+ISORT_ARGS = ['.', '--check-only', '-m', '0', '-w', '120']
 
 sys.path.append(os.path.dirname(__file__))
 
