@@ -29,7 +29,7 @@ END:VEVENT
 END:VCALENDAR
 """
 
-abritel_ical=r"""BEGIN:VCALENDAR
+abritel_ical = r"""BEGIN:VCALENDAR
 VERSION:2.0
 CALSCALE:GREGORIAN
 PRODID:-//HomeAway.com, Inc.//EN
@@ -115,7 +115,8 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.first().status.id, status.id)
 
     def test_update_existing_booking_with_same_dates(self):
-        factories.BookingFactory(lodging=self.lodging, begin_date=arrow.get("20200802").date(), end_date=arrow.get("20200812").date())
+        factories.BookingFactory(lodging=self.lodging, begin_date=arrow.get("20200802").date(),
+                                 end_date=arrow.get("20200812").date())
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
@@ -201,4 +202,3 @@ class ExportFullPlanningTestCase(TestCase):
         self.assertEqual(len(c.events), 1)
         e = c.events.pop()
         self.assertEqual(e.name, "Cédric")
-

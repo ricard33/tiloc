@@ -3,3 +3,8 @@ coverage
 fabric~=2.5.0
 patchwork~=1.0.1
 factory_boy
+flake8>=3.8.3
+pep8>=1.7.0
+isort>=5.2.2
+pytest
+pytest-django

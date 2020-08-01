@@ -2,7 +2,7 @@ class Router:
     """
     A router to control all database operations on models.
     """
-    route_app_labels = {'legacy',}
+    route_app_labels = {'legacy', }
 
     def db_for_read(self, model, **hints):
         """
@@ -25,10 +25,7 @@ class Router:
         Allow relations if a model in the legacy apps is
         involved.
         """
-        if (
-            obj1._meta.app_label in self.route_app_labels or
-            obj2._meta.app_label in self.route_app_labels
-        ):
+        if obj1._meta.app_label in self.route_app_labels or obj2._meta.app_label in self.route_app_labels:
             return True
         return None
 

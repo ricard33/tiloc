@@ -52,7 +52,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                                       status=channel.default_booking_status or models.BookingStatus.objects.first(),
                                       begin_date=event.begin.date(),
                                       end_date=event.end.date(),
-                                      duration=(event.end.date()-event.begin.date()).days,
+                                      duration=(event.end.date() - event.begin.date()).days,
                                       price=0
                                       )
     sync.last_import = arrow.utcnow().datetime

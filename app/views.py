@@ -31,7 +31,7 @@ def pages(request):
         template = loader.get_template('ui/pages/' + load_template)
         return HttpResponse(template.render(context, request))
 
-    except:
+    except Exception:
         template = loader.get_template('ui/pages/error-404.html')
         return HttpResponse(template.render(context, request))
 

@@ -20,7 +20,8 @@ class Owner(models.Model):
     name = models.CharField(_("name"), max_length=200, unique=True)
     email = models.EmailField(_("email"))
     phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
-    contact = models.TextField(_("contact"), blank=True, null=True, help_text=_("Phone number and email as displayed in contracts, invoices, etc..."))
+    contact = models.TextField(_("contact"), blank=True, null=True,
+                               help_text=_("Phone number and email as displayed in contracts, invoices, etc..."))
     address = models.TextField(_("address"), blank=True, null=True)
     legal = models.TextField(_("legal mention"), blank=True, null=True, help_text=_("Legal mention on bills"))
     payment = models.TextField(_("payment"), blank=True, null=True, help_text=_("Payment information"))
@@ -28,8 +29,10 @@ class Owner(models.Model):
     no_vat = models.BooleanField(_("no vat"), )
     vat_rate = models.DecimalField(_("vat rate"), max_digits=10, decimal_places=2, blank=True, null=True)
     note = models.TextField(_("note"), blank=True)
-    invoice_label = models.CharField(_("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT)
-    deposit_label = models.CharField(_("deposit or down payment"), max_length=30, choices=DepositOrDownPayment.choices, default=DepositOrDownPayment.DEPOSIT)
+    invoice_label = models.CharField(_("invoice label"), max_length=30, choices=InvoiceLabel.choices,
+                                     default=InvoiceLabel.RECEIPT)
+    deposit_label = models.CharField(_("deposit or down payment"), max_length=30, choices=DepositOrDownPayment.choices,
+                                     default=DepositOrDownPayment.DEPOSIT)
     logo = models.ImageField(_("logo"), blank=True)
     signature = models.ImageField(_("signature"), blank=True)
     display_week = models.BooleanField(_("display week number"), default=False)
@@ -48,7 +51,8 @@ class Lodging(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     rank = models.IntegerField(_("rank"), )
     address = models.TextField(_("address"), )
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, help_text=_("Default price for one night"))
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2,
+                                     help_text=_("Default price for one night"))
     # weekly_rate = models.DecimalField(_("weekly price"), max_digits=10, decimal_places=2, null=True, blank=True)
     guaranty = models.DecimalField(_("guaranty deposit"), max_digits=10, decimal_places=2, null=True, blank=True)
     cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2, null=True, blank=True)
@@ -80,7 +84,8 @@ class Service(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     designation = models.CharField(_("designation"), max_length=256)
     quantity = models.DecimalField(_("quantity"), max_digits=10, decimal_places=2, blank=True, null=True)
-    unit_price_ht = models.DecimalField(_("unit price VAT excl."), max_digits=10, decimal_places=2, blank=True, null=True)
+    unit_price_ht = models.DecimalField(_("unit price VAT excl."), max_digits=10, decimal_places=2, blank=True,
+                                        null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=10, decimal_places=2, blank=True, null=True)
     auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
     auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
@@ -125,8 +130,10 @@ class BookingChannelSync(models.Model):
     lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
     source_url = models.URLField(_("Source URL"))
     active = models.BooleanField(_("active"), default=True)
-    last_import = models.DateTimeField(blank=True, null=True, help_text=_("Last time we imported remote calendar from channel."))
-    last_export = models.DateTimeField(blank=True, null=True, help_text=_("Last time the calendar has been successfully requested by remote channel."))
+    last_import = models.DateTimeField(blank=True, null=True,
+                                       help_text=_("Last time we imported remote calendar from channel."))
+    last_export = models.DateTimeField(blank=True, null=True, help_text=_(
+        "Last time the calendar has been successfully requested by remote channel."))
 
 
 class Booking(models.Model):
@@ -143,7 +150,8 @@ class Booking(models.Model):
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
     status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT)
     source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT, blank=True, null=True)
-    source_uid = models.CharField(_("channel UID"), max_length=256, null=True, blank=True, help_text=_('UID on source channel'))
+    source_uid = models.CharField(_("channel UID"), max_length=256, null=True, blank=True,
+                                  help_text=_('UID on source channel'))
     begin_date = models.DateField(_("begin date"), )
     end_date = models.DateField(_("end date"), )
     duration = models.PositiveSmallIntegerField(_("duration"), )
@@ -152,8 +160,10 @@ class Booking(models.Model):
     babies = models.PositiveSmallIntegerField(_("babies"), default=0)
     catering = models.CharField(_("catering"), choices=Catering.choices, default=Catering.NONE, max_length=20)
     daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
-    price = models.DecimalField(_("price"), max_digits=10, decimal_places=2, help_text=_("Total price, either computed by daily price or applying flat rate"))
-    is_flat_rate = models.BooleanField(_("flat rate?"), default=False, help_text=_("Use flat rate price insteed of daily price computation if true"))
+    price = models.DecimalField(_("price"), max_digits=10, decimal_places=2,
+                                help_text=_("Total price, either computed by daily price or applying flat rate"))
+    is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
+                                       help_text=_("Use flat rate price insteed of daily price computation if true"))
     deposit = models.DecimalField(_("deposit"), max_digits=10, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("guaranty"), max_digits=10, decimal_places=2, blank=True, null=True)
     info = models.TextField(_("info"), blank=True, null=True)
@@ -191,14 +201,15 @@ class Holidays(models.Model):
         verbose_name_plural = _("holidays")
 
 
-class Pricing(models.Model): # or RatePlan
+class Pricing(models.Model):  # or RatePlan
     name = models.CharField(_("name"), max_length=256)
     daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
     weekend_rate = models.DecimalField(_("weekend rate"), max_digits=10, decimal_places=2, blank=True, null=True)
     weekly_rate = models.DecimalField(_("weekly rate"), max_digits=10, decimal_places=2, blank=True, null=True)
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
     included_guests = models.PositiveSmallIntegerField(_("Number of guests included in the price"))
-    supplement_per_additional_guest = models.PositiveSmallIntegerField(_('Supplement per night and per aditional guest'))
+    supplement_per_additional_guest = models.PositiveSmallIntegerField(
+        _('Supplement per night and per aditional guest'))
     info = models.TextField(_("info"), blank=True, null=True)
 
 

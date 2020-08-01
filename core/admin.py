@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse
 
 from core import models
-from .imp_exp_resources import *
+from .imp_exp_resources import BookingResource
 
 
 class BookingAdmin(ImportExportModelAdmin):
@@ -32,7 +32,7 @@ class BookingChannelAdmin(ImportExportModelAdmin):
 
 class BookingChannelSyncAdmin(ImportExportModelAdmin):
     list_display = ('id', 'channel', 'lodging', 'source_url', 'url_for_remote', 'active', 'last_import', 'last_export')
-    list_display_links = ( 'channel', 'lodging')
+    list_display_links = ('channel', 'lodging')
 
     def get_queryset(self, request):
         qs = super(BookingChannelSyncAdmin, self).get_queryset(request)
@@ -50,18 +50,18 @@ class LodgingAdmin(ImportExportModelAdmin):
 
 class OwnerAdmin(ImportExportModelAdmin):
     list_display = ('id', 'name', 'email', 'phone', 'active')
-    list_display_links = ( 'name', )
+    list_display_links = ('name', )
 
 
 class HolidaysAdmin(ImportExportModelAdmin):
     list_display = ('id', 'name', 'begin_date', 'end_date')
-    list_display_links = ( 'name', )
+    list_display_links = ('name', )
 
 
 class PricingAdmin(ImportExportModelAdmin):
     list_display = ('id', 'name', 'daily_rate', 'weekend_rate', 'weekly_rate', 'minimum_stay', 'included_guests',
                     'supplement_per_additional_guest')
-    list_display_links = ( 'name', )
+    list_display_links = ('name', )
     list_editable = ('daily_rate', 'weekend_rate', 'weekly_rate', 'minimum_stay', 'included_guests',
                      'supplement_per_additional_guest')
 
@@ -69,7 +69,7 @@ class PricingAdmin(ImportExportModelAdmin):
 class SeasonalVariationAdmin(ImportExportModelAdmin):
     list_display = ('id', 'pricing', 'name', 'begin_date', 'end_date',
                     'daily_rate', 'weekend_rate', 'weekly_rate', 'minimum_stay')
-    list_display_links = ( 'name', )
+    list_display_links = ('name', )
 
 
 admin.site.register(models.Booking, BookingAdmin)

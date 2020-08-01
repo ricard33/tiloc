@@ -95,7 +95,7 @@ def export_full_planning(request, owner_id=None):
     return response
 
 
-@api_view(['GET',])
+@api_view(['GET', ])
 def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')
@@ -110,10 +110,11 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
             d2 = d2.floor('day').shift(days=1)
             month = d1.format(fmt='YYYY-MM')
             delta = (min(d2, arrow.get(booking.end_date)) - max(d1, arrow.get(booking.begin_date))).days
-            value = data.setdefault(month, {'date': month, 'days': 0, 'turnover': 0, 'capacity': days_in_month * lodging_count})
+            value = data.setdefault(month, {'date':     month, 'days': 0, 'turnover': 0,
+                                            'capacity': days_in_month * lodging_count})
             if delta > 0:
                 value['days'] = value['days'] + delta
-                if booking.duration> 0:
+                if booking.duration > 0:
                     value['turnover'] = value['turnover'] + delta * booking.price / booking.duration
 
     keys = list(data.keys())
@@ -125,7 +126,7 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
     return Response(sorted_data)
 
 
-@api_view(['GET',])
+@api_view(['GET', ])
 def channel_distribution(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')
@@ -133,7 +134,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-1), end=arro
     dates_range = [begin.date(), end.date()]
     booking_count = Count('booking',
                           filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
-                                 & Q(booking__lodging__isnull=False))
+                                & Q(booking__lodging__isnull=False))  # noqa: E127
     channels = models.BookingChannel.objects.annotate(booking_count=booking_count)
     for row in channels:
         data.append({'channel': row.name, 'count': row.booking_count})

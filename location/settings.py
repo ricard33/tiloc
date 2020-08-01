@@ -38,7 +38,7 @@ ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')
 UNITTEST = 'test' in sys.argv
 
 LOGGING_CONFIG = None  # disable log configuration by Django
-DEFAULT_LOG_FORMAT='%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
+DEFAULT_LOG_FORMAT = '%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
 
 configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
 
@@ -48,7 +48,7 @@ if ENV not in ['dev', 'prod']:
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
     SECRET_KEY = config.get('APP', 'SECRET_KEY')  # '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
-except:
+except Exception:
     print('SECRET_KEY not found! Generating a new one...', file=sys.stderr)
     import random
 
@@ -126,11 +126,11 @@ WSGI_APPLICATION = 'location.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config.get('DATABASE', 'engine', 'django.db.backends.sqlite3'),
-        'HOST': config.get('DATABASE', 'host', ''),
-        'PORT': config.getint('DATABASE', 'port', 5432),
-        'NAME': config.get('DATABASE', 'name', os.path.join(BASE_DIR, 'db.sqlite3')),
-        'USER': config.get('DATABASE', 'user', 'location'),
+        'ENGINE':   config.get('DATABASE', 'engine', 'django.db.backends.sqlite3'),
+        'HOST':     config.get('DATABASE', 'host', ''),
+        'PORT':     config.getint('DATABASE', 'port', 5432),
+        'NAME':     config.get('DATABASE', 'name', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER':     config.get('DATABASE', 'user', 'location'),
         'PASSWORD': config.get('DATABASE', 'password', ''),
     },
     # 'legacy': {
@@ -160,7 +160,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = ['core.auth_backend.EmailBackend']
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -203,20 +202,20 @@ REST_FRAMEWORK = {
         'knox.auth.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication'
     ),
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES':     [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE':                100
+    'DEFAULT_PAGINATION_CLASS':       'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':                      100
 }
 
 REST_KNOX = {
-  'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'
-                           or 'cryptography.hazmat.primitives.hashes.SHA512',
-  # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-  'TOKEN_TTL': timedelta(days=30),
-  # 'TOKEN_LIMIT_PER_USER': None,
-  'AUTO_REFRESH': True,
+    'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'
+                             or 'cryptography.hazmat.primitives.hashes.SHA512',  # noqa: E131
+    # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+    'TOKEN_TTL':             timedelta(days=30),
+    # 'TOKEN_LIMIT_PER_USER': None,
+    'AUTO_REFRESH':          True,
 }
 
 APP_NAME = _("My Rentals")
@@ -228,8 +227,8 @@ GRAPPELLI_ADMIN_TITLE = _("Tourism Location")
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME':    'bundles/',
-        'STATS_FILE':         os.path.join(BASE_DIR, 'webpack-stats.%s.json' % ENV),
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE':      os.path.join(BASE_DIR, 'webpack-stats.%s.json' % ENV),
     }
 }
 
