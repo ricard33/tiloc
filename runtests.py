@@ -14,7 +14,7 @@ PYTEST_ARGS = {
     'fast': ['core', '--tb=short', '-q', '-s', '-rw'],
 }
 
-FLAKE8_ARGS = ['app', 'core', 'legacy', 'location',]
+FLAKE8_ARGS = ['authentication', 'core', 'location',]
 
 ISORT_ARGS = ['.', '--check-only', '-m', '0', '-w', '120']
 

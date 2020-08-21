@@ -60,7 +60,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
     path("", include("authentication.urls")),
-    path("app/", include("app.urls")),
     # path('', include('frontend.urls')),
     # url(r'^', IndexPage.as_view(template_name="index.html")),
 ]

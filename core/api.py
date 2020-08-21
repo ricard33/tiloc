@@ -5,7 +5,7 @@ import pdfkit as pdfkit
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db import transaction
-from django.http import HttpResponse, Http404
+from django.http import Http404, HttpResponse
 from knox.models import AuthToken
 from rest_framework import generics, permissions, viewsets
 from rest_framework.decorators import action

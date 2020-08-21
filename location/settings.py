@@ -79,9 +79,7 @@ INSTALLED_APPS = [
     'import_export',
     'knox',
     'django_cron',
-    # 'legacy',
     'core',
-    'app',
     # 'frontend',
     'webpack_loader',
 ]
