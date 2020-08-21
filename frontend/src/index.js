@@ -13,6 +13,7 @@ import orm from "./orm";
 import { createFullStore } from "./store";
 import "./index.css";
 import { createBrowserHistory } from "history";
+import "quill";
 
 const { sagaMiddleware, store } = createFullStore(orm);
 const browserHistory = createBrowserHistory();

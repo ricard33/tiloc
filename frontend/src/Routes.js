@@ -5,12 +5,13 @@ import { RouteWithLayout } from "./components";
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
 import {
-  // BookingEdit,
   BookingList as BookingView,
-  Planning as PlanningView,
+  ContractEdit,
   Dashboard as DashboardView,
+  NotFound as NotFoundView,
+  Planning as PlanningView,
   SignIn,
-  NotFound as NotFoundView
+  TestPage
 } from "./views";
 
 const Routes = () => {
@@ -44,12 +45,18 @@ const Routes = () => {
         layout={MainLayout}
         path="/bookings"
       />
-      {/*<RouteWithLayout*/}
-      {/*  component={BookingEdit}*/}
-      {/*  exact*/}
-      {/*  layout={MainLayout}*/}
-      {/*  path="/bookings/:id"*/}
-      {/*/>*/}
+      <RouteWithLayout
+        component={ContractEdit}
+        exact
+        layout={MainLayout}
+        path="/bookings/:bookingId/contract"
+      />
+      <RouteWithLayout
+        component={TestPage}
+        exact
+        layout={MainLayout}
+        path="/test-page"
+      />
       <RouteWithLayout
         component={NotFoundView}
         exact

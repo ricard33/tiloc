@@ -32,6 +32,7 @@
   "Statistics": "Statistics",
   "Further information": "Further information",
   "Delete": "Delete",
+  "Contract": "Contract",
   "Cancel": "Cancel",
   "Save": "Save",
   "Guest:": "Guest:",
@@ -46,6 +47,12 @@
   "Contact:": "Contact:",
   "Remarks:": "Remarks:",
   "Importing bookings": "Importing bookings",
+  "Rental agreement": "Rental agreement",
+  "The model contract is provided as an example only and does not replace legal advice or professional assistance. No legal or other liability is accepted by the software publisher.": "The model contract is provided as an example only and does not replace legal advice or professional assistance. No legal or other liability is accepted by the software publisher.",
+  "Contract saved {{modified_date}}. Click on 'Regenerate' to update it.": "Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
+  "Regenerate": "Regenerate",
+  "Print": "Print",
+  "PDF": "PDF",
   "Sort": "Sort",
   "default rate": "default rate",
   "week": "week",
@@ -72,7 +79,6 @@
   "Origin of bookings": "Origin of bookings",
   "Filling rate": "Filling rate",
   "Turnover": "Turnover",
-  "Last year": "Last year",
   "Holidays": "Holidays",
   "Pricing": "Pricing"
 }

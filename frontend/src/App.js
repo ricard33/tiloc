@@ -5,6 +5,7 @@ import validate from "validate.js";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
+import * as actions from "./actions";
 import { auth } from "./actions";
 import "./assets/scss/index.scss";
 import AlertHandler from "./components/alertHandler";
@@ -12,9 +13,9 @@ import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
 import moment from "moment";
+import { ConfirmProvider } from "material-ui-confirm";
 // import 'moment/min/moment-with-locales';
-import localization from 'moment/locale/fr';
-import * as actions from "./actions";
+import localization from "moment/locale/fr";
 
 
 validate.validators = {
@@ -25,8 +26,8 @@ validate.validators = {
 function App(props) {
   const dispatch = useDispatch();
   const token = useSelector(store => store.auth.token);
-  moment.updateLocale('fr', localization);
-  moment.locale('fr');
+  moment.updateLocale("fr", localization);
+  moment.locale("fr");
 
   useEffect(() => {
     dispatch(auth.loadUser(token));
@@ -35,10 +36,12 @@ function App(props) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router history={props.history}>
-        <Routes/>
-      </Router>
-      <AlertHandler />
+      <ConfirmProvider>
+        <Router history={props.history}>
+          <Routes/>
+        </Router>
+        <AlertHandler/>
+      </ConfirmProvider>
     </ThemeProvider>
   );
 }

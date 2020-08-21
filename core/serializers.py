@@ -102,3 +102,15 @@ class SeasonalVariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SeasonalVariation
         fields = '__all__'
+
+
+class ContractTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ContractTemplate
+        fields = '__all__'
+
+
+class ContractSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Contract
+        fields = '__all__'

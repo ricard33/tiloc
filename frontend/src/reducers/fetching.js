@@ -54,4 +54,5 @@ export default combineReducers({
   'booking_channels': fetchingReducer(types.FETCH_BOOKING_CHANNELS),
   'lodgings': fetchingReducer(types.FETCH_LODGINGS),
   'owners': fetchingReducer(types.FETCH_OWNERS),
+  'contracts': fetchingReducer(types.FETCH_CONTRACTS),
 })

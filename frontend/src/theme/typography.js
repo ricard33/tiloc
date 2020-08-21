@@ -14,48 +14,48 @@ export default {
     "\"Segoe UI Emoji\"",
     "\"Segoe UI Symbol\""
   ].join(","),
-  // h1: {
+  h1: {
   //   color: palette.text.primary,
-  //   fontWeight: 500,
-  //   fontSize: "35px",
-  //   letterSpacing: "-0.24px",
+    fontWeight: 500,
+    fontSize: "2.5rem",
+    // letterSpacing: "-0.24px",
   //   lineHeight: "40px"
-  // },
-  // h2: {
+  },
+  h2: {
   //   color: palette.text.primary,
-  //   fontWeight: 500,
-  //   fontSize: "29px",
+    fontWeight: 500,
+    fontSize: "2rem",
   //   letterSpacing: "-0.24px",
   //   lineHeight: "32px"
-  // },
-  // h3: {
+  },
+  h3: {
   //   color: palette.text.primary,
-  //   fontWeight: 500,
-  //   fontSize: "24px",
+    fontWeight: 500,
+    fontSize: "1.5rem",
   //   letterSpacing: "-0.06px",
   //   lineHeight: "28px"
-  // },
-  // h4: {
+  },
+  h4: {
   //   color: palette.text.primary,
-  //   fontWeight: 500,
-  //   fontSize: "20px",
+    fontWeight: 500,
+    fontSize: "1.2rem",
   //   letterSpacing: "-0.06px",
   //   lineHeight: "24px"
-  // },
-  // h5: {
+  },
+  h5: {
   //   color: palette.text.primary,
-  //   fontWeight: 500,
-  //   fontSize: "16px",
+    fontWeight: 500,
+    fontSize: "1rem",
   //   letterSpacing: "-0.05px",
   //   lineHeight: "20px"
-  // },
-  // h6: {
+  },
+  h6: {
   //   color: palette.text.primary,
-  //   fontWeight: 500,
-  //   fontSize: "14px",
+    fontWeight: 500,
+    fontSize: "0.9em",
   //   letterSpacing: "-0.05px",
   //   lineHeight: "20px"
-  // },
+  },
   // subtitle1: {
   //   color: palette.text.primary,
   //   fontSize: "16px",
@@ -71,13 +71,13 @@ export default {
   // },
   body1: {
     color: palette.text.primary,
-    fontSize: "14px",
+    fontSize: "0.85em",
     letterSpacing: "-0.05px",
     lineHeight: "21px"
   },
   body2: {
     color: palette.text.secondary,
-    fontSize: "12px",
+    fontSize: "0.8em",
     letterSpacing: "-0.04px",
     lineHeight: "18px"
   },

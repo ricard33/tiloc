@@ -37,12 +37,12 @@ export function deleteBooking(booking_id, callback) {
 
 export function fetchBookingStatuses() {
   return {
-    type: types.FETCH_BOOKING_STATUSES_REQUEST
+    type: types.REQUEST(types.FETCH_BOOKING_STATUSES)
   };
 }
 
 export function fetchBookingChannels() {
   return {
-    type: types.FETCH_BOOKING_CHANNELS_REQUEST
+    type: types.REQUEST(types.FETCH_BOOKING_CHANNELS)
   };
 }

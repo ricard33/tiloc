@@ -38,6 +38,10 @@ class LodgingFactory(factory.DjangoModelFactory):
     address = factory.Faker("address")
     daily_rate = 50
 
+    description = """<strong>Capacity:</strong> 4 adults</br>
+    <strong>Lodging type:</strong> Bungalow</br>
+    ..."""
+
 
 class BookingChannelFactory(factory.DjangoModelFactory):
     class Meta:
@@ -78,3 +82,19 @@ class BookingFactory(factory.DjangoModelFactory):
     duration = factory.LazyAttribute(lambda b: (b.end_date - b.begin_date).days)
     daily_rate = factory.LazyAttribute(lambda b: b.lodging.daily_rate)
     price = factory.LazyAttribute(lambda b: b.daily_rate * b.duration)
+
+
+class ContractTemplateFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.ContractTemplate
+
+    name = factory.Sequence(lambda n: "template %d" % n)
+    content = "{{ lodging.name }}: from {{ booking.begin_date }} to {{ booking.end_date }}..."
+
+
+class ContractFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = models.Contract
+
+    booking = factory.SubFactory(BookingFactory)
+    content = ""

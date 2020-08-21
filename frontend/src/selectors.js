@@ -32,7 +32,9 @@ export const guests = createSelector(orm.Booking, orm, (booking, session) => {
   }).reduce((unique, item) =>
     unique.filter(e => e.name === item.name).length > 0 ? unique : [...unique, item], []);
 });
-
-export function toto() {
-  console.log(arguments);
-}
+export const contracts = createSelector(orm.Booking.contract);
+// export const contracts = createSelector(orm.Contract);
+export const contracts2 = createSelector(orm.Booking, orm, (booking, session) => {
+  return session.Booking.all().toModelArray()
+    .map(b => b.contract ? b.contract.ref : undefined);
+});

@@ -1,0 +1,247 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { makeStyles } from "@material-ui/styles";
+import { useTranslation } from "react-i18next";
+import PropTypes from "prop-types";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import { bookingType } from "../../common/propTypesUtils";
+import DialogActions from "@material-ui/core/DialogActions";
+import Button from "@material-ui/core/Button";
+import {
+  DeleteForever as DeleteIcon,
+  PictureAsPdf as PdfIcon,
+  Refresh as RefreshIcon,
+  Save as SaveIcon
+} from "@material-ui/icons";
+import * as actions from "../../actions";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import * as selectors from "../../selectors";
+import { Grid } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import useWindowDimensions from "../../common/windowDimensions";
+import moment from "moment";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Editor from "../Editor";
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    padding: theme.spacing(1)
+  },
+  content: {
+    marginTop: theme.spacing(2)
+  },
+  formControl: {
+    width: "100%"
+  },
+  flexBoxAlignLeft: {
+    display: "flex",
+    alignItems: "baseline"
+    // justifyContent: "stretch"
+  },
+  flexBoxStretched: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between"
+  },
+  spacer: {
+    flexBasis: "2em"
+  },
+  button: {
+    margin: theme.spacing(1)
+  },
+  statusItem: {
+    width: "-webkit-fill-available"
+    // width: "stretch",
+    // padding: theme.spacing(1)
+    // height: "1em",
+    // marginRight: "5px"
+  },
+  deleteButton: {
+    color: "red"
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff"
+  }
+}));
+
+const ContractDialog = props => {
+  const { booking, onClose } = props;
+  const classes = useStyles();
+  const { height, width } = useWindowDimensions();
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const contract = useSelector(store => selectors.contracts(store, booking.id));
+  const [content, setContent] = useState(contract ? contract.content : undefined);
+  const [loading, setLoading] = useState(true);
+
+  console.assert(!!booking, "Booking not initialized");
+
+  const loaded = useCallback(
+    () => {
+      setLoading(false);
+    },
+    []
+  );
+
+  useEffect(() => {
+    dispatch(actions.getOrCreateContract(booking.id, loaded));
+  }, [booking.id, loaded, dispatch]);
+
+  useEffect(() => {
+    if(contract)
+      setContent(contract.content);
+  }, [contract]);
+
+  function onChange(newContent) {
+    setContent(newContent);
+  }
+
+  function regenerateContract() {
+    setContent(undefined);
+    setLoading(true);
+    dispatch(actions.generateContract(booking.id, loaded));
+  }
+
+  function makePDF() {
+    const fileDownload = require("js-file-download");
+    axios.get("/api/contract/" + contract.id + "/pdf/",
+      {
+        responseType: "blob" // important
+      })
+      .then((response) => {
+        const contentDisposition = response.headers["content-disposition"];
+        let fileName = "contract.pdf";
+        if (contentDisposition) {
+          fileName = contentDisposition.split("filename=")[1];
+        }
+
+        fileDownload(response.data, fileName);
+      });
+
+  }
+
+  function onCancel() {
+    onClose();
+  }
+
+  function onDelete() {
+    if (contract.id)
+      dispatch(actions.deleteContract(contract.id, () => {
+        console.debug("Closing...");
+        onClose();
+      }));
+  }
+
+  function onSave() {
+    const submittedContract = {
+      id: contract.id,
+      content: content
+    };
+    const action = actions.updateContract;
+    dispatch(action(submittedContract, () => {
+      onClose(submittedContract);
+    }));
+  }
+
+  return (
+    <Dialog
+      className={classes.root}
+      onClose={onClose}
+      aria-labelledby="simple-dialog-title"
+      open={!!contract}
+      maxWidth="md"
+      fullScreen={width <= 600}
+      disableEnforceFocus
+      disablePortal
+      disableAutoFocus
+    >
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+
+      <DialogTitle id="simple-dialog-title">
+        {t("Rental agreement")}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          {t("The model contract is provided as an example only and does not replace legal advice or professional assistance. " +
+            "No legal or other liability is accepted by the software publisher.")}
+        </DialogContentText>
+        {contract &&
+        <Grid
+          container
+          spacing={1}
+        >
+          <Grid item xs={12}>
+            <Typography>{t("Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
+              { modified_date: moment(contract.modified).fromNow() })}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            {content &&
+            <Editor
+              content={content}
+              onChange={onChange}
+            />}
+          </Grid>
+        </Grid>
+        }
+      </DialogContent>
+      <DialogActions>
+        {contract && contract.id &&
+        <Button
+          type="button"
+          className={classes.deleteButton}
+          color="secondary"
+          startIcon={<DeleteIcon/>}
+          onClick={onDelete}
+        >{t("Delete")}</Button>}
+        <div style={{ flex: "1 0 0" }}/>
+        <Button
+          type="button"
+          color="default"
+          className={classes.button}
+          startIcon={<RefreshIcon/>}
+          onClick={regenerateContract}
+        >{t("Regenerate")}</Button>
+        {/*<Button*/}
+        {/*  type="button"*/}
+        {/*  color="default"*/}
+        {/*  className={classes.button}*/}
+        {/*  startIcon={<PrintIcon/>}*/}
+        {/*  onClick={printContract}*/}
+        {/*  title={t("Print")}*/}
+        {/*/>*/}
+        <Button
+          type="button"
+          color="default"
+          className={classes.button}
+          startIcon={<PdfIcon/>}
+          onClick={makePDF}
+          title={t("PDF")}
+        >{t("PDF")}</Button>
+        <div style={{ flex: "1 0 0" }}/>
+        <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+        <Button
+          type="submit"
+          color="primary"
+          className={classes.button}
+          startIcon={<SaveIcon/>}
+          onClick={onSave}
+        >{t("Save")}</Button>
+      </DialogActions>
+    </Dialog>
+
+  );
+};
+
+ContractDialog.propTypes = {
+  booking: bookingType,
+  onClose: PropTypes.func.isRequired
+};
+
+export default ContractDialog;

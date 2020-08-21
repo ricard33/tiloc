@@ -1,5 +1,8 @@
+import os
 import uuid
 
+import jinja2
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -58,6 +61,9 @@ class Lodging(models.Model):
     cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
+
+    contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
+    description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
 
     class Meta:
         verbose_name = _("Lodging")
@@ -168,8 +174,6 @@ class Booking(models.Model):
     guaranty = models.DecimalField(_("guaranty"), max_digits=10, decimal_places=2, blank=True, null=True)
     info = models.TextField(_("info"), blank=True, null=True)
 
-    contract = models.FileField(_("contract"), blank=True, null=True)
-    contract_date = models.DateField(_("contract date"), blank=True, null=True)
     special_conditions = models.TextField(_("Special conditions"), blank=True, null=True)
     options = models.ManyToManyField(Service, through='BookedService')
 
@@ -181,6 +185,62 @@ class Booking(models.Model):
 
     def get_absolute_url(self):
         return reverse('booking-detail', kwargs={'pk': self.pk})
+
+    def generate_contract(self, url_server='http://127.0.0.1:8000'):
+        if not Contract.objects.filter(booking=self).exists():
+            self.contract = Contract(booking=self)
+        if self.lodging.contract_template:
+            # jinja2 template
+            template_env = jinja2.Environment()
+            template = template_env.from_string(self.lodging.contract_template.content)
+            content = template.render({
+                'booking': self,
+                'lodging': self.lodging,
+                'owner': self.lodging.owner,
+                'url_server': url_server,
+            })
+            page_break = '<div style="display: block; page-break-before: always;"></div>'
+            if self.lodging.description:
+                content += page_break + self.lodging.description
+            self.contract.content = content
+        else:
+            self.contract.content = ""
+        self.contract.save()
+        return self.contract
+
+
+class Contract(models.Model):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
+    content = models.TextField(_("Contract"))
+    pdf = models.FilePathField(path=os.path.join(settings.MEDIA_ROOT, 'contracts'), null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    pdf_created = models.DateTimeField(null=True, blank=True)
+    signed = models.DateTimeField(_("signed"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Contract")
+
+    def __str__(self):
+        return "%s (%s -> %s)" % (self.booking.guest_name, self.booking.begin_date, self.booking.end_date)
+
+    def make_pdf_path(self):
+        return os.path.join('contracts', str(self.booking.lodging.uid),
+                            "%s_%s.pdf" % (self.booking.begin_date.isoformat(),
+                                           self.booking.guest_name.replace(" ", "_")))
+
+
+class ContractTemplate(models.Model):
+    name = models.CharField(max_length=100)
+    content = models.TextField(_("Contract"))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Contract template")
+
+    def __str__(self):
+        return self.name
 
 
 class BookedService(models.Model):

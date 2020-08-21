@@ -17,6 +17,7 @@ import os
 
 from django.conf import settings
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from django.views.decorators.cache import never_cache
@@ -36,6 +37,8 @@ router.register(r'owner', api.OwnerViewSet, 'owner')
 router.register(r'holidays', api.HolidaysViewSet, 'holidays')
 router.register(r'pricing', api.PricingViewSet, 'pricing')
 router.register(r'seasonal_variation', api.SeasonalVariationViewSet, 'seasonal_variation')
+router.register(r'contract_template', api.ContractTemplateViewSet, 'contract_template')
+router.register(r'contract', api.ContractViewSet, 'contract')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),
@@ -59,10 +62,12 @@ urlpatterns = [
     path("", include("authentication.urls")),
     path("app/", include("app.urls")),
     # path('', include('frontend.urls')),
-    url(r'^', IndexPage.as_view(template_name="index.html")),
+    # url(r'^', IndexPage.as_view(template_name="index.html")),
 ]
 
 if settings.ENV == 'dev':
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
     # patch for static files from React (They are broken due to use of django dev server instead of Webpack one)
     public_path = os.path.join(settings.BASE_DIR, 'frontend', 'public')
     for root, dirs, files in os.walk(public_path, topdown=True):
@@ -72,3 +77,5 @@ if settings.ENV == 'dev':
             # print(relative_path)
             urlpatterns.insert(-1, url(relative_path, never_cache(serve_static_file),
                                        kwargs={'document_path': fullpath}))
+
+urlpatterns.append(url(r'^', IndexPage.as_view(template_name="index.html")))

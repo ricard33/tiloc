@@ -17,8 +17,8 @@ describe.skip("booking actions", () => {
     const store = mockStore({ bookings: {} });
 
     const expectedActions = [
-      { type: types.FETCH_BOOKINGS_REQUEST },
-      { type: types.FETCH_BOOKINGS_SUCCESS, data: resp.data },
+      { type: types.REQUEST(types.FETCH_BOOKINGS) },
+      { type: types.SUCCESS(types.FETCH_BOOKINGS), data: resp.data },
     ];
 
     return store.dispatch(bookings.fetchBookings()).then(() => {
@@ -31,8 +31,8 @@ describe.skip("booking actions", () => {
     const store = mockStore({ bookings: {} });
 
     const expectedActions = [
-      { type: types.FETCH_BOOKINGS_REQUEST },
-      { type: types.FETCH_BOOKINGS_FAILURE, error: "Predictable error" },
+      { type: types.REQUEST(types.FETCH_BOOKINGS) },
+      { type: types.FAILURE(types.FETCH_BOOKINGS), error: "Predictable error" },
     ];
 
     return store.dispatch(bookings.fetchBookings()).then(() => {
@@ -44,7 +44,7 @@ describe.skip("booking actions", () => {
 
 describe("generic restful client", () =>{
   it("should use composed action names", () => {
-    expect(types["FETCH_BOOKING_STATUSES_REQUEST"]).toEqual(types.FETCH_BOOKING_STATUSES_REQUEST);
+    expect(types["FETCH_BOOKING_STATUSES"]).toEqual(types.FETCH_BOOKING_STATUSES);
   });
 });
 
@@ -56,8 +56,8 @@ describe("booking status actions", () => {
     const store = mockStore({ statuses: {} });
 
     const expectedActions = [
-      { type: types.FETCH_BOOKING_STATUSES_REQUEST },
-      { type: types.FETCH_BOOKING_STATUSES_SUCCESS, data: resp.data },
+      { type: types.REQUEST(types.FETCH_BOOKING_STATUSES) },
+      { type: types.SUCCESS(types.FETCH_BOOKING_STATUSES), data: resp.data },
     ];
 
     return store.dispatch(bookings.fetchBookingStatuses()).then(() => {

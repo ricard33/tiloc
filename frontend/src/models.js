@@ -1,4 +1,4 @@
-import { Model, fk, attr, many } from "redux-orm";
+import { attr, fk, many, Model, oneToOne } from "redux-orm";
 import * as types from "actions/actionTypes";
 
 export const createModels = () => {
@@ -35,7 +35,7 @@ export const createModels = () => {
 
     static reducer(action, Owner, session) {
       switch (action.type) {
-        case types.FETCH_OWNERS_SUCCESS: {
+        case types.SUCCESS(types.FETCH_OWNERS): {
           action.data.results.forEach(item => Owner.parse(item));
           break;
         }
@@ -76,7 +76,7 @@ export const createModels = () => {
 
     static reducer(action, Lodging, session) {
       switch (action.type) {
-        case types.FETCH_LODGINGS_SUCCESS: {
+        case types.SUCCESS(types.FETCH_LODGINGS): {
           action.data.results.forEach(item => Lodging.parse(item));
           break;
         }
@@ -113,7 +113,7 @@ export const createModels = () => {
 
     static reducer(action, BookingStatus, session) {
       switch (action.type) {
-        case types.FETCH_BOOKING_STATUSES_SUCCESS: {
+        case types.SUCCESS(types.FETCH_BOOKING_STATUSES): {
           action.data.results.forEach(item => BookingStatus.parse(item));
           break;
         }
@@ -142,7 +142,7 @@ export const createModels = () => {
 
     static reducer(action, BookingChannel, session) {
       switch (action.type) {
-        case types.FETCH_BOOKING_CHANNELS_SUCCESS: {
+        case types.SUCCESS(types.FETCH_BOOKING_CHANNELS): {
           action.data.results.forEach(item => BookingChannel.parse(item));
           break;
         }
@@ -187,8 +187,6 @@ export const createModels = () => {
         deposit: attr(),
         guaranty: attr(),
         info: attr(),
-        contract: attr(),
-        contract_date: attr(),
         special_conditions: attr(),
         options: many({
           to: Service,
@@ -211,7 +209,7 @@ export const createModels = () => {
 
     static reducer(action, Booking, session) {
       switch (action.type) {
-        case types.FETCH_BOOKINGS_SUCCESS: {
+        case types.SUCCESS(types.FETCH_BOOKINGS): {
           action.data.results.forEach(item => Booking.parse(item));
           break;
         }
@@ -252,8 +250,77 @@ export const createModels = () => {
     }
   };
 
+  const ContractTemplate = class ContractTemplateModel extends Model {
+    static modelName = "ContractTemplate";
+
+    static get field() {
+      return {
+        id: attr(),
+        name: attr(),
+        content: attr(),
+        created: attr(),
+        modified: attr(),
+      };
+    }
+
+    static parse(data) {
+      const { ContractTemplate } = this.session;
+      return ContractTemplate.upsert(data);
+    }
+  };
+
+  const Contract = class ContractModel extends Model {
+    static modelName = "Contract";
+
+    static get fields() {
+      return {
+        id: attr(),
+        booking: oneToOne({
+          to: 'Booking',
+          as: 'booking',
+          relatedName: 'contract'
+        }),
+        content: attr(),
+        pdf: attr(),
+        created: attr(),
+        modified: attr(),
+        pdf_created: attr(),
+        signed: attr(),
+      };
+    }
+
+    static parse(data) {
+      const { Contract } = this.session;
+      return Contract.upsert(data);
+    }
+
+    static reducer(action, Contract, session) {
+      switch (action.type) {
+        case types.SUCCESS(types.FETCH_CONTRACTS): {
+          action.data.results.forEach(item => Contract.parse(item));
+          break;
+        }
+        case types.SUCCESS(types.UPDATE_CONTRACT):
+        case types.SUCCESS(types.GET_OR_CREATE_CONTRACT):
+        case types.SUCCESS(types.GENERATE_CONTRACT): {
+          Contract.parse(action.data);
+          break;
+        }
+        case types.SUCCESS(types.DELETE_CONTRACT): {
+          let contract = Contract.withId(action.id);
+          contract.delete();
+          break;
+        }
+        default: {
+        }
+      }
+    }
+
+  };
+
   return {
     Owner, Lodging, Category, Service,
-    BookingStatus, BookingChannel, Booking, BookedService
+    BookingStatus, BookingChannel, Booking, BookedService,
+    Contract, ContractTemplate,
   };
 };

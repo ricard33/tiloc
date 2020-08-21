@@ -1,7 +1,8 @@
-import { put, takeEvery, all, call, apply } from "redux-saga/effects";
+import { all, apply, call, put, takeEvery } from "redux-saga/effects";
 import * as types from "./actions/actionTypes";
-import axios from "axios";
 import * as actionTypes from "./actions/actionTypes";
+import axios from "axios";
+import { template } from "./common/stringUtils";
 
 // const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
@@ -63,7 +64,8 @@ function* _fetchData(path, action) {
   const actionBaseName = action.type.slice(0, -8);
   try {
     const offset = 0, limit = null; // not yet used
-    const response = yield call(axios.get, path);
+    let filter = action.filter ? "?" + action.filter : "";
+    const response = yield call(axios.get, path + filter);
     yield put({
       type: types.SUCCESS(actionBaseName),
       data: response.data,
@@ -80,10 +82,10 @@ function* _fetchData(path, action) {
 
 function* _createData(path, action) {
   if(!action.type.endsWith("_REQUEST"))
-    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
+    throw new Error("createData: Action types have to finish by '_REQUEST' string");
   const actionBaseName = action.type.slice(0, -8);
   try {
-    const response = yield call(axios.post, path, action.data);
+    const response = yield call(axios.post, template(path, action.urlParams), action.data);
     yield put({
       type: types.SUCCESS(actionBaseName),
       data: response.data,
@@ -102,10 +104,10 @@ function* _createData(path, action) {
 
 function* _updateData(path, action) {
   if(!action.type.endsWith("_REQUEST"))
-    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
+    throw new Error("updateData: Action types have to finish by '_REQUEST' string");
   const actionBaseName = action.type.slice(0, -8);
   try {
-    const response = yield call(axios.put, path + action.id + "/", action.data);
+    const response = yield call(axios.patch, path + action.id + "/", action.data);
     yield put({
       type: types.SUCCESS(actionBaseName),
       data: response.data,
@@ -124,7 +126,7 @@ function* _updateData(path, action) {
 
 function* _deleteData(path, action) {
   if(!action.type.endsWith("_REQUEST"))
-    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
+    throw new Error("deleteData: Action types have to finish by '_REQUEST' string");
   const actionBaseName = action.type.slice(0, -8);
   try {
     const response = yield call(axios.delete, path + action.id + "/");
@@ -150,13 +152,18 @@ export default function* rootSaga() {
   yield all([
     yield takeEvery(actionTypes.USER_LOADING, loadUser),
     yield takeEvery(actionTypes.LOGIN_REQUEST, login),
-    yield takeEvery(actionTypes.FETCH_BOOKINGS_REQUEST, _fetchData, "/api/booking/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKINGS), _fetchData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_BOOKING), _createData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_BOOKING), _updateData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_BOOKING), _deleteData, "/api/booking/"),
-    yield takeEvery(actionTypes.FETCH_BOOKING_STATUSES_REQUEST, _fetchData, "/api/booking_status/"),
-    yield takeEvery(actionTypes.FETCH_BOOKING_CHANNELS_REQUEST, _fetchData, "/api/booking_channel/"),
-    yield takeEvery(actionTypes.FETCH_LODGINGS_REQUEST, _fetchData, "/api/lodging/"),
-    yield takeEvery(actionTypes.FETCH_OWNERS_REQUEST, _fetchData, "/api/owner/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKING_STATUSES), _fetchData, "/api/booking_status/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKING_CHANNELS), _fetchData, "/api/booking_channel/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_LODGINGS), _fetchData, "/api/lodging/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_OWNERS), _fetchData, "/api/owner/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_CONTRACTS), _fetchData, "/api/contract/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.GET_OR_CREATE_CONTRACT), _createData, "/api/booking/${bookingId}/get_or_create_contract/"), // eslint-disable-line no-template-curly-in-string
+    yield takeEvery(actionTypes.REQUEST(actionTypes.GENERATE_CONTRACT), _createData, "/api/booking/${bookingId}/generate_contract/"),// eslint-disable-line no-template-curly-in-string
+    yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_CONTRACT), _updateData, "/api/contract/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_CONTRACT), _deleteData, "/api/contract/"),
   ]);
 }

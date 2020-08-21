@@ -44,6 +44,8 @@ configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
 if ENV not in ['dev', 'prod']:
     logging.critical('Bad value for APP_ENV environment settings: %s', ENV)
 
+logging.info("Starting django application (DEBUG=%s ENV=%s)" % (DEBUG, ENV))
+
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
     SECRET_KEY = config.get('APP', 'SECRET_KEY')  # '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
@@ -72,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'django_filters',
     'rest_framework',
     'import_export',
     'knox',
@@ -109,6 +112,7 @@ TEMPLATES = [
                 'constance.context_processors.config',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -182,6 +186,12 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')
 ]
 
+# Media files (uploaded, generated PDF, etc...)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
+MEDIA_URL = '/files/'
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+os.makedirs(os.path.join(MEDIA_ROOT, 'contracts'), exist_ok=True)
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -197,16 +207,20 @@ if os.path.exists(PROD_ASSETS_DIR):
     STATICFILES_DIRS.append(PROD_ASSETS_DIR)
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'knox.auth.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication'
-    ),
+    ],
     'DEFAULT_PERMISSION_CLASSES':     [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS':       'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE':                      100
+    'PAGE_SIZE':                      100,
+    'DEFAULT_FILTER_BACKENDS':        ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+if ENV == 'dev':
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 REST_KNOX = {
     'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'
@@ -217,12 +231,12 @@ REST_KNOX = {
     'AUTO_REFRESH':          True,
 }
 
-APP_NAME = _("My Rentals")
+APP_NAME = _("Ti Loc")
 CONSTANCE_CONFIG = {
     # 'DEBUG': (False, 'Turn on DEBUG information on Django'),
 }
 
-GRAPPELLI_ADMIN_TITLE = _("Tourism Location")
+GRAPPELLI_ADMIN_TITLE = _("Ti Loc")
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -237,6 +251,8 @@ CRON_CLASSES = [
     "core.cron.SyncBookingsJob",
     # ...
 ]
+
+WKHTMLTOPDF_PATH = config.get('PDF', 'WKHTMLTOPDF_PATH', 'wkhtmltopdf')
 
 # Activate Django-Heroku.
 # django_heroku.settings(locals())

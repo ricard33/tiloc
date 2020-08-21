@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/styles";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
@@ -6,16 +6,16 @@ import PropTypes from "prop-types";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
-// import DialogContentText from "@material-ui/core/DialogContentText";
-// import { BookingEdit } from "../index";
 import { bookingType } from "../../common/propTypesUtils";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import {
-  Save as SaveIcon,
-  DeleteForever as DeleteIcon,
   Contacts as ContactsIcon,
-  NightsStay as NightsStayIcon, Forward as ForwardIcon
+  DeleteForever as DeleteIcon,
+  Forward as ForwardIcon,
+  NightsStay as NightsStayIcon,
+  PictureAsPdf as PdfIcon,
+  Save as SaveIcon
 } from "@material-ui/icons";
 import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,6 +39,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import useWindowDimensions from "../../common/windowDimensions";
+import { useConfirm } from "material-ui-confirm";
 
 
 const useStyles = makeStyles(theme => ({
@@ -80,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingDialog = props => {
-  const { className, booking, onClose } = props;
+  const { className, booking, onClose, onOpenContract } = props;
   const classes = useStyles();
   const { height, width } = useWindowDimensions();
   const { t } = useTranslation();
@@ -91,6 +92,7 @@ const BookingDialog = props => {
   const owners = useSelector(store => selectors.owners(store));
   const loading = useSelector(store => store.fetching.bookings.loading | store.fetching.booking_statuses.loading);
   const allGuests = useSelector(store => selectors.guests(store));
+  const confirm = useConfirm();
   const variant = "outlined";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
   const marks = [
@@ -323,15 +325,26 @@ const BookingDialog = props => {
     return onDateChange(newDate, "end_date");
   }
 
+  function openContract() {
+    onOpenContract(booking);
+  }
+
   function onCancel() {
     onClose();
   }
 
   function onDelete() {
-    dispatch(actions.deleteBooking(booking.id, () => {
-      console.debug("Closing...");
-      onClose();
-    }));
+    confirm({
+      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {guest_name: booking.guest_name, lodging_name: booking.lodging.name}),
+      description: t("Do you really want to permanently delete this booking?")
+    })
+      .then(() => {
+        dispatch(actions.deleteBooking(booking.id, () => {
+          onClose();
+        }));
+      })
+      .catch(() => { /* ... */
+      });
   }
 
   function onSubmit(data) {
@@ -757,6 +770,14 @@ const BookingDialog = props => {
           onClick={onDelete}
         >{t("Delete")}</Button>}
         <div style={{ flex: "1 0 0" }}/>
+        { onOpenContract && <Button
+          type="button"
+          color="default"
+          className={classes.button}
+          startIcon={<PdfIcon/>}
+          onClick={openContract}
+        >{t("Contract")}</Button>}
+        <div style={{ flex: "1 0 0" }}/>
         <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
         <Button
           type="submit"
@@ -767,14 +788,14 @@ const BookingDialog = props => {
         >{t("Save")}</Button>
       </DialogActions>
     </Dialog>
-
   );
 };
 
 BookingDialog.propTypes = {
   booking: bookingType,
   className: PropTypes.string,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  onOpenContract: PropTypes.func,
 };
 
 export default BookingDialog;

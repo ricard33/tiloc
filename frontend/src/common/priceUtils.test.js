@@ -1,4 +1,5 @@
 import { computeBookingPrice, DecimalPrecision } from "./priceUtils";
+import { parseISO } from "date-fns";
 
 describe("Module priceUtils:", () => {
   describe("computeBookingPrice()", () => {
@@ -11,8 +12,8 @@ describe("Module priceUtils:", () => {
           daily_rate: 55,
           price_details: [
             {
-              begin_date: "2020-03-14",
-              end_date: "2020-03-17",
+              begin_date: parseISO("2020-03-14"),
+              end_date: parseISO("2020-03-17"),
               day_count: 3,
               rate_name: null,
               is_week_rate: false
@@ -28,8 +29,8 @@ describe("Module priceUtils:", () => {
           daily_rate: 50,
           price_details: [
             {
-              begin_date: "2020-03-14",
-              end_date: "2020-04-02",
+              begin_date: parseISO("2020-03-14"),
+              end_date: parseISO("2020-04-02"),
               day_count: 19,
               rate_name: null,
               is_week_rate: true

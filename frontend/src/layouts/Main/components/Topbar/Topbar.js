@@ -3,12 +3,12 @@ import { Link as RouterLink } from "react-router-dom";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/styles";
-import { AppBar, Toolbar, Badge, Hidden, IconButton, Avatar } from "@material-ui/core";
+import { AppBar, Avatar, Badge, Hidden, IconButton, Toolbar } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
 import InputIcon from "@material-ui/icons/Input";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
-import LogoWhiteImg from "assets/images/logos/logo--white.svg";
+import LogoTiLoc from "assets/images/logos/logo-tiloc.png";
 import { useSelector } from "react-redux";
 import { getGravatarUrl } from "react-awesome-gravatar";
 import Menu from "@material-ui/core/Menu";
@@ -26,7 +26,14 @@ const useStyles = makeStyles(theme => ({
   },
   signOutButton: {
     marginLeft: theme.spacing(1)
-  }
+  },
+  appLogo: {
+    verticalAlign: "text-bottom"
+  },
+  appName: {
+    color: "white",
+    fontSize: "2em"
+  },
 }));
 
 const Topbar = props => {
@@ -59,9 +66,12 @@ const Topbar = props => {
       <Toolbar>
         <RouterLink to="/">
           <img
+            className={classes.appLogo}
             alt="Logo"
-            src={LogoWhiteImg}
+            src={LogoTiLoc}
+            width="32"
           />
+          <span className={classes.appName}>Ti Loc</span>
         </RouterLink>
         <div className={classes.flexGrow}/>
         <Hidden smDown>

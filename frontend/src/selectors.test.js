@@ -1,4 +1,3 @@
-import { createSelector } from "redux-orm";
 import { createTestORM, populateOrmStore } from "./common/testUtils";
 // import * as ormModule from "./orm";
 
@@ -60,6 +59,14 @@ describe("Selectors", () => {
     expect(lodgings(ormState, 2).name).toEqual("Paradise");
   });
 
+  it("return contract", () => {
+    const { contracts, bookings } = selectors;
+
+    expect(contracts(ormState)).toHaveLength(2);
+    expect(contracts(ormState, 1)).toBeNull();  // no contract for booking[id:1]
+    expect(contracts(ormState, 2).id).toEqual(1);
+    expect(contracts(ormState, 2).content).toEqual("Contract for Guest 2");
+  });
 
 });
 

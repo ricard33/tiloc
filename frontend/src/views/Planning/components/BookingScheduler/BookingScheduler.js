@@ -14,7 +14,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { startOfMonth } from "date-fns";
 import { makeStyles } from "@material-ui/styles";
-import { Tooltip, HtmlTooltip, BookingQuickView } from "components";
+import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles(theme => ({
@@ -64,7 +64,7 @@ const timeSteps = {
 const BookingScheduler = props => {
   const {
     bookings, lodgings, beginDate, statuses,
-    onOpenBooking, onCreateBooking
+    onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected
   } = props;
   const classes = useStyles();
   const [visibleTime, setVisibleTime] = useState({
@@ -132,9 +132,9 @@ const BookingScheduler = props => {
     status: booking.status,
     start_time: moment(booking.begin_date).add(12, "hours").valueOf(),
     end_time: moment(booking.end_date).add(6, "hours").valueOf(),
-    canMove: true,
-    canResize: true,
-    canChangeGroup: true,
+    canMove: false,
+    canResize: false,
+    canChangeGroup: false,
     itemProps: {
       // these optional attributes are passed to the root <div /> of each item as <div {...itemProps} />
       "data-custom-attribute": "Random content",
@@ -167,6 +167,14 @@ const BookingScheduler = props => {
     onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
+  function eventItemSelected(bookingId, e, time) {
+    onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
+  }
+
+  function eventItemDeselected(bookingId) {
+    onItemDeselected && onItemDeselected(bookings.filter(b => b.id === bookingId)[0]);
+  }
+
   function onCanvasClick(groupId, time) {
     onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0], new Date(time));
   }
@@ -183,12 +191,17 @@ const BookingScheduler = props => {
         defaultTimeEnd={visibleTime.end}
         // onTimeChange={onTimeChange}
         onItemClick={eventClicked}
+        onItemSelect={eventItemSelected}
+        onItemDeselect={eventItemDeselected}
         onCanvasClick={onCanvasClick}
         minZoom={14 * 86400 * 1000}
-        canResize={"both"}
+        canMove={false}
+        canChangeGroup={false}
+        canResize={false}
         dragSnap={24 * 60 * 60 * 1000}
-        stackItems={true}
-        useResizeHandle
+        stackItems
+        // itemTouchSendsClick
+        // useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 150}
         sidebarContent={<div>Above The Left</div>}
@@ -264,6 +277,8 @@ BookingScheduler.propTypes = {
   bookings: PropTypes.array.isRequired,
   lodgings: PropTypes.array.isRequired,
   onCreateBooking: PropTypes.func,
+  onItemDeselected: PropTypes.func,
+  onItemSelected: PropTypes.func,
   onOpenBooking: PropTypes.func,
   statuses: PropTypes.array.isRequired
 };

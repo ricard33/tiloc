@@ -7,11 +7,11 @@ export const createTestORM =  () => {
   const models = createModels();
   const {
     Owner, Lodging, Category, Service,
-    BookingStatus, BookingChannel, Booking, BookedService
+    BookingStatus, BookingChannel, Booking, BookedService, Contract, ContractTemplate
   } = models;
   const orm = new ORM({ stateSelector });
   orm.register(Owner, Lodging, Category, Service,
-    BookingStatus, BookingChannel, Booking, BookedService);
+    BookingStatus, BookingChannel, Booking, BookedService, Contract, ContractTemplate);
   return orm;
 };
 
@@ -45,12 +45,17 @@ export const populateOrmStore = (session) => {
     guest_contact: "+12345",
     guest_address: "Road 66, LA"
   });
-  session.Booking.create({
+  let booking2 = session.Booking.create({
     id: 2,
     lodging: lodging,
     guest_name: "Guest 2",
     guest_contact: "+54321",
     guest_address: "Fort-de-France, Martinique"
   });
+  session.Contract.create({
+    id: 1,
+    booking: booking2,
+    content: "Contract for Guest 2",
+  })
   return session.state;
 };

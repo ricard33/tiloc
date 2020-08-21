@@ -2,6 +2,6 @@ import * as types from "./actionTypes";
 
 export function fetchOwners() {
   return {
-    type: types.FETCH_OWNERS_REQUEST
+    type: types.REQUEST(types.FETCH_OWNERS)
   };
 }
