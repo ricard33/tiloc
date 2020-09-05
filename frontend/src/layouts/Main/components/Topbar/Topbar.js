@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/styles";
@@ -9,13 +9,14 @@ import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
 import InputIcon from "@material-ui/icons/Input";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import LogoTiLoc from "assets/images/logos/logo-tiloc.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getGravatarUrl } from "react-awesome-gravatar";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import { useTranslation } from "react-i18next";
+import { auth } from "../../../../actions";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -33,7 +34,7 @@ const useStyles = makeStyles(theme => ({
   appName: {
     color: "white",
     fontSize: "2em"
-  },
+  }
 }));
 
 const Topbar = props => {
@@ -45,6 +46,8 @@ const Topbar = props => {
   const [notifications] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const user = useSelector(store => store.auth.user);
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const avatar = getGravatarUrl(user.email, {
     default: "mp"
@@ -56,6 +59,13 @@ const Topbar = props => {
 
   const handleCloseUserMenu = () => {
     setAnchorEl(null);
+  };
+
+  const handleSignOut = event => {
+    event.preventDefault();
+    dispatch(auth.logout(() => {
+      history.push('/logged-out');
+    }));
   };
 
   return (
@@ -99,12 +109,12 @@ const Topbar = props => {
             elevation={0}
             getContentAnchorEl={null}
             anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
+              vertical: "bottom",
+              horizontal: "center"
             }}
             transformOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
+              vertical: "top",
+              horizontal: "center"
             }}
             keepMounted
             open={Boolean(anchorEl)}
@@ -112,15 +122,16 @@ const Topbar = props => {
           >
             <MenuItem>
               <ListItemIcon>
-                <AccountBoxIcon fontSize="small" />
+                <AccountBoxIcon fontSize="small"/>
               </ListItemIcon>
-              <ListItemText primary={t("My account")} />
+              <ListItemText primary={t("My account")}/>
             </MenuItem>
-            <MenuItem>
+            <MenuItem
+              onClick={handleSignOut}>
               <ListItemIcon>
-                <InputIcon fontSize="small" />
+                <InputIcon fontSize="small"/>
               </ListItemIcon>
-              <ListItemText primary={t("Logout")} />
+              <ListItemText primary={t("Logout")}/>
             </MenuItem>
           </Menu>
         </Hidden>

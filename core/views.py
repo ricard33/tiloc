@@ -7,8 +7,10 @@ from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from ics import Calendar, Event
+from proxy.views import proxy_view
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -24,6 +26,13 @@ class IndexPage(TemplateView):
         if 'text/html' not in accept:
             raise Http404(_('"%(path)s" does not exist') % {'path': request.path})
         return super().get(request, *args, **kwargs)
+
+
+@csrf_exempt
+def loggly_proxy(request, path):
+    extra_requests_args = {}
+    remote_url = 'http://logs-01.loggly.com/' + path
+    return proxy_view(request, remote_url, extra_requests_args)
 
 
 @transaction.atomic

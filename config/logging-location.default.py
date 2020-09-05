@@ -12,6 +12,9 @@ LOGGING = {
         'simple': {
             'format': '%(levelname)s %(message)s'
         },
+        'json': {
+            '()': 'core.log_json_formatter.CustomisedJSONFormatter'
+        }
     },
     #'filters': {
     #    'special': {
@@ -34,6 +37,14 @@ LOGGING = {
             'maxBytes': 10 * 1024 * 1024,
             'backupCount': 10,
         },
+        'loggly': {
+            'class': 'loggly.handlers.HTTPSHandler',
+            'level': 'INFO',
+            'formatter': 'json',
+            'url': 'https://logs-01.loggly.com/inputs/d583d26b-9593-46f3-9b28-021d264a222a/tag/python'
+        }
+
+
         # 'mail_admins': {
         #     'level': 'ERROR',
         #     'class': 'logging.handlers.SMTPHandler',
@@ -47,7 +58,7 @@ LOGGING = {
         # }
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console', 'file', 'loggly'],
         'level': 'DEBUG',
     },
     'loggers': {

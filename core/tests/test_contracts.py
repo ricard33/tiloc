@@ -1,3 +1,4 @@
+from knox.models import AuthToken
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -31,7 +32,9 @@ class ContractTestCase(APITestCase):
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}...")
         booking = factories.BookingFactory(lodging__contract_template=contract_template)
         self.client.force_login(user)
-        response = self.client.post('/api/booking/%d/generate_contract/' % booking.id)
+        instance, token = AuthToken.objects.create(user)
+        header = {'HTTP_AUTHORIZATION': "Token " + token}
+        response = self.client.post('/api/booking/%d/generate_contract/' % booking.id, **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)

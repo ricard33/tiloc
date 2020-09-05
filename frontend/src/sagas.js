@@ -3,6 +3,7 @@ import * as types from "./actions/actionTypes";
 import * as actionTypes from "./actions/actionTypes";
 import axios from "axios";
 import { template } from "./common/stringUtils";
+import logger from './common/logger';
 
 // const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
@@ -25,6 +26,7 @@ function* loadUser(action) {
       yield put({ type: actionTypes.AUTHENTICATION_ERROR, data: res.data });
     }
   } else {
+    logger.warn(res);
     console.error("Server Error!");
     throw res;
   }
@@ -39,21 +41,35 @@ function loginFromApi(username, password) {
 function* login(action) {
   const { username, password, callback } = action;
 
-  const res = yield call(loginFromApi, username, password);
-
   try {
-    if (res.status === 200) {
-      yield put({ type: actionTypes.LOGIN_SUCCESSFUL, data: res.data });
-      yield call(callback);
-    } else if (res.status === 403 || res.status === 401) {
-      yield put({ type: actionTypes.AUTHENTICATION_ERROR, data: res.data });
-      throw res.data;
-    } else {
-      yield put({ type: actionTypes.LOGIN_FAILED, data: res.data });
-      throw res.data;
-    }
+    const res = yield call(loginFromApi, username, password);
+    yield put({ type: actionTypes.LOGIN_SUCCESSFUL, data: res.data });
+    yield call(callback);
   } catch (reason) {
     console.error("LOGIN ERROR", reason);
+    logger.error(reason)
+    const res = reason.response;
+    if (res  && (res.status === 403 || res.status === 401)) {
+      yield put({ type: actionTypes.AUTHENTICATION_ERROR, data: res.data });
+    } else {
+      const data = res ? res.data : reason.message;
+      yield put({ type: actionTypes.LOGIN_FAILED, data: data});
+    }
+  }
+}
+
+function* logout(action) {
+  const { callback } = action;
+
+  const res = yield call(axios.post, "/api/auth/logout/");
+
+  try {
+    yield put({ type: actionTypes.LOGOUT_SUCCESSFUL });
+    if(callback)
+      yield call(callback);
+  } catch (reason) {
+    console.error("LOGOUT ERROR", reason);
+    logger.error(reason)
   }
 }
 
@@ -73,6 +89,7 @@ function* _fetchData(path, action) {
     });
   } catch (error) {
     console.error(types.FAILURE(actionBaseName), error);
+    logger.error(error, {action})
     yield put({
       type: types.FAILURE(actionBaseName),
       error
@@ -95,6 +112,7 @@ function* _createData(path, action) {
     }
   } catch (error) {
     console.error(types.FAILURE(actionBaseName), error);
+    logger.error(error, {action})
     yield put({
       type: types.FAILURE(actionBaseName),
       error
@@ -117,6 +135,7 @@ function* _updateData(path, action) {
     }
   } catch (error) {
     console.error(types.FAILURE(actionBaseName), error);
+    logger.error(error, {action})
     yield put({
       type: types.FAILURE(actionBaseName),
       error
@@ -139,6 +158,7 @@ function* _deleteData(path, action) {
     }
   } catch (error) {
     console.error(types.FAILURE(actionBaseName), error);
+    logger.error(error, {action})
     yield put({
       type: types.FAILURE(actionBaseName),
       error
@@ -152,6 +172,7 @@ export default function* rootSaga() {
   yield all([
     yield takeEvery(actionTypes.USER_LOADING, loadUser),
     yield takeEvery(actionTypes.LOGIN_REQUEST, login),
+    yield takeEvery(actionTypes.LOGOUT_REQUEST, logout),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKINGS), _fetchData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_BOOKING), _createData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_BOOKING), _updateData, "/api/booking/"),

@@ -1,4 +1,4 @@
-arrow~=0.15.8
+arrow~=0.16.0
 django
 djangorestframework
 django-cron
@@ -6,11 +6,14 @@ django-constance[redis]
 django-grappelli
 django-heroku
 django-import-export
+django-proxy
 django-rest-knox
 django-webpack-loader
 gunicorn
 ics
 invoke~=1.4.1
+JSON-log-formatter
+loggly-python-handler
 my-django-tweaks
 Pillow
 pdfkit

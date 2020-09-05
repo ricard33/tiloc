@@ -8289,6 +8289,11 @@ lodash@^4.0.0, lodash@^4.15.0, lodash@^4.17.13, lodash@^4.17.15, lodash@^4.17.19
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
   integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
 
+loggly-jslogger@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/loggly-jslogger/-/loggly-jslogger-2.2.2.tgz#f527e6c09c57587b4eb3852638ee1b3b3b77bc8b"
+  integrity sha512-0lmavRkkmsYhMy0wd0zKSk9R3nU3cDIcqKTI/HZVMVwYtZlg1s2lmWCKpbs7PIPqwvUXtH1u+NFPGpDIvzwhlA==
+
 loglevel@^1.6.6:
   version "1.6.7"
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"

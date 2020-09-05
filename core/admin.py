@@ -72,6 +72,11 @@ class SeasonalVariationAdmin(ImportExportModelAdmin):
     list_display_links = ('name', )
 
 
+class ContractTemplateAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'name', 'created', 'modified')
+    list_display_links = ('id', 'name', )
+
+
 admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.Service)
 admin.site.register(models.Lodging, LodgingAdmin)
@@ -85,4 +90,4 @@ admin.site.register(models.Holidays, HolidaysAdmin)
 admin.site.register(models.Pricing, PricingAdmin)
 admin.site.register(models.SeasonalVariation, SeasonalVariationAdmin)
 admin.site.register(models.Contract)
-admin.site.register(models.ContractTemplate)
+admin.site.register(models.ContractTemplate, ContractTemplateAdmin)

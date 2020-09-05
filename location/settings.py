@@ -96,8 +96,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'location.urls'
-LOGIN_REDIRECT_URL = "home"  # Route defined in app/urls.py
-LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")  # ROOT dir for templates
 
 TEMPLATES = [
@@ -217,8 +215,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS':        ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-if ENV == 'dev':
-    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
+# if ENV == 'dev':
+#     REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 REST_KNOX = {
     'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'
@@ -227,6 +225,7 @@ REST_KNOX = {
     'TOKEN_TTL':             timedelta(days=30),
     # 'TOKEN_LIMIT_PER_USER': None,
     'AUTO_REFRESH':          True,
+    'USER_SERIALIZER':       'core.serializers.UserSerializer',
 }
 
 APP_NAME = _("Ti Loc")

@@ -1,12 +1,14 @@
+import logging
 import os
 
 import arrow
 import pdfkit as pdfkit
 from django.conf import settings
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from knox.models import AuthToken
+from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
@@ -35,7 +37,7 @@ class RegistrationAPI(generics.GenericAPIView):
         })
 
 
-class LoginAPI(generics.GenericAPIView):
+class LoginAPI_(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginUserSerializer
 
@@ -52,7 +54,22 @@ class LoginAPI(generics.GenericAPIView):
         })
 
 
+class LoginAPI(KnoxLoginView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = LoginUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = authenticate(**serializer.validated_data)
+        logging.getLogger('auth').info("User %s successfully logged." % user.email)
+        login(request, user)
+        if not user or not user.is_active:
+            raise AuthenticationFailed()
+        return super(LoginAPI, self).post(request, format=None)
+
+
 class UserAPI(generics.RetrieveAPIView):
+    # authentication_classes = (TokenAuthentication,)
     permission_classes = [permissions.IsAuthenticated, ]
     serializer_class = UserSerializer
 

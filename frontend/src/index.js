@@ -13,6 +13,7 @@ import orm from "./orm";
 import { createFullStore } from "./store";
 import "./index.css";
 import { createBrowserHistory } from "history";
+import logger from "./common/logger";
 
 const { sagaMiddleware, store } = createFullStore(orm);
 const browserHistory = createBrowserHistory();
@@ -31,6 +32,7 @@ axios.interceptors.request.use(
     return config;
   }, function(error) {
     // Do something with request error
+    logger.error(error);
     return Promise.reject(error);
   });
 
@@ -45,18 +47,24 @@ axios.interceptors.response.use(
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.error("Code " + error.response.status, error.response.data);
-      console.log(error.response.headers);
+      console.error(error.config.method + " " + error.config.url + " => Code " + error.response.status, error.response.data);
+
+      if (error.response.status === 401) {
+        if (["/login", "/logged-out"].indexOf(browserHistory.location.pathname) < 0) {
+          const location = { ...browserHistory.location };
+          store.dispatch(alert.loadErrors(error.response.data.detail, error));
+          store.dispatch(authActions.tokenExpired());
+          console.warn("Push to /login from", location);
+          browserHistory.push("/login", { from: location });
+        }
+        else
+          return Promise.reject(error);
+      }
+      console.debug(error.response.headers);
       if (error.response.data.detail)
         store.dispatch(alert.loadErrors(error.response.data.detail, error));
       else
         store.dispatch(alert.loadErrors("Server error", error));
-      if (error.response.status === 401){
-        const location = {...browserHistory.location};
-        store.dispatch(authActions.tokenExpired())
-        console.warn("Push to /login from", location);
-        browserHistory.push("/login", {from: location});
-      }
 
     } else if (error.request) {
       // The request was made but no response was received
@@ -69,7 +77,7 @@ axios.interceptors.response.use(
       console.log("Request error", error.message);
       store.dispatch(alert.loadErrors("Request error", error));
     }
-    console.log(error.config);
+    console.debug(error.config);
     return Promise.reject(error);
   }
 );

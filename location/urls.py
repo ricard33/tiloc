@@ -59,9 +59,11 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
-    path("", include("authentication.urls")),
+    # path("", include("authentication.urls")),
     # path('', include('frontend.urls')),
     # url(r'^', IndexPage.as_view(template_name="index.html")),
+
+    url('loggly/(?P<path>.*)', views.loggly_proxy),
 ]
 
 if settings.ENV == 'dev':
@@ -77,4 +79,4 @@ if settings.ENV == 'dev':
             urlpatterns.insert(-1, url(relative_path, never_cache(serve_static_file),
                                        kwargs={'document_path': fullpath}))
 
-urlpatterns.append(url(r'^', IndexPage.as_view(template_name="index.html")))
+urlpatterns.append(url(r'^', IndexPage.as_view(template_name="index.html"), name="home"))

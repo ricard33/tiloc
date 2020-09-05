@@ -11,6 +11,7 @@ import {
   NotFound as NotFoundView,
   Planning as PlanningView,
   SignIn,
+  LoggedOut,
   TestPage
 } from "./views";
 
@@ -26,6 +27,11 @@ const Routes = () => {
         component={SignIn} exact layout={MinimalLayout}
         needAuthentication={false}
         path="/login"
+      />
+      <RouteWithLayout
+        component={LoggedOut} exact layout={MinimalLayout}
+        needAuthentication={false}
+        path="/logged-out"
       />
       <RouteWithLayout
         component={DashboardView}

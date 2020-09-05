@@ -13,8 +13,8 @@ import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
 import moment from "moment";
-import { ConfirmProvider } from "material-ui-confirm";
 // import 'moment/min/moment-with-locales';
+import { ConfirmProvider } from "material-ui-confirm";
 import localization from "moment/locale/fr";
 
 
@@ -33,7 +33,7 @@ function App(props) {
     dispatch(auth.loadUser(token));
     dispatch(actions.fetchOwners());
   }, [dispatch, token]);
-
+  
   return (
     <ThemeProvider theme={theme}>
       <ConfirmProvider>

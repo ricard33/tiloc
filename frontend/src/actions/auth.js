@@ -16,6 +16,13 @@ export function login(username, password, callback) {
   };
 }
 
+export function logout(callback) {
+  return {
+    type: actionTypes.LOGOUT_REQUEST,
+    callback
+  };
+}
+
 export function tokenExpired() {
   return {
     type: actionTypes.AUTH_TOKEN_EXPIRED,

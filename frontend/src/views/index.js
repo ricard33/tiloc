@@ -9,6 +9,7 @@ export { default as ContractEdit } from './ContractEdit';
 // export { default as Settings } from './Settings';
 // export { default as Login } from './SignIn';
 export { default as SignIn } from './SignIn';
+export { default as LoggedOut } from './LoggedOut';
 // export { default as SignUp } from './SignUp';
 export { default as TestPage } from './TestPage';
 // export { default as Typography } from './Typography';
