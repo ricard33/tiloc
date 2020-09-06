@@ -151,7 +151,7 @@ def run_frontend_tests(c):
 #         archive_name = 'build_location-%(VERSION)s.tar.gz' % {'VERSION': get_version()}
 #         subprocess.check_call(['tar', '-czf', archive_name,
 #                                # '--exclude=frontend/static_src',
-#                                'app', 'assets', 'authentication', 'config/logging-location.default.py', 'core',
+#                                'assets', 'config/logging-location.default.py', 'core',
 #                                'legacy', 'locale', 'location', 'templates', 'static', 'manage.py',
 #                                'requirements.txt', 'deployment',
 #                                ],

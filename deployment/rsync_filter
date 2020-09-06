@@ -1,6 +1,7 @@
-+ /app/
 + /assets/
-+ /authentication/
++ /config/
++ /config/logging-*.default.py
+- /config/*
 + /core/
 + /deployment/
 + /locale/

@@ -1,4 +1,5 @@
 arrow~=0.16.0
+babel
 django
 djangorestframework
 django-cron
@@ -13,6 +14,7 @@ django-webpack-loader
 gunicorn
 ics
 invoke~=1.4.1
+jinja2
 JSON-log-formatter
 loggly-python-handler
 my-django-tweaks

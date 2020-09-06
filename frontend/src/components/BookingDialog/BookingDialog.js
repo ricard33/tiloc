@@ -392,6 +392,12 @@ const BookingDialog = props => {
               ref={register}
               defaultValue={booking.id}
             />
+            <input
+              type="hidden"
+              name="guaranty"
+              ref={register}
+              defaultValue={initialState.guaranty}
+            />
             <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="status_id">{t("Booking status")}</InputLabel>

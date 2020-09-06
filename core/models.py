@@ -1,11 +1,14 @@
+import logging
 import os
 import uuid
+from datetime import date
 
-import jinja2
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger('api')
 
 
 class Owner(models.Model):
@@ -187,23 +190,27 @@ class Booking(models.Model):
         return reverse('booking-detail', kwargs={'pk': self.pk})
 
     def generate_contract(self, url_server='http://127.0.0.1:8000'):
+        if not self.lodging:
+            logger.warning("Lodging not set, can't generate a contract")
+            return None
         if not Contract.objects.filter(booking=self).exists():
             self.contract = Contract(booking=self)
         if self.lodging.contract_template:
-            # jinja2 template
-            template_env = jinja2.Environment()
-            template = template_env.from_string(self.lodging.contract_template.content)
-            content = template.render({
-                'booking': self,
-                'lodging': self.lodging,
-                'owner': self.lodging.owner,
-                'url_server': url_server,
-            })
+            from core.jinja2_tools import render_template
+            content = render_template(self.lodging.contract_template.content,
+                                      {
+                                          'booking':    self,
+                                          'lodging':    self.lodging,
+                                          'owner':      self.lodging.owner,
+                                          'url_server': url_server,
+                                          'date':       date.today()
+                                      })
             page_break = '<div style="display: block; page-break-before: always;"></div>'
             if self.lodging.description:
                 content += page_break + self.lodging.description
             self.contract.content = content
         else:
+            logger.warning("Contract template not set for lodging '%s', can't generate a contract", self.lodging)
             self.contract.content = ""
         self.contract.save()
         return self.contract
