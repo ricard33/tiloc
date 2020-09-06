@@ -2,10 +2,11 @@ arrow~=0.16.0
 django
 djangorestframework
 django-cron
-django-constance[redis]
+django-constance[database]
 django-grappelli
 django-heroku
 django-import-export
+django-picklefield
 django-proxy
 django-rest-knox
 django-webpack-loader

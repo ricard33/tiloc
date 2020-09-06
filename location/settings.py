@@ -66,6 +66,7 @@ ALLOWED_HOSTS.extend(config.getlist('SECURITY', 'ALLOWED_HOSTS', []))
 
 INSTALLED_APPS = [
     'constance',
+    'constance.backends.database',
     'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -111,6 +112,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.settings'
             ],
         },
     },
@@ -229,8 +231,10 @@ REST_KNOX = {
 }
 
 APP_NAME = _("Ti Loc")
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_CONFIG = {
-    # 'DEBUG': (False, 'Turn on DEBUG information on Django'),
+    'DEBUG': (False, 'Turn on DEBUG information on Django'),
 }
 
 GRAPPELLI_ADMIN_TITLE = _("Ti Loc")
