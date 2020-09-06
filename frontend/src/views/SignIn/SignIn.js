@@ -15,6 +15,7 @@ import {
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { auth } from "../../actions";
+import { useTranslation } from "react-i18next";
 
 const schema = {
   email: {
@@ -139,6 +140,7 @@ const SignIn = props => {
     touched: {},
     errors: {}
   });
+  const { t } = useTranslation();
 
   useEffect(() => {
     const errors = validate(formState.values, schema);
@@ -217,7 +219,7 @@ const SignIn = props => {
                   className={classes.title}
                   variant="h2"
                 >
-                  Sign in
+                  {t("Sign in")}
                 </Typography>
                 { /*
                 <Typography
@@ -266,7 +268,7 @@ const SignIn = props => {
                   color="textSecondary"
                   gutterBottom
                 >
-                  Sign in with email address
+                  {t("Sign in with email address")}
                 </Typography>
                 <TextField
                   className={classes.textField}
@@ -275,7 +277,7 @@ const SignIn = props => {
                   helperText={
                     hasError('email') ? formState.errors.email[0] : null
                   }
-                  label="Email address"
+                  label={t("Email address")}
                   name="email"
                   onChange={handleChange}
                   type="text"
@@ -289,7 +291,7 @@ const SignIn = props => {
                   helperText={
                     hasError('password') ? formState.errors.password[0] : null
                   }
-                  label="Password"
+                  label={t("Password")}
                   name="password"
                   onChange={handleChange}
                   type="password"
@@ -305,19 +307,19 @@ const SignIn = props => {
                   type="submit"
                   variant="contained"
                 >
-                  Sign in now
+                  {t("Sign in now")}
                 </Button>
                 <Typography
                   color="textSecondary"
                   variant="body1"
                 >
-                  Don't have an account?{' '}
+                  {t("Don't have an account?")}{' '}
                   <Link
                     component={RouterLink}
                     to="/sign-up"
                     variant="h6"
                   >
-                    Sign up
+                    {t("Sign up")}
                   </Link>
                 </Typography>
               </form>

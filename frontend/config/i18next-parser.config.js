@@ -53,7 +53,10 @@ module.exports = {
   // Supports JSON (.json) and YAML (.yml) file formats
   // Where to write the locale files relative to process.cwd()
 
-  input: undefined,
+  input: [
+    '../src/**/*.{js,hbs}',
+    '!../src/components/Editor/ckeditor5/**/*'
+  ],
   // An array of globs that describe where to look for source files
   // relative to the location of the configuration file
 

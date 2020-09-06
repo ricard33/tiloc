@@ -1,6 +1,8 @@
 {
   "Deposit": "Deposit",
   "Down payment": "Down payment",
+  "Delete booking: {{ guest_name }} on {{ lodging_name }}": "Delete booking: {{ guest_name }} on {{ lodging_name }}",
+  "Do you really want to permanently delete this booking?": "Do you really want to permanently delete this booking?",
   "Modify a booking": "Modify a booking",
   "Add a booking": "Add a booking",
   "Booking status": "Booking status",
@@ -51,7 +53,6 @@
   "The model contract is provided as an example only and does not replace legal advice or professional assistance. No legal or other liability is accepted by the software publisher.": "The model contract is provided as an example only and does not replace legal advice or professional assistance. No legal or other liability is accepted by the software publisher.",
   "Contract saved {{modified_date}}. Click on 'Regenerate' to update it.": "Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
   "Regenerate": "Regenerate",
-  "Print": "Print",
   "PDF": "PDF",
   "Sort": "Sort",
   "default rate": "default rate",
@@ -79,6 +80,17 @@
   "Origin of bookings": "Origin of bookings",
   "Filling rate": "Filling rate",
   "Turnover": "Turnover",
+  "You are now logged out.": "You are now logged out.",
+  "Click on \"Log in\" button to sign in again.": "Click on \"Log in\" button to sign in again.",
+  "Log in": "Log in",
   "Holidays": "Holidays",
-  "Pricing": "Pricing"
+  "Pricing": "Pricing",
+  "Edit booking": "Edit booking",
+  "Sign in": "Sign in",
+  "Sign in with email address": "Sign in with email address",
+  "Email address": "Email address",
+  "Password": "Password",
+  "Sign in now": "Sign in now",
+  "Don't have an account?": "Don't have an account?",
+  "Sign up": "Sign up"
 }

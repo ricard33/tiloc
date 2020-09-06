@@ -138,3 +138,4 @@ frontend0/
 /.idea/shelf/
 /config/config.ini
 .DS_Store
+/backup/

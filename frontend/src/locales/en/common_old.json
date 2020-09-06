@@ -1,5 +1,4 @@
 {
-  "Edit booking": "Edit booking",
   "Duration": "Duration",
   "Details": "Details",
   "nights": "nights",
@@ -16,5 +15,6 @@
   "Account": "Account",
   "Deposit can't be negative": "Deposit can't be negative",
   "Deposit can't be higher than price": "Deposit can't be higher than price",
-  "Last year": "Last year"
+  "Last year": "Last year",
+  "Print": "Print"
 }
