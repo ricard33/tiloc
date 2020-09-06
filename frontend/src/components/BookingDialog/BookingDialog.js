@@ -643,6 +643,7 @@ const BookingDialog = props => {
                       control={control}
                       color="primary"
                       name="is_flat_rate"
+                      defaultValue={initialState.is_flate_rate}
                       onChange={([event]) => handleChange(event)}
                     />
                   }
