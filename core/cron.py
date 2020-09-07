@@ -31,9 +31,22 @@ class SyncBookingsJob(CronJobBase):
 class ExportBookingsJob(CronJobBase):
     schedule = Schedule(run_at_times="02:00")
     code = 'core.export_bookings'    # a unique code
+    PURGE_OLDER_THAN_DAYS = 30
+
+    @staticmethod
+    def make_filename(date):
+        return "bookings-" + date.strftime("%Y-%m-%d_%H-%M-%S") + ".xlsx"
 
     def do(self):
         dataset = BookingResource().export()
-        filename = os.path.join(settings.BACKUP_DIR, "bookings-" + arrow.utcnow().isoformat(sep='_') + ".xlsx")
+        filename = os.path.join(settings.BACKUP_DIR, self.make_filename(arrow.utcnow()))
         with open(filename, 'wb') as f:
             f.write(dataset.xlsx)
+
+        purge_date = arrow.utcnow().shift(days=-self.PURGE_OLDER_THAN_DAYS)
+        max_filename = self.make_filename(purge_date)
+        for filename in os.listdir(settings.BACKUP_DIR):
+            fullpath = os.path.join(settings.BACKUP_DIR, filename)
+            if os.path.isfile(fullpath) and filename < max_filename:
+                os.remove(fullpath)
+
