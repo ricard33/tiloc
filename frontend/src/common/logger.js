@@ -14,6 +14,9 @@ let previous;
 
 const logFn = (level, data, extended_data = {}, once = false) => {
 
+  if(!process.env.REACT_APP_LOGGLY_ACTIVE)
+    return;
+
   if (!logger.key) {
     console.warn('Loggly key not defined!');
     return;

@@ -34,7 +34,6 @@ os.makedirs(LOG_DIR, exist_ok=True)
 BACKUP_DIR = os.path.join(BASE_DIR, 'backup')
 os.makedirs(BACKUP_DIR, exist_ok=True)
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')

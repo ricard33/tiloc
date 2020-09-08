@@ -1,7 +1,13 @@
 import os
 import sys
 
-LOG_FOLDER = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'log'))
+from smartconfigparser import Config
+
+CONFIG_FOLDER = os.path.dirname(__file__)
+LOG_FOLDER = os.path.normpath(os.path.join(CONFIG_FOLDER, '..', 'log'))
+config = Config()
+config.read(os.path.join(CONFIG_FOLDER, 'config.ini'))
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -41,7 +47,10 @@ LOGGING = {
             'class': 'loggly.handlers.HTTPSHandler',
             'level': 'INFO',
             'formatter': 'json',
-            'url': 'https://logs-01.loggly.com/inputs/d583d26b-9593-46f3-9b28-021d264a222a/tag/python'
+            'url': 'https://logs-01.loggly.com/inputs/%(key)s/tag/%(tag)s' % {
+                'key': config.get('LOGGLY', 'API_KEY', ''),
+                'tag': config.get('LOGGLY', 'TAG', 'python')
+            }
         }
 
 
@@ -58,7 +67,7 @@ LOGGING = {
         # }
     },
     'root': {
-        'handlers': ['console', 'file', 'loggly'],
+        'handlers': ['console', 'file'] + (config.getboolean('LOGGLY', 'ACTIVE', True) and ['loggly'] or []),
         'level': 'DEBUG',
     },
     'loggers': {
