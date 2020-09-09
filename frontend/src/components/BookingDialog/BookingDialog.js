@@ -77,7 +77,8 @@ const useStyles = makeStyles(theme => ({
     // marginRight: "5px"
   },
   deleteButton: {
-    color: "red"
+    color: "red",
+    margin: theme.spacing(1)
   },
   priceInput: {
     width: "7em"
@@ -685,7 +686,7 @@ const BookingDialog = props => {
                   type: "number"
                 }}
                 inputRef={register({
-                  min: { value: 0, message: t("Commission fees can't be negative") },
+                  min: { value: 0, message: t("Commission fees can't be negative") }
                 })}
                 label={t("Commission fees")}
                 margin="dense"
@@ -786,31 +787,37 @@ const BookingDialog = props => {
         }
       </DialogContent>
       <DialogActions>
-        {booking && booking.id &&
-        <Button
-          type="button"
-          className={classes.deleteButton}
-          color="secondary"
-          startIcon={<DeleteIcon/>}
-          onClick={onDelete}
-        >{t("Delete")}</Button>}
-        <div style={{ flex: "1 0 0" }}/>
-        {onOpenContract && <Button
-          type="button"
-          color="default"
-          className={classes.button}
-          startIcon={<PdfIcon/>}
-          onClick={openContract}
-        >{t("Contract")}</Button>}
-        <div style={{ flex: "1 0 0" }}/>
-        <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
-        <Button
-          type="submit"
-          color="primary"
-          className={classes.button}
-          startIcon={<SaveIcon/>}
-          onClick={form.handleSubmit(onSubmit)}
-        >{t("Save")}</Button>
+        <Grid container justify="space-between">
+          <Grid item>
+            {booking && booking.id &&
+            <Button
+              type="button"
+              className={classes.deleteButton}
+              color="secondary"
+              startIcon={<DeleteIcon/>}
+              onClick={onDelete}
+            >{t("Delete")}</Button>}
+          </Grid>
+          <Grid item>
+            {onOpenContract && <Button
+              type="button"
+              color="default"
+              className={classes.button}
+              startIcon={<PdfIcon/>}
+              onClick={openContract}
+            >{t("Contract")}</Button>}
+          </Grid>
+          <Grid item>
+            <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+            <Button
+              type="submit"
+              color="primary"
+              className={classes.button}
+              startIcon={<SaveIcon/>}
+              onClick={form.handleSubmit(onSubmit)}
+            >{t("Save")}</Button>
+          </Grid>
+        </Grid>
       </DialogActions>
     </Dialog>
   );
