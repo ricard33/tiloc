@@ -186,6 +186,7 @@ export const createModels = () => {
         price: attr(),
         deposit: attr(),
         guaranty: attr(),
+        commission_fees: attr(),
         info: attr(),
         special_conditions: attr(),
         options: many({

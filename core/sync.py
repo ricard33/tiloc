@@ -53,11 +53,11 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                                       begin_date=event.begin.date(),
                                       end_date=event.end.date(),
                                       duration=(event.end.date() - event.begin.date()).days,
-                                      price=0
+                                      price=0,
+                                      deposit=0
                                       )
-    sync.last_import = arrow.utcnow().datetime
-    sync.save()
+        sync.last_import = arrow.utcnow().datetime
+        sync.save()
 
-
-def retrieve_and_synchronize_bookings(sync: models.BookingChannelSync):
-    return synchronize_bookings(sync, retrieve_ical(sync.source_url))
+    def retrieve_and_synchronize_bookings(sync: models.BookingChannelSync):
+        return synchronize_bookings(sync, retrieve_ical(sync.source_url))

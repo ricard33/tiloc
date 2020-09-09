@@ -18,7 +18,7 @@ from . import models
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
-                          PricingSerializer, SeasonalVariationSerializer, UserSerializer)
+                          PricingSerializer, SeasonalVariationSerializer, UserSerializer, PaymentSerializer)
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -174,3 +174,10 @@ class ContractViewSet(viewsets.ModelViewSet):
                 response['Content-Disposition'] = 'inline; filename=' + os.path.basename(full_path)
                 return response
         raise Http404
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = models.Payment.objects.all().order_by('date')
+    serializer_class = PaymentSerializer
+
+

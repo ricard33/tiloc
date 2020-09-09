@@ -39,6 +39,7 @@ router.register(r'pricing', api.PricingViewSet, 'pricing')
 router.register(r'seasonal_variation', api.SeasonalVariationViewSet, 'seasonal_variation')
 router.register(r'contract_template', api.ContractTemplateViewSet, 'contract_template')
 router.register(r'contract', api.ContractViewSet, 'contract')
+router.register(r'payment', api.PaymentViewSet, 'payment')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),

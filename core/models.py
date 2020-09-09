@@ -175,6 +175,7 @@ class Booking(models.Model):
                                        help_text=_("Use flat rate price insteed of daily price computation if true"))
     deposit = models.DecimalField(_("deposit"), max_digits=10, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("guaranty"), max_digits=10, decimal_places=2, blank=True, null=True)
+    commission_fees = models.DecimalField(_("commission fees"), max_digits=10, decimal_places=2, blank=True, null=True)
     info = models.TextField(_("info"), blank=True, null=True)
 
     special_conditions = models.TextField(_("Special conditions"), blank=True, null=True)
@@ -289,3 +290,19 @@ class SeasonalVariation(models.Model):
     weekend_rate = models.DecimalField(_("weekend rate"), max_digits=10, decimal_places=2, blank=True, null=True)
     weekly_rate = models.DecimalField(_("weekly rate"), max_digits=10, decimal_places=2, blank=True, null=True)
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
+
+
+class Payment(models.Model):
+    class PaymentMethod(models.TextChoices):
+        CASH = 'cash', _('Cash')
+        BANK_CARD = 'bank_card', _('Bank card')
+        CHECK = 'check', _('Check')
+        TRANSFER = 'transfer', _('Transfer')
+        PAYPAL = 'paypal', _('PayPal')
+        HOLIDAY_VOUCHERS = 'vouchers', _('Holiday vouchers')
+        OTHER = 'other', _('Other')
+
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+    amount = models.DecimalField(_("amount"), max_digits=10, decimal_places=2)
+    method = models.CharField(_("Payment method"), max_length=30, choices=PaymentMethod.choices)
+    date = models.DateField(_("Payment date"))

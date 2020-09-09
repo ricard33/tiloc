@@ -114,3 +114,9 @@ class ContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Contract
         fields = '__all__'
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Payment
+        fields = '__all__'

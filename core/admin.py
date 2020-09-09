@@ -12,7 +12,7 @@ class BookingAdmin(ImportExportModelAdmin):
         'id', 'lodging', 'status',
         'guest_name',
         'begin_date', 'end_date', 'duration', 'adults', 'children', 'babies',
-        'price', 'is_flat_rate', 'deposit', 'guaranty', 'source', 'source_uid_')
+        'price', 'is_flat_rate', 'deposit', 'guaranty', 'commission_fees', 'source', 'source_uid_')
     list_filter = ('lodging', 'status', 'begin_date', 'source')
     resource_class = BookingResource
 
@@ -77,6 +77,10 @@ class ContractTemplateAdmin(ImportExportModelAdmin):
     list_display_links = ('id', 'name', )
 
 
+class PaymentAdmin(ImportExportModelAdmin):
+    list_display = ('id', 'booking', 'amount', 'method', 'date')
+
+
 admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.Service)
 admin.site.register(models.Lodging, LodgingAdmin)
@@ -91,3 +95,4 @@ admin.site.register(models.Pricing, PricingAdmin)
 admin.site.register(models.SeasonalVariation, SeasonalVariationAdmin)
 admin.site.register(models.Contract)
 admin.site.register(models.ContractTemplate, ContractTemplateAdmin)
+admin.site.register(models.Payment, PaymentAdmin)

@@ -40,6 +40,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import useWindowDimensions from "../../common/windowDimensions";
 import { useConfirm } from "material-ui-confirm";
+import Hidden from "@material-ui/core/Hidden";
 
 
 const useStyles = makeStyles(theme => ({
@@ -77,6 +78,9 @@ const useStyles = makeStyles(theme => ({
   },
   deleteButton: {
     color: "red"
+  },
+  priceInput: {
+    width: "7em"
   }
 }));
 
@@ -170,10 +174,11 @@ const BookingDialog = props => {
         Object.assign(initialState, computeBookingPrice(initialState.begin_date, initialState.end_date,
           initialState.daily_rate, 0, 0, [], depositPercent));
       initialState.guaranty = booking.guaranty || lodging.guaranty;
+      initialState.commission_fees = booking.commission_fees || 0;
       initialState.adults = booking.adults || 2;
       initialState.children = booking.children || 0;
       initialState.babies = booking.babies || 0;
-      initialState.source_id = booking.source_id || '';
+      initialState.source_id = booking.source_id || "";
 
       // console.debug("initialState", initialState);
       return initialState;
@@ -181,7 +186,7 @@ const BookingDialog = props => {
   }
 
   function handleChange(data) {
-    // console.debug(data);
+    console.debug(data);
     // console.debug("handleChange", data.target);
     let value = data.target.value;
     switch (data.target.name) {
@@ -193,14 +198,13 @@ const BookingDialog = props => {
       case "lodging_id": {
         const formValues = getValues();
         value = Number(data.target.value);
-        if(value > 0) {
+        if (value > 0) {
           lodging = lodgings.filter(x => x.id === value)[0];
-          if(!isFlatRate && formValues.daily_rate !== lodging.daily_rate){
+          if (!isFlatRate && formValues.daily_rate !== lodging.daily_rate) {
             const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
             setValue(objectToValuesArray(priceObj));
           }
-        }
-        else
+        } else
           lodging = null;
         return value;
       }
@@ -335,7 +339,10 @@ const BookingDialog = props => {
 
   function onDelete() {
     confirm({
-      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {guest_name: booking.guest_name, lodging_name: booking.lodging.name}),
+      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
+        guest_name: booking.guest_name,
+        lodging_name: booking.lodging.name
+      }),
       description: t("Do you really want to permanently delete this booking?")
     })
       .then(() => {
@@ -516,47 +523,29 @@ const BookingDialog = props => {
             </Grid>
             {/* Dates and nights */}
             <Grid item xs={12}>
-              <Typography id="input-slider" gutterBottom>
-                {t("Nights")}
-              </Typography>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                  <NightsStayIcon/>
-                </Grid>
-                <Grid item xs>
-                  <Slider
-                    aria-labelledby="continuous-slider"
-                    onChange={handleNightsSliderChange}
-                    step={1}
-                    value={Number(duration)}
-                    valueLabelDisplay="on"
-                    marks={marks}
-                    min={1}
-                  />
-                </Grid>
-                <Grid item>
-                  <Input
-                    className={classes.input}
-                    onChange={handleChange}
-                    // onBlur={handleNightsBlur}
-                    inputProps={{
-                      step: 1,
-                      min: 1,
-                      max: 100,
-                      type: "number",
-                      "aria-labelledby": "input-slider"
-                    }}
-                    inputRef={register}
-                    margin="dense"
-                    name="duration"
-                  />
-                </Grid>
-              </Grid>
+              <FormControl className={classes.formControl} variant={variant}>
+                <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
+                <Controller
+                  as={Select}
+                  name="duration"
+                  control={control}
+                  label={t("Nights")}
+                  margin="dense"
+                  onChange={([event]) => handleChange(event)}
+                >
+                  {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
+                    <MenuItem key={n} value={n}>{n}</MenuItem>
+                  ))}
+                  {(duration > 31) &&
+                  <MenuItem key={duration} value={duration}>{duration}</MenuItem>
+                  }
+                </Controller>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <Grid container justify="space-around" alignItems="center">
-                  <Grid item sm={5} xs={6}>
+                  <Grid item sm={5} xs={12}>
                     <Controller
                       as={KeyboardDatePicker}
                       control={control}
@@ -570,13 +559,16 @@ const BookingDialog = props => {
                       name="begin_date"
                       onChange={([date]) => handleBeginDateChange(date)}
                       variant={variant}
+                      inputVariant={variant}
                       autoOk
                     />
                   </Grid>
-                  <Grid item sm={2} xs={12}>
-                    <ForwardIcon/>
-                  </Grid>
-                  <Grid item sm={5} xs={6}>
+                  <Hidden xsDown>
+                    <Grid item sm={2} xs={12} style={{ "text-align": "center" }}>
+                      <ForwardIcon/>
+                    </Grid>
+                  </Hidden>
+                  <Grid item sm={5} xs={12}>
                     <Controller
                       as={KeyboardDatePicker}
                       control={control}
@@ -590,6 +582,7 @@ const BookingDialog = props => {
                       name="end_date"
                       onChange={([date]) => handleEndDateChange(date)}
                       variant={variant}
+                      inputVariant={variant}
                       autoOk
                     />
                   </Grid>
@@ -601,9 +594,10 @@ const BookingDialog = props => {
               item container xs={12} alignItems="center"
               justify={!isFlatRate ? "space-around" : "flex-start"}>
               {!isFlatRate &&
-              <Grid item sm={6} xs={12} className={classes.flexBoxStretched}>
-                {t("{{count}} night", { count: duration })}&nbsp;x&nbsp;
+              <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
+                <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
                 <TextField
+                  className={classes.priceInput}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">€</InputAdornment>,
                     type: "number"
@@ -621,8 +615,9 @@ const BookingDialog = props => {
                 =
                 <div className={classes.spacer}/>
               </Grid>}
-              <Grid item sm={6} xs={12} className={classes.flexBoxAlignLeft}>
+              <Grid item sm={5} xs={12} className={classes.flexBoxAlignLeft}>
                 <TextField
+                  className={classes.priceInput}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">€</InputAdornment>,
                     type: "number"
@@ -657,13 +652,17 @@ const BookingDialog = props => {
               <TextField
                 error={!!errors.deposit}
                 helperText={errors.deposit && errors.deposit.message}
+                className={classes.priceInput}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">€</InputAdornment>,
                   type: "number"
                 }}
                 inputRef={register({
-                  min: { value: 0, message: t("{{depositLabel}} can't be negative", {depositLabel: depositLabel}) },
-                  max: { value: price, message: t("{{depositLabel}} can't be higher than price", {depositLabel: depositLabel}) }
+                  min: { value: 0, message: t("{{depositLabel}} can't be negative", { depositLabel: depositLabel }) },
+                  max: {
+                    value: price,
+                    message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
+                  }
                 })}
                 label={depositLabel}
                 margin="dense"
@@ -675,6 +674,25 @@ const BookingDialog = props => {
               <Typography>
                 {watchBalance && t("Balance: {{amount}} €", { amount: watchBalance.price - watchBalance.deposit })}
               </Typography>
+            </Grid>
+            <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+              <TextField
+                error={!!errors.commission_fees}
+                helperText={errors.commission_fees && errors.commission_fees.message}
+                className={classes.priceInput}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                  type: "number"
+                }}
+                inputRef={register({
+                  min: { value: 0, message: t("Commission fees can't be negative") },
+                })}
+                label={t("Commission fees")}
+                margin="dense"
+                name="commission_fees"
+                onChange={handleChange}
+                variant={variant}
+              />
             </Grid>
             {/* number of persons */}
             <Grid item xs={12} className={classes.flexBoxAlignLeft}>
@@ -777,7 +795,7 @@ const BookingDialog = props => {
           onClick={onDelete}
         >{t("Delete")}</Button>}
         <div style={{ flex: "1 0 0" }}/>
-        { onOpenContract && <Button
+        {onOpenContract && <Button
           type="button"
           color="default"
           className={classes.button}
@@ -802,7 +820,7 @@ BookingDialog.propTypes = {
   booking: bookingType,
   className: PropTypes.string,
   onClose: PropTypes.func.isRequired,
-  onOpenContract: PropTypes.func,
+  onOpenContract: PropTypes.func
 };
 
 export default BookingDialog;
