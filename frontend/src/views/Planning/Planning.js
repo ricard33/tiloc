@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { startOfMonth } from "date-fns";
+import { startOfMonth, parse } from "date-fns";
 import { BookingScheduler } from "./components";
 import * as actions from "../../actions";
 import { bookings as bookingsActions, lodgings as lodgingsActions } from "../../actions";
@@ -10,10 +10,15 @@ import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { BookingDialog } from "../../components";
 import { useConfirm } from "material-ui-confirm";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import { DeleteForever as DeleteIcon, Description as DescriptionIcon, Edit as EditIcon } from "@material-ui/icons";
+import queryString from "query-string";
+import IconButton from "@material-ui/core/IconButton";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -22,20 +27,35 @@ const useStyles = makeStyles(theme => ({
   content: {
     marginTop: theme.spacing(2)
   },
+  toolbar: {
+    textAlign: "right"
+  },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff"
   },
   deleteButton: {
     color: "red"
-  }
+  },
+  statusLegend: {
+    border: "solid 1px",
+    fontSize: "x-small",
+    margin: "5px",
+    padding: "0 4px"
+  },
 }));
 
 const Planning = props => {
   const classes = useStyles();
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const [beginDate, setBeginDate] = useState(startOfMonth(new Date()));
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  let requestedDate = parse(query.start, "yyyy-MM", new Date());
+  if (isNaN(requestedDate))
+    requestedDate = new Date();
+
+  const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   // const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
   const bookings = useSelector(store => selectors.bookings(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
@@ -86,12 +106,16 @@ const Planning = props => {
 
   const onDeleteBooking = (booking) => {
     confirm({
-      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {guest_name: booking.guest_name, lodging_name: booking.lodging.name}),
+      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
+        guest_name: booking.guest_name,
+        lodging_name: booking.lodging.name
+      }),
       description: t("Do you really want to permanently delete this booking?")
     })
       .then(() => {
         setSelected(null);
-        dispatch(actions.deleteBooking(booking.id, () => {}));
+        dispatch(actions.deleteBooking(booking.id, () => {
+        }));
       })
       .catch(() => { /* ... */
       });
@@ -112,7 +136,30 @@ const Planning = props => {
 
   return (
     <div className={classes.root}>
-      {/*<PlanningToolbar/>*/}
+      <div className={classes.toolbar}>
+        <IconButton
+          type="button"
+          className={classes.deleteButton}
+          color="secondary"
+          onClick={() => onDeleteBooking(selected)}
+          disabled={!selected}
+        ><DeleteIcon/></IconButton>
+        <IconButton
+          type="button"
+          color="default"
+          className={classes.button}
+          onClick={() => onEditContract(selected)}
+          title={t("Contract")}
+          disabled={!selected}
+        ><DescriptionIcon/></IconButton>
+        <IconButton
+          type="submit"
+          color="primary"
+          className={classes.button}
+          onClick={() => onEditBooking(selected)}
+          disabled={!selected}
+        ><EditIcon/></IconButton>
+      </div>
       <BookingScheduler
         bookings={bookings2}
         lodgings={lodgings}
@@ -123,7 +170,7 @@ const Planning = props => {
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}
       />
-      <Grid container xs={12} justify="space-between" alignItems="flex-start">
+      <Grid container justify="space-between" alignItems="flex-start">
         <Grid item>
           <Button
             type="button"
@@ -161,6 +208,23 @@ const Planning = props => {
         onClose={handleCloseEdit}
         onOpenContract={onEditContract}
       />}
+
+      <br/>
+      <Card className={classes.root}>
+        <CardContent>
+          <Typography variant="h5" component="h2">
+            {t("Legend")}
+          </Typography>
+          {bookingStatuses.map(status => {
+            return <span
+              key={status.id}
+              className={classes.statusLegend}
+              style={{ background: "#" + status.color }}
+            >{status.name}</span>
+          })}
+        </CardContent>
+      </Card>
+      <div>Legend: TODO</div>
     </div>
   );
 };

@@ -564,7 +564,7 @@ const BookingDialog = props => {
                     />
                   </Grid>
                   <Hidden xsDown>
-                    <Grid item sm={2} xs={12} style={{ "text-align": "center" }}>
+                    <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
                       <ForwardIcon/>
                     </Grid>
                   </Hidden>
