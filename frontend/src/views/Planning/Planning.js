@@ -63,10 +63,18 @@ const Planning = props => {
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const [selected, setSelected] = useState(null);
   const [editBooking, setEditBooking] = useState(null);
+  const [needFirstTimeEdit, setNeedFirstTimeEdit] = useState(query.edit !== undefined);
   const history = useHistory();
   const confirm = useConfirm();
 
   // const bookings = allBookings.toModelArray();
+
+  if(needFirstTimeEdit && !editBooking && bookings && bookings.filter(b => b.id === Number(query.edit)).length) {
+    console.debug("Open EDIT ", bookings.filter(b => b.id === Number(query.edit)));
+    setEditBooking(bookings.filter(b => b.id === Number(query.edit))[0]);
+    setNeedFirstTimeEdit(false);
+  }
+
 
   useEffect(() => {
     dispatch(bookingsActions.fetchBookings());

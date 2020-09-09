@@ -47,7 +47,7 @@ configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
 if ENV not in ['dev', 'prod']:
     logging.critical('Bad value for APP_ENV environment settings: %s', ENV)
 
-logging.info("Starting django application (DEBUG=%s ENV=%s)" % (DEBUG, ENV))
+logging.info("Starting django application (%s) %s", ENV, DEBUG and "**DEBUG MODE ACTIVATED**" or "")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
