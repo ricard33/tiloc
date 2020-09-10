@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'django.forms',
     'django_filters',
     'rest_framework',
+    'corsheaders',
     'import_export',
     'knox',
     'django_cron',
@@ -90,6 +91,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -206,6 +209,8 @@ STATICFILES_DIRS = [
 PROD_ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 if os.path.exists(PROD_ASSETS_DIR):
     STATICFILES_DIRS.append(PROD_ASSETS_DIR)
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

@@ -4,6 +4,7 @@ django
 djangorestframework
 django-cron
 django-constance[database]
+django-cors-headers
 django-grappelli
 django-heroku
 django-import-export
@@ -22,3 +23,5 @@ Pillow
 pdfkit
 requests
 smartconfigparser
+whitenoise
+whitenoise[brotli]
