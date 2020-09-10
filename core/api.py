@@ -18,7 +18,7 @@ from . import models
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
-                          PricingSerializer, SeasonalVariationSerializer, UserSerializer, PaymentSerializer)
+                          PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, UserSerializer)
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -179,5 +179,3 @@ class ContractViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = models.Payment.objects.all().order_by('date')
     serializer_class = PaymentSerializer
-
-

@@ -9,16 +9,11 @@ import {
   CardContent,
   IconButton,
   Divider,
-  Typography
 } from '@material-ui/core';
-import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
 import RefreshIcon from '@material-ui/icons/Refresh';
-import TabletMacIcon from '@material-ui/icons/TabletMac';
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import palette from "../../../../theme/palette";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,24 +45,6 @@ const ChannelsDistribution = props => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [data, setData] = useState({});
-  const [loaded, setLoaded] = useState(false);
-
-  const data0 = {
-    datasets: [
-      {
-        data: [63, 15, 22],
-        backgroundColor: [
-          theme.palette.primary.main,
-          theme.palette.error.main,
-          theme.palette.warning.main
-        ],
-        borderWidth: 8,
-        borderColor: theme.palette.white,
-        hoverBorderColor: theme.palette.white
-      }
-    ],
-    labels: ['Desktop', 'Tablet', 'Mobile']
-  };
 
   const options = {
     legend: {
@@ -91,28 +68,6 @@ const ChannelsDistribution = props => {
     }
   };
 
-  const devices = [
-    {
-      title: 'Desktop',
-      value: '63',
-      icon: <LaptopMacIcon />,
-      color: theme.palette.primary.main
-    },
-    {
-      title: 'Tablet',
-      value: '15',
-      icon: <TabletMacIcon />,
-      color: theme.palette.error.main
-    },
-    {
-      title: 'Mobile',
-      value: '23',
-      icon: <PhoneIphoneIcon />,
-      color: theme.palette.warning.main
-    }
-  ];
-
-
   useEffect(() => {
     axios.get("stats/channel_distribution/")
       .then(response => {
@@ -132,12 +87,10 @@ const ChannelsDistribution = props => {
             }
           ]
         });
-        setLoaded(true)
       })
       .catch(() => {
-        setLoaded(true);
       });
-  }, [dispatch]);
+  }, [dispatch, t, theme.palette.white]);
 
   return (
     <Card

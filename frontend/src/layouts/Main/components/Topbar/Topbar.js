@@ -126,8 +126,7 @@ const Topbar = props => {
               </ListItemIcon>
               <ListItemText primary={t("My account")}/>
             </MenuItem>
-            <MenuItem
-              onClick={handleSignOut}>
+            <MenuItem onClick={handleSignOut}>
               <ListItemIcon>
                 <InputIcon fontSize="small"/>
               </ListItemIcon>

@@ -13,7 +13,6 @@ import {
   Contacts as ContactsIcon,
   DeleteForever as DeleteIcon,
   Forward as ForwardIcon,
-  NightsStay as NightsStayIcon,
   PictureAsPdf as PdfIcon,
   Save as SaveIcon
 } from "@material-ui/icons";
@@ -31,8 +30,6 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import Slider from "@material-ui/core/Slider";
-import Input from "@material-ui/core/Input";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -88,26 +85,17 @@ const useStyles = makeStyles(theme => ({
 const BookingDialog = props => {
   const { className, booking, onClose, onOpenContract } = props;
   const classes = useStyles();
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
   const bookingChannels = useSelector(store => selectors.bookingChannels(store));
   const lodgings = useSelector(store => selectors.lodgings(store));
-  const owners = useSelector(store => selectors.owners(store));
-  const loading = useSelector(store => store.fetching.bookings.loading | store.fetching.booking_statuses.loading);
+  // const owners = useSelector(store => selectors.owners(store));
   const allGuests = useSelector(store => selectors.guests(store));
   const confirm = useConfirm();
   const variant = "outlined";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
-  const marks = [
-    { value: 1, label: "1" },
-    { value: 7, label: "7" },
-    { value: 14, label: "14" },
-    { value: 30, label: "30" },
-    { value: 60, label: "60" },
-    { value: 100, label: "100" }
-  ];
 
   bookingStatuses.sort((a, b) => a.rank - b.rank);
 
@@ -192,8 +180,6 @@ const BookingDialog = props => {
     let value = data.target.value;
     switch (data.target.name) {
       case "status_id": {
-        const status = bookingStatuses.filter(x => x.id === Number(data.target.value))[0];
-        // TODO see what to do with status
         return data.target.value;
       }
       case "lodging_id": {
@@ -251,7 +237,6 @@ const BookingDialog = props => {
           // setValue('is_flat_rate', false);
           return false;
         }
-        break;
       case "deposit":
         if (!data.target.value) {
           // setBalance(0);
@@ -290,12 +275,6 @@ const BookingDialog = props => {
       : computeBookingPrice(formValues.begin_date, endDate, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
     setValue(objectToValuesArray(priceObj));
     setValue([{ end_date: endDate }]);
-    return duration;
-  }
-
-  function handleNightsSliderChange(event, newValue) {
-    const duration = onDurationChange(newValue);
-    setValue("duration", duration);
     return duration;
   }
 
@@ -358,7 +337,6 @@ const BookingDialog = props => {
   function onSubmit(data) {
     console.log("Submit: ", data);
     const submittedBooking = {
-      // ...booking,  // Remove it and put in hidden fields missing values
       ...data,
       begin_date: data.begin_date.toISOString().substr(0, 10),
       end_date: data.end_date.toISOString().substr(0, 10),
@@ -591,9 +569,7 @@ const BookingDialog = props => {
               </MuiPickersUtilsProvider>
             </Grid>
             {/* Price */}
-            <Grid
-              item container xs={12} alignItems="center"
-              justify={!isFlatRate ? "space-around" : "flex-start"}>
+            <Grid item container xs={12} alignItems="center" justify={!isFlatRate ? "space-around" : "flex-start"}>
               {!isFlatRate &&
               <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
                 <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
@@ -762,7 +738,7 @@ const BookingDialog = props => {
                   // native
                   onChange={([event]) => handleChange(event)}
                 >
-                  <MenuItem key={0} value=""></MenuItem>
+                  <MenuItem key={0} value=""/>
                   {bookingChannels.map(channel => (
                     <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
                   ))}
@@ -799,7 +775,8 @@ const BookingDialog = props => {
             >{t("Delete")}</Button>}
           </Grid>
           <Grid item>
-            {onOpenContract && <Button
+            {onOpenContract &&
+            <Button
               type="button"
               color="default"
               className={classes.button}

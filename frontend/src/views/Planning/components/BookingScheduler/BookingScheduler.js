@@ -9,7 +9,7 @@ import Timeline, {
   TodayMarker
 } from "react-calendar-timeline";
 import "react-calendar-timeline/lib/Timeline.css";
-import moment from "moment";
+import { add, parseISO } from "date-fns";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { startOfMonth } from "date-fns";
@@ -17,9 +17,6 @@ import { makeStyles } from "@material-ui/styles";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
 import "./BookingScheduler.css";
-import { Grid } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import purple from "@material-ui/core/colors/purple";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -28,13 +25,6 @@ const useStyles = makeStyles(theme => ({
     minWidth: "inherit",
     padding: "inherit",
     height: "fill-available"
-  },
-  navButton: {
-    color: theme.palette.getContrastText(purple[500]),
-    backgroundColor: purple[500],
-    "&:hover": {
-      backgroundColor: purple[700]
-    }
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -54,22 +44,6 @@ const useStyles = makeStyles(theme => ({
     height: "10px"
   }
 }));
-
-const NavButton = (props) => {
-  const {children, ...attr} = props;
-  const classes = useStyles();
-  return (
-    <Button
-      // className={classes.navButton}
-      size="small"
-      // variant="contained"
-      color="primary"
-      {...attr}
-    >
-      {children}
-    </Button>
-  );
-};
 
 const timeSteps = {
   second: 0,
@@ -110,16 +84,12 @@ function useWindowSize() {
 
 const BookingScheduler = props => {
   const {
-    bookings, lodgings, beginDate, statuses,
+    bookings, lodgings, beginDate,
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected
   } = props;
   const classes = useStyles();
   const rootRef = useRef();
   const [horizontalMonths, setHorizontalMonths] = useState(1);
-  const [visibleTime, setVisibleTime] = useState({
-    start: moment(beginDate),
-    end: moment(beginDate).add(horizontalMonths, "month")
-  });
   const [collapsed, setCollapsed] = useState(false);
   const [selected, setSelected] = useState([]);
   const [width, height] = useWindowSize();
@@ -130,10 +100,6 @@ const BookingScheduler = props => {
     if (nbMonths !== horizontalMonths) {
       console.debug("Changing nb months to " + nbMonths);
       setHorizontalMonths(nbMonths);
-      setVisibleTime({
-        start: moment(visibleTime.start),
-        end: moment(visibleTime.start).add(nbMonths, "month")
-      });
     }
   };
   updateLayout(width, height);
@@ -157,14 +123,14 @@ const BookingScheduler = props => {
     className: classes.groupSeparator,
     height: 10
   });
-  groups.push({
-    id: -2,
-    title: t("Holidays"),
-    tip: t("Holidays"),
-    stackItems: true,
-    className: classes.specialGroup
-    // height: 25
-  });
+  // groups.push({
+  //   id: -2,
+  //   title: t("Holidays"),
+  //   tip: t("Holidays"),
+  //   stackItems: true,
+  //   className: classes.specialGroup
+  //   // height: 25
+  // });
   groups.push({
     id: -3,
     title: t("Cancellation / Waiting"),
@@ -173,29 +139,29 @@ const BookingScheduler = props => {
     className: classes.specialGroup
     // height: 25
   });
-  groups.push({
-    id: -4,
-    title: "",
-    tip: "",
-    stackItems: false,
-    className: classes.groupSeparator,
-    height: 10
-  });
-  groups.push({
-    id: -5,
-    title: t("Pricing"),
-    tip: t("Pricing"),
-    stackItems: true,
-    className: classes.specialGroup
-  });
+  // groups.push({
+  //   id: -4,
+  //   title: "",
+  //   tip: "",
+  //   stackItems: false,
+  //   className: classes.groupSeparator,
+  //   height: 10
+  // });
+  // groups.push({
+  //   id: -5,
+  //   title: t("Pricing"),
+  //   tip: t("Pricing"),
+  //   stackItems: true,
+  //   className: classes.specialGroup
+  // });
 
   const items = bookings.map(booking => ({
     id: booking.id,
     group: booking.lodging_id > 0 ? booking.lodging_id : -3,
     title: booking.guest_name,
     status: booking.status,
-    start_time: moment(booking.begin_date).add(12, "hours").valueOf(),
-    end_time: moment(booking.end_date).add(6, "hours").valueOf(),
+    start_time: add(parseISO(booking.begin_date), { hours: 12 }).valueOf(),
+    end_time: add(parseISO(booking.end_date), { hours: 6 }).valueOf(),
     canMove: false,
     canResize: false,
     canChangeGroup: false,
@@ -216,23 +182,13 @@ const BookingScheduler = props => {
 
   // bookings && console.debug(bookings[0]);
   // items && console.debug(items[0]);
-  // console.debug(statuses);
-
-  function getStatus(statusId) {
-    return statuses.filter(s => s.id === statusId)[0];
-  }
-
-  function onViewChange(event) {
-    console.debug("[onViewChange]");
-
-  }
 
   function eventClicked(bookingId) {
     onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function eventItemSelected(bookingId, e, time) {
-    setSelected([bookingId])
+    setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
@@ -249,95 +205,90 @@ const BookingScheduler = props => {
     window.setTimeout(() => window.dispatchEvent(new Event("resize")));
   }, []);
 
-  const onPrevNextClick = (months) => {
-    setVisibleTime({
-      start: moment(visibleTime.start).add(months, "month"),
-      end: moment(visibleTime.end).add(months, "month")
-    });
-  };
-
+  // eslint-disable-next-line react/no-multi-comp
   function renderTimeline(start, end) {
-    return <Timeline
-      groups={groups}
-      items={items}
-      // keys={keys}
-      // defaultTimeStart={visibleTime.start}
-      // defaultTimeEnd={visibleTime.end}
-      visibleTimeStart={start}
-      visibleTimeEnd={end}
-      onItemClick={eventClicked}
-      selected={selected}
-      onItemSelect={eventItemSelected}
-      onItemDeselect={eventItemDeselected}
-      onCanvasClick={onCanvasClick}
-      minZoom={14 * 86400 * 1000}
-      canMove={false}
-      canChangeGroup={false}
-      canResize={false}
-      dragSnap={24 * 60 * 60 * 1000}
-      lineHeight={20}
-      stackItems
-      itemTouchSendsClick
-      // useResizeHandle
-      timeSteps={timeSteps}
-      sidebarWidth={collapsed ? 30 : 130}
-      sidebarContent={<div>Above The Left</div>}
-      groupRenderer={renderGroup}
-      itemRenderer={renderItem}
-    >
-      <TimelineHeaders className={"sticky " + classes.timelineHeader}>
-        <SidebarHeader>
-          {renderSidebarHeader}
-        </SidebarHeader>
-        <DateHeader unit="month" className={classes.dateHeader} height={15}/>
-        <DateHeader unit="day" className={classes.dateHeader} height={15}/>
-      </TimelineHeaders>
-      <TimelineMarkers>
-        <TodayMarker>
-          {({ styles, date }) =>
-            <div style={{ ...styles, backgroundColor: "red" }}/>
-          }
-        </TodayMarker>
-        <CursorMarker/>
-      </TimelineMarkers>
-    </Timeline>;
+    return (
+      <Timeline
+        groups={groups}
+        items={items}
+        // keys={keys}
+        visibleTimeStart={start}
+        visibleTimeEnd={end}
+        onItemClick={eventClicked}
+        selected={selected}
+        onItemSelect={eventItemSelected}
+        onItemDeselect={eventItemDeselected}
+        onCanvasClick={onCanvasClick}
+        minZoom={14 * 86400 * 1000}
+        canMove={false}
+        canChangeGroup={false}
+        canResize={false}
+        dragSnap={24 * 60 * 60 * 1000}
+        lineHeight={20}
+        stackItems
+        itemTouchSendsClick
+        // useResizeHandle
+        timeSteps={timeSteps}
+        sidebarWidth={collapsed ? 30 : 130}
+        sidebarContent={<div>Above The Left</div>}
+        groupRenderer={renderGroup}
+        itemRenderer={renderItem}
+      >
+        <TimelineHeaders className={"sticky " + classes.timelineHeader}>
+          <SidebarHeader>
+            {renderSidebarHeader}
+          </SidebarHeader>
+          <DateHeader unit="month" className={classes.dateHeader} height={15}/>
+          <DateHeader unit="day" className={classes.dateHeader} height={15}/>
+        </TimelineHeaders>
+        <TimelineMarkers>
+          <TodayMarker>
+            {({ styles, date }) =>
+              <div style={{ ...styles, backgroundColor: "red" }}/>
+            }
+          </TodayMarker>
+          <CursorMarker/>
+        </TimelineMarkers>
+      </Timeline>
+    );
   }
 
   var timelines = [];
 
   for (var i = 0; i < 12; i += horizontalMonths) {
-    var start = moment(visibleTime.start).add(i, "month");
+    var start = add(beginDate, { months: i });
     timelines.push(
       <div key={i}>
         {renderTimeline(
           start.valueOf(),
-          moment(start).add(horizontalMonths, "month").valueOf())}
+          add(start, { months: horizontalMonths }).valueOf())}
       </div>
     );
   }
 
   return (
     <div className={classes.root} ref={rootRef}>
-      <Grid container justify="space-between">
-        <Grid item>
-          <NavButton onClick={() => onPrevNextClick(-1)}>
-            &lt;&lt; {visibleTime.start.add(-1, "month").format("MMMM YYYY")}
-          </NavButton>
-          <NavButton onClick={() => onPrevNextClick(-6)}>&lt;&lt; -{t("6 months")}</NavButton>
-          <NavButton onClick={() => onPrevNextClick(-12)}>&lt;&lt; -{t("12 months")}</NavButton>
-        </Grid>
-        <Grid item>
-          <NavButton onClick={() => onPrevNextClick(12)}>+{t("12 months")} &gt;&gt;</NavButton>
-          <NavButton onClick={() => onPrevNextClick(6)}>+{t("6 months")} &gt;&gt;</NavButton>
-          <NavButton onClick={() => onPrevNextClick(1)}>
-            {visibleTime.start.add(1, "month").format("MMMM YYYY")} &gt;&gt;
-          </NavButton>
-        </Grid>
-      </Grid>
+      {/*<Grid container justify="space-between">*/}
+      {/*  <Grid item>*/}
+      {/*    <NavButton onClick={() => onPrevNextClick(-1)}>*/}
+      {/*      &lt;&lt; {visibleTime.start.add(-1, "month").format("MMMM YYYY")}*/}
+      {/*    </NavButton>*/}
+      {/*    <NavButton onClick={() => onPrevNextClick(-6)}>&lt;&lt; -{t("6 months")}</NavButton>*/}
+      {/*    <NavButton onClick={() => onPrevNextClick(-12)}>&lt;&lt; -{t("12 months")}</NavButton>*/}
+      {/*  </Grid>*/}
+      {/*  <Grid item>*/}
+      {/*    <NavButton onClick={() => onPrevNextClick(12)}>+{t("12 months")} &gt;&gt;</NavButton>*/}
+      {/*    <NavButton onClick={() => onPrevNextClick(6)}>+{t("6 months")} &gt;&gt;</NavButton>*/}
+      {/*    <NavButton onClick={() => onPrevNextClick(1)}>*/}
+      {/*      {visibleTime.start.add(1, "month").format("MMMM YYYY")} &gt;&gt;*/}
+      {/*    </NavButton>*/}
+      {/*  </Grid>*/}
+      {/*</Grid>*/}
       {timelines}
     </div>
   );
 
+  // eslint-disable-next-line react/no-multi-comp,react/prop-types
   function renderSidebarHeader({ getRootProps }) {
     return <div {...getRootProps()}>
       <button
@@ -352,12 +303,10 @@ const BookingScheduler = props => {
     </div>;
   }
 
-  function renderItem({
-    item,
-    itemContext,
-    getItemProps,
-    getResizeProps
-  }) {
+  // eslint-disable-next-line react/no-multi-comp
+  function renderItem(props) {
+    /* eslint-disable react/prop-types */
+    const { item, itemContext, getItemProps, getResizeProps } = props;
     const { title, ...itemProps } = getItemProps(item.itemProps); // remove the title props
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
     return (
@@ -377,6 +326,7 @@ const BookingScheduler = props => {
     );
   }
 
+  // eslint-disable-next-line react/no-multi-comp
   function renderGroup({ group }) {
     return (
       <Tooltip title={group.tip}>
@@ -400,7 +350,6 @@ BookingScheduler.propTypes = {
   onItemDeselected: PropTypes.func,
   onItemSelected: PropTypes.func,
   onOpenBooking: PropTypes.func,
-  statuses: PropTypes.array.isRequired
 };
 
 export default BookingScheduler;

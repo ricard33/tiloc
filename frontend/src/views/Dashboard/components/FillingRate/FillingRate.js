@@ -12,7 +12,6 @@ import {
   Divider,
   Button
 } from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
 import { get_options } from './chart';
@@ -77,7 +76,7 @@ const FillingRate = props => {
       .catch(() => {
         setLoaded(true);
       });
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   return (
     <Card
@@ -98,7 +97,8 @@ const FillingRate = props => {
       <Divider />
       <CardContent>
         <div className={classes.chartContainer}>
-          {loaded && <Bar
+          {loaded &&
+          <Bar
             data={data}
             options={get_options()}
           />}

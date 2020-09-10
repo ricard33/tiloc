@@ -1,63 +1,17 @@
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/styles";
-import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import CKEditor from "@ckeditor/ckeditor5-react";
 import CustomeEditor from "./ckeditor5";
 import "./Editor.css";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(1)
-  },
-  content: {
-    marginTop: theme.spacing(2)
-  },
-  formControl: {
-    width: "100%"
-  },
-  flexBoxAlignLeft: {
-    display: "flex",
-    alignItems: "baseline"
-    // justifyContent: "stretch"
-  },
-  flexBoxStretched: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between"
-  },
-  spacer: {
-    flexBasis: "2em"
-  },
-  button: {
-    margin: theme.spacing(1)
-  },
-  statusItem: {
-    width: "-webkit-fill-available"
-    // width: "stretch",
-    // padding: theme.spacing(1)
-    // height: "1em",
-    // marginRight: "5px"
-  },
-  deleteButton: {
-    color: "red"
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  }
-}));
-
 const Editor = props => {
   const { content, onChange } = props;
-  const classes = useStyles();
-  const { t } = useTranslation();
   let editorInstance = null;
 
   useEffect(() => {
     if (editorInstance)
       editorInstance.setData(content);
-  }, [content]);
+  }, [editorInstance, content]);
 
   function _onChange(event, editor) {
     onChange && onChange(editor.getData());

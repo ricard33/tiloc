@@ -49,4 +49,3 @@ class ExportBookingsJob(CronJobBase):
             fullpath = os.path.join(settings.BACKUP_DIR, filename)
             if os.path.isfile(fullpath) and filename < max_filename:
                 os.remove(fullpath)
-

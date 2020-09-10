@@ -19,6 +19,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import NavBar from "./components/NavBar";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: "x-small",
     margin: "5px",
     padding: "0 4px"
-  },
+  }
 }));
 
 const Planning = props => {
@@ -69,7 +70,7 @@ const Planning = props => {
 
   // const bookings = allBookings.toModelArray();
 
-  if(needFirstTimeEdit && !editBooking && bookings && bookings.filter(b => b.id === Number(query.edit)).length) {
+  if (needFirstTimeEdit && !editBooking && bookings && bookings.filter(b => b.id === Number(query.edit)).length) {
     console.debug("Open EDIT ", bookings.filter(b => b.id === Number(query.edit)));
     setEditBooking(bookings.filter(b => b.id === Number(query.edit))[0]);
     setNeedFirstTimeEdit(false);
@@ -168,11 +169,11 @@ const Planning = props => {
           disabled={!selected}
         ><EditIcon/></IconButton>
       </div>
+      <NavBar date={beginDate} onChange={(newDate) => setBeginDate(newDate)}/>
       <BookingScheduler
         bookings={bookings2}
         lodgings={lodgings}
         beginDate={beginDate}
-        statuses={bookingStatuses}
         onCreateBooking={onCreateBooking}
         onOpenBooking={onEditBooking}
         onItemSelected={onSelectBooking}
@@ -211,7 +212,8 @@ const Planning = props => {
           >{t("Edit booking")}</Button>
         </Grid>
       </Grid>
-      {editBooking && <BookingDialog
+      {editBooking &&
+      <BookingDialog
         booking={editBooking}
         onClose={handleCloseEdit}
         onOpenContract={onEditContract}
@@ -224,11 +226,12 @@ const Planning = props => {
             {t("Legend")}
           </Typography>
           {bookingStatuses.map(status => {
-            return <span
-              key={status.id}
-              className={classes.statusLegend}
-              style={{ background: "#" + status.color }}
-            >{status.name}</span>
+            return (
+              <span
+                key={status.id}
+                className={classes.statusLegend}
+                style={{ background: "#" + status.color }}
+              >{status.name}</span>);
           })}
         </CardContent>
       </Card>

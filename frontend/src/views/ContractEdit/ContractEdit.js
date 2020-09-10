@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { useTranslation } from "react-i18next";
-import PropTypes from "prop-types";
 import { useHistory, useParams } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {
@@ -19,6 +18,8 @@ import Typography from "@material-ui/core/Typography";
 import moment from "moment";
 import Editor from "../../components/Editor";
 import Alert from "@material-ui/lab/Alert";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -64,7 +65,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ContractEdit = props => {
-  const {} = props;
   let { bookingId } = useParams();
   const classes = useStyles();
   const { t } = useTranslation();
@@ -150,6 +150,10 @@ const ContractEdit = props => {
 
   return (
     <div className={classes.root}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+
       <Typography variant="h1">
         {t("Rental agreement")}
       </Typography>
@@ -222,7 +226,6 @@ const ContractEdit = props => {
 };
 
 ContractEdit.propTypes = {
-  onClose: PropTypes.func
 };
 
 export default ContractEdit;

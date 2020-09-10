@@ -1,8 +1,7 @@
-from babel.dates import format_date
 import jinja2
+from babel.dates import format_date
 from babel.numbers import format_decimal
 from django.conf import settings
-
 from django.utils import translation
 
 

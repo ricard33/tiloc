@@ -25,6 +25,7 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const BundleTracker = require('webpack-bundle-tracker');
+const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
 
 const postcssNormalize = require('postcss-normalize');
 
@@ -180,9 +181,9 @@ module.exports = function(webpackEnv) {
       // Point sourcemap entries to original disk location (format as URL on Windows)
       devtoolModuleFilenameTemplate: isEnvProduction
         ? info =>
-            path
-              .relative(paths.appSrc, info.absoluteResourcePath)
-              .replace(/\\/g, '/')
+          path
+            .relative(paths.appSrc, info.absoluteResourcePath)
+            .replace(/\\/g, "/")
         : isEnvDevelopment &&
           (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
       // Prevents conflicts when multiple webpack runtimes (from different apps)
@@ -242,18 +243,18 @@ module.exports = function(webpackEnv) {
             parser: safePostCssParser,
             map: shouldUseSourceMap
               ? {
-                  // `inline: false` forces the sourcemap to be output into a
-                  // separate file
-                  inline: false,
-                  // `annotation: true` appends the sourceMappingURL to the end of
-                  // the css file, helping the browser find the sourcemap
-                  annotation: true,
-                }
-              : false,
+                // `inline: false` forces the sourcemap to be output into a
+                // separate file
+                inline: false,
+                // `annotation: true` appends the sourceMappingURL to the end of
+                // the css file, helping the browser find the sourcemap
+                annotation: true
+              }
+              : false
           },
           cssProcessorPluginOptions: {
-            preset: ['default', { minifyFontValues: { removeQuotes: false } }],
-          },
+            preset: ["default", { minifyFontValues: { removeQuotes: false } }]
+          }
         }),
       ],
       // Automatically split vendor and commons
@@ -517,19 +518,19 @@ module.exports = function(webpackEnv) {
           },
           isEnvProduction
             ? {
-                minify: {
-                  removeComments: true,
-                  collapseWhitespace: true,
-                  removeRedundantAttributes: true,
-                  useShortDoctype: true,
-                  removeEmptyAttributes: true,
-                  removeStyleLinkTypeAttributes: true,
-                  keepClosingSlash: true,
-                  minifyJS: true,
-                  minifyCSS: true,
-                  minifyURLs: true,
-                },
+              minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeRedundantAttributes: true,
+                useShortDoctype: true,
+                removeEmptyAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                keepClosingSlash: true,
+                minifyJS: true,
+                minifyCSS: true,
+                minifyURLs: true
               }
+            }
             : undefined
         )
       ),
@@ -648,6 +649,8 @@ module.exports = function(webpackEnv) {
           // The formatter is invoked directly in WebpackDevServerUtils during development
           formatter: isEnvProduction ? typescriptFormatter : undefined,
         }),
+      isEnvProduction && new DuplicatePackageCheckerPlugin(),  //dedupe similar code
+      isEnvProduction && new webpack.optimize.AggressiveMergingPlugin(),//Merge chunks
       isEnvProduction && new BundleTracker({path: paths.statsRoot, filename: 'webpack-stats.prod.json'}),
       isEnvDevelopment && new BundleTracker({path: paths.statsRoot, filename: 'webpack-stats.dev.json'}),
     ].filter(Boolean),

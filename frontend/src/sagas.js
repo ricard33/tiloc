@@ -61,7 +61,7 @@ function* login(action) {
 function* logout(action) {
   const { callback } = action;
 
-  const res = yield call(axios.post, "/api/auth/logout/");
+  yield call(axios.post, "/api/auth/logout/");
 
   try {
     yield put({ type: actionTypes.LOGOUT_SUCCESSFUL });
