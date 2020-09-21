@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from core import models
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
 
@@ -19,7 +19,7 @@ class AdminFactory(UserFactory):
     is_superuser = True
 
 
-class OwnerFactory(factory.DjangoModelFactory):
+class OwnerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Owner
 
@@ -28,7 +28,7 @@ class OwnerFactory(factory.DjangoModelFactory):
     no_vat = False
 
 
-class LodgingFactory(factory.DjangoModelFactory):
+class LodgingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Lodging
 
@@ -43,14 +43,14 @@ class LodgingFactory(factory.DjangoModelFactory):
     ..."""
 
 
-class BookingChannelFactory(factory.DjangoModelFactory):
+class BookingChannelFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingChannel
 
     name = factory.Faker('name')
 
 
-class BookingChannelSyncFactory(factory.DjangoModelFactory):
+class BookingChannelSyncFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingChannelSync
 
@@ -59,7 +59,7 @@ class BookingChannelSyncFactory(factory.DjangoModelFactory):
     source_url = factory.Faker('uri')
 
 
-class BookingStatusFactory(factory.DjangoModelFactory):
+class BookingStatusFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingStatus
 
@@ -68,7 +68,7 @@ class BookingStatusFactory(factory.DjangoModelFactory):
     rank = factory.Sequence(lambda n: n)
 
 
-class BookingFactory(factory.DjangoModelFactory):
+class BookingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Booking
 
@@ -84,7 +84,7 @@ class BookingFactory(factory.DjangoModelFactory):
     price = factory.LazyAttribute(lambda b: b.daily_rate * b.duration)
 
 
-class ContractTemplateFactory(factory.DjangoModelFactory):
+class ContractTemplateFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.ContractTemplate
 
@@ -92,7 +92,7 @@ class ContractTemplateFactory(factory.DjangoModelFactory):
     content = "{{ lodging.name }}: from {{ booking.begin_date }} to {{ booking.end_date }}..."
 
 
-class ContractFactory(factory.DjangoModelFactory):
+class ContractFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Contract
 

@@ -1,4 +1,6 @@
-import { format } from 'date-fns'
+import { format,
+  formatDistanceToNow as _formatDistanceToNow
+} from 'date-fns'
 import { enGB, fr } from 'date-fns/locale'
 import { getLanguage } from "./intlUtils";
 
@@ -9,5 +11,14 @@ const locales = {enGB, fr}
 export function formatDate(date, formatStr = 'PP') {
   return format(date, formatStr, {
     locale: locales[getLanguage()]
+  })
+}
+
+
+export function formatDistanceToNow(date, options = {}) {
+  return _formatDistanceToNow(date, {
+    locale: locales[getLanguage()],
+    addSuffix: true,
+    ...options,
   })
 }

@@ -7,10 +7,11 @@ import {
   // TotalUsers,
   // TasksProgress,
   // TotalProfit,
-  LatestSales,
+  FillingRate,
   UsersByDevice,
-  LatestProducts,
-  LatestOrders
+  // LatestProducts,
+  LatestBookings,
+  NextEvents
 } from './components';
 
 const useStyles = makeStyles(theme => ({
@@ -28,15 +29,25 @@ const Dashboard = () => {
         container
         spacing={4}
       >
-        {/*<Grid*/}
-        {/*  item*/}
-        {/*  lg={3}*/}
-        {/*  sm={6}*/}
-        {/*  xl={3}*/}
-        {/*  xs={12}*/}
-        {/*>*/}
-        {/*  <Budget />*/}
-        {/*</Grid>*/}
+        <Grid
+          item
+          xl={9}
+          lg={8}
+          md={12}
+          xs={12}
+        >
+          <NextEvents />
+        </Grid>
+        <Grid
+          item
+          xl={3}
+          lg={4}
+          md={12}
+          sm={12}
+          xs={12}
+        >
+          <LatestBookings />
+        </Grid>
         {/*<Grid*/}
         {/*  item*/}
         {/*  lg={3}*/}
@@ -71,7 +82,7 @@ const Dashboard = () => {
           xl={9}
           xs={12}
         >
-          <LatestSales />
+          <FillingRate />
         </Grid>
         <Grid
           item
@@ -82,24 +93,24 @@ const Dashboard = () => {
         >
           <UsersByDevice />
         </Grid>
-        <Grid
-          item
-          lg={4}
-          md={6}
-          xl={3}
-          xs={12}
-        >
-          <LatestProducts />
-        </Grid>
-        <Grid
-          item
-          lg={8}
-          md={12}
-          xl={9}
-          xs={12}
-        >
-          <LatestOrders />
-        </Grid>
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  lg={4}*/}
+        {/*  md={6}*/}
+        {/*  xl={3}*/}
+        {/*  xs={12}*/}
+        {/*>*/}
+        {/*  <LatestProducts />*/}
+        {/*</Grid>*/}
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  lg={8}*/}
+        {/*  md={12}*/}
+        {/*  xl={9}*/}
+        {/*  xs={12}*/}
+        {/*>*/}
+        {/*  <LatestBookings />*/}
+        {/*</Grid>*/}
       </Grid>
     </div>
   );

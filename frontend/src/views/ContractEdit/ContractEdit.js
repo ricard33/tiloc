@@ -84,7 +84,7 @@ const ContractEdit = props => {
   );
 
   useEffect(() => {
-    dispatch(actions.fetchBookings());
+    // dispatch(actions.fetchBookings());
     dispatch(actions.getOrCreateContract(bookingId, loaded));
   }, [bookingId, loaded, dispatch]);
 

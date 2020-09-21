@@ -77,7 +77,7 @@ export default {
   },
   body2: {
     color: palette.text.secondary,
-    fontSize: "0.8em",
+    fontSize: "0.7em",
     letterSpacing: "-0.04px",
     lineHeight: "18px"
   },

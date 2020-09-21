@@ -181,6 +181,9 @@ class Booking(models.Model):
     special_conditions = models.TextField(_("Special conditions"), blank=True, null=True)
     options = models.ManyToManyField(Service, through='BookedService')
 
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = _("Booking")
 
@@ -217,10 +220,14 @@ class Booking(models.Model):
         return self.contract
 
 
+def contracts_path():
+    return os.path.join(settings.MEDIA_ROOT, 'contracts')
+
+
 class Contract(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
     content = models.TextField(_("Contract"))
-    pdf = models.FilePathField(path=os.path.join(settings.MEDIA_ROOT, 'contracts'), null=True, blank=True)
+    pdf = models.FilePathField(path=contracts_path, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     pdf_created = models.DateTimeField(null=True, blank=True)

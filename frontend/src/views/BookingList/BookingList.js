@@ -3,7 +3,7 @@ import { BookingsTable, BookingsToolbar } from "./components";
 import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { bookings } from "../../actions";
+import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import orm from "orm";
 // import { useTranslation } from "react-i18next";
@@ -34,7 +34,7 @@ const BookingList = () => {
   const numSelected = selected.length;
 
   useEffect(() => {
-    dispatch(bookings.fetchBookings());
+    dispatch(actions.fetchBookings());
   }, [dispatch]);
 
   const onSelectionChange = (newSelection) => {

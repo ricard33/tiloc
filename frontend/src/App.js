@@ -32,6 +32,10 @@ function App(props) {
   useEffect(() => {
     dispatch(auth.loadUser(token));
     dispatch(actions.fetchOwners());
+    dispatch(actions.fetchBookings());
+    dispatch(actions.fetchBookingStatuses());
+    dispatch(actions.fetchBookingChannels());
+    dispatch(actions.fetchLodgings());
   }, [dispatch, token]);
   
   return (

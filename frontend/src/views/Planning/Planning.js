@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/styles";
 import { startOfMonth, parse } from "date-fns";
 import { BookingScheduler } from "./components";
 import * as actions from "../../actions";
-import { bookings as bookingsActions, lodgings as lodgingsActions } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import * as selectors from "../../selectors";
 import { useTranslation } from "react-i18next";
@@ -78,10 +77,10 @@ const Planning = props => {
 
 
   useEffect(() => {
-    dispatch(bookingsActions.fetchBookings());
-    dispatch(bookingsActions.fetchBookingStatuses());
-    dispatch(bookingsActions.fetchBookingChannels());
-    dispatch(lodgingsActions.fetchLodgings());
+    dispatch(actions.fetchBookings());
+    // dispatch(actions.fetchBookingStatuses());
+    // dispatch(actions.fetchBookingChannels());
+    // dispatch(actions.fetchLodgings());
   }, [dispatch]);
 
   const onEditBooking = (booking) => {

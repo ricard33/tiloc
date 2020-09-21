@@ -13,7 +13,7 @@ django-proxy
 django-rest-knox
 django-webpack-loader
 gunicorn
-ics
+ics>=0.7
 invoke~=1.4.1
 jinja2
 JSON-log-formatter

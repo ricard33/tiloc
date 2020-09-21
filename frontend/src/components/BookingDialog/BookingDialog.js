@@ -128,11 +128,11 @@ const BookingDialog = props => {
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
 
   useEffect(() => {
-    dispatch(actions.fetchBookings());
-    dispatch(actions.fetchBookingStatuses());
-    dispatch(actions.fetchBookingChannels());
-    dispatch(actions.fetchLodgings());
-    dispatch(actions.fetchOwners());
+    // dispatch(actions.fetchBookings());
+    // dispatch(actions.fetchBookingStatuses());
+    // dispatch(actions.fetchBookingChannels());
+    // dispatch(actions.fetchLodgings());
+    // dispatch(actions.fetchOwners());
   }, [dispatch]);
 
   function initializeDefaults(booking) {

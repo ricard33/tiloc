@@ -192,7 +192,9 @@ export const createModels = () => {
         options: many({
           to: Service,
           through: "BookedService"
-        })
+        }),
+        created: attr(),
+        modified: attr(),
       };
     }
 

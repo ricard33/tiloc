@@ -35,7 +35,7 @@ const theme = createMuiTheme({
       margin: "dense"
     },
     MuiListItem: {
-      dense: true
+      dense: false
     },
     MuiOutlinedInput: {
       margin: "dense"
