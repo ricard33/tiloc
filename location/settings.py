@@ -225,8 +225,9 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS':        ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-# if ENV == 'dev':
-#     REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
+if ENV == 'dev':
+    # needed to allow access to /api/ pages
+    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
 
 REST_KNOX = {
     'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'

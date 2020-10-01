@@ -46,6 +46,7 @@ urlpatterns = [
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url("^api/auth/register/$", api.RegistrationAPI.as_view()),
     url("^api/auth/login/$", api.LoginAPI.as_view()),
+    url("^api/auth/logout/$", api.LogoutAPI.as_view()),
     url("^api/auth/user/$", api.UserAPI.as_view()),
     url(r'^api/auth/', include('knox.urls')),
 

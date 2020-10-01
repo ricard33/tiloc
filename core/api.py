@@ -4,11 +4,11 @@ import os
 import arrow
 import pdfkit as pdfkit
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from knox.models import AuthToken
-from knox.views import LoginView as KnoxLoginView
+from knox.views import LoginView as KnoxLoginView, LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
@@ -66,6 +66,13 @@ class LoginAPI(KnoxLoginView):
         if not user or not user.is_active:
             raise AuthenticationFailed()
         return super(LoginAPI, self).post(request, format=None)
+
+
+class LogoutAPI(KnoxLogoutView):
+
+    def post(self, request, format=None):
+        logout(request)
+        return super(LogoutAPI, self).post(request, format=None)
 
 
 class UserAPI(generics.RetrieveAPIView):
