@@ -11,6 +11,11 @@ from django.utils.translation import gettext_lazy as _
 logger = logging.getLogger('api')
 
 
+def user_directory_path(instance, filename):
+	# file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
+	return 'owner_{0}/{1}'.format(instance.id, filename)
+
+
 class Owner(models.Model):
     class DepositOrDownPayment(models.TextChoices):
         DEPOSIT = 'deposit', _('Deposit')
@@ -39,8 +44,8 @@ class Owner(models.Model):
                                      default=InvoiceLabel.RECEIPT)
     deposit_label = models.CharField(_("deposit or down payment"), max_length=30, choices=DepositOrDownPayment.choices,
                                      default=DepositOrDownPayment.DEPOSIT)
-    logo = models.ImageField(_("logo"), blank=True)
-    signature = models.ImageField(_("signature"), blank=True)
+    logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True)
+    signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True)
     display_week = models.BooleanField(_("display week number"), default=False)
 
     class Meta:
@@ -227,7 +232,7 @@ def contracts_path():
 class Contract(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
     content = models.TextField(_("Contract"))
-    pdf = models.FilePathField(path=contracts_path, null=True, blank=True)
+    pdf = models.CharField(max_length=100, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     pdf_created = models.DateTimeField(null=True, blank=True)
