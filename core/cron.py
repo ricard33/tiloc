@@ -24,7 +24,11 @@ class SyncBookingsJob(CronJobBase):
         logger.info("Starting booking synchronizer")
         for sync in models.BookingChannelSync.objects.filter(active=True):
             logger.info("[%s] Synchronize bookings from [%s]", sync.lodging.name, sync.channel.name)
-            retrieve_and_synchronize_bookings(sync)
+            try:
+                retrieve_and_synchronize_bookings(sync)
+            except:
+                logging.exception("[%s] exception during bookings synchronization from [%s]",
+                                  sync.lodging.name, sync.channel.name)
         logger.info("Booking synchronizer finished in %.2f seconds", time() - t0)
 
 

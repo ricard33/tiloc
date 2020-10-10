@@ -14,7 +14,7 @@ def retrieve_ical(url) -> str:
     logger.debug("Requesting ical from %s" % url)
     r = requests.get(url)
     if r.status_code != 200:
-        logger.error("HTTP Error requesting ical: [%d] %s", r.status_code, r.text)
+        logger.error("HTTP Error requesting ical @ [%s]: [%d] %s", url, r.status_code, r.text)
         r.raise_for_status()
     return r.text
 
