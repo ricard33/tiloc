@@ -22,12 +22,11 @@ LOGGING = {
             '()': 'core.log_json_formatter.CustomisedJSONFormatter'
         }
     },
-    #'filters': {
-    #    'special': {
-    #        '()': 'project.logging.SpecialFilter',
-    #        'foo': 'bar',
-    #    },
-    #},
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'handlers': {
         'console': {
             'level': 'NOTSET',
@@ -51,23 +50,16 @@ LOGGING = {
                 'key': config.get('LOGGLY', 'API_KEY', ''),
                 'tag': config.get('LOGGLY', 'TAG', 'python')
             }
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
         }
-
-
-        # 'mail_admins': {
-        #     'level': 'ERROR',
-        #     'class': 'logging.handlers.SMTPHandler',
-        #     'mailhost': 'mail.example.org',
-        #     'fromaddr': 'app@tiloc.fr',
-        #     'toaddrs': ['alerts@example.org',],
-        #     'subject': "ALERT form Ti Loc",
-        #     'credentials': ['username', 'password'],
-        #     'secure': False,
-        #     #'filters': ['special']
-        # }
     },
     'root': {
-        'handlers': ['console', 'file'] + (config.getboolean('LOGGLY', 'ACTIVE', True) and ['loggly'] or []),
+        'handlers': ['console', 'file', 'mail_admins'] + (config.getboolean('LOGGLY', 'ACTIVE', True) and ['loggly'] or []),
         'level': 'DEBUG',
     },
     'loggers': {

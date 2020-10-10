@@ -39,16 +39,6 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')
 UNITTEST = 'test' in sys.argv
 
-LOGGING_CONFIG = None  # disable log configuration by Django
-DEFAULT_LOG_FORMAT = '%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
-
-configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
-
-if ENV not in ['dev', 'prod']:
-    logging.critical('Bad value for APP_ENV environment settings: %s', ENV)
-
-logging.info("Starting django application (%s) %s", ENV, DEBUG and "**DEBUG MODE ACTIVATED**" or "")
-
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
     SECRET_KEY = config.get('APP', 'SECRET_KEY')  # '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
@@ -61,6 +51,16 @@ except Exception:
     f = open(CONFIG_FILE, 'wt')
     config.write(f)
     f.close()
+
+LOGGING_CONFIG = None  # disable log configuration by Django
+DEFAULT_LOG_FORMAT = '%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
+
+LOGGING = configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
+
+if ENV not in ['dev', 'prod']:
+    logging.critical('Bad value for APP_ENV environment settings: %s', ENV)
+
+logging.info("Starting django application (%s) %s", ENV, DEBUG and "**DEBUG MODE ACTIVATED**" or "")
 
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(config.getlist('SECURITY', 'ALLOWED_HOSTS', []))
@@ -211,6 +211,22 @@ if os.path.exists(PROD_ASSETS_DIR):
     STATICFILES_DIRS.append(PROD_ASSETS_DIR)
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# admin user
+ADMINS = (
+    ('Support', config.get('APP', 'EMAIL_ADMIN', 'support@tiloc.fr')),
+)
+
+# Email configuration
+DEFAULT_FROM_EMAIL = config.get('EMAIL', 'DEFAULT_FROM_EMAIL', 'app@tiloc.fr')
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_HOST = config.get('EMAIL', 'SMTP_HOST', 'smtp-crd.alwaysdata.net')
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config.get('EMAIL', 'SMTP_USER', '')
+EMAIL_HOST_PASSWORD = config.get('EMAIL', 'SMTP_PASSWORD', '')
+EMAIL_USE_TLS = True
+EMAIL_SUBJECT_PREFIX = config.get('EMAIL', 'SUBJECT_PREFIX', '[TiLoc]') + ' '
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
