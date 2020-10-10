@@ -119,7 +119,7 @@ const BookingDialog = props => {
   const formValues = getValues();
   // const [balance, setBalance] = useState(formValues.price - formValues.deposit);
 
-  const watchBalance = watch(["price", "deposit"], formValues.price - formValues.deposit);
+  const watchBalance = watch(["price", "deposit"], {price: formValues.price, deposit: formValues.deposit});
   const existingGuest = watch("guest_name", initialState.guest_name);
   const isFlatRate = watch("is_flat_rate", initialState.is_flate_rate);
   const duration = watch("duration", initialState.duration);
