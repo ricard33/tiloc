@@ -23,7 +23,7 @@ class IndexPage(TemplateView):
     def get(self, request, *args, **kwargs):
         accept = request.META.get('HTTP_ACCEPT')
 
-        if 'text/html' not in accept:
+        if not accept or 'text/html' not in accept:
             raise Http404(_('"%(path)s" does not exist') % {'path': request.path})
         return super().get(request, *args, **kwargs)
 
