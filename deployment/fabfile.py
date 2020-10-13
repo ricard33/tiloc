@@ -38,6 +38,10 @@ def get_most_recent_modified(path):
 def write_version_properties(version):
     with open(os.path.join(WORKSPACE, 'location', 'version.properties'), "wt") as f:
         f.write("VERSION=%s\n" % version)
+        # f.write("DATE=%s\n" % datetime.utcnow().strftime("%Y-%m-%d"))
+        f.write("DATE=%s\n" % datetime.utcnow().isoformat())
+        import socket
+        f.write("BUILDER=%s\n" % socket.gethostname())
 
 
 @task
@@ -267,6 +271,8 @@ def restart(c):
 
 @task(default=True)
 def deploy(c):
+    version = get_version(c)
+    write_version_properties(version)
     deploy_location(c)
     restart(c)
 

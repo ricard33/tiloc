@@ -43,6 +43,7 @@ router.register(r'payment', api.PaymentViewSet, 'payment')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),
+    url(r'^api/info/', api.version_view, name='version'),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url("^api/auth/register/$", api.RegistrationAPI.as_view()),
     url("^api/auth/login/$", api.LoginAPI.as_view()),

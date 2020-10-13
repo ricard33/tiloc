@@ -10,8 +10,9 @@ from django.http import Http404, HttpResponse
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView, LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from . import models
@@ -19,6 +20,16 @@ from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
                           PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, UserSerializer)
+from location import __version__, __date__
+
+
+@api_view()
+@permission_classes([AllowAny])
+def version_view(request, *args, **kwargs):
+    return Response({
+        'version': __version__,
+        'build_date': __date__.isoformat(timespec='seconds'),
+    })
 
 
 class RegistrationAPI(generics.GenericAPIView):

@@ -139,3 +139,4 @@ frontend0/
 /config/config.ini
 .DS_Store
 /backup/
+/location/version.properties

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
@@ -10,9 +10,12 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CalendarIcon from '@material-ui/icons/CalendarToday';
 import ListIcon from '@material-ui/icons/List';
 import MoneyIcon from '@material-ui/icons/AttachMoney';
+import { parseISO } from "date-fns";
 
 import { SidebarNav } from './components';
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { formatDate } from "../../../../common/dateUtils";
 
 const useStyles = makeStyles(theme => ({
   drawer: {
@@ -34,6 +37,11 @@ const useStyles = makeStyles(theme => ({
   },
   nav: {
     marginBottom: theme.spacing(2)
+  },
+  version: {
+    fontSize: "x-small",
+    position: "fixed",
+    bottom: "4px"
   }
 }));
 
@@ -42,6 +50,7 @@ const Sidebar = props => {
 
   const classes = useStyles();
   const { t } = useTranslation();
+  const [version, setVersion] = useState({});
 
   const pages = [
     {
@@ -81,6 +90,19 @@ const Sidebar = props => {
     }
   ];
 
+  useEffect(() => {
+    axios.get("api/info/")
+      .then(response => {
+        // console.debug(response);
+        setVersion({
+          version: response.data.version,
+          build_date: formatDate(parseISO(response.data.build_date))
+        });
+      })
+      .catch(() => {
+      });
+  }, []);
+
   return (
     <Drawer
       anchor="left"
@@ -100,6 +122,10 @@ const Sidebar = props => {
           pages={pages}
         />
         {/*<UpgradePlan />*/}
+        <div className={classes.version}>
+          <div>{t("version")} {version.version}</div>
+          <div>{t("build on")} {version.build_date}</div>
+        </div>
       </div>
     </Drawer>
   );
