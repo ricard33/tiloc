@@ -58,6 +58,7 @@ class Owner(models.Model):
 class Lodging(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
     active = models.BooleanField(_("active"), default=True)
+    shown = models.BooleanField(_("shown"), default=True)
     name = models.CharField(_("name"), max_length=200, unique=True)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     rank = models.IntegerField(_("rank"), )

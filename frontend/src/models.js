@@ -52,6 +52,7 @@ export const createModels = () => {
       return {
         id: attr(),
         active: attr(),
+        shown: attr(),
         name: attr(),
         owner: fk("Owner", "lodgings"),
         rank: attr(),

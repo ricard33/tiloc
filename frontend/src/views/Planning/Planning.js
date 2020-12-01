@@ -171,7 +171,7 @@ const Planning = props => {
       <NavBar date={beginDate} onChange={(newDate) => setBeginDate(newDate)}/>
       <BookingScheduler
         bookings={bookings2}
-        lodgings={lodgings}
+        lodgings={lodgings.filter(b => b.shown)}
         beginDate={beginDate}
         onCreateBooking={onCreateBooking}
         onOpenBooking={onEditBooking}
