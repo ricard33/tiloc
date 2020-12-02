@@ -37,6 +37,9 @@ const useStyles = makeStyles(theme => ({
   specialGroup: {
     fontWeight: "bold"
   },
+  timeline: {
+    marginBottom: '10px',
+  },
   timelineHeader: {
     height: "30px"
   },
@@ -174,7 +177,8 @@ const BookingScheduler = props => {
       },
       style: {
         background: "#" + booking.status.color,
-        color: "black"
+        color: "black",
+        opacity: booking.lodging_id > 0 ? undefined : '50%'
       }
     },
     booking
@@ -258,7 +262,7 @@ const BookingScheduler = props => {
   for (var i = 0; i < 12; i += horizontalMonths) {
     var start = add(beginDate, { months: i });
     timelines.push(
-      <div key={i}>
+      <div key={i} className={classes.timeline}>
         {renderTimeline(
           start.valueOf(),
           add(start, { months: horizontalMonths }).valueOf())}
