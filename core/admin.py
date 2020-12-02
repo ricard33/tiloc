@@ -45,7 +45,9 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
 
 
 class LodgingAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'name', 'owner', 'rank', 'active', 'shown', 'capacity')
+    list_display = ('id', 'name', 'owner', 'rank', 'active', 'shown', 'capacity', 'daily_rate', 'guaranty',
+                    'cleaning_fee', 'contract_template')
+    list_filter = ('owner',)
 
 
 class OwnerAdmin(ImportExportModelAdmin):
