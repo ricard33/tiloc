@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'import_export',
     'knox',
+    'simple_history',
     'django_cron',
     'core',
     # 'frontend',
@@ -100,6 +101,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'location.urls'

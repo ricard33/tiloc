@@ -1,13 +1,15 @@
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
 from django.utils.translation import gettext_lazy as _
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from rest_framework.reverse import reverse
+from simple_history.admin import SimpleHistoryAdmin
 
 from core import models
 from core.imp_exp_resources import BookingResource
 
 
-class BookingAdmin(ImportExportModelAdmin):
+class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         'id', 'lodging', 'status',
         'guest_name',
@@ -44,13 +46,13 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
                        request=self.request) + '?s=%d' % obj.id
 
 
-class LodgingAdmin(ImportExportModelAdmin):
+class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = ('id', 'name', 'owner', 'rank', 'active', 'shown', 'capacity', 'daily_rate', 'guaranty',
                     'cleaning_fee', 'contract_template')
     list_filter = ('owner',)
 
 
-class OwnerAdmin(ImportExportModelAdmin):
+class OwnerAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = ('id', 'name', 'email', 'phone', 'active')
     list_display_links = ('name', )
 
@@ -74,7 +76,7 @@ class SeasonalVariationAdmin(ImportExportModelAdmin):
     list_display_links = ('name', )
 
 
-class ContractTemplateAdmin(ImportExportModelAdmin):
+class ContractTemplateAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = ('id', 'name', 'created', 'modified')
     list_display_links = ('id', 'name', )
 
@@ -83,8 +85,13 @@ class PaymentAdmin(ImportExportModelAdmin):
     list_display = ('id', 'booking', 'amount', 'method', 'date')
 
 
+class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
+    list_display = ('reference', 'category', 'designation', 'quantity', 'unit_price_ht', 'vat', 'auto_add_booking',
+                    'auto_add_invoice')
+
+
 admin.site.register(models.Booking, BookingAdmin)
-admin.site.register(models.Service)
+admin.site.register(models.Service, ServiceAdmin)
 admin.site.register(models.Lodging, LodgingAdmin)
 admin.site.register(models.Category)
 admin.site.register(models.Owner, OwnerAdmin)

@@ -1,3 +1,5 @@
+from datetime import date
+
 import arrow
 from django.test import TestCase
 # Create your tests here.
@@ -114,8 +116,8 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.first().status.id, status.id)
 
     def test_update_existing_booking_with_same_dates(self):
-        factories.BookingFactory(lodging=self.lodging, begin_date=arrow.get("20200802").date(),
-                                 end_date=arrow.get("20200812").date())
+        factories.BookingFactory(lodging=self.lodging, begin_date=arrow.get("2020-08-02").date(),
+                                 end_date=arrow.get("2020-08-12").date())
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
@@ -163,14 +165,15 @@ class ExportCalendarTestCase(TestCase):
 
     def test_booking_dates(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric",
-                                 begin_date=arrow.get("20200802").date(), end_date=arrow.get("20200812").date())
+                                 begin_date=arrow.get("2020-08-02").date(),
+                                 end_date=arrow.get("2020-08-12").date())
         r = self.client.get('/calendar/%s/' % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
         e = c.events.pop()
-        self.assertEqual(e.begin.date(), arrow.get("20200802").date())
-        self.assertEqual(e.end, arrow.get("20200812"))
+        self.assertEqual(e.begin.date(), date(2020, 8, 2))
+        self.assertEqual(e.end.date(), date(2020, 8, 12))
 
 
 class ExportFullPlanningTestCase(TestCase):

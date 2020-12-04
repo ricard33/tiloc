@@ -7,13 +7,14 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from simple_history.models import HistoricalRecords
 
 logger = logging.getLogger('api')
 
 
 def user_directory_path(instance, filename):
-	# file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
-	return 'owner_{0}/{1}'.format(instance.id, filename)
+    # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
+    return 'owner_{0}/{1}'.format(instance.id, filename)
 
 
 class Owner(models.Model):
@@ -48,6 +49,8 @@ class Owner(models.Model):
     signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True)
     display_week = models.BooleanField(_("display week number"), default=False)
 
+    history = HistoricalRecords()
+
     class Meta:
         verbose_name = _("Owner")
 
@@ -73,6 +76,8 @@ class Lodging(models.Model):
 
     contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
+
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = _("Lodging")
@@ -104,6 +109,8 @@ class Service(models.Model):
     vat = models.DecimalField(_("VAT %"), max_digits=10, decimal_places=2, blank=True, null=True)
     auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
     auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
+
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = _("Service")
@@ -178,7 +185,7 @@ class Booking(models.Model):
     price = models.DecimalField(_("price"), max_digits=10, decimal_places=2,
                                 help_text=_("Total price, either computed by daily price or applying flat rate"))
     is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
-                                       help_text=_("Use flat rate price insteed of daily price computation if true"))
+                                       help_text=_("Use flat rate price instead of daily price computation if true"))
     deposit = models.DecimalField(_("deposit"), max_digits=10, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("guaranty"), max_digits=10, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=10, decimal_places=2, blank=True, null=True)
@@ -189,6 +196,7 @@ class Booking(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = _("Booking")
@@ -256,6 +264,7 @@ class ContractTemplate(models.Model):
     content = models.TextField(_("Contract"))
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = _("Contract template")
@@ -290,7 +299,7 @@ class Pricing(models.Model):  # or RatePlan
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
     included_guests = models.PositiveSmallIntegerField(_("Number of guests included in the price"))
     supplement_per_additional_guest = models.PositiveSmallIntegerField(
-        _('Supplement per night and per aditional guest'))
+        _('Supplement per night and per additional guest'))
     info = models.TextField(_("info"), blank=True, null=True)
 
 
