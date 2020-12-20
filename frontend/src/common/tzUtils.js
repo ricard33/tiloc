@@ -1,4 +1,4 @@
-import { parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export const shiftPickerDateToUTCDate = (pickerDate) => {
   // console.debug("PickerDate", pickerDate);
@@ -28,3 +28,7 @@ export const shiftUTCDateToPickerDate = (utcDate) => {
   }
   return utcDate;
 };
+
+export const formatISO: string = (dateWithTZ) => {
+  return format(dateWithTZ, 'yyyy-MM-dd');
+}

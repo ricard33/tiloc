@@ -338,8 +338,8 @@ const BookingDialog = props => {
     console.log("Submit: ", data);
     const submittedBooking = {
       ...data,
-      begin_date: data.begin_date.toISOString().substr(0, 10),
-      end_date: data.end_date.toISOString().substr(0, 10),
+      begin_date: formatISO(data.begin_date),
+      end_date: formatISO(data.end_date),
       lodging_id: data.lodging_id > 0 ? data.lodging_id : null
     };
     const action = booking.id ? actions.updateBooking : actions.createBooking;

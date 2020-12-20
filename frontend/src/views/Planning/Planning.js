@@ -19,6 +19,7 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import NavBar from "./components/NavBar";
+import { formatISO } from "../../common/tzUtils";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -93,7 +94,7 @@ const Planning = props => {
     if (lodging) {
       setEditBooking({
         lodging_id: lodging.id,
-        begin_date: moment(begin_date).toISOString().substr(0, 10)
+        begin_date: formatISO(begin_date)
       });
     }
   };
