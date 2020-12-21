@@ -28,15 +28,15 @@ export const DecimalPrecision = {
     if (n < 0)
       o *= -1;
     return Math.floor((n + r) * o) / o;
-  },
+  }
 };
 
 export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, weekRate, seasonalRates = [],
   depositPercent) => {
   // TODO compute price using seasonal rates
-  if(typeof beginDate === "string")
+  if (typeof beginDate === "string")
     beginDate = parseISO(beginDate);
-  if(typeof endDate === "string")
+  if (typeof endDate === "string")
     endDate = parseISO(endDate);
   const duration = differenceInCalendarDays(endDate, beginDate);
   const isWeekRate = weekRate && duration >= 7;
@@ -56,4 +56,18 @@ export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, 
       }
     ]
   };
+};
+
+export const computeOptionsPrice = (options, duration) => {
+  let total = 0;
+  if (options) {
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      if (option.unit_price_ht) {
+        total += (option.vat ? option.unit_price_ht * (100 + option.vat) / 100 : option.unit_price_ht)
+          * Number(option.quantity) * (option.is_flat_rate ? 1 : duration);
+      }
+    }
+    return total;
+  }
 };

@@ -36,6 +36,7 @@ function App(props) {
     dispatch(actions.fetchBookingStatuses());
     dispatch(actions.fetchBookingChannels());
     dispatch(actions.fetchLodgings());
+    dispatch(actions.fetchServices());
   }, [dispatch, token]);
   
   return (

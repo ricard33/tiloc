@@ -179,6 +179,7 @@ export default function* rootSaga() {
     yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_BOOKING), _deleteData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKING_STATUSES), _fetchData, "/api/booking_status/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKING_CHANNELS), _fetchData, "/api/booking_channel/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_SERVICES), _fetchData, "/api/service/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_LODGINGS), _fetchData, "/api/lodging/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_OWNERS), _fetchData, "/api/owner/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_CONTRACTS), _fetchData, "/api/contract/"),

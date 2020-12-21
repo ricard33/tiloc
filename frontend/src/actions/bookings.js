@@ -46,3 +46,9 @@ export function fetchBookingChannels() {
     type: types.REQUEST(types.FETCH_BOOKING_CHANNELS)
   };
 }
+
+export function fetchServices() {
+  return {
+    type: types.REQUEST(types.FETCH_SERVICES)
+  };
+}

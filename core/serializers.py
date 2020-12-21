@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from core import models
 
@@ -71,6 +72,26 @@ class BookingChannelSyncSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Service
+        fields = '__all__'
+
+
+class BookedServiceSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='service.id')
+    reference = serializers.ReadOnlyField(source='service.reference')
+    designation = serializers.ReadOnlyField(source='service.designation')
+    unit_price_ht = serializers.ReadOnlyField(source='service.unit_price_ht')
+    vat = serializers.ReadOnlyField(source='service.vat')
+    is_flat_rate = serializers.ReadOnlyField(source='service.is_flat_rate')
+    included_in_booking = serializers.ReadOnlyField(source='service.included_in_booking')
+
+    class Meta:
+        model = models.BookedService
+        fields = ('id', 'reference', 'designation', 'unit_price_ht', 'vat', 'included_in_booking', 'is_flat_rate', 'quantity')
+
+
 class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(source='status', queryset=models.BookingStatus.objects.all())
@@ -80,10 +101,36 @@ class BookingSerializer(serializers.ModelSerializer):
     source = BookingChannelSerializer(read_only=True)
     source_id = serializers.PrimaryKeyRelatedField(source='source', queryset=models.BookingChannel.objects.all(),
                                                    required=False, allow_null=True)
+    options = BookedServiceSerializer(source='bookedservice_set', many=True, required=False)
 
     class Meta:
         model = models.Booking
         fields = '__all__'
+
+    def create(self, validated_data: dict):
+        options = validated_data.pop('bookedservice_set', [])
+        instance = super().create(validated_data)
+        for option in options:
+            models.BookedService.objects.create(service_id=option['service']['id'], booking_id=instance.id, quantity=option['quantity'])
+        return instance
+
+    def update(self, instance, validated_data):
+        options = validated_data.pop('bookedservice_set', [])
+        instance = super().update(instance, validated_data)
+        existing_service_ids = instance.options.all().values_list('id', flat=True)
+        all_service_ids = []
+        for option in options:
+            service_id = option['service']['id']
+            all_service_ids.append(service_id)
+            if service_id in existing_service_ids:
+                booked_option = instance.bookedservice_set.get(service__id=service_id)
+                booked_option.quantity = option['quantity']
+                booked_option.save(update_fields=('quantity',))
+            else:
+                models.BookedService.objects.create(service_id=service_id, booking_id=instance.id, quantity=option['quantity'])
+        to_remove_service_ids = instance.options.exclude(id__in=all_service_ids).values_list('id', flat=True)
+        instance.options.remove(*to_remove_service_ids)
+        return instance
 
 
 class HolidaysSerializer(serializers.ModelSerializer):
@@ -120,3 +167,6 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Payment
         fields = '__all__'
+
+
+

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles, withStyles } from "@material-ui/styles";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
@@ -14,16 +14,17 @@ import {
   DeleteForever as DeleteIcon,
   Forward as ForwardIcon,
   PictureAsPdf as PdfIcon,
-  Save as SaveIcon
+  Save as SaveIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@material-ui/icons";
 import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useFieldArray } from "react-hook-form";
 import * as selectors from "../../selectors";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
-import { computeBookingPrice, DecimalPrecision } from "../../common/priceUtils";
+import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
 import { getDepositLabel } from "../../common/ownerPrefsUtils";
-import { Grid, TextField } from "@material-ui/core";
+import { Accordion, AccordionDetails, AccordionSummary as MuiAccordionSummary, Grid, TextField } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -38,7 +39,33 @@ import Checkbox from "@material-ui/core/Checkbox";
 import useWindowDimensions from "../../common/windowDimensions";
 import { useConfirm } from "material-ui-confirm";
 import Hidden from "@material-ui/core/Hidden";
+import { formatISO } from "../../common/tzUtils";
 
+
+const AccordionSummary = withStyles({
+  root: {
+    backgroundColor: 'rgba(0, 0, 0, .03)',
+    borderBottom: '1px solid rgba(0, 0, 0, .125)',
+    marginBottom: -1,
+    minHeight: 56,
+    '&$expanded': {
+      minHeight: 38,
+    },
+  },
+  content: {
+    fontWeight: 'bold',
+    '&$expanded': {
+      margin: '3px 0',
+    },
+    '& p': {
+      fontWeight: 'bold',
+      marginBottom: 0
+    },
+  },
+  expanded: {
+
+  },
+})(MuiAccordionSummary);
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,6 +73,10 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     marginTop: theme.spacing(2)
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(15),
+    fontWeight: theme.typography.fontWeightRegular
   },
   formControl: {
     width: "100%"
@@ -79,6 +110,14 @@ const useStyles = makeStyles(theme => ({
   },
   priceInput: {
     width: "7em"
+  },
+  quantityInput: {
+    width: "5em"
+  },
+  options: {
+    alignItems: "center",
+    fontSize: "small",
+    textAlign: "center",
   }
 }));
 
@@ -93,6 +132,8 @@ const BookingDialog = props => {
   const lodgings = useSelector(store => selectors.lodgings(store));
   // const owners = useSelector(store => selectors.owners(store));
   const allGuests = useSelector(store => selectors.guests(store));
+  const allOptions = useSelector(store => selectors.services(store));
+  // const [selectedOptions, setSelectedOptions] = useState(booking.options || [])
   const confirm = useConfirm();
   const variant = "outlined";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
@@ -112,18 +153,24 @@ const BookingDialog = props => {
     defaultValues: initialState
   });
   const { register, control, errors, setValue, getValues, watch } = form;
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "options"
+  });
 
   let lodging = booking ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
-  // const [booking, setBooking] = useState(initialState);
   const formValues = getValues();
-  // const [balance, setBalance] = useState(formValues.price - formValues.deposit);
+  // console.debug("formValues: ", formValues);
 
-  const watchBalance = watch(["price", "deposit"], {price: formValues.price, deposit: formValues.deposit});
+  const watchBalance = watch(["price", "deposit"], { price: formValues.price, deposit: formValues.deposit });
   const existingGuest = watch("guest_name", initialState.guest_name);
-  const isFlatRate = watch("is_flat_rate", initialState.is_flate_rate);
+  const isFlatRate = watch("is_flat_rate", initialState.is_flat_rate);
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
+  const options = watch('options', fields);
+  const fullPrice = Number(price) + computeOptionsPrice(options, duration);
+  // console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
 
@@ -158,7 +205,7 @@ const BookingDialog = props => {
       initialState.end_date = parseISO(booking.end_date || format(addDays(initialState.begin_date, initialState.duration || 7), "yyyy-MM-dd"));
       initialState.duration = booking.duration || differenceInCalendarDays(initialState.end_date, initialState.begin_date);
       initialState.daily_rate = booking.daily_rate || lodging.daily_rate;
-      initialState.is_flate_rate = booking.is_flate_rate || false;
+      initialState.is_flat_rate = booking.is_flat_rate || false;
       if (initialState.price === undefined)
         Object.assign(initialState, computeBookingPrice(initialState.begin_date, initialState.end_date,
           initialState.daily_rate, 0, 0, [], depositPercent));
@@ -168,10 +215,18 @@ const BookingDialog = props => {
       initialState.children = booking.children || 0;
       initialState.babies = booking.babies || 0;
       initialState.source_id = booking.source_id || "";
+      initialState.options = booking.options || [];
 
       // console.debug("initialState", initialState);
       return initialState;
     }
+  }
+
+  function onAddOption(data) {
+    console.debug("ADD OPTION", data.target.value);
+    const value = Number(data.target.value);
+    const option = allOptions.filter(o => o.id === value)[0];
+    append(option);
   }
 
   function handleChange(data) {
@@ -349,41 +404,54 @@ const BookingDialog = props => {
     }));
   }
 
+  function getDesignation(option) {
+    return option.designation + (
+      option.unit_price_ht ? " - " + option.unit_price_ht + "€" + (
+        !option.is_flat_rate ? " / j" : ""
+      ) : ""
+    );
+  }
+
   return (
     <Dialog
       className={clsx(classes.root, className)}
       onClose={onClose}
       aria-labelledby="simple-dialog-title"
       open={!!booking}
-      maxWidth="sm"
-      fullScreen={width <= 600}
+      maxWidth={width < 1280 ? "sm" : "lg"}
+      fullScreen={width < 600}
     >
       <DialogTitle id="simple-dialog-title">
-        {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
+        <Grid justify="space-between" container spacing={4}>
+          <Grid item xs={8}>
+            {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
+          </Grid>
+          <Grid item xs={4}>
+            <span className={classes.totalPrice}>
+              {t("total = {{ fullPrice }} €", {fullPrice: DecimalPrecision.round(fullPrice)})}</span>
+          </Grid>
+        </Grid>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         {/*<DialogContentText>*/}
         {/*  {booking && booking.id ?*/}
         {/*    t("You can change booking details") : t("You can create a new booking") }*/}
         {/*</DialogContentText>*/}
         {booking &&
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Grid
-            container
-            spacing={1}
-          >
-            <input
-              type="hidden"
-              name="id"
-              ref={register}
-              defaultValue={booking.id}
-            />
-            <input
-              type="hidden"
-              name="guaranty"
-              ref={register}
-              defaultValue={initialState.guaranty}
-            />
+          <input
+            type="hidden"
+            name="id"
+            ref={register}
+            defaultValue={booking.id}
+          />
+          <input
+            type="hidden"
+            name="guaranty"
+            ref={register}
+            defaultValue={initialState.guaranty}
+          />
+          <Grid container spacing={1}>
             <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="status_id">{t("Booking status")}</InputLabel>
@@ -426,337 +494,441 @@ const BookingDialog = props => {
                 </Controller>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom variant="h6">{t("Guest")}</Typography>
-            </Grid>
-            <Grid item xs={1}>
-              <ContactsIcon/>
-            </Grid>
-            <Grid item xs={11}>
-              <FormControl className={classes.formControl} variant={variant}>
-                <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
-                <Select
-                  inputProps={{
-                    name: "existing-guest",
-                    id: "booking-existing-guest"
-                  }}
-                  label={t("Existing guest")}
-                  margin="dense"
-                  name="existing-guest"
-                  native
-                  onChange={handleChange}
-                  value={existingGuest}
-                  ref={register}
-                >
-                  <option key={0} value={0}>{t("-- Choose --")}</option>
-                  {allGuests.map(guest => (
-                    <option key={guest.name} value={guest.name}>{guest.name}</option>
-                  ))}
-                </Select>
-                <FormHelperText>{t("Select an existing guest to automatically fill its information")}</FormHelperText>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Controller
-                as={TextField}
-                name="guest_name"
-                control={control}
-                rules={{ required: true }}
-                fullWidth
-                error={!!errors.guest_name}
-                helperText={errors.guest_name && t("Guest name is required")}
-                label={t("Full guest name")}
-                margin="dense"
-                required
-                variant={variant}
-              />
-            </Grid>
-            <Grid item sm={6} xs={12}>
-              <Controller
-                as={TextField}
-                name="guest_contact"
-                control={control}
-                fullWidth
-                label={t("Phone / email")}
-                margin="dense"
-                multiline
-                rows={2}
-                variant={variant}
-              />
-            </Grid>
-            <Grid item sm={6} xs={12}>
-              <Controller
-                as={TextField}
-                control={control}
-                name="guest_address"
-                fullWidth
-                label={t("Address")}
-                margin="dense"
-                multiline
-                rows={2}
-                variant={variant}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom variant="h6">{t("Booking details")}</Typography>
-            </Grid>
-            {/* Dates and nights */}
-            <Grid item xs={12}>
-              <FormControl className={classes.formControl} variant={variant}>
-                <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
-                <Controller
-                  as={Select}
-                  name="duration"
-                  control={control}
-                  label={t("Nights")}
-                  margin="dense"
-                  onChange={([event]) => handleChange(event)}
-                >
-                  {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
-                    <MenuItem key={n} value={n}>{n}</MenuItem>
-                  ))}
-                  {(duration > 31) &&
-                  <MenuItem key={duration} value={duration}>{duration}</MenuItem>
-                  }
-                </Controller>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Grid container justify="space-around" alignItems="center">
-                  <Grid item sm={5} xs={12}>
-                    <Controller
-                      as={KeyboardDatePicker}
-                      control={control}
-                      format="dd/MM/yyyy"
-                      id="date-picker-inline"
-                      KeyboardButtonProps={{
-                        "aria-label": "arrival date"
-                      }}
-                      label={t("Arrival")}
-                      margin="dense"
-                      name="begin_date"
-                      onChange={([date]) => handleBeginDateChange(date)}
-                      variant={variant}
-                      inputVariant={variant}
-                      autoOk
-                    />
-                  </Grid>
-                  <Hidden xsDown>
-                    <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
-                      <ForwardIcon/>
+            <Grid item lg={6} xs={12}>
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="panel1a-content" id="guest-header">
+                  <Typography gutterBottom className={classes.heading}>{t("Guest")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <Grid item xs={1}>
+                      <ContactsIcon/>
                     </Grid>
-                  </Hidden>
-                  <Grid item sm={5} xs={12}>
-                    <Controller
-                      as={KeyboardDatePicker}
-                      control={control}
-                      format="dd/MM/yyyy"
-                      id="date-picker-dialog"
-                      KeyboardButtonProps={{
-                        "aria-label": "departure date"
-                      }}
-                      label={t("Departure")}
-                      margin="dense"
-                      name="end_date"
-                      onChange={([date]) => handleEndDateChange(date)}
-                      variant={variant}
-                      inputVariant={variant}
-                      autoOk
-                    />
+                    <Grid item xs={11}>
+                      <FormControl className={classes.formControl} variant={variant}>
+                        <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
+                        <Select
+                          inputProps={{
+                            name: "existing-guest",
+                            id: "booking-existing-guest"
+                          }}
+                          label={t("Existing guest")}
+                          margin="dense"
+                          name="existing-guest"
+                          native
+                          onChange={handleChange}
+                          value={existingGuest}
+                          ref={register}
+                        >
+                          <option key={0} value={0}>{t("-- Choose --")}</option>
+                          {allGuests.map(guest => (
+                            <option key={guest.name} value={guest.name}>{guest.name}</option>
+                          ))}
+                        </Select>
+                        <FormHelperText>{t("Select an existing guest to automatically fill its information")}</FormHelperText>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Controller
+                        as={TextField}
+                        name="guest_name"
+                        control={control}
+                        rules={{ required: true }}
+                        fullWidth
+                        error={!!errors.guest_name}
+                        helperText={errors.guest_name && t("Guest name is required")}
+                        label={t("Full guest name")}
+                        margin="dense"
+                        required
+                        variant={variant}
+                      />
+                    </Grid>
+                    <Grid item sm={6} xs={12}>
+                      <Controller
+                        as={TextField}
+                        name="guest_contact"
+                        control={control}
+                        fullWidth
+                        label={t("Phone / email")}
+                        margin="dense"
+                        multiline
+                        rows={2}
+                        variant={variant}
+                      />
+                    </Grid>
+                    <Grid item sm={6} xs={12}>
+                      <Controller
+                        as={TextField}
+                        control={control}
+                        name="guest_address"
+                        fullWidth
+                        label={t("Address")}
+                        margin="dense"
+                        multiline
+                        rows={2}
+                        variant={variant}
+                      />
+                    </Grid>
                   </Grid>
-                </Grid>
-              </MuiPickersUtilsProvider>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-            {/* Price */}
-            <Grid item container xs={12} alignItems="center" justify={!isFlatRate ? "space-around" : "flex-start"}>
-              {!isFlatRate &&
-              <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
-                <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
-                <TextField
-                  className={classes.priceInput}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                    type: "number"
-                  }}
-                  label={t("Daily rate")}
-                  name="daily_rate"
-                  error={!!errors.daily_rate}
-                  onChange={handleChange}
-                  inputRef={register({ min: 1 })}
-                  margin="dense"
-                  required
-                  variant={variant}
-                />
-                <div className={classes.spacer}/>
-                =
-                <div className={classes.spacer}/>
-              </Grid>}
-              <Grid item sm={5} xs={12} className={classes.flexBoxAlignLeft}>
-                <TextField
-                  className={classes.priceInput}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                    type: "number"
-                  }}
-                  label={t("Total")}
-                  margin="dense"
-                  name="price"
-                  onChange={handleChange}
-                  inputRef={register}
-                  required
-                  variant={variant}
-                />
-                <div className={classes.spacer}/>
-                <FormControlLabel
-                  control={
-                    <Controller
-                      as={Checkbox}
-                      control={control}
-                      color="primary"
-                      name="is_flat_rate"
-                      defaultValue={initialState.is_flate_rate}
-                      onChange={([event]) => handleChange(event)}
-                    />
-                  }
-                  label={t("Flat rate")}
-                  labelPlacement="start"
-                  margin="dense"
-                />
-              </Grid>
+            <Grid item lg={6} xs={12}>
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="panel1a-content" id="booking-header">
+                  <Typography gutterBottom className={classes.heading}>{t("Booking details")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    {/* Dates and nights */}
+                    <Grid item xs={12}>
+                      <FormControl className={classes.formControl} variant={variant}>
+                        <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
+                        <Controller
+                          as={Select}
+                          name="duration"
+                          control={control}
+                          label={t("Nights")}
+                          margin="dense"
+                          onChange={([event]) => handleChange(event)}
+                        >
+                          {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
+                            <MenuItem key={n} value={n}>{n}</MenuItem>
+                          ))}
+                          {(duration > 31) &&
+                        <MenuItem key={duration} value={duration}>{duration}</MenuItem>
+                          }
+                        </Controller>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <Grid container justify="space-around" alignItems="center">
+                          <Grid item sm={5} xs={12}>
+                            <Controller
+                              as={KeyboardDatePicker}
+                              control={control}
+                              format="dd/MM/yyyy"
+                              id="date-picker-inline"
+                              KeyboardButtonProps={{
+                                "aria-label": "arrival date"
+                              }}
+                              label={t("Arrival")}
+                              margin="dense"
+                              name="begin_date"
+                              onChange={([date]) => handleBeginDateChange(date)}
+                              variant={variant}
+                              inputVariant={variant}
+                              autoOk
+                            />
+                          </Grid>
+                          <Hidden xsDown>
+                            <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
+                              <ForwardIcon/>
+                            </Grid>
+                          </Hidden>
+                          <Grid item sm={5} xs={12}>
+                            <Controller
+                              as={KeyboardDatePicker}
+                              control={control}
+                              format="dd/MM/yyyy"
+                              id="date-picker-dialog"
+                              KeyboardButtonProps={{
+                                "aria-label": "departure date"
+                              }}
+                              label={t("Departure")}
+                              margin="dense"
+                              name="end_date"
+                              onChange={([date]) => handleEndDateChange(date)}
+                              variant={variant}
+                              inputVariant={variant}
+                              autoOk
+                            />
+                          </Grid>
+                        </Grid>
+                      </MuiPickersUtilsProvider>
+                    </Grid>
+                    {/* Price */}
+                    <Grid item container xs={12} alignItems="center" justify={!isFlatRate ? "space-around" : "flex-start"}>
+                      {!isFlatRate &&
+                    <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
+                      <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
+                      <TextField
+                        className={classes.priceInput}
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                          type: "number"
+                        }}
+                        label={t("Daily rate")}
+                        name="daily_rate"
+                        error={!!errors.daily_rate}
+                        onChange={handleChange}
+                        inputRef={register({ min: 1 })}
+                        margin="dense"
+                        required
+                        variant={variant}
+                      />
+                      <div className={classes.spacer}/>
+                      =
+                      <div className={classes.spacer}/>
+                    </Grid>}
+                      <Grid item sm={5} xs={12} className={classes.flexBoxAlignLeft}>
+                        <TextField
+                          className={classes.priceInput}
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                            type: "number"
+                          }}
+                          label={t("Total")}
+                          margin="dense"
+                          name="price"
+                          onChange={handleChange}
+                          inputRef={register}
+                          required
+                          variant={variant}
+                        />
+                        <div className={classes.spacer}/>
+                        <FormControlLabel
+                          control={
+                            <Controller
+                              as={Checkbox}
+                              control={control}
+                              color="primary"
+                              name="is_flat_rate"
+                              defaultValue={initialState.is_flat_rate}
+                              onChange={([event]) => handleChange(event)}
+                            />
+                          }
+                          label={t("Flat rate")}
+                          labelPlacement="start"
+                          margin="dense"
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+                      <TextField
+                        error={!!errors.deposit}
+                        helperText={errors.deposit && errors.deposit.message}
+                        className={classes.priceInput}
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                          type: "number"
+                        }}
+                        inputRef={register({
+                          min: {
+                            value: 0,
+                            message: t("{{depositLabel}} can't be negative", { depositLabel: depositLabel })
+                          },
+                          max: {
+                            value: price,
+                            message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
+                          }
+                        })}
+                        label={depositLabel}
+                        margin="dense"
+                        name="deposit"
+                        onChange={handleChange}
+                        variant={variant}
+                      />
+                      <div className={classes.spacer}/>
+                      <Typography>
+                        {watchBalance && t("Balance: {{amount}} €", { amount: watchBalance.price - watchBalance.deposit })}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+                      <TextField
+                        error={!!errors.commission_fees}
+                        helperText={errors.commission_fees && errors.commission_fees.message}
+                        className={classes.priceInput}
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                          type: "number"
+                        }}
+                        inputRef={register({
+                          min: { value: 0, message: t("Commission fees can't be negative") }
+                        })}
+                        label={t("Commission fees")}
+                        margin="dense"
+                        name="commission_fees"
+                        onChange={handleChange}
+                        variant={variant}
+                      />
+                    </Grid>
+                    {/* number of persons */}
+                    <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+                      <FormControl variant={variant}>
+                        <InputLabel htmlFor="adults">{t("Adults")}</InputLabel>
+                        <Controller
+                          as={Select}
+                          name="adults"
+                          control={control}
+                          label={t("Adults")}
+                          margin="dense"
+                          native
+                          onChange={([event]) => handleChange(event)}
+                        >
+                          {[...Array(10).keys()].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </Controller>
+                      </FormControl>
+                      <div className={classes.spacer}/>
+                      <FormControl variant={variant}>
+                        <InputLabel htmlFor="children">{t("Children")}</InputLabel>
+                        <Controller
+                          as={Select}
+                          name="children"
+                          control={control}
+                          label={t("Children")}
+                          margin="dense"
+                          native
+                          onChange={([event]) => handleChange(event)}
+                        >
+                          {[...Array(10).keys()].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </Controller>
+                      </FormControl>
+                      <div className={classes.spacer}/>
+                      <FormControl variant={variant}>
+                        <InputLabel htmlFor="babies">{t("Babies")}</InputLabel>
+                        <Controller
+                          as={Select}
+                          name="babies"
+                          control={control}
+                          label={t("Babies")}
+                          margin="dense"
+                          native
+                          onChange={([event]) => handleChange(event)}
+                        >
+                          {[...Array(10).keys()].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </Controller>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-            <Grid item xs={12} className={classes.flexBoxAlignLeft}>
-              <TextField
-                error={!!errors.deposit}
-                helperText={errors.deposit && errors.deposit.message}
-                className={classes.priceInput}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                  type: "number"
-                }}
-                inputRef={register({
-                  min: { value: 0, message: t("{{depositLabel}} can't be negative", { depositLabel: depositLabel }) },
-                  max: {
-                    value: price,
-                    message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
-                  }
-                })}
-                label={depositLabel}
-                margin="dense"
-                name="deposit"
-                onChange={handleChange}
-                variant={variant}
-              />
-              <div className={classes.spacer}/>
-              <Typography>
-                {watchBalance && t("Balance: {{amount}} €", { amount: watchBalance.price - watchBalance.deposit })}
-              </Typography>
+            <Grid item lg={6} xs={12}>
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="options-content" id="options-header">
+                  <Typography gutterBottom className={classes.heading}>{t("Options")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12}>
+                      {
+                        fields.map((option, index) => (
+                          <Grid container key={option.id} className={classes.options}>
+                            <input type="hidden" name={`options[${index}].id`} ref={register()} defaultValue={option.id}/>
+                            <input type="hidden" name={`options[${index}].designation`} ref={register()} defaultValue={option.designation}/>
+                            <input type="hidden" name={`options[${index}].unit_price_ht`} ref={register()} defaultValue={option.unit_price_ht}/>
+                            <input type="hidden" name={`options[${index}].vat`} ref={register()} defaultValue={option.vat}/>
+                            <input type="hidden" name={`options[${index}].is_flat_rate`} ref={register()} defaultValue={option.is_flat_rate}/>
+                            <Grid item xs={6} style={{ textAlign: "left" }}><span>{getDesignation(option)}</span></Grid>
+                            <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price_ht && <span>{option.unit_price_ht}&nbsp;x</span>}</Grid>
+                            <Grid item xs={2}>
+                              <Controller
+                                as={<TextField/>}
+                                control={control}
+                                InputProps={{
+                                  type: "number"
+                                }}
+                                className={classes.quantityInput}
+                                margin="dense"
+                                name={"options[" + index + "].quantity"}
+                                defaultValue={option.quantity}
+                                required
+                                variant={variant}
+                              />
+                            </Grid>
+                            <Grid item xs={2} style={{ textAlign: "left" }}>
+                              { option.unit_price_ht &&
+                              <span>=&nbsp;{DecimalPrecision.round(option.unit_price_ht * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))} &euro;</span>}
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Button
+                                type="button"
+                                className={classes.deleteButton}
+                                color="secondary"
+                                startIcon={<DeleteIcon/>}
+                                onClick={() => remove(index)}
+                              />
+                            </Grid>
+                          </Grid>
+                        ))
+                      }
+                      <FormControl className={classes.formControl} variant={variant}>
+                        <InputLabel htmlFor="booking-options">{t("Options")}</InputLabel>
+                        <Select
+                          inputProps={{
+                            name: "options_select",
+                            id: "booking-options"
+                          }}
+                          label={t("Options")}
+                          margin="dense"
+                          native
+                          value={0}
+                          onChange={onAddOption}
+                        >
+                          <option key={0} value={0}>{t("-- Add an option --")}</option>
+                          {allOptions.map(option => (
+                            <option key={option.id} value={option.id} disabled={fields.filter(o => Number(o.id) === option.id).length > 0}>
+                              {getDesignation(option)}
+                            </option>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-            <Grid item xs={12} className={classes.flexBoxAlignLeft}>
-              <TextField
-                error={!!errors.commission_fees}
-                helperText={errors.commission_fees && errors.commission_fees.message}
-                className={classes.priceInput}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                  type: "number"
-                }}
-                inputRef={register({
-                  min: { value: 0, message: t("Commission fees can't be negative") }
-                })}
-                label={t("Commission fees")}
-                margin="dense"
-                name="commission_fees"
-                onChange={handleChange}
-                variant={variant}
-              />
-            </Grid>
-            {/* number of persons */}
-            <Grid item xs={12} className={classes.flexBoxAlignLeft}>
-              <FormControl variant={variant}>
-                <InputLabel htmlFor="adults">{t("Adults")}</InputLabel>
-                <Controller
-                  as={Select}
-                  name="adults"
-                  control={control}
-                  label={t("Adults")}
-                  margin="dense"
-                  native
-                  onChange={([event]) => handleChange(event)}
-                >
-                  {[...Array(10).keys()].map(n => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </Controller>
-              </FormControl>
-              <div className={classes.spacer}/>
-              <FormControl variant={variant}>
-                <InputLabel htmlFor="children">{t("Children")}</InputLabel>
-                <Controller
-                  as={Select}
-                  name="children"
-                  control={control}
-                  label={t("Children")}
-                  margin="dense"
-                  native
-                  onChange={([event]) => handleChange(event)}
-                >
-                  {[...Array(10).keys()].map(n => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </Controller>
-              </FormControl>
-              <div className={classes.spacer}/>
-              <FormControl variant={variant}>
-                <InputLabel htmlFor="babies">{t("Babies")}</InputLabel>
-                <Controller
-                  as={Select}
-                  name="babies"
-                  control={control}
-                  label={t("Babies")}
-                  margin="dense"
-                  native
-                  onChange={([event]) => handleChange(event)}
-                >
-                  {[...Array(10).keys()].map(n => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </Controller>
-              </FormControl>
-            </Grid>
-            {/* options */}
-            {/* statistics */}
-            <Grid item xs={12}>
-              <FormControl className={classes.formControl} variant={variant}>
-                <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
-                <Controller
-                  as={Select}
-                  name="source_id"
-                  control={control}
-                  label={t("Statistics")}
-                  margin="dense"
-                  // native
-                  onChange={([event]) => handleChange(event)}
-                >
-                  <MenuItem key={0} value=""/>
-                  {bookingChannels.map(channel => (
-                    <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
-                  ))}
-                </Controller>
-              </FormControl>
-            </Grid>
-            {/* notes */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                inputRef={register}
-                label={t("Further information")}
-                margin="dense"
-                multiline
-                rows={4}
-                name="special_conditions"
-                variant={variant}
-              />
+            <Grid item lg={6} xs={12}>
+              <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="complements-content" id="complements-header">
+                  <Typography gutterBottom className={classes.heading}>{t("Complements")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    {/* statistics */}
+                    <Grid item xs={12}>
+                      <FormControl className={classes.formControl} variant={variant}>
+                        <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
+                        <Controller
+                          as={Select}
+                          name="source_id"
+                          control={control}
+                          label={t("Statistics")}
+                          margin="dense"
+                          // native
+                          onChange={([event]) => handleChange(event)}
+                        >
+                          <MenuItem key={0} value=""/>
+                          {bookingChannels.map(channel => (
+                            <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
+                          ))}
+                        </Controller>
+                      </FormControl>
+                    </Grid>
+                    {/* notes */}
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        inputRef={register}
+                        label={t("Further information")}
+                        margin="dense"
+                        multiline
+                        rows={4}
+                        name="special_conditions"
+                        variant={variant}
+                      />
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
           </Grid>
         </form>
@@ -779,6 +951,7 @@ const BookingDialog = props => {
             <Button
               type="button"
               color="default"
+              disabled={!booking || !booking.id}
               className={classes.button}
               startIcon={<PdfIcon/>}
               onClick={openContract}

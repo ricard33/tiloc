@@ -6,7 +6,6 @@ import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import * as selectors from "../../selectors";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
 import { BookingDialog } from "../../components";
 import { useConfirm } from "material-ui-confirm";
 import { useHistory, useLocation } from "react-router-dom";

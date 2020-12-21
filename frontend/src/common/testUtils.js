@@ -7,11 +7,11 @@ export const createTestORM =  () => {
   const models = createModels();
   const {
     Owner, Lodging, Category, Service,
-    BookingStatus, BookingChannel, Booking, BookedService, Contract, ContractTemplate
+    BookingStatus, BookingChannel, Booking, Contract, ContractTemplate
   } = models;
   const orm = new ORM({ stateSelector });
   orm.register(Owner, Lodging, Category, Service,
-    BookingStatus, BookingChannel, Booking, BookedService, Contract, ContractTemplate);
+    BookingStatus, BookingChannel, Booking, Contract, ContractTemplate);
   return orm;
 };
 

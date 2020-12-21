@@ -35,6 +35,7 @@ class BookingChannelAdmin(ImportExportModelAdmin):
 class BookingChannelSyncAdmin(ImportExportModelAdmin):
     list_display = ('id', 'channel', 'lodging', 'source_url', 'url_for_remote', 'active', 'last_import', 'last_export')
     list_display_links = ('channel', 'lodging')
+    list_filter = ('lodging', 'lodging__owner', 'channel', 'active')
 
     def get_queryset(self, request):
         qs = super(BookingChannelSyncAdmin, self).get_queryset(request)
@@ -86,8 +87,8 @@ class PaymentAdmin(ImportExportModelAdmin):
 
 
 class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
-    list_display = ('reference', 'category', 'designation', 'quantity', 'unit_price_ht', 'vat', 'auto_add_booking',
-                    'auto_add_invoice')
+    list_display = ('reference', 'category', 'designation', 'quantity', 'unit_price_ht', 'vat', 'is_flat_rate',
+                    'included_in_booking', 'auto_add_booking', 'auto_add_invoice')
 
 
 admin.site.register(models.Booking, BookingAdmin)

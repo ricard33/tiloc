@@ -1,4 +1,4 @@
-import { attr, fk, many, Model, oneToOne } from "redux-orm";
+import { attr, fk, Model, oneToOne } from "redux-orm";
 import * as types from "actions/actionTypes";
 
 export const createModels = () => {
@@ -93,6 +93,42 @@ export const createModels = () => {
 
   const Service = class ServiceModel extends Model {
     static modelName = "Service";
+
+    static get fields() {
+      return {
+        id: attr(),
+        reference: attr(),
+        category: fk('Category', 'services'),
+        designation: attr(),
+        quantity: attr(),
+        unit_price_ht: attr(),
+        vat: attr(),
+        is_flat_rate: attr(),
+        included_in_booking: attr(),
+        auto_add_booking: attr(),
+        auto_add_invoice: attr(),
+      };
+    }
+
+    static parse(data) {
+      const { Service } = this.session;
+      return Service.upsert({
+        ...data
+        // Not recursive, just an id
+        // category: Category.parse(data.category)
+      });
+    }
+
+    static reducer(action, Service, session) {
+      switch (action.type) {
+        case types.SUCCESS(types.FETCH_SERVICES): {
+          action.data.results.forEach(item => Service.parse(item));
+          break;
+        }
+        default: {
+        }
+      }
+    }
   };
 
   const BookingStatus = class BookingStatusModel extends Model {
@@ -190,10 +226,7 @@ export const createModels = () => {
         commission_fees: attr(),
         info: attr(),
         special_conditions: attr(),
-        options: many({
-          to: Service,
-          through: "BookedService"
-        }),
+        options: attr(),
         created: attr(),
         modified: attr(),
       };
@@ -233,24 +266,6 @@ export const createModels = () => {
         default: {
         }
       }
-    }
-  };
-
-  const BookedService = class BookedServiceModel extends Model {
-    static modelName = "BookedService";
-
-    static get field() {
-      return {
-        id: attr(),
-        booking: fk("Booking"),
-        service: fk("Service"),
-        quantity: attr()
-      };
-    }
-
-    static parse(data) {
-      const { BookedService } = this.session;
-      return BookedService.upsert(data);
     }
   };
 
@@ -324,7 +339,7 @@ export const createModels = () => {
 
   return {
     Owner, Lodging, Category, Service,
-    BookingStatus, BookingChannel, Booking, BookedService,
+    BookingStatus, BookingChannel, Booking,
     Contract, ContractTemplate,
   };
 };

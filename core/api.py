@@ -19,7 +19,8 @@ from . import models
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
-                          PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, UserSerializer)
+                          PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, UserSerializer,
+                          ServiceSerializer, BookedServiceSerializer)
 from location import __version__, __date__
 
 
@@ -197,3 +198,9 @@ class ContractViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = models.Payment.objects.all().order_by('date')
     serializer_class = PaymentSerializer
+
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    queryset = models.Service.objects.all().order_by('reference')
+    serializer_class = ServiceSerializer
+

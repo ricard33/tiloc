@@ -1,5 +1,5 @@
 import { createSelector } from "redux-orm";
-import { format, compareAsc } from "date-fns";
+import { format } from "date-fns";
 import orm from "./orm";
 
 export const bookings = createSelector(orm.Booking);
@@ -75,3 +75,4 @@ export const lastBookings = createSelector(orm.Booking, orm, (booking, session) 
     };
   });
 });
+export const services = createSelector(orm.Service);

@@ -63,7 +63,7 @@ class BookingStatusFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingStatus
 
-    name = factory.Sequence(lambda n: ['option', 'contract sent', 'deposit paid', 'paid'][n % 4])
+    name = factory.Iterator(['option', 'contract sent', 'deposit paid', 'paid'])
     color = factory.Faker('color')
     rank = factory.Sequence(lambda n: n)
 
@@ -98,3 +98,37 @@ class ContractFactory(factory.django.DjangoModelFactory):
 
     booking = factory.SubFactory(BookingFactory)
     content = ""
+
+
+class CategoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Category
+        django_get_or_create = ['name']
+
+    name = factory.Sequence(lambda n: "Cat %d" % (n % 3))
+
+
+class ServiceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Service
+        django_get_or_create = ['reference']
+
+    category = factory.SubFactory(CategoryFactory)
+    reference = factory.Sequence(lambda n: "REF%d" % n)
+    designation = factory.Sequence(lambda n: "Service no %d" % n)
+
+
+class BookedServiceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.BookedService
+
+    booking = factory.SubFactory(BookingFactory)
+    service = factory.SubFactory(ServiceFactory)
+    quantity = 1
+
+
+class BookingWithServiceFactory(BookingFactory):
+    service0 = factory.RelatedFactory(
+        BookedServiceFactory,
+        factory_related_name='booking'
+    )

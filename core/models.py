@@ -103,10 +103,15 @@ class Service(models.Model):
     reference = models.CharField(_("reference"), blank=True, null=True, max_length=20)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     designation = models.CharField(_("designation"), max_length=256)
-    quantity = models.DecimalField(_("quantity"), max_digits=10, decimal_places=2, blank=True, null=True)
+    quantity = models.SmallIntegerField(_("quantity"), default=1)
     unit_price_ht = models.DecimalField(_("unit price VAT excl."), max_digits=10, decimal_places=2, blank=True,
                                         null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=10, decimal_places=2, blank=True, null=True)
+    is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
+                                       help_text=_("Use flat rate price instead of daily price computation"))
+    included_in_booking = models.BooleanField(
+        _("included in booking"), default=False,
+        help_text=_("If true, the price of this option is included in booking price and not displayed separately"))
     auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
     auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
 
@@ -114,6 +119,7 @@ class Service(models.Model):
 
     class Meta:
         verbose_name = _("Service")
+        ordering = ("reference",)
 
     def __str__(self):
         return self.designation
@@ -204,6 +210,14 @@ class Booking(models.Model):
     def __str__(self):
         return "%s from %s to %s" % (self.guest_name, self.begin_date, self.end_date)
 
+    @property
+    def price_with_options(self):
+        total = self.price
+        for option in self.bookedservice_set.all():
+            if option.service.unit_price_ht:
+                total += option.service.unit_price_ht * (option.service.is_flat_rate and 1 or self.duration)
+        return total
+
     def get_absolute_url(self):
         return reverse('booking-detail', kwargs={'pk': self.pk})
 
@@ -276,7 +290,7 @@ class ContractTemplate(models.Model):
 class BookedService(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    quantity = models.DecimalField(_("quantity"), max_digits=10, decimal_places=2)
+    quantity = models.SmallIntegerField(_("quantity"))
 
     class Meta:
         verbose_name = _("Booking service")
