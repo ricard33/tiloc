@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -18,13 +18,14 @@ import {
   TableRow,
   Tooltip,
   TableSortLabel
-} from '@material-ui/core';
+} from "@material-ui/core";
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
 import { StatusBullet } from 'components';
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import * as selectors from "../../../../selectors";
+import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -144,9 +145,11 @@ const NextEvents = props => {
       <Divider />
       <CardActions className={classes.actions}>
         <Button
+          component={NavLink}
           color="primary"
           size="small"
           variant="text"
+          to="/planning"
         >
           {t("View planning")} <ArrowRightIcon />
         </Button>

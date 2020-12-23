@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import { parse, parseISO } from 'date-fns';
 import PropTypes from 'prop-types';
@@ -10,16 +10,15 @@ import {
   CardContent,
   Button,
   Divider,
-  List, ListItem, ListItemText, IconButton
+  List, ListItem, ListItemText
 } from "@material-ui/core";
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-import { StatusBullet } from 'components';
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useSelector } from "react-redux";
 import * as selectors from "../../../../selectors";
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDistanceToNow } from "../../../../common/dateUtils";
+import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -44,12 +43,6 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: 0
   }
 }));
-
-const statusColors = {
-  delivered: 'success',
-  pending: 'info',
-  refunded: 'danger'
-};
 
 const LatestBookings = props => {
   const { className, ...rest } = props;
@@ -92,11 +85,11 @@ const LatestBookings = props => {
               />
               <ListItemText
                 secondary={formatDate(parse(booking.begin_date, "yyyy-MM-dd", new Date()), "PPP") + " - "
-                + formatDate(parse(booking.end_date, "yyyy-MM-dd", new Date()), "PPP") }
+                + formatDate(parse(booking.end_date, "yyyy-MM-dd", new Date()), "PPP")}
               />
               <ListItemText
                 primary={Number(booking.price).toLocaleString() + " €"}
-                secondary={formatDistanceToNow(parseISO(booking.created)) }
+                secondary={formatDistanceToNow(parseISO(booking.created))}
               />
             </ListItem>
           ))}
@@ -105,11 +98,13 @@ const LatestBookings = props => {
       <Divider />
       <CardActions className={classes.actions}>
         <Button
+          component={NavLink}
           color="primary"
           size="small"
           variant="text"
+          to="/planning"
         >
-          View all <ArrowRightIcon />
+          {t("View all")} <ArrowRightIcon />
         </Button>
       </CardActions>
     </Card>

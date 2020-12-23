@@ -138,20 +138,29 @@ const ContractEdit = props => {
   }
 
   function onSave() {
+    _onSave(onClose);
+  }
+
+  function onSaveAndMakePDF() {
+    _onSave(makePDF);
+  }
+
+  function _onSave(callback: (contract) => void) {
     const submittedContract = {
       id: contract.id,
       content: content
     };
     const action = actions.updateContract;
     dispatch(action(submittedContract, () => {
-      onClose(submittedContract);
+      callback(submittedContract);
     }));
   }
+
 
   return (
     <div className={classes.root}>
       <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit"/>
+        <CircularProgress color="inherit" />
       </Backdrop>
 
       <Typography variant="h1">
@@ -187,7 +196,7 @@ const ContractEdit = props => {
               type="button"
               className={classes.deleteButton}
               color="secondary"
-              startIcon={<DeleteIcon/>}
+              startIcon={<DeleteIcon />}
               onClick={onDelete}
             >{t("Delete")}</Button>}
           </Grid>
@@ -196,17 +205,25 @@ const ContractEdit = props => {
               type="button"
               color="default"
               className={classes.button}
-              startIcon={<RefreshIcon/>}
+              startIcon={<RefreshIcon />}
               onClick={regenerateContract}
             >{t("Regenerate")}</Button>
             <Button
               type="button"
               color="default"
               className={classes.button}
-              startIcon={<PdfIcon/>}
+              startIcon={<PdfIcon />}
               onClick={makePDF}
               title={t("PDF")}
             >{t("PDF")}</Button>
+            <Button
+              type="button"
+              color="default"
+              className={classes.button}
+              startIcon={<PdfIcon />}
+              onClick={onSaveAndMakePDF}
+              title={t("PDF")}
+            >{t("Save and make PDF")}</Button>
           </Grid>
           <Grid item>
             <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
@@ -214,7 +231,7 @@ const ContractEdit = props => {
               type="submit"
               color="primary"
               className={classes.button}
-              startIcon={<SaveIcon/>}
+              startIcon={<SaveIcon />}
               onClick={onSave}
             >{t("Save")}</Button>
           </Grid>
@@ -225,7 +242,6 @@ const ContractEdit = props => {
   );
 };
 
-ContractEdit.propTypes = {
-};
+ContractEdit.propTypes = {};
 
 export default ContractEdit;
