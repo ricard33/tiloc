@@ -167,6 +167,3 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Payment
         fields = '__all__'
-
-
-

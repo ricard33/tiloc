@@ -20,4 +20,6 @@ def my_format_decimal(value, format=None, locale=settings.LANGUAGE_CODE):
 
 
 def my_format_date(value, format='medium', locale=settings.LANGUAGE_CODE):
-    return format_date(value, format, locale=locale)
+    if value:
+        return format_date(value, format, locale=locale)
+    return "......../......../................"

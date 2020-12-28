@@ -12,7 +12,10 @@ import {
   Planning as PlanningView,
   SignIn,
   LoggedOut,
-  TestPage
+  TestPage,
+  Settings,
+  ContractTemplateList,
+  ContractTemplateEdit,
 } from "./views";
 
 const Routes = () => {
@@ -56,6 +59,24 @@ const Routes = () => {
         exact
         layout={MainLayout}
         path="/bookings/:bookingId/contract"
+      />
+      <RouteWithLayout
+        component={Settings}
+        exact
+        layout={MainLayout}
+        path="/settings/"
+      />
+      <RouteWithLayout
+        component={ContractTemplateList}
+        exact
+        layout={MainLayout}
+        path="/settings/contract-templates"
+      />
+      <RouteWithLayout
+        component={ContractTemplateEdit}
+        exact
+        layout={MainLayout}
+        path="/settings/contract-templates/:templateId"
       />
       <RouteWithLayout
         component={TestPage}

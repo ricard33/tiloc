@@ -8,29 +8,29 @@ from core.tests import factories
 class ContractTestCase(APITestCase):
     def setUp(self) -> None:
         for name in ['option', 'contract sent', 'deposit paid', 'paid']:
-            factories.BookingStatusFactory(name=name)
+            factories.BookingStatusFactory.create(name=name)
 
     def test_generate_contract(self):
-        contract_template = factories.ContractTemplateFactory(
+        contract_template = factories.ContractTemplateFactory.create(
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}...")
-        booking = factories.BookingFactory(lodging__contract_template=contract_template)
+        booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
         booking.generate_contract()
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
         self.assertIn(booking.lodging.name, booking.contract.content)
 
     def test_generate_contract_without_template(self):
-        booking = factories.BookingFactory(lodging__contract_template=None)
+        booking = factories.BookingFactory.create(lodging__contract_template=None)
         booking.generate_contract()
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
         self.assertEqual("", booking.contract.content)
 
     def test_generate_contract_with_api(self):
-        user = factories.AdminFactory()
-        contract_template = factories.ContractTemplateFactory(
+        user = factories.AdminFactory.create()
+        contract_template = factories.ContractTemplateFactory.create(
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}...")
-        booking = factories.BookingFactory(lodging__contract_template=contract_template)
+        booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
         self.client.force_login(user)
         instance, token = AuthToken.objects.create(user)
         header = {'HTTP_AUTHORIZATION': "Token " + token}
@@ -43,3 +43,17 @@ class ContractTestCase(APITestCase):
 
     # @override_settings(MEDIA_ROOT="/www/", MEDIA_URL="http://mediaserv.com/myapp/")
     # def test_make_pdf(self):
+
+
+class ContractTemplateTestCase(APITestCase):
+    def setUp(self) -> None:
+        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+            factories.BookingStatusFactory.create(name=name)
+
+    def test_generate_contract(self):
+        contract_template = factories.ContractTemplateFactory.create(
+            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date|format_date('full') }} to {{ booking.end_date|format_date('full') }}...")
+        lodging = factories.LodgingFactory.create(contract_template=contract_template)
+        content = lodging.generate_empty_contract()
+        self.assertIn(lodging.name, content)
+        self.assertIn("..../..../........", content)

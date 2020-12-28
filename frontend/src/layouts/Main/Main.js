@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/styles';
-import { useMediaQuery } from '@material-ui/core';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import clsx from "clsx";
+import { makeStyles, useTheme } from "@material-ui/styles";
+import { Breadcrumbs, Link, Typography, useMediaQuery } from "@material-ui/core";
+import { Sidebar, Topbar, Footer } from "./components";
+import { Route, Link as RouterLink } from "react-router-dom";
 
-import { Sidebar, Topbar, Footer } from './components';
+
+const breadcrumbNameMap = {
+  '/dashboard': 'Dashboard',
+  '/planning': 'Planning',
+  '/bookings': 'Bookings',
+  '/settings': 'Settings',
+  'contract-templates': 'Contract templates',
+  'contract': 'Contract',
+};
+
+
+const LinkRouter = (props) => <Link {...props} component={RouterLink} />;
 
 const useStyles = makeStyles(theme => ({
   root: {
     paddingTop: 56,
-    height: '100%',
-    [theme.breakpoints.up('sm')]: {
+    height: "100%",
+    [theme.breakpoints.up("sm")]: {
       paddingTop: 64
     }
   },
@@ -18,7 +31,10 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 160
   },
   content: {
-    height: '100%'
+    height: "100%"
+  },
+  breadcrumb: {
+    padding: `0 ${theme.spacing(1)}px`,
   }
 }));
 
@@ -27,7 +43,7 @@ const Main = props => {
 
   const classes = useStyles();
   const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'), {
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
     defaultMatches: true
   });
 
@@ -54,9 +70,36 @@ const Main = props => {
       <Sidebar
         onClose={handleSidebarClose}
         open={shouldOpenSidebar}
-        variant={isDesktop ? 'persistent' : 'temporary'}
+        variant={isDesktop ? "persistent" : "temporary"}
       />
       <main className={classes.content}>
+        <Route>
+          {({ location }) => {
+            const pathnames = location.pathname.split("/").filter((x) => x);
+
+            return (
+              <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
+                <LinkRouter color="inherit" to="/">
+                  Home
+                </LinkRouter>
+                {pathnames.map((value, index) => {
+                  const last = index === pathnames.length - 1;
+                  const to = `/${pathnames.slice(0, index + 1).join("/")}/`;
+
+                  return last ? (
+                    <Typography color="textPrimary" key={to}>
+                      {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
+                    </Typography>
+                  ) : (
+                    <LinkRouter color="inherit" to={to} key={to}>
+                      {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
+                    </LinkRouter>
+                  );
+                })}
+              </Breadcrumbs>
+            );
+          }}
+        </Route>
         {children}
         <Footer />
       </main>

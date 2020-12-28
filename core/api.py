@@ -142,6 +142,32 @@ class LodgingViewSet(viewsets.ModelViewSet):
     queryset = models.Lodging.objects.all().order_by('name')
     serializer_class = LodgingSerializer
 
+    @action(detail=True, methods=['get'])
+    @transaction.atomic
+    def empty_contract_pdf(self, request, pk=None):
+        lodging = self.get_object()
+        full_path = os.path.join(settings.MEDIA_ROOT, "lodging_%d" % lodging.id, "empty_contract.pdf")
+        os.makedirs(os.path.split(full_path)[0], exist_ok=True)
+
+        sid = transaction.savepoint()
+        if request.GET.get('template_id'):
+            lodging.contract_template_id = request.GET.get('template_id')
+        config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_PATH)
+        options = {
+            'encoding': "UTF-8",
+        }
+        pdfkit.from_string(
+            lodging.generate_empty_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost')),
+            full_path, configuration=config, options=options)
+        transaction.savepoint_rollback(sid)
+
+        if os.path.exists(full_path):
+            with open(full_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="application/pdf")
+                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(full_path)
+                return response
+        raise Http404
+
 
 class OwnerViewSet(viewsets.ModelViewSet):
     queryset = models.Owner.objects.all().order_by('name')
@@ -178,7 +204,7 @@ class ContractViewSet(viewsets.ModelViewSet):
         contract = self.get_object()
         rel_path = contract.make_pdf_path()
         full_path = os.path.join(settings.MEDIA_ROOT, rel_path)
-        if contract.pdf_created is None or contract.modified > contract.pdf_created:
+        if contract.pdf_created is None or contract.modified > contract.pdf_created or not os.path.exists(full_path):
             os.makedirs(os.path.split(full_path)[0], exist_ok=True)
             config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_PATH)
             options = {
@@ -203,4 +229,3 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = models.Service.objects.all().order_by('reference')
     serializer_class = ServiceSerializer
-

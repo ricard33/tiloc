@@ -55,4 +55,5 @@ export default combineReducers({
   'lodgings': fetchingReducer(types.FETCH_LODGINGS),
   'owners': fetchingReducer(types.FETCH_OWNERS),
   'contracts': fetchingReducer(types.FETCH_CONTRACTS),
+  'contract_templates': fetchingReducer(types.FETCH_CONTRACT_TEMPLATES),
 })

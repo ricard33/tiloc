@@ -86,6 +86,17 @@ class Lodging(models.Model):
     def __str__(self):
         return self.name
 
+    def generate_empty_contract(self, url_server='http://127.0.0.1:8000'):
+        booking = Booking(
+            lodging=self,
+            guest_name="........................................",
+            guest_contact="email: .................................@.................... - tel: ...................................",
+            guest_address="........................................\n........................................\n........................................",
+            guaranty=self.guaranty,
+            adults=0,
+        )
+        return booking.generate_contract(url_server=url_server, save=False).content
+
 
 class Category(models.Model):
     """Category of receipts, mainly for reports"""
@@ -221,7 +232,7 @@ class Booking(models.Model):
     def get_absolute_url(self):
         return reverse('booking-detail', kwargs={'pk': self.pk})
 
-    def generate_contract(self, url_server='http://127.0.0.1:8000'):
+    def generate_contract(self, url_server='http://127.0.0.1:8000', save=True):
         if not self.lodging:
             logger.warning("Lodging not set, can't generate a contract")
             return None
@@ -229,13 +240,17 @@ class Booking(models.Model):
             self.contract = Contract(booking=self)
         if self.lodging.contract_template:
             from core.jinja2_tools import render_template
+            signature_img = '<img style="width: 300px; height: 150px" ' \
+                            'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
+
             content = render_template(self.lodging.contract_template.content,
                                       {
                                           'booking':    self,
                                           'lodging':    self.lodging,
                                           'owner':      self.lodging.owner,
                                           'url_server': url_server,
-                                          'date':       date.today()
+                                          'date':       date.today(),
+                                          'signature':  signature_img
                                       })
             page_break = '<div style="display: block; page-break-before: always;"></div>'
             if self.lodging.description:
@@ -244,7 +259,8 @@ class Booking(models.Model):
         else:
             logger.warning("Contract template not set for lodging '%s', can't generate a contract", self.lodging)
             self.contract.content = ""
-        self.contract.save()
+        if save:
+            self.contract.save()
         return self.contract
 
 

@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import CKEditor from "@ckeditor/ckeditor5-react";
 import CustomeEditor from "./ckeditor5";
+import CustomFigureAttributes from './ckeditor5/plugins/custom-figure-attributes';
+import AllowImageWidth from './ckeditor5/plugins/image_width_and_height';
 import "./Editor.css";
 
 const Editor = props => {
@@ -19,7 +21,7 @@ const Editor = props => {
 
   return (
     <div className="document-editor">
-      <div className="document-editor__toolbar"/>
+      <div className="document-editor__toolbar" />
       <div className="document-editor__editable-container">
         <CKEditor
           className="document-editor__editable"
@@ -35,49 +37,88 @@ const Editor = props => {
           editor={CustomeEditor}
           data={content}
           config={{
+            // extraPlugins: [CustomFigureAttributes,],
+            // extraPlugins: [AllowImageWidth],
+            removePlugins: ["ImageResize"],
             toolbar: {
               items: [
                 "heading",
                 "|",
-                "fontSize",
-                "fontFamily",
-                "|",
                 "bold",
                 "italic",
                 "underline",
-                "strikethrough",
-                "highlight",
-                "|",
-                "alignment",
-                "|",
-                "numberedList",
+                "link",
                 "bulletedList",
+                "numberedList",
+                "alignment",
+                "fontFamily",
+                "fontSize",
+                "fontColor",
+                "removeFormat",
                 "|",
                 "indent",
                 "outdent",
                 "|",
-                "todoList",
-                "link",
-                "imageUpload",
+                // "imageUpload",
+                "blockQuote",
                 "insertTable",
-                "|",
                 "undo",
                 "redo",
                 "|",
                 "horizontalLine",
                 "pageBreak",
-                "specialCharacters",
                 "|",
-                "exportPdf"
+                "specialCharacters",
+                // "|",
+                // "insertSignature"
               ]
             },
             language: "fr",
             image: {
+              resizeUnit: "px",
+
+              // Configure the available styles.
+              styles: [
+                "alignLeft", "alignCenter", "alignRight"
+              ],
+
+              // Configure the available image resize options.
+              resizeOptions: [
+                {
+                  name: "imageResize:original",
+                  label: "Original",
+                  value: null
+                },
+                {
+                  name: "imageResize:50",
+                  label: "50%",
+                  value: "50"
+                },
+                {
+                  name: "imageResize:75",
+                  label: "75%",
+                  value: "75"
+                }
+              ],
               toolbar: [
                 "imageTextAlternative",
-                "imageStyle:full",
-                "imageStyle:side"
+                "imageStyle:alignLeft", "imageStyle:alignCenter", "imageStyle:alignRight",
+                "|",
+                "imageResize"
               ]
+            },
+            simpleUpload: {
+              // The URL that the images are uploaded to.
+              uploadUrl: "/upload/",
+
+              // Enable the XMLHttpRequest.withCredentials property.
+              withCredentials: true,
+
+              // Headers sent along with the XMLHttpRequest to the upload server.
+              headers: {
+                // "X-CSRF-TOKEN": "CSRF-Token",
+                Authorization: 'Token ' + localStorage.getItem("token")
+              }
             },
             table: {
               contentToolbar: [

@@ -76,3 +76,4 @@ export const lastBookings = createSelector(orm.Booking, orm, (booking, session) 
   });
 });
 export const services = createSelector(orm.Service);
+export const contractTemplates = createSelector(orm.ContractTemplate);

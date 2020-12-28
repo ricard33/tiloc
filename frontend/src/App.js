@@ -13,15 +13,17 @@ import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
 import moment from "moment";
-// import 'moment/min/moment-with-locales';
 import { ConfirmProvider } from "material-ui-confirm";
 import localization from "moment/locale/fr";
+import { Breadcrumbs, Link, Typography } from "@material-ui/core";
+import { Link as RouterLink } from 'react-router-dom';
 
 
 validate.validators = {
   ...validate.validators,
   ...validators
 };
+
 
 function App(props) {
   const dispatch = useDispatch();
@@ -43,6 +45,7 @@ function App(props) {
     <ThemeProvider theme={theme}>
       <ConfirmProvider>
         <Router history={props.history}>
+
           <Routes/>
         </Router>
         <AlertHandler/>

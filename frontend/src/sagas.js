@@ -81,12 +81,15 @@ function* _fetchData(path, action) {
   try {
     const offset = 0, limit = null; // not yet used
     let filter = action.filter ? "?" + action.filter : "";
-    const response = yield call(axios.get, path + filter);
+    const response = yield call(axios.get, template(path, action) + filter);
     yield put({
       type: types.SUCCESS(actionBaseName),
       data: response.data,
       query: {offset, limit}
     });
+    if(action.callback) {
+      yield call(action.callback, response.data);
+    }
   } catch (error) {
     console.error(types.FAILURE(actionBaseName), error);
     logger.error(error, {action})
@@ -187,5 +190,10 @@ export default function* rootSaga() {
     yield takeEvery(actionTypes.REQUEST(actionTypes.GENERATE_CONTRACT), _createData, "/api/booking/${bookingId}/generate_contract/"),// eslint-disable-line no-template-curly-in-string
     yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_CONTRACT), _updateData, "/api/contract/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_CONTRACT), _deleteData, "/api/contract/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_CONTRACT_TEMPLATES), _fetchData, "/api/contract_template/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.GET_CONTRACT_TEMPLATE), _fetchData, "/api/contract_template/${id}/"), // eslint-disable-line no-template-curly-in-string
+    yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_CONTRACT_TEMPLATE), _createData, "/api/contract_template/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_CONTRACT_TEMPLATE), _updateData, "/api/contract_template/"),
+    yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_CONTRACT_TEMPLATE), _deleteData, "/api/contract_template/"),
   ]);
 }

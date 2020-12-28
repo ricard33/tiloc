@@ -286,6 +286,27 @@ export const createModels = () => {
       const { ContractTemplate } = this.session;
       return ContractTemplate.upsert(data);
     }
+
+    static reducer(action, ContractTemplate, session) {
+      switch (action.type) {
+        case types.SUCCESS(types.FETCH_CONTRACT_TEMPLATES): {
+          action.data.results.forEach(item => ContractTemplate.parse(item));
+          break;
+        }
+        case types.SUCCESS(types.GET_CONTRACT_TEMPLATE):
+        case types.SUCCESS(types.UPDATE_CONTRACT_TEMPLATE): {
+          ContractTemplate.parse(action.data);
+          break;
+        }
+        case types.SUCCESS(types.DELETE_CONTRACT_TEMPLATE): {
+          let template = ContractTemplate.withId(action.id);
+          template.delete();
+          break;
+        }
+        default: {
+        }
+      }
+    }
   };
 
   const Contract = class ContractModel extends Model {

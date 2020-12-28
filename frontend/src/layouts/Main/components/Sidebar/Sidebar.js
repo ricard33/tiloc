@@ -71,27 +71,30 @@ const Sidebar = props => {
     {
       title: t('Prices'),
       href: '/prices',
-      icon: <MoneyIcon />
+      icon: <MoneyIcon />,
+      disabled: true,
     },
     {
       title: t('Contacts'),
       href: '/contacts',
-      icon: <GroupIcon />
+      icon: <GroupIcon />,
+      disabled: true,
     },
     {
       title: t('My account'),
       href: '/account',
-      icon: <AccountBoxIcon />
+      icon: <AccountBoxIcon />,
+      disabled: true,
     },
     {
       title: t('Settings'),
-      href: '/settings',
+      href: '/settings/',
       icon: <SettingsIcon />
     }
   ];
 
   useEffect(() => {
-    axios.get("api/info/")
+    axios.get("/api/info/")
       .then(response => {
         // console.debug(response);
         setVersion({

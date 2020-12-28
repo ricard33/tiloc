@@ -40,7 +40,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   function(response) {
     // Do something with response data
-    console.debug("set-cookie", response.headers["set-cookie"]);
+    // console.debug("set-cookie", response.headers["set-cookie"]);
     return response;
   },
   function(error) {
