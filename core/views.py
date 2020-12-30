@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -39,7 +40,7 @@ def loggly_proxy(request, path):
 def export_calendar(request, uid):
     lodging = get_object_or_404(models.Lodging, uid=uid)
     source = request.GET.get('s')
-    qs = lodging.booking_set.all()
+    qs = lodging.booking_set.filter(end_date__gte=timezone.now())
     if source:
         sync = get_object_or_404(models.BookingChannelSync, id=source)
         qs = qs.exclude(source=sync.channel)
