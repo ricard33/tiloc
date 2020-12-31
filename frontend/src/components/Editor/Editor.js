@@ -37,7 +37,7 @@ const Editor = props => {
           editor={CustomeEditor}
           data={content}
           config={{
-            // extraPlugins: [CustomFigureAttributes,],
+            extraPlugins: [CustomFigureAttributes,],
             // extraPlugins: [AllowImageWidth],
             removePlugins: ["ImageResize"],
             toolbar: {
@@ -74,6 +74,19 @@ const Editor = props => {
               ]
             },
             language: "fr",
+            fontSize: {
+              options: [
+                9,
+                10,
+                11,
+                12,
+                13,
+                'default',
+                17,
+                19,
+                21
+              ]
+            },
             image: {
               resizeUnit: "px",
 

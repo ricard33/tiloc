@@ -241,7 +241,7 @@ class Booking(models.Model):
             self.contract = Contract(booking=self)
         if self.lodging.contract_template:
             from core.jinja2_tools import render_template
-            signature_img = '<img style="width: 250px; height: 150px" ' \
+            signature_img = '<img style="max-width: 200px; max-height: 100px" ' \
                             'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
 
             content = render_template(self.lodging.contract_template.content,

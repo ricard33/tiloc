@@ -19,16 +19,16 @@ export default class CustomFigureAttributes {
     const editor = this.editor;
 
     // Define on which elements the CSS classes should be preserved:
-    setupCustomClassConversion("img", "image", editor);
+    // setupCustomClassConversion("img", "image", editor);
     // setupCustomClassConversion("table", "table", editor);
 
     // editor.conversion.for("upcast").add(upcastCustomClasses("figure"), { priority: "low" });
 
     // Define custom attributes that should be preserved.
     // setupCustomAttributeConversion("img", "image", "id", editor);
-    // setupCustomAttributeConversion("img", "image", "style", editor);
-    setupCustomAttributeConversion("img", "image", "width", editor);
-    setupCustomAttributeConversion("img", "image", "height", editor);
+    setupCustomAttributeConversion("img", "image", "style", editor);
+    // setupCustomAttributeConversion("img", "image", "width", editor);
+    // setupCustomAttributeConversion("img", "image", "height", editor);
     // setupCustomAttributeConversion("table", "table", "id", editor);
   }
 }
