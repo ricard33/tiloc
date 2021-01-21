@@ -6,9 +6,11 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
 from django.http import Http404, HttpResponse
+from knox.auth import TokenAuthentication
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView, LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, viewsets
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny
@@ -139,6 +141,7 @@ class BookingChannelSyncViewSet(viewsets.ModelViewSet):
 
 
 class LodgingViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     queryset = models.Lodging.objects.all().order_by('name')
     serializer_class = LodgingSerializer
 
