@@ -89,7 +89,7 @@ const Planning = props => {
   };
 
   const onCreateBooking = (lodging, begin_date) => {
-    console.debug("CREATE ", lodging ? lodging.id : null, begin_date.toISOString());
+    console.debug("CREATE ", lodging ? lodging.id : null, begin_date);
     if (lodging) {
       setEditBooking({
         lodging_id: lodging.id,

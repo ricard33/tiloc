@@ -17,6 +17,7 @@ import { makeStyles } from "@material-ui/styles";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
 import "./BookingScheduler.css";
+import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -202,7 +203,8 @@ const BookingScheduler = props => {
   }
 
   function onCanvasClick(groupId, time) {
-    onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0], new Date(time));
+    const localDate = shiftUTCDateToLocalDate(new Date(time));
+    onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0], localDate);
   }
 
   useLayoutEffect(() => {
