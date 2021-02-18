@@ -220,7 +220,7 @@ class Booking(models.Model):
         verbose_name = _("Booking")
 
     def __str__(self):
-        return "%s from %s to %s" % (self.guest_name, self.begin_date, self.end_date)
+        return "%s (%s: %s -> %s)" % (self.guest_name, self.lodging and self.lodging.name or '--', self.begin_date, self.end_date)
 
     @property
     def price_with_options(self):
@@ -357,6 +357,7 @@ class Payment(models.Model):
         OTHER = 'other', _('Other')
 
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+    description = models.CharField(_("description"), max_length=255)
     amount = models.DecimalField(_("amount"), max_digits=10, decimal_places=2)
     method = models.CharField(_("Payment method"), max_length=30, choices=PaymentMethod.choices)
     date = models.DateField(_("Payment date"))
