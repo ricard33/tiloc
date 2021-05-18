@@ -174,6 +174,7 @@ class BookingChannelSync(models.Model):
                                        help_text=_("Last time we imported remote calendar from channel."))
     last_export = models.DateTimeField(blank=True, null=True, help_text=_(
         "Last time the calendar has been successfully requested by remote channel."))
+    last_import_error = models.TextField(null=True, blank=True)
 
 
 class Booking(models.Model):
