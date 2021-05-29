@@ -19,6 +19,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import NavBar from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
+import useInterval from "../../common/useInterval";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -75,13 +76,16 @@ const Planning = props => {
     setNeedFirstTimeEdit(false);
   }
 
-
   useEffect(() => {
-    dispatch(actions.fetchBookings());
+    // dispatch(actions.fetchBookings());
     // dispatch(actions.fetchBookingStatuses());
     // dispatch(actions.fetchBookingChannels());
     // dispatch(actions.fetchLodgings());
   }, [dispatch]);
+
+  useInterval(() => {
+    dispatch(actions.fetchBookings());
+  }, 60000);
 
   const onEditBooking = (booking) => {
     console.debug("EDIT ", booking.id);

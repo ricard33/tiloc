@@ -232,6 +232,7 @@ const BookingScheduler = props => {
         dragSnap={24 * 60 * 60 * 1000}
         lineHeight={20}
         stackItems
+        clickTolerance={1}
         itemTouchSendsClick
         // useResizeHandle
         timeSteps={timeSteps}
