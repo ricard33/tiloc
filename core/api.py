@@ -8,22 +8,24 @@ from django.db import transaction
 from django.http import Http404, HttpResponse
 from knox.auth import TokenAuthentication
 from knox.models import AuthToken
-from knox.views import LoginView as KnoxLoginView, LogoutView as KnoxLogoutView
+from knox.views import LoginView as KnoxLoginView
+from knox.views import LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.decorators import action, permission_classes, api_view
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from location import __date__, __version__
 
 from . import models
 from .pdf_tools import generate_pdf
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
-                          PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, UserSerializer,
-                          ServiceSerializer)
-from location import __version__, __date__
+                          PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, ServiceSerializer,
+                          UserSerializer)
 
 
 @api_view()

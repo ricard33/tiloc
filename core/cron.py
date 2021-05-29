@@ -35,7 +35,7 @@ class SyncBookingsJob(CronJobBase):
                 with transaction.atomic():
                     sync.last_import_error = str(ex)
                     sync.save(update_fields=['last_import_error'])
-            except:
+            except Exception:
                 logging.exception("[%s] exception during bookings synchronization from [%s]",
                                   sync.lodging.name, sync.channel.name)
             if (arrow.utcnow().datetime - sync.last_import) > timedelta(hours=6):

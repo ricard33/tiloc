@@ -3,8 +3,8 @@ from knox.models import AuthToken
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from core.tests import factories
 from core import models
+from core.tests import factories
 
 
 class BookingTestCase(APITestCase):

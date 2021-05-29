@@ -1,5 +1,5 @@
-import os, datetime
-
+import datetime
+import os
 
 version_build_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'version.properties')
 
