@@ -56,6 +56,22 @@ class BookingTestCase(APITestCase):
         response = self.client.post('/api/booking/', data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
 
+    def test_update_cancelled_booking(self):
+        booking = factories.BookingFactory.create(lodging=None, daily_rate=50)
+        data = {
+            'special_conditions':      'something',
+        }
+        response = self.client.patch('/api/booking/%d/' % booking.id, data, format='json', **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        instance = models.Booking.objects.get(id=response.data['id'])
+        self.assertEqual('something', instance.special_conditions)
+
+    def test_delete_cancelled_booking(self):
+        booking = factories.BookingFactory.create(lodging=None, daily_rate=50)
+        response = self.client.delete('/api/booking/%d/' % booking.id, format='json', **self.header)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
+        self.assertFalse(models.Booking.objects.filter(id=booking.id).exists())
+
     def test_create_booking_with_services(self):
         # factories.ServiceFactory.create_batch(5)
         service = factories.ServiceFactory.create()
