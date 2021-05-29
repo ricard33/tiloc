@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from location import __date__, __version__
 
 from . import models
+from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
@@ -106,6 +107,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
     queryset = models.Booking.objects.all().order_by('-begin_date')
     serializer_class = BookingSerializer
+    pagination_class = LargeResultsSetPagination
 
     @transaction.atomic
     @action(detail=True, methods=['post'])
