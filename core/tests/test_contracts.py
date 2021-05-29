@@ -56,4 +56,4 @@ class ContractTemplateTestCase(APITestCase):
         lodging = factories.LodgingFactory.create(contract_template=contract_template)
         content = lodging.generate_empty_contract()
         self.assertIn(lodging.name, content)
-        self.assertIn("..../..../........", content)
+        self.assertIn("......../......../................", content)

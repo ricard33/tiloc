@@ -164,16 +164,20 @@ class ExportCalendarTestCase(TestCase):
         self.assertEqual(len(c.events), 1)
 
     def test_booking_dates(self):
+        now = arrow.now()
+        year_ = now.date().year + 1
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric",
-                                 begin_date=arrow.get("2020-08-02").date(),
-                                 end_date=arrow.get("2020-08-12").date())
+                                 begin_date=arrow.get("%d-08-02" % year_).date(),
+                                 end_date=arrow.get("%d-08-12" % year_).date())
+        self.assertEqual(models.Booking.objects.all().count(), 1)
+
         r = self.client.get('/calendar/%s/' % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
         e = c.events.pop()
-        self.assertEqual(e.begin.date(), date(2020, 8, 2))
-        self.assertEqual(e.end.date(), date(2020, 8, 12))
+        self.assertEqual(e.begin.date(), date(year_, 8, 2))
+        self.assertEqual(e.end.date(), date(year_, 8, 12))
 
 
 class ExportFullPlanningTestCase(TestCase):
