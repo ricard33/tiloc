@@ -1,5 +1,6 @@
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import ModelAdmin, TabularInline
+from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from rest_framework.reverse import reverse
@@ -9,18 +10,30 @@ from core import models
 from core.imp_exp_resources import BookingResource
 
 
+class PaymentInlineAdmin(TabularInline):
+    model = models.Payment
+    ordering = ('-date', )
+
+
 class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         'id', 'lodging', 'status',
         'guest_name',
         'begin_date', 'end_date', 'duration', 'adults', 'children', 'babies',
-        'price', 'is_flat_rate', 'deposit', 'guaranty', 'commission_fees', 'source', 'source_uid_')
+        'price', 'cashed_in', 'is_flat_rate', 'deposit', 'guaranty', 'commission_fees', 'source', 'source_uid_')
     list_filter = ('lodging', 'status', 'begin_date', 'source')
+    ordering = ('-begin_date', )
     resource_class = BookingResource
+    inlines = [
+        PaymentInlineAdmin
+    ]
 
     def source_uid_(self, obj: models.Booking):
         return obj.source_uid and "%s..." % obj.source_uid[0:5]
     source_uid_.short_description = _("Channel UID")
+
+    def cashed_in(self, obj: models.Booking):
+        return obj.payment_set.all().aggregate(total=Sum('amount'))['total']
 
 
 class BookingStatusAdmin(ImportExportModelAdmin):
@@ -33,7 +46,8 @@ class BookingChannelAdmin(ImportExportModelAdmin):
 
 
 class BookingChannelSyncAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'channel', 'lodging', 'source_url', 'url_for_remote', 'active', 'last_import', 'last_export')
+    list_display = ('id', 'channel', 'lodging', 'source_url', 'url_for_remote', 'active', 'last_import', 'last_export',
+                    'last_import_error')
     list_display_links = ('channel', 'lodging')
     list_filter = ('lodging', 'lodging__owner', 'channel', 'active')
 
@@ -61,6 +75,7 @@ class OwnerAdmin(ImportExportMixin, SimpleHistoryAdmin):
 class HolidaysAdmin(ImportExportModelAdmin):
     list_display = ('id', 'name', 'begin_date', 'end_date')
     list_display_links = ('name', )
+    ordering = ('begin_date', )
 
 
 class PricingAdmin(ImportExportModelAdmin):
@@ -84,6 +99,7 @@ class ContractTemplateAdmin(ImportExportMixin, SimpleHistoryAdmin):
 
 class PaymentAdmin(ImportExportModelAdmin):
     list_display = ('id', 'booking', 'description', 'amount', 'method', 'date')
+    ordering = ('-date', )
 
 
 class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
