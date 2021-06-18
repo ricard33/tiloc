@@ -1,6 +1,8 @@
 {
   "Deposit": "Deposit",
   "Down payment": "Down payment",
+  "Unsaved changes detected": "Unsaved changes detected",
+  "Some modifications aren't saved. Do you want to save them and open contract?": "Some modifications aren't saved. Do you want to save them and open contract?",
   "Delete booking: {{ guest_name }} on {{ lodging_name }}": "Delete booking: {{ guest_name }} on {{ lodging_name }}",
   "Do you really want to permanently delete this booking?": "Do you really want to permanently delete this booking?",
   "Modify a booking": "Modify a booking",

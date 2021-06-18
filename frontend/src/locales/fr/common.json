@@ -1,6 +1,8 @@
 {
   "Deposit": "Arrhes",
   "Down payment": "Accompte",
+  "Unsaved changes detected": "Changements non enregistrés détectés",
+  "Some modifications aren't saved. Do you want to save them and open contract?": "Des changements n'ont pas été enregistrés. Souhaitez-vous les enregistrer et ouvrir le contrat ?",
   "Delete booking: {{ guest_name }} on {{ lodging_name }}": "Suppression de réservation: {{ guest_name }} pour {{ lodging_name }}",
   "Do you really want to permanently delete this booking?": "Voulez-vous vraiment supprimer définitivement cette réservation ?",
   "Modify a booking": "Modifier une réservation",

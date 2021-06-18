@@ -156,12 +156,12 @@ const BookingDialog = props => {
   const form = useForm({
     defaultValues: initialState
   });
-  const { register, control, errors, setValue, getValues, watch } = form;
+  const { register, control, errors, setValue, getValues, watch, formState } = form;
+  const { dirty, isValid } = formState;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "options"
   });
-
   let lodging = booking ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
   const formValues = getValues();
@@ -369,8 +369,18 @@ const BookingDialog = props => {
     return onDateChange(newDate, "end_date");
   }
 
-  function openContract() {
-    onOpenContract(booking);
+  function openContract(data) {
+    if(dirty) {
+      confirm({
+        title: t("Unsaved changes detected"),
+        description: t("Some modifications aren't saved. Do you want to save them and open contract?")
+      })
+        .then(() => {
+          saveBooking(data, submittedBooking => onOpenContract(submittedBooking))
+        });
+    }
+    else
+      onOpenContract(booking);
   }
 
   function onCancel() {
@@ -394,7 +404,7 @@ const BookingDialog = props => {
       });
   }
 
-  function onSubmit(data) {
+  function saveBooking(data, callback) {
     console.log("Submit: ", data);
     const submittedBooking = {
       ...data,
@@ -404,9 +414,17 @@ const BookingDialog = props => {
     };
     const action = booking.id ? actions.updateBooking : actions.createBooking;
     dispatch(action(submittedBooking, () => {
+      if (callback)
+        callback(submittedBooking);
+    }));
+
+  }
+
+  function onSubmit(data) {
+    saveBooking(data, submittedBooking => {
       console.debug("Closing...");
       onClose(submittedBooking);
-    }));
+    });
   }
 
   function getDesignation(option) {
@@ -963,7 +981,7 @@ const BookingDialog = props => {
               disabled={!booking || !booking.id}
               className={classes.button}
               startIcon={<PdfIcon/>}
-              onClick={openContract}
+              onClick={form.handleSubmit(openContract)}
             >{t("Contract")}</Button>}
           </Grid>
           <Grid item>
