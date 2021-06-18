@@ -118,6 +118,10 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     fontSize: "small",
     textAlign: "center",
+  },
+  totalPrice: {},
+  thirdPartyPrice: {
+    fontSize: "x-small",
   }
 }));
 
@@ -169,7 +173,8 @@ const BookingDialog = props => {
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
   const options = watch('options', fields);
-  const fullPrice = Number(price) + computeOptionsPrice(options, duration);
+  const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
+  const fullPrice = watch('fullPrice', Number(price) + includedInPriceOptions);
   // console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
@@ -230,7 +235,7 @@ const BookingDialog = props => {
   }
 
   function handleChange(data) {
-    console.debug(data);
+    // console.debug(data);
     // console.debug("handleChange", data.target);
     let value = data.target.value;
     switch (data.target.name) {
@@ -429,6 +434,9 @@ const BookingDialog = props => {
           <Grid item xs={4}>
             <span className={classes.totalPrice}>
               {t("total = {{ fullPrice }} €", {fullPrice: DecimalPrecision.round(fullPrice)})}</span>
+            {excludedFromPriceOptions > 0 && (
+              <span className={classes.thirdPartyPrice}><br/>(+ {excludedFromPriceOptions} € {t("for third party services")})</span>)
+            }
           </Grid>
         </Grid>
       </DialogTitle>
@@ -827,6 +835,7 @@ const BookingDialog = props => {
                             <input type="hidden" name={`options[${index}].unit_price_ht`} ref={register()} defaultValue={option.unit_price_ht}/>
                             <input type="hidden" name={`options[${index}].vat`} ref={register()} defaultValue={option.vat}/>
                             <input type="hidden" name={`options[${index}].is_flat_rate`} ref={register()} defaultValue={option.is_flat_rate}/>
+                            <input type="hidden" name={`options[${index}].not_included_in_price`} ref={register()} defaultValue={option.not_included_in_price}/>
                             <Grid item xs={6} style={{ textAlign: "left" }}><span>{getDesignation(option)}</span></Grid>
                             <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price_ht && <span>{option.unit_price_ht}&nbsp;x</span>}</Grid>
                             <Grid item xs={2}>

@@ -129,6 +129,10 @@ const ContractTemplateEdit = (props) => {
   }
 
   function onSave() {
+    _onSave();
+  }
+
+  function onSaveAndClose() {
     _onSave(onClose);
   }
 
@@ -249,6 +253,13 @@ const ContractTemplateEdit = (props) => {
               startIcon={<SaveIcon />}
               onClick={onSave}
             >{t("Save")}</Button>
+            <Button
+              type="submit"
+              color="primary"
+              className={classes.button}
+              startIcon={<SaveIcon />}
+              onClick={onSaveAndClose}
+            >{t("Save and Close")}</Button>
           </Grid>
         </Grid>
       </Grid>

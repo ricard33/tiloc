@@ -86,10 +86,12 @@ class BookedServiceSerializer(serializers.ModelSerializer):
     vat = serializers.ReadOnlyField(source='service.vat')
     is_flat_rate = serializers.ReadOnlyField(source='service.is_flat_rate')
     included_in_booking = serializers.ReadOnlyField(source='service.included_in_booking')
+    not_included_in_price = serializers.ReadOnlyField(source='service.not_included_in_price')
 
     class Meta:
         model = models.BookedService
-        fields = ('id', 'reference', 'designation', 'unit_price_ht', 'vat', 'included_in_booking', 'is_flat_rate', 'quantity')
+        fields = ('id', 'reference', 'designation', 'unit_price_ht', 'vat',
+                  'included_in_booking', 'not_included_in_price', 'is_flat_rate', 'quantity')
 
 
 class BookingSerializer(serializers.ModelSerializer):

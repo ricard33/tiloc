@@ -105,6 +105,7 @@ export const createModels = () => {
         vat: attr(),
         is_flat_rate: attr(),
         included_in_booking: attr(),
+        not_included_in_price: attr(),
         auto_add_booking: attr(),
         auto_add_invoice: attr(),
       };

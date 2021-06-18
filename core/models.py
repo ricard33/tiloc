@@ -124,6 +124,9 @@ class Service(models.Model):
     included_in_booking = models.BooleanField(
         _("included in booking"), default=False,
         help_text=_("If true, the price of this option is included in booking price and not displayed separately"))
+    not_included_in_price = models.BooleanField(
+        _("not included in price"), default=False,
+        help_text=_("Service not included in current booking price. Maybe provided by external partner..."))
     auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
     auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
 
@@ -221,14 +224,15 @@ class Booking(models.Model):
         verbose_name = _("Booking")
 
     def __str__(self):
-        return "%s (%s: %s -> %s)" % (self.guest_name, self.lodging and self.lodging.name or '--', self.begin_date, self.end_date)
+        return "%s (%s: %s -> %s)" % (
+        self.guest_name, self.lodging and self.lodging.name or '--', self.begin_date, self.end_date)
 
     @property
     def price_with_options(self):
         total = self.price
-        for option in self.bookedservice_set.all():
+        for option in self.bookedservice_set.filter(service__not_included_in_price=False):
             if option.service.unit_price_ht:
-                total += option.service.unit_price_ht * (option.service.is_flat_rate and 1 or self.duration)
+                total += option.service.unit_price_ht * (1 + option.service.vat) * (option.service.is_flat_rate and 1 or self.duration)
         return total
 
     def get_absolute_url(self):
@@ -250,7 +254,11 @@ class Booking(models.Model):
                                           'booking':    self,
                                           'lodging':    self.lodging,
                                           'owner':      self.lodging.owner,
-                                          'options':   self.bookedservice_set.all(),
+                                          'options':    list(self.bookedservice_set.all()),
+                                          'included_options':   self.bookedservice_set.filter(
+                                              service__not_included_in_price=False),
+                                          'third_party_options': self.bookedservice_set.filter(
+                                              service__not_included_in_price=True),
                                           'url_server': url_server,
                                           'date':       date.today(),
                                           'signature':  signature_img

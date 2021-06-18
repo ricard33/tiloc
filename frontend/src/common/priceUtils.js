@@ -58,16 +58,22 @@ export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, 
   };
 };
 
+function parseBool(val) { return val === true || val === "true" }
+
 export const computeOptionsPrice = (options, duration) => {
-  let total = 0;
+  let totalIncluded = 0, totalExclude = 0;
   if (options) {
     for (let i = 0; i < options.length; i++) {
       const option = options[i];
       if (option.unit_price_ht) {
-        total += (option.vat ? option.unit_price_ht * (100 + option.vat) / 100 : option.unit_price_ht)
-          * Number(option.quantity) * (option.is_flat_rate ? 1 : duration);
+        const price = (option.vat ? option.unit_price_ht * (100 + option.vat) / 100 : option.unit_price_ht)
+          * Number(option.quantity) * (parseBool(option.is_flat_rate)? 1 : duration);
+        if(parseBool(option.not_included_in_price))
+          totalExclude += price;
+        else
+          totalIncluded += price;
       }
     }
-    return total;
+    return [totalIncluded, totalExclude];
   }
 };
