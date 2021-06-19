@@ -391,7 +391,7 @@ const BookingDialog = props => {
     confirm({
       title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
         guest_name: booking.guest_name,
-        lodging_name: booking.lodging.name
+        lodging_name: booking.lodging ? booking.lodging.name : "-"
       }),
       description: t("Do you really want to permanently delete this booking?")
     })
