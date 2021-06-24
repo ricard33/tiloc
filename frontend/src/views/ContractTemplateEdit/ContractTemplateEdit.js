@@ -94,8 +94,10 @@ const ContractTemplateEdit = (props) => {
   }, [templateId, loaded, dispatch]);
 
   useEffect(() => {
-    if (template)
+    if (template) {
+      setName(template.name);
       setContent(template.content);
+    }
   }, [template]);
 
   function onChange(newContent) {
@@ -180,6 +182,7 @@ const ContractTemplateEdit = (props) => {
             id="template-name" name="templateName" label={t("Template name")}
             value={name}
             onChange={(event) => setName(event.target.value)}
+            fullWidth
           />
         </Grid>
         <Grid item xs={12}>

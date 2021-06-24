@@ -62,9 +62,11 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
 
 
 class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
-    list_display = ('id', 'name', 'owner', 'rank', 'active', 'shown', 'capacity', 'daily_rate', 'guaranty',
-                    'cleaning_fee', 'contract_template')
-    list_filter = ('owner',)
+    list_display = ('__str__', 'id', 'name', 'owner', 'rank', 'active', 'shown', 'capacity', 'daily_rate', 'guaranty',
+                    'cleaning_fee', 'tourist_tax', 'contract_template')
+    list_editable = ('name', 'rank', 'active', 'shown', 'capacity', 'daily_rate', 'guaranty',
+                     'cleaning_fee', 'tourist_tax', 'contract_template')
+    list_filter = ('owner', 'active', 'shown')
 
 
 class OwnerAdmin(ImportExportMixin, SimpleHistoryAdmin):

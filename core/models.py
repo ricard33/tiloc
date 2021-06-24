@@ -73,6 +73,7 @@ class Lodging(models.Model):
     cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
+    tourist_tax = models.DecimalField(_("tourist tax"), max_digits=10, decimal_places=2, null=True, blank=True)
 
     contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
@@ -232,7 +233,7 @@ class Booking(models.Model):
         total = self.price
         for option in self.bookedservice_set.filter(service__not_included_in_price=False):
             if option.service.unit_price_ht:
-                total += option.service.unit_price_ht * (1 + option.service.vat) * (option.service.is_flat_rate and 1 or self.duration)
+                total += option.service.unit_price_ht * (1 + (option.service.vat or 0)) * (option.service.is_flat_rate and 1 or self.duration)
         return total
 
     def get_absolute_url(self):
