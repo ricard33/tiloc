@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-06-18 12:20+0000\n"
-"PO-Revision-Date: 2021-06-18 08:22-0400\n"
+"PO-Revision-Date: 2021-06-24 19:54-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 #: core/admin.py:33
 msgid "Channel UID"
@@ -232,7 +232,7 @@ msgstr ""
 
 #: core/models.py:128
 msgid "not included in price"
-msgstr "nombre de personnes incluses dans le tarif"
+msgstr "non inclus dans le tarif"
 
 #: core/models.py:129
 msgid ""
