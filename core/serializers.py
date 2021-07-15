@@ -54,6 +54,13 @@ class LodgingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class LodgingSubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Lodging
+        fields = ['id', 'uid', 'active', 'shown', 'name', 'owner', 'rank', 'daily_rate', 'guaranty', 'cleaning_fee',
+                  'capacity', 'information', 'tourist_tax']
+
+
 class BookingStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.BookingStatus
@@ -97,7 +104,7 @@ class BookedServiceSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(source='status', queryset=models.BookingStatus.objects.all())
-    lodging = LodgingSerializer(read_only=True)
+    lodging = LodgingSubSerializer(read_only=True)
     lodging_id = serializers.PrimaryKeyRelatedField(source='lodging', queryset=models.Lodging.objects.all(),
                                                     allow_null=True)
     source = BookingChannelSerializer(read_only=True)

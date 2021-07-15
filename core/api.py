@@ -105,7 +105,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows bookings to be viewed or edited.
     """
-    queryset = models.Booking.objects.all().order_by('-begin_date')
+    queryset = models.Booking.objects.all().order_by('-begin_date').prefetch_related('status', 'lodging', 'source', 'options')
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
 
