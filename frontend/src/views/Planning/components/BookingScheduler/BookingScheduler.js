@@ -94,17 +94,21 @@ const BookingScheduler = props => {
   const classes = useStyles();
   const rootRef = useRef();
   const [horizontalMonths, setHorizontalMonths] = useState(1);
+  const [lineHeight, setLineHeight] = useState(20);
   const [collapsed, setCollapsed] = useState(false);
   const [selected, setSelected] = useState([]);
   const [width, height] = useWindowSize();
   const { t } = useTranslation();
 
   const updateLayout = (width, height) => {
-    const nbMonths = width > 800 ? 2 : 1;
+    const nbMonths = width > 1300 ? 2 : width > 700 ? 1 : 0.5;
     if (nbMonths !== horizontalMonths) {
       console.debug("Changing nb months to " + nbMonths);
       setHorizontalMonths(nbMonths);
     }
+    const newLineHeight = nbMonths < 1 ? 30 : 20;
+    if(newLineHeight !== lineHeight)
+      setLineHeight(newLineHeight)
   };
   updateLayout(width, height);
 
@@ -230,10 +234,10 @@ const BookingScheduler = props => {
         canChangeGroup={false}
         canResize={false}
         dragSnap={24 * 60 * 60 * 1000}
-        lineHeight={20}
+        lineHeight={lineHeight}
         stackItems
         clickTolerance={1}
-        itemTouchSendsClick
+        // itemTouchSendsClick
         // useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 130}
@@ -263,12 +267,12 @@ const BookingScheduler = props => {
   var timelines = [];
 
   for (var i = 0; i < 12; i += horizontalMonths) {
-    var start = add(beginDate, { months: i });
+    var start = add(beginDate, { months: Math.trunc(i), days: 30 * (i % 1) });
     timelines.push(
       <div key={i} className={classes.timeline}>
         {renderTimeline(
           start.valueOf(),
-          add(start, { months: horizontalMonths }).valueOf())}
+          add(start, horizontalMonths < 1 ? { days: 32 * horizontalMonths} : { months: horizontalMonths }).valueOf())}
       </div>
     );
   }
