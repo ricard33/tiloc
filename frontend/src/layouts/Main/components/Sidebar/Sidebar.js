@@ -10,6 +10,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CalendarIcon from '@material-ui/icons/CalendarToday';
 import ListIcon from '@material-ui/icons/List';
 import MoneyIcon from '@material-ui/icons/AttachMoney';
+import LocalLaundryServiceIcon from '@material-ui/icons/LocalLaundryService';
 import { parseISO } from "date-fns";
 
 import { SidebarNav } from './components';
@@ -67,6 +68,13 @@ const Sidebar = props => {
       title: t('Bookings'),
       href: '/bookings',
       icon: <ListIcon />
+    },
+    {
+      title: t('Cleanings'),
+      href: {pathname: "https://www.dropbox.com/scl/fi/xe72bjehbqml88s8awx7b/Planning-m-nages-locations.gsheet?dl=0&rlkey=k0coe99vb9in9xbqk4a261lv5" },
+      icon: <LocalLaundryServiceIcon />,
+      disabled: false,
+      external: true,
     },
     {
       title: t('Prices'),

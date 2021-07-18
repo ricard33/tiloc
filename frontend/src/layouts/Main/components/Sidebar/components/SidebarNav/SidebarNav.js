@@ -68,6 +68,7 @@ const SidebarNav = props => {
           <Button
             activeClassName={classes.active}
             className={classes.button}
+            target={page.external ? '_blank' : ''}
             component={CustomRouterLink}
             to={page.href}
             disabled={page.disabled}
