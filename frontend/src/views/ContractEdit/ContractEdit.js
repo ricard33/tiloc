@@ -145,7 +145,7 @@ const ContractEdit = props => {
     _onSave(makePDF);
   }
 
-  function _onSave(callback: (contract) => void) {
+  function _onSave(callback/*: (contract) => void*/) {
     const submittedContract = {
       id: contract.id,
       content: content

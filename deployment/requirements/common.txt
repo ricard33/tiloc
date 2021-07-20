@@ -7,7 +7,7 @@ django-constance[database]==2.8.0
 django-cors-headers==3.5.0
 django-grappelli==2.14.3
 django-heroku
-django-import-export==2.4.0
+django-import-export==2.5.0
 django-picklefield==3.0.1
 django-proxy==1.2.1
 django-rest-knox==4.1.0

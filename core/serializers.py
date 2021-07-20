@@ -101,6 +101,18 @@ class BookedServiceSerializer(serializers.ModelSerializer):
                   'included_in_booking', 'not_included_in_price', 'is_flat_rate', 'quantity')
 
 
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Payment
+        fields = '__all__'
+
+
+class PaymentSubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Payment
+        exclude = ['booking']
+
+
 class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(source='status', queryset=models.BookingStatus.objects.all())
@@ -111,6 +123,7 @@ class BookingSerializer(serializers.ModelSerializer):
     source_id = serializers.PrimaryKeyRelatedField(source='source', queryset=models.BookingChannel.objects.all(),
                                                    required=False, allow_null=True)
     options = BookedServiceSerializer(source='bookedservice_set', many=True, required=False)
+    payments = PaymentSubSerializer(source='payment_set', many=True, required=False)
 
     class Meta:
         model = models.Booking
@@ -169,10 +182,4 @@ class ContractTemplateSerializer(serializers.ModelSerializer):
 class ContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Contract
-        fields = '__all__'
-
-
-class PaymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Payment
         fields = '__all__'

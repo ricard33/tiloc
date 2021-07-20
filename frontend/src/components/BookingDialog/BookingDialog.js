@@ -15,7 +15,7 @@ import {
   Forward as ForwardIcon,
   PictureAsPdf as PdfIcon,
   Save as SaveIcon,
-  ExpandMore as ExpandMoreIcon,
+  ExpandMore as ExpandMoreIcon
 } from "@material-ui/icons";
 import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,13 @@ import * as selectors from "../../selectors";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
 import { getDepositLabel } from "../../common/ownerPrefsUtils";
-import { Accordion, AccordionDetails, AccordionSummary as MuiAccordionSummary, Grid, TextField } from "@material-ui/core";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary as MuiAccordionSummary,
+  Grid,
+  TextField
+} from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -40,31 +46,34 @@ import useWindowDimensions from "../../common/windowDimensions";
 import { useConfirm } from "material-ui-confirm";
 import Hidden from "@material-ui/core/Hidden";
 import { formatISO } from "../../common/tzUtils";
+import { formatDate } from "../../common/dateUtils";
+import IconButton from "@material-ui/core/IconButton";
+import TableRow from "@material-ui/core/TableRow";
+import TableHead from "@material-ui/core/TableHead";
+import Payments from "../Payments";
 
 
 const AccordionSummary = withStyles({
   root: {
-    backgroundColor: 'rgba(0, 0, 0, .03)',
-    borderBottom: '1px solid rgba(0, 0, 0, .125)',
+    backgroundColor: "rgba(0, 0, 0, .03)",
+    borderBottom: "1px solid rgba(0, 0, 0, .125)",
     marginBottom: -1,
     minHeight: 56,
-    '&$expanded': {
-      minHeight: 38,
-    },
+    "&$expanded": {
+      minHeight: 38
+    }
   },
   content: {
-    fontWeight: 'bold',
-    '&$expanded': {
-      margin: '3px 0',
+    fontWeight: "bold",
+    "&$expanded": {
+      margin: "3px 0"
     },
-    '& p': {
-      fontWeight: 'bold',
+    "& p": {
+      fontWeight: "bold",
       marginBottom: 0
-    },
+    }
   },
-  expanded: {
-
-  },
+  expanded: {}
 })(MuiAccordionSummary);
 
 const useStyles = makeStyles(theme => ({
@@ -117,11 +126,11 @@ const useStyles = makeStyles(theme => ({
   options: {
     alignItems: "center",
     fontSize: "small",
-    textAlign: "center",
+    textAlign: "center"
   },
   totalPrice: {},
   thirdPartyPrice: {
-    fontSize: "x-small",
+    fontSize: "x-small"
   }
 }));
 
@@ -172,9 +181,9 @@ const BookingDialog = props => {
   const isFlatRate = watch("is_flat_rate", initialState.is_flat_rate);
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
-  const options = watch('options', fields);
+  const options = watch("options", fields);
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
-  const fullPrice = watch('fullPrice', Number(price) + includedInPriceOptions);
+  const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   // console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
@@ -370,16 +379,15 @@ const BookingDialog = props => {
   }
 
   function openContract(data) {
-    if(dirty) {
+    if (dirty) {
       confirm({
         title: t("Unsaved changes detected"),
         description: t("Some modifications aren't saved. Do you want to save them and open contract?")
       })
         .then(() => {
-          saveBooking(data, submittedBooking => onOpenContract(submittedBooking))
+          saveBooking(data, submittedBooking => onOpenContract(submittedBooking));
         });
-    }
-    else
+    } else
       onOpenContract(booking);
   }
 
@@ -451,9 +459,11 @@ const BookingDialog = props => {
           </Grid>
           <Grid item xs={4}>
             <span className={classes.totalPrice}>
-              {t("total = {{ fullPrice }} €", {fullPrice: DecimalPrecision.round(fullPrice)})}</span>
+              {t("total = {{ fullPrice }} €", { fullPrice: DecimalPrecision.round(fullPrice) })}</span>
             {excludedFromPriceOptions > 0 && (
-              <span className={classes.thirdPartyPrice}><br/>(+ {excludedFromPriceOptions} € {t("for third party services")})</span>)
+              <span
+                className={classes.thirdPartyPrice}
+              ><br />(+ {excludedFromPriceOptions} € {t("for third party services")})</span>)
             }
           </Grid>
         </Grid>
@@ -522,13 +532,13 @@ const BookingDialog = props => {
             </Grid>
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="panel1a-content" id="guest-header">
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="guest-header">
                   <Typography gutterBottom className={classes.heading}>{t("Guest")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={1}>
                     <Grid item xs={1}>
-                      <ContactsIcon/>
+                      <ContactsIcon />
                     </Grid>
                     <Grid item xs={11}>
                       <FormControl className={classes.formControl} variant={variant}>
@@ -601,7 +611,7 @@ const BookingDialog = props => {
             </Grid>
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="panel1a-content" id="booking-header">
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="booking-header">
                   <Typography gutterBottom className={classes.heading}>{t("Booking details")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -622,7 +632,7 @@ const BookingDialog = props => {
                             <MenuItem key={n} value={n}>{n}</MenuItem>
                           ))}
                           {(duration > 31) &&
-                        <MenuItem key={duration} value={duration}>{duration}</MenuItem>
+                          <MenuItem key={duration} value={duration}>{duration}</MenuItem>
                           }
                         </Controller>
                       </FormControl>
@@ -635,7 +645,7 @@ const BookingDialog = props => {
                               as={KeyboardDatePicker}
                               control={control}
                               format="dd/MM/yyyy"
-                              id="date-picker-inline"
+                              id="date-picker-start"
                               KeyboardButtonProps={{
                                 "aria-label": "arrival date"
                               }}
@@ -650,7 +660,7 @@ const BookingDialog = props => {
                           </Grid>
                           <Hidden xsDown>
                             <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
-                              <ForwardIcon/>
+                              <ForwardIcon />
                             </Grid>
                           </Hidden>
                           <Grid item sm={5} xs={12}>
@@ -658,7 +668,7 @@ const BookingDialog = props => {
                               as={KeyboardDatePicker}
                               control={control}
                               format="dd/MM/yyyy"
-                              id="date-picker-dialog"
+                              id="date-picker-stop"
                               KeyboardButtonProps={{
                                 "aria-label": "departure date"
                               }}
@@ -675,29 +685,33 @@ const BookingDialog = props => {
                       </MuiPickersUtilsProvider>
                     </Grid>
                     {/* Price */}
-                    <Grid item container xs={12} alignItems="center" justify={!isFlatRate ? "space-around" : "flex-start"}>
+                    <Grid
+                      item container xs={12}
+                      alignItems="center"
+                      justify={!isFlatRate ? "space-around" : "flex-start"}
+                    >
                       {!isFlatRate &&
-                    <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
-                      <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
-                      <TextField
-                        className={classes.priceInput}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                          type: "number"
-                        }}
-                        label={t("Daily rate")}
-                        name="daily_rate"
-                        error={!!errors.daily_rate}
-                        onChange={handleChange}
-                        inputRef={register({ min: 1 })}
-                        margin="dense"
-                        required
-                        variant={variant}
-                      />
-                      <div className={classes.spacer}/>
-                      =
-                      <div className={classes.spacer}/>
-                    </Grid>}
+                      <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
+                        <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
+                        <TextField
+                          className={classes.priceInput}
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                            type: "number"
+                          }}
+                          label={t("Daily rate")}
+                          name="daily_rate"
+                          error={!!errors.daily_rate}
+                          onChange={handleChange}
+                          inputRef={register({ min: 1 })}
+                          margin="dense"
+                          required
+                          variant={variant}
+                        />
+                        <div className={classes.spacer} />
+                        =
+                        <div className={classes.spacer} />
+                      </Grid>}
                       <Grid item sm={5} xs={12} className={classes.flexBoxAlignLeft}>
                         <TextField
                           className={classes.priceInput}
@@ -713,7 +727,7 @@ const BookingDialog = props => {
                           required
                           variant={variant}
                         />
-                        <div className={classes.spacer}/>
+                        <div className={classes.spacer} />
                         <FormControlLabel
                           control={
                             <Controller
@@ -756,7 +770,7 @@ const BookingDialog = props => {
                         onChange={handleChange}
                         variant={variant}
                       />
-                      <div className={classes.spacer}/>
+                      <div className={classes.spacer} />
                       <Typography>
                         {watchBalance && t("Balance: {{amount}} €", { amount: watchBalance.price - watchBalance.deposit })}
                       </Typography>
@@ -798,7 +812,7 @@ const BookingDialog = props => {
                           ))}
                         </Controller>
                       </FormControl>
-                      <div className={classes.spacer}/>
+                      <div className={classes.spacer} />
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="children">{t("Children")}</InputLabel>
                         <Controller
@@ -815,7 +829,7 @@ const BookingDialog = props => {
                           ))}
                         </Controller>
                       </FormControl>
-                      <div className={classes.spacer}/>
+                      <div className={classes.spacer} />
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="babies">{t("Babies")}</InputLabel>
                         <Controller
@@ -839,7 +853,7 @@ const BookingDialog = props => {
             </Grid>
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="options-content" id="options-header">
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="options-content" id="options-header">
                   <Typography gutterBottom className={classes.heading}>{t("Options")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -848,17 +862,36 @@ const BookingDialog = props => {
                       {
                         fields.map((option, index) => (
                           <Grid container key={option.id} className={classes.options}>
-                            <input type="hidden" name={`options[${index}].id`} ref={register()} defaultValue={option.id}/>
-                            <input type="hidden" name={`options[${index}].designation`} ref={register()} defaultValue={option.designation}/>
-                            <input type="hidden" name={`options[${index}].unit_price_ht`} ref={register()} defaultValue={option.unit_price_ht}/>
-                            <input type="hidden" name={`options[${index}].vat`} ref={register()} defaultValue={option.vat}/>
-                            <input type="hidden" name={`options[${index}].is_flat_rate`} ref={register()} defaultValue={option.is_flat_rate}/>
-                            <input type="hidden" name={`options[${index}].not_included_in_price`} ref={register()} defaultValue={option.not_included_in_price}/>
+                            <input
+                              type="hidden" name={`options[${index}].id`} ref={register()}
+                              defaultValue={option.id}
+                            />
+                            <input
+                              type="hidden" name={`options[${index}].designation`} ref={register()}
+                              defaultValue={option.designation}
+                            />
+                            <input
+                              type="hidden" name={`options[${index}].unit_price_ht`} ref={register()}
+                              defaultValue={option.unit_price_ht}
+                            />
+                            <input
+                              type="hidden" name={`options[${index}].vat`} ref={register()}
+                              defaultValue={option.vat}
+                            />
+                            <input
+                              type="hidden" name={`options[${index}].is_flat_rate`} ref={register()}
+                              defaultValue={option.is_flat_rate}
+                            />
+                            <input
+                              type="hidden" name={`options[${index}].not_included_in_price`} ref={register()}
+                              defaultValue={option.not_included_in_price}
+                            />
                             <Grid item xs={6} style={{ textAlign: "left" }}><span>{getDesignation(option)}</span></Grid>
-                            <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price_ht && <span>{option.unit_price_ht}&nbsp;x</span>}</Grid>
+                            <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price_ht &&
+                            <span>{option.unit_price_ht}&nbsp;x</span>}</Grid>
                             <Grid item xs={2}>
                               <Controller
-                                as={<TextField/>}
+                                as={<TextField />}
                                 control={control}
                                 InputProps={{
                                   type: "number"
@@ -872,7 +905,7 @@ const BookingDialog = props => {
                               />
                             </Grid>
                             <Grid item xs={2} style={{ textAlign: "left" }}>
-                              { option.unit_price_ht &&
+                              {option.unit_price_ht &&
                               <span>=&nbsp;{DecimalPrecision.round(option.unit_price_ht * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))} &euro;</span>}
                             </Grid>
                             <Grid item xs={1}>
@@ -880,7 +913,7 @@ const BookingDialog = props => {
                                 type="button"
                                 className={classes.deleteButton}
                                 color="secondary"
-                                startIcon={<DeleteIcon/>}
+                                startIcon={<DeleteIcon />}
                                 onClick={() => remove(index)}
                               />
                             </Grid>
@@ -902,7 +935,10 @@ const BookingDialog = props => {
                         >
                           <option key={0} value={0}>{t("-- Add an option --")}</option>
                           {allOptions.map(option => (
-                            <option key={option.id} value={option.id} disabled={fields.filter(o => Number(o.id) === option.id).length > 0}>
+                            <option
+                              key={option.id} value={option.id}
+                              disabled={fields.filter(o => Number(o.id) === option.id).length > 0}
+                            >
                               {getDesignation(option)}
                             </option>
                           ))}
@@ -915,7 +951,10 @@ const BookingDialog = props => {
             </Grid>
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon/>} aria-controls="complements-content" id="complements-header">
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />} aria-controls="complements-content"
+                  id="complements-header"
+                >
                   <Typography gutterBottom className={classes.heading}>{t("Complements")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -933,7 +972,7 @@ const BookingDialog = props => {
                           // native
                           onChange={([event]) => handleChange(event)}
                         >
-                          <MenuItem key={0} value=""/>
+                          <MenuItem key={0} value="" />
                           {bookingChannels.map(channel => (
                             <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
                           ))}
@@ -957,6 +996,19 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
+            <Grid item lg={6} xs={12}>
+              <Accordion defaultExpanded>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />} aria-controls="complements-content"
+                  id="complements-header"
+                >
+                  <Typography gutterBottom className={classes.heading}>{t("Payments")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Payments bookingId={booking.id} />
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
           </Grid>
         </form>
         }
@@ -969,7 +1021,7 @@ const BookingDialog = props => {
               type="button"
               className={classes.deleteButton}
               color="secondary"
-              startIcon={<DeleteIcon/>}
+              startIcon={<DeleteIcon />}
               onClick={onDelete}
             >{t("Delete")}</Button>}
           </Grid>
@@ -980,7 +1032,7 @@ const BookingDialog = props => {
               color="default"
               disabled={!booking || !booking.id}
               className={classes.button}
-              startIcon={<PdfIcon/>}
+              startIcon={<PdfIcon />}
               onClick={form.handleSubmit(openContract)}
             >{t("Contract")}</Button>}
           </Grid>
@@ -990,7 +1042,7 @@ const BookingDialog = props => {
               type="submit"
               color="primary"
               className={classes.button}
-              startIcon={<SaveIcon/>}
+              startIcon={<SaveIcon />}
               onClick={form.handleSubmit(onSubmit)}
             >{t("Save")}</Button>
           </Grid>

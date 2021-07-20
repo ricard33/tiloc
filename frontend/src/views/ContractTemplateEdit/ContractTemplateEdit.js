@@ -142,7 +142,7 @@ const ContractTemplateEdit = (props) => {
     _onSave(makePDF);
   }
 
-  function _onSave(callback: (template) => void) {
+  function _onSave(callback/*: (template) => void*/) {
     const submittedTemplate = {
       id: template ? template.id : undefined,
       name: name,

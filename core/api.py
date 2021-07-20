@@ -221,6 +221,7 @@ class ContractViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = models.Payment.objects.all().order_by('date')
     serializer_class = PaymentSerializer
+    filterset_fields = ['booking_id']
 
 
 class ServiceViewSet(viewsets.ModelViewSet):

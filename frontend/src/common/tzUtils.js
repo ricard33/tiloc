@@ -19,6 +19,6 @@ export const shiftUTCDateToLocalDate = (utcDate) => {
   return utcDate;
 };
 
-export const formatISO: string = (dateWithTZ) => {
+export const formatISO = (dateWithTZ) => {
   return format(dateWithTZ, 'yyyy-MM-dd');
 }
