@@ -1,6 +1,5 @@
 import React, {  } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { Payment } from "../types/models";
 import { useTranslation } from "react-i18next";
 import { formatISO } from "../common/tzUtils";
 import {
@@ -8,24 +7,37 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle, InputAdornment, MenuItem,
   TextField, Theme
 } from "@material-ui/core";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@material-ui/core/styles";
+import { Payment, paymentMethods } from "../types/payment";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
+  input: {
+    marginLeft: "4px",
+    marginRight: "4px",
+  },
   date: {
+    marginLeft: "4px",
+    marginRight: "4px",
     width: "8em"
   },
-  description: {},
+  description: {
+    marginLeft: "4px",
+    marginRight: "4px",
+  },
   method: {
+    marginLeft: "4px",
+    marginRight: "4px",
     width: "10em"
   },
   amount: {
+    marginLeft: "4px",
+    marginRight: "4px",
     width: "5em"
   },
 }));
@@ -43,28 +55,24 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
   const { register, handleSubmit, control, formState: { errors } } = useForm<Payment>();
   const onSubmit: SubmitHandler<Payment> = data => {
     console.log(data);
-    onAdd(data);
+    onAdd({
+      ...data,
+      amount: Number(data.amount)
+    });
   };
-  const variant = "outlined";
+  const variant = "standard";
 
-  const paymentMethods = [
-    ['cash', t('Cash')],
-    ['bank_card', t('Bank card')],
-    ['check', t('Check')],
-    ['transfer', t('Transfer')],
-    ['paypal', t('PayPal')],
-    ['vouchers', t('Holiday vouchers')],
-    ['other', t('Other')],
-  ]
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if(event.key === 'Enter'){
+      handleSubmit(onSubmit)(event);
+      event.preventDefault();
+    }
+  }
 
   return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
-      <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="md">
+      <DialogTitle id="form-dialog-title">{t("Add payment")}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          To subscribe to this website, please enter your email address here. We will send updates
-          occasionally.
-        </DialogContentText>
         <form onSubmit={handleSubmit(onSubmit)}>
           <input
             type="hidden"
@@ -83,7 +91,6 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
                 }}
                 format="dd/MM/yyyy"
                 label={t("date")}
-                margin="dense"
                 variant="inline"
                 className={classes.date}
                 inputVariant={variant}
@@ -99,7 +106,6 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             rules={{ required: true }}
             render={({ field }) => <TextField
               label={t("description")}
-              margin="dense"
               variant={variant}
               className={classes.description}
               error={!!errors.description}
@@ -114,7 +120,6 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             rules={{ required: true }}
             render={({ field }) => <TextField
               label={t("payment method")}
-              margin="dense"
               variant={variant}
               className={classes.method}
               select
@@ -122,7 +127,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
               helperText={errors.method?.type === "required" && t("The payment method is required")}
               {...field}
             >
-              {paymentMethods.map(m => <MenuItem key={m[0]} value={m[0]}>{m[1]}</MenuItem>)}
+              {paymentMethods(t).map(m => <MenuItem key={m[0]} value={m[0]}>{m[1]}</MenuItem>)}
             </TextField>}
           />
           <Controller
@@ -132,11 +137,11 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             rules={{ required: true }}
             render={({ field }) => <TextField
               label={t("amount")}
-              margin="dense"
               variant={variant}
               className={classes.amount}
               error={!!errors.amount}
               helperText={errors.amount?.type === "required" && t("The amount is required")}
+              onKeyPress={handleKeyPress}
               InputProps={{
                 endAdornment: <InputAdornment position="end">€</InputAdornment>,
                 type: "number"

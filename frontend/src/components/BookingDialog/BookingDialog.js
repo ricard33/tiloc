@@ -996,6 +996,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
+            {booking.id &&
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary
@@ -1008,7 +1009,7 @@ const BookingDialog = props => {
                   <Payments bookingId={booking.id} />
                 </AccordionDetails>
               </Accordion>
-            </Grid>
+            </Grid>}
           </Grid>
         </form>
         }

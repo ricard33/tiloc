@@ -54,7 +54,7 @@ module.exports = {
   // Where to write the locale files relative to process.cwd()
 
   input: [
-    '../src/**/*.{js,hbs}',
+    '../src/**/*.{js,jsx,hbs,ts,tsx}',
     '!../src/components/Editor/ckeditor5/**/*'
   ],
   // An array of globs that describe where to look for source files
