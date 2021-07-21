@@ -40,7 +40,7 @@ const NavBar = props => {
   };
 
   return (
-    <Grid container justify="space-between">
+    <Grid container justifyContent="space-between">
       <Grid item>
         <NavButton onClick={() => onPrevNextClick(-1)}>
           &lt;&lt; {formatDate(add(currentDate, {months: -1}), monthFormat)}

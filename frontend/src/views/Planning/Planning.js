@@ -182,7 +182,7 @@ const Planning = props => {
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}
       />
-      <Grid container justify="space-between" alignItems="flex-start">
+      <Grid container justifyContent="space-between" alignItems="flex-start">
         <Grid item>
           <Button
             type="button"

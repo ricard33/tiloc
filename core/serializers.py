@@ -123,7 +123,7 @@ class BookingSerializer(serializers.ModelSerializer):
     source_id = serializers.PrimaryKeyRelatedField(source='source', queryset=models.BookingChannel.objects.all(),
                                                    required=False, allow_null=True)
     options = BookedServiceSerializer(source='bookedservice_set', many=True, required=False)
-    payments = PaymentSubSerializer(source='payment_set', many=True, required=False)
+    payments = PaymentSubSerializer(source='payment_set', many=True, required=False, read_only=True)
 
     class Meta:
         model = models.Booking

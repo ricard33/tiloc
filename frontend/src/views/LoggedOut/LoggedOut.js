@@ -28,7 +28,7 @@ const LoggedOut = () => {
     <div className={classes.root}>
       <Grid
         container
-        justify="center"
+        justifyContent="center"
         spacing={4}
       >
         <Grid

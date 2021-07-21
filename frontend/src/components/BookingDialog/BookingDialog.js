@@ -121,6 +121,7 @@ const useStyles = makeStyles(theme => ({
     width: "7em"
   },
   quantityInput: {
+    fontSize: "medium",
     width: "5em"
   },
   options: {
@@ -148,7 +149,7 @@ const BookingDialog = props => {
   const allOptions = useSelector(store => selectors.services(store));
   // const [selectedOptions, setSelectedOptions] = useState(booking.options || [])
   const confirm = useConfirm();
-  const variant = "outlined";
+  const variant = "filled";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
 
   bookingStatuses.sort((a, b) => a.rank - b.rank);
@@ -156,8 +157,8 @@ const BookingDialog = props => {
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
 
-  const objectToValuesArray = object => Object.keys(object).map(function(key) {
-    return { [key]: object[key] };
+  const setMultipleValues = object => Object.keys(object).map(function(key) {
+    setValue(key, object[key]);
   });
 
   const initialState = initializeDefaults(booking);
@@ -165,8 +166,8 @@ const BookingDialog = props => {
   const form = useForm({
     defaultValues: initialState
   });
-  const { register, control, errors, setValue, getValues, watch, formState } = form;
-  const { dirty, isValid } = formState;
+  const { register, control, setValue, getValues, watch, formState } = form;
+  const { errors, dirty, isValid } = formState;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "options"
@@ -174,17 +175,18 @@ const BookingDialog = props => {
   let lodging = booking ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
   const formValues = getValues();
-  // console.debug("formValues: ", formValues);
+  console.debug("formValues: ", formValues);
 
-  const watchBalance = watch(["price", "deposit"], { price: formValues.price, deposit: formValues.deposit });
+  const deposit = watch("deposit", initialState.deposit);
   const existingGuest = watch("guest_name", initialState.guest_name);
   const isFlatRate = watch("is_flat_rate", initialState.is_flat_rate);
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
   const options = watch("options", fields);
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
-  const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
-  // console.log("options", options, fullPrice);
+  // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
+  const fullPrice = Number(price) + includedInPriceOptions;
+  console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
 
@@ -245,7 +247,7 @@ const BookingDialog = props => {
 
   function handleChange(data) {
     // console.debug(data);
-    // console.debug("handleChange", data.target);
+    console.debug("handleChange", data.target.value);
     let value = data.target.value;
     switch (data.target.name) {
       case "status_id": {
@@ -258,7 +260,7 @@ const BookingDialog = props => {
           lodging = lodgings.filter(x => x.id === value)[0];
           if (!isFlatRate && formValues.daily_rate !== lodging.daily_rate) {
             const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
-            setValue(objectToValuesArray(priceObj));
+            setMultipleValues(priceObj);
           }
         } else
           lodging = null;
@@ -267,11 +269,9 @@ const BookingDialog = props => {
       case "existing-guest":
         const guest = allGuests.filter(guest => guest.name === data.target.value);
         if (guest) {
-          setValue([
-            { guest_name: guest[0].name },
-            { guest_contact: guest[0].contact },
-            { guest_address: guest[0].address }
-          ]);
+          setValue("guest_name", guest[0].name);
+          setValue("guest_contact", guest[0].contact);
+          setValue("guest_address", guest[0].address);
         }
         break;
       case "duration":
@@ -281,18 +281,16 @@ const BookingDialog = props => {
         value = Number(data.target.value);
         // const formValues = getValues();
         const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], depositPercent);
-        setValue(objectToValuesArray(priceObj));
+        setMultipleValues(priceObj);
         // setBalance(priceObj.price - priceObj.deposit);
         return value;
       }
       case "price":
         value = Number(data.target.value);
-        setValue([
-          { daily_rate: DecimalPrecision.round(value / getValues().duration) },
-          { price: value },
-          { price_details: undefined },
-          { is_flat_rate: true }
-        ]);
+        setValue("daily_rate", DecimalPrecision.round(value / getValues().duration));
+        setValue("price", value);
+        setValue("price_details", undefined);
+        setValue("is_flat_rate", true);
         // setBalance(value - getValues().deposit);
         return value;
       case "is_flat_rate":
@@ -301,7 +299,7 @@ const BookingDialog = props => {
         else {
           const formValues = getValues();
           const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
-          setValue(objectToValuesArray(priceObj));
+          setMultipleValues(priceObj);
           // setBalance(priceObj.price - priceObj.deposit);
           // setValue('is_flat_rate', false);
           return false;
@@ -319,6 +317,7 @@ const BookingDialog = props => {
             // setBalance(price - deposit);
             return deposit;
           }
+          return 0;
         }
         break;
       case "adults":
@@ -342,8 +341,8 @@ const BookingDialog = props => {
     const endDate = addDays(formValues.begin_date, duration);
     const priceObj = formValues.is_flat_rate ? { daily_rate: formValues.price / duration }
       : computeBookingPrice(formValues.begin_date, endDate, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
-    setValue(objectToValuesArray(priceObj));
-    setValue([{ end_date: endDate }]);
+    setMultipleValues(priceObj);
+    setValue("end_date", endDate);
     return duration;
   }
 
@@ -363,18 +362,18 @@ const BookingDialog = props => {
     const duration = differenceInCalendarDays(newBooking.end_date, newBooking.begin_date);
     const priceObj = newBooking.is_flat_rate ? { daily_rate: newBooking.price / duration }
       : computeBookingPrice(newBooking.begin_date, newBooking.end_date, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
-    setValue([
-      ...objectToValuesArray(priceObj),
-      { duration: duration }
-    ]);
+    setMultipleValues(priceObj);
+    setValue("duration", duration);
     return newBooking[fieldName];
   }
 
-  function handleBeginDateChange(newDate) {
+  function handleBeginDateChange(newDate, onChange) {
+    onChange(newDate);
     return onDateChange(newDate, "begin_date");
   }
 
-  function handleEndDateChange(newDate) {
+  function handleEndDateChange(newDate, onChange) {
+    onChange(newDate);
     return onDateChange(newDate, "end_date");
   }
 
@@ -453,7 +452,7 @@ const BookingDialog = props => {
       fullScreen={width < 600}
     >
       <DialogTitle id="simple-dialog-title">
-        <Grid justify="space-between" container spacing={4}>
+        <Grid justifyContent="space-between" container spacing={4}>
           <Grid item xs={8}>
             {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
           </Grid>
@@ -477,57 +476,58 @@ const BookingDialog = props => {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <input
             type="hidden"
-            name="id"
-            ref={register}
+            {...register("id")}
             defaultValue={booking.id}
           />
           <input
             type="hidden"
-            name="guaranty"
-            ref={register}
+            {...register("guaranty")}
             defaultValue={initialState.guaranty}
           />
           <Grid container spacing={1}>
             <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
-                <InputLabel htmlFor="status_id">{t("Booking status")}</InputLabel>
+                <InputLabel id="status-label">{t("Booking status")}</InputLabel>
                 <Controller
-                  as={Select}
                   name="status_id"
                   control={control}
-                  label={t("Booking status")}
-                  margin="dense"
-                  onChange={([event]) => event.target.value}
-                >
-                  {bookingStatuses.map(status => (
-                    <MenuItem key={status.id} value={status.id}>
-                      <span
-                        className={classes.statusItem}
-                        style={{ background: "#" + status.color }}
-                      >{status.name}</span>
-                    </MenuItem>
-                  ))}
-                </Controller>
+                  render={({field}) => <Select
+                    labelId="status-label"
+                    margin="dense"
+                    {...field}
+                  >
+                    {bookingStatuses.map(status => (
+                      <MenuItem key={status.id} value={status.id}>
+                        <span
+                          className={classes.statusItem}
+                          style={{ background: "#" + status.color }}
+                        >{status.name}</span>
+                      </MenuItem>
+                    ))}
+                  </Select>}
+                />
               </FormControl>
             </Grid>
             <Grid item sm={8} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
                 <Controller
-                  as={Select}
                   name="lodging_id"
                   control={control}
                   rules={{ required: true }}
-                  label={t("Lodging")}
-                  margin="dense"
-                  onChange={([event]) => handleChange(event)}
-                >
-                  {lodgings.map(lodging => (
-                    <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
-                  ))}
-                  <MenuItem value="" disabled>---</MenuItem>
-                  <MenuItem value="0">{t("Cancellation / Waiting")}</MenuItem>
-                </Controller>
+                  render={({field}) => <Select
+                    label={t("Lodging")}
+                    margin="dense"
+                    {...field}
+                    onChange={(event) => field.onChange(handleChange(event))}
+                  >
+                    {lodgings.map(lodging => (
+                      <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
+                    ))}
+                    <MenuItem value="" disabled>---</MenuItem>
+                    <MenuItem value="0">{t("Cancellation / Waiting")}</MenuItem>
+                  </Select>}
+                />
               </FormControl>
             </Grid>
             <Grid item lg={6} xs={12}>
@@ -550,11 +550,9 @@ const BookingDialog = props => {
                           }}
                           label={t("Existing guest")}
                           margin="dense"
-                          name="existing-guest"
                           native
-                          onChange={handleChange}
                           value={existingGuest}
-                          ref={register}
+                          onChange={handleChange}
                         >
                           <option key={0} value={0}>{t("-- Choose --")}</option>
                           {allGuests.map(guest => (
@@ -566,43 +564,49 @@ const BookingDialog = props => {
                     </Grid>
                     <Grid item xs={12}>
                       <Controller
-                        as={TextField}
                         name="guest_name"
                         control={control}
                         rules={{ required: true }}
-                        fullWidth
-                        error={!!errors.guest_name}
-                        helperText={errors.guest_name && t("Guest name is required")}
-                        label={t("Full guest name")}
-                        margin="dense"
-                        required
-                        variant={variant}
+                        render={({field}) => <TextField
+                          fullWidth
+                          error={!!errors.guest_name}
+                          helperText={errors.guest_name && t("Guest name is required")}
+                          label={t("Full guest name")}
+                          margin="dense"
+                          required
+                          variant={variant}
+                          {...field}
+                        />}
                       />
                     </Grid>
                     <Grid item sm={6} xs={12}>
                       <Controller
-                        as={TextField}
                         name="guest_contact"
                         control={control}
-                        fullWidth
-                        label={t("Phone / email")}
-                        margin="dense"
-                        multiline
-                        rows={2}
-                        variant={variant}
+                        render={({field}) => <TextField
+                          fullWidth
+                          label={t("Phone / email")}
+                          margin="dense"
+                          multiline
+                          rows={2}
+                          variant={variant}
+                          {...field}
+                        />}
                       />
                     </Grid>
                     <Grid item sm={6} xs={12}>
                       <Controller
-                        as={TextField}
                         control={control}
                         name="guest_address"
-                        fullWidth
-                        label={t("Address")}
-                        margin="dense"
-                        multiline
-                        rows={2}
-                        variant={variant}
+                        render={({field}) => <TextField
+                          fullWidth
+                          label={t("Address")}
+                          margin="dense"
+                          multiline
+                          rows={2}
+                          variant={variant}
+                          {...field}
+                        />}
                       />
                     </Grid>
                   </Grid>
@@ -621,41 +625,47 @@ const BookingDialog = props => {
                       <FormControl className={classes.formControl} variant={variant}>
                         <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
                         <Controller
-                          as={Select}
                           name="duration"
                           control={control}
-                          label={t("Nights")}
-                          margin="dense"
-                          onChange={([event]) => handleChange(event)}
-                        >
-                          {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
-                            <MenuItem key={n} value={n}>{n}</MenuItem>
-                          ))}
-                          {(duration > 31) &&
-                          <MenuItem key={duration} value={duration}>{duration}</MenuItem>
-                          }
-                        </Controller>
+                          rules={{ valueAsNumber: true }}
+                          render={({field}) => <Select
+                            label={t("Nights")}
+                            margin="dense"
+                            {...field}
+                            onChange={(event) => field.onChange(handleChange(event))}
+                          >
+                            {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
+                              <MenuItem key={n} value={n}>{n}</MenuItem>
+                            ))}
+                            {(duration > 31) &&
+                            <MenuItem key={duration} value={duration}>{duration}</MenuItem>
+                            }
+                          </Select>}
+                        />
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
                       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <Grid container justify="space-around" alignItems="center">
+                        <Grid container justifyContent="space-around" alignItems="center">
                           <Grid item sm={5} xs={12}>
                             <Controller
-                              as={KeyboardDatePicker}
                               control={control}
-                              format="dd/MM/yyyy"
-                              id="date-picker-start"
-                              KeyboardButtonProps={{
-                                "aria-label": "arrival date"
-                              }}
-                              label={t("Arrival")}
-                              margin="dense"
                               name="begin_date"
-                              onChange={([date]) => handleBeginDateChange(date)}
-                              variant={variant}
-                              inputVariant={variant}
-                              autoOk
+                              render={({field}) => <KeyboardDatePicker
+                                format="dd/MM/yyyy"
+                                id="date-picker-start"
+                                KeyboardButtonProps={{
+                                  "aria-label": "arrival date"
+                                }}
+                                label={t("Arrival")}
+                                margin="dense"
+                                selected={field.value}
+                                variant="inline"
+                                inputVariant={variant}
+                                autoOk
+                                {...field}
+                                onChange={(date) => handleBeginDateChange(date, field.onChange)}
+                              />}
                             />
                           </Grid>
                           <Hidden xsDown>
@@ -665,20 +675,22 @@ const BookingDialog = props => {
                           </Hidden>
                           <Grid item sm={5} xs={12}>
                             <Controller
-                              as={KeyboardDatePicker}
                               control={control}
-                              format="dd/MM/yyyy"
-                              id="date-picker-stop"
-                              KeyboardButtonProps={{
-                                "aria-label": "departure date"
-                              }}
-                              label={t("Departure")}
-                              margin="dense"
                               name="end_date"
-                              onChange={([date]) => handleEndDateChange(date)}
-                              variant={variant}
-                              inputVariant={variant}
-                              autoOk
+                              render={({field}) => <KeyboardDatePicker
+                                format="dd/MM/yyyy"
+                                id="date-picker-stop"
+                                KeyboardButtonProps={{
+                                  "aria-label": "departure date"
+                                }}
+                                label={t("Departure")}
+                                margin="dense"
+                                variant="inline"
+                                inputVariant={variant}
+                                autoOk
+                                {...field}
+                                onChange={(date) => handleEndDateChange(date, field.onChange)}
+                              />}
                             />
                           </Grid>
                         </Grid>
@@ -688,55 +700,66 @@ const BookingDialog = props => {
                     <Grid
                       item container xs={12}
                       alignItems="center"
-                      justify={!isFlatRate ? "space-around" : "flex-start"}
+                      justifyContent={!isFlatRate ? "space-around" : "flex-start"}
                     >
                       {!isFlatRate &&
                       <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
                         <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
-                        <TextField
-                          className={classes.priceInput}
-                          InputProps={{
-                            endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                            type: "number"
-                          }}
-                          label={t("Daily rate")}
+                        <Controller
                           name="daily_rate"
-                          error={!!errors.daily_rate}
-                          onChange={handleChange}
-                          inputRef={register({ min: 1 })}
-                          margin="dense"
+                          control={control}
+                          rules={{ min: 1, valueAsNumber: true }}
+                          render={({ field }) => <TextField
+                            className={classes.priceInput}
+                            label={t("Daily rate")}
+                            error={!!errors.daily_rate}
+                            margin="dense"
+                            variant={variant}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                              type: "number"
+                            }}
+                            {...field}
+                            onChange={event => field.onChange(handleChange(event))}
+                          />}
                           required
-                          variant={variant}
                         />
                         <div className={classes.spacer} />
                         =
                         <div className={classes.spacer} />
                       </Grid>}
                       <Grid item sm={5} xs={12} className={classes.flexBoxAlignLeft}>
-                        <TextField
-                          className={classes.priceInput}
-                          InputProps={{
-                            endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                            type: "number"
-                          }}
-                          label={t("Total")}
-                          margin="dense"
+                        <Controller
+                          control={control}
                           name="price"
-                          onChange={handleChange}
-                          inputRef={register}
-                          required
-                          variant={variant}
+                          rules={{ valueAsNumber: true }}
+                          render={({ field }) => <TextField
+                            className={classes.priceInput}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                              type: "number"
+                            }}
+                            label={t("Total")}
+                            margin="dense"
+                            required
+                            variant={variant}
+                            {...field}
+                            onChange={event => field.onChange(handleChange(event))}
+                          />}
                         />
                         <div className={classes.spacer} />
                         <FormControlLabel
                           control={
                             <Controller
-                              as={Checkbox}
                               control={control}
-                              color="primary"
                               name="is_flat_rate"
-                              defaultValue={initialState.is_flat_rate}
-                              onChange={([event]) => handleChange(event)}
+                              render={({ field }) => <Checkbox
+                                color="primary"
+                                defaultValue={initialState.is_flat_rate}
+                                {...field}
+                                checked={field.value}
+                                onChange={event => field.onChange(handleChange(event))}
+                              />}
                             />
                           }
                           label={t("Flat rate")}
@@ -746,15 +769,10 @@ const BookingDialog = props => {
                       </Grid>
                     </Grid>
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
-                      <TextField
-                        error={!!errors.deposit}
-                        helperText={errors.deposit && errors.deposit.message}
-                        className={classes.priceInput}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                          type: "number"
-                        }}
-                        inputRef={register({
+                      <Controller
+                        control={control}
+                        name="deposit"
+                        rules={{
                           min: {
                             value: 0,
                             message: t("{{depositLabel}} can't be negative", { depositLabel: depositLabel })
@@ -762,89 +780,113 @@ const BookingDialog = props => {
                           max: {
                             value: price,
                             message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
-                          }
-                        })}
-                        label={depositLabel}
-                        margin="dense"
-                        name="deposit"
-                        onChange={handleChange}
-                        variant={variant}
+                          },
+                          valueAsNumber: true,
+                        }}
+                        render={({ field }) => <TextField
+                          error={!!errors.deposit}
+                          helperText={errors.deposit && errors.deposit.message}
+                          className={classes.priceInput}
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                            type: "number"
+                          }}
+                          label={depositLabel}
+                          margin="dense"
+                          variant={variant}
+                          {...field}
+                          onChange={event => field.onChange(handleChange(event))}
+                        />}
                       />
                       <div className={classes.spacer} />
                       <Typography>
-                        {watchBalance && t("Balance: {{amount}} €", { amount: watchBalance.price - watchBalance.deposit })}
+                        {price ? t("Balance: {{amount}} €", { amount: price - deposit }) : ""}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
-                      <TextField
-                        error={!!errors.commission_fees}
-                        helperText={errors.commission_fees && errors.commission_fees.message}
-                        className={classes.priceInput}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                          type: "number"
-                        }}
-                        inputRef={register({
-                          min: { value: 0, message: t("Commission fees can't be negative") }
-                        })}
-                        label={t("Commission fees")}
-                        margin="dense"
+                      <Controller
+                        control={control}
                         name="commission_fees"
-                        onChange={handleChange}
-                        variant={variant}
+                        rules={{
+                          min: { value: 0, message: t("Commission fees can't be negative") },
+                          valueAsNumber: true,
+                        }}
+                        render={({ field }) => <TextField
+                          error={!!errors.commission_fees}
+                          helperText={errors.commission_fees && errors.commission_fees.message}
+                          className={classes.priceInput}
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                            type: "number"
+                          }}
+                          label={t("Commission fees")}
+                          margin="dense"
+                          variant={variant}
+                          {...field}
+                          onChange={event => field.onChange(handleChange(event))}
+                        />}
                       />
                     </Grid>
-                    {/* number of persons */}
+                    {/*/!* number of persons *!/*/}
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="adults">{t("Adults")}</InputLabel>
                         <Controller
-                          as={Select}
                           name="adults"
                           control={control}
-                          label={t("Adults")}
-                          margin="dense"
-                          native
-                          onChange={([event]) => handleChange(event)}
-                        >
-                          {[...Array(10).keys()].map(n => (
-                            <option key={n} value={n}>{n}</option>
-                          ))}
-                        </Controller>
+                          rules={{ valueAsNumber: true }}
+                          render={({ field }) => <Select
+                            label={t("Adults")}
+                            margin="dense"
+                            native
+                            {...field}
+                            onChange={event => field.onChange(handleChange(event))}
+                          >
+                            {[...Array(10).keys()].map(n => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </Select>}
+                        />
                       </FormControl>
                       <div className={classes.spacer} />
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="children">{t("Children")}</InputLabel>
                         <Controller
-                          as={Select}
                           name="children"
                           control={control}
-                          label={t("Children")}
-                          margin="dense"
-                          native
-                          onChange={([event]) => handleChange(event)}
-                        >
-                          {[...Array(10).keys()].map(n => (
-                            <option key={n} value={n}>{n}</option>
-                          ))}
-                        </Controller>
+                          rules={{ valueAsNumber: true }}
+                          render={({ field }) => <Select
+                            label={t("Children")}
+                            margin="dense"
+                            native
+                            {...field}
+                            onChange={event => field.onChange(handleChange(event))}
+                          >
+                            {[...Array(10).keys()].map(n => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </Select>}
+                        />
                       </FormControl>
                       <div className={classes.spacer} />
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="babies">{t("Babies")}</InputLabel>
                         <Controller
-                          as={Select}
                           name="babies"
                           control={control}
-                          label={t("Babies")}
-                          margin="dense"
-                          native
-                          onChange={([event]) => handleChange(event)}
-                        >
-                          {[...Array(10).keys()].map(n => (
-                            <option key={n} value={n}>{n}</option>
-                          ))}
-                        </Controller>
+                          rules={{ valueAsNumber: true }}
+                          render={({ field }) => <Select
+                            label={t("Babies")}
+                            margin="dense"
+                            native
+                            {...field}
+                            onChange={event => field.onChange(handleChange(event))}
+                          >
+                            {[...Array(10).keys()].map(n => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </Select>}
+                        />
                       </FormControl>
                     </Grid>
                   </Grid>
@@ -863,27 +905,27 @@ const BookingDialog = props => {
                         fields.map((option, index) => (
                           <Grid container key={option.id} className={classes.options}>
                             <input
-                              type="hidden" name={`options[${index}].id`} ref={register()}
+                              type="hidden" {...register(`options[${index}].id`)}
                               defaultValue={option.id}
                             />
                             <input
-                              type="hidden" name={`options[${index}].designation`} ref={register()}
+                              type="hidden" {...register(`options[${index}].designation`)}
                               defaultValue={option.designation}
                             />
                             <input
-                              type="hidden" name={`options[${index}].unit_price_ht`} ref={register()}
+                              type="hidden" {...register(`options[${index}].unit_price_ht`)}
                               defaultValue={option.unit_price_ht}
                             />
                             <input
-                              type="hidden" name={`options[${index}].vat`} ref={register()}
+                              type="hidden" {...register(`options[${index}].vat`)}
                               defaultValue={option.vat}
                             />
                             <input
-                              type="hidden" name={`options[${index}].is_flat_rate`} ref={register()}
+                              type="hidden" {...register(`options[${index}].is_flat_rate`)}
                               defaultValue={option.is_flat_rate}
                             />
                             <input
-                              type="hidden" name={`options[${index}].not_included_in_price`} ref={register()}
+                              type="hidden" {...register(`options[${index}].not_included_in_price`)}
                               defaultValue={option.not_included_in_price}
                             />
                             <Grid item xs={6} style={{ textAlign: "left" }}><span>{getDesignation(option)}</span></Grid>
@@ -891,17 +933,20 @@ const BookingDialog = props => {
                             <span>{option.unit_price_ht}&nbsp;x</span>}</Grid>
                             <Grid item xs={2}>
                               <Controller
-                                as={<TextField />}
                                 control={control}
-                                InputProps={{
-                                  type: "number"
-                                }}
-                                className={classes.quantityInput}
-                                margin="dense"
                                 name={"options[" + index + "].quantity"}
-                                defaultValue={option.quantity}
-                                required
-                                variant={variant}
+                                rules={{ valueAsNumber: true }}
+                                render={({field}) => <TextField
+                                  InputProps={{
+                                    type: "number"
+                                  }}
+                                  className={classes.quantityInput}
+                                  margin="dense"
+                                  defaultValue={option.quantity}
+                                  required
+                                  // variant={variant}
+                                  {...field}
+                                />}
                               />
                             </Grid>
                             <Grid item xs={2} style={{ textAlign: "left" }}>
@@ -964,32 +1009,38 @@ const BookingDialog = props => {
                       <FormControl className={classes.formControl} variant={variant}>
                         <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
                         <Controller
-                          as={Select}
                           name="source_id"
                           control={control}
-                          label={t("Statistics")}
-                          margin="dense"
-                          // native
-                          onChange={([event]) => handleChange(event)}
-                        >
-                          <MenuItem key={0} value="" />
-                          {bookingChannels.map(channel => (
-                            <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
-                          ))}
-                        </Controller>
+                          render={({field}) => <Select
+                            label={t("Statistics")}
+                            margin="dense"
+                            // native
+                            {...field}
+                            onChange={event => field.onChange(handleChange(event))}
+                          >
+                            <MenuItem key={0} value="" />
+                            {bookingChannels.map(channel => (
+                              <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
+                            ))}
+                          </Select>}
+                        />
                       </FormControl>
                     </Grid>
                     {/* notes */}
                     <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        inputRef={register}
-                        label={t("Further information")}
-                        margin="dense"
-                        multiline
-                        rows={4}
+                      <Controller
+                        control={control}
                         name="special_conditions"
-                        variant={variant}
+                        render={({ field }) => <TextField
+                          fullWidth
+                          inputRef={register("special_conditions")}
+                          label={t("Further information")}
+                          margin="dense"
+                          multiline
+                          rows={4}
+                          variant={variant}
+                          {...field}
+                        />}
                       />
                     </Grid>
                   </Grid>
@@ -1015,7 +1066,7 @@ const BookingDialog = props => {
         }
       </DialogContent>
       <DialogActions>
-        <Grid container justify="space-between">
+        <Grid container justifyContent="space-between">
           <Grid item>
             {booking && booking.id &&
             <Button

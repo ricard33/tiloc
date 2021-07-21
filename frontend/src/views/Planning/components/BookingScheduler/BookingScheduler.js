@@ -279,7 +279,7 @@ const BookingScheduler = props => {
 
   return (
     <div className={classes.root} ref={rootRef}>
-      {/*<Grid container justify="space-between">*/}
+      {/*<Grid container justifyContent="space-between">*/}
       {/*  <Grid item>*/}
       {/*    <NavButton onClick={() => onPrevNextClick(-1)}>*/}
       {/*      &lt;&lt; {visibleTime.start.add(-1, "month").format("MMMM YYYY")}*/}

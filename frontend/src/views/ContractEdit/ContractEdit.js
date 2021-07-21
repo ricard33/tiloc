@@ -189,7 +189,7 @@ const ContractEdit = props => {
             onChange={onChange}
           />}
         </Grid>
-        <Grid item container xs={12} justify="space-between" alignItems="flex-start">
+        <Grid item container xs={12} justifyContent="space-between" alignItems="flex-start">
           <Grid item>
             {contract && contract.id &&
             <Button
