@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import CKEditor from "@ckeditor/ckeditor5-react";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 import CustomeEditor from "./ckeditor5";
 import CustomFigureAttributes from './ckeditor5/plugins/custom-figure-attributes';
 import AllowImageWidth from './ckeditor5/plugins/image_width_and_height';
@@ -25,7 +25,7 @@ const Editor = props => {
       <div className="document-editor__editable-container">
         <CKEditor
           className="document-editor__editable"
-          onInit={editor => {
+          onReady={editor => {
             console.log("Editor is ready to use!", editor);
             editorInstance = editor;
 
