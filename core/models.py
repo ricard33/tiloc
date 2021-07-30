@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import uuid
 from datetime import date
 
@@ -283,7 +284,7 @@ def contracts_path():
 class Contract(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
     content = models.TextField(_("Contract"))
-    pdf = models.CharField(max_length=100, null=True, blank=True)
+    pdf = models.CharField(max_length=255, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     pdf_created = models.DateTimeField(null=True, blank=True)
@@ -296,9 +297,18 @@ class Contract(models.Model):
         return "%s (%s -> %s)" % (self.booking.guest_name, self.booking.begin_date, self.booking.end_date)
 
     def make_pdf_path(self):
+        def multiple_replace(string, rep_dict):
+            pattern = re.compile("|".join([re.escape(k) for k in sorted(rep_dict, key=len, reverse=True)]),
+                                 flags=re.DOTALL)
+            return pattern.sub(lambda x: rep_dict[x.group(0)], string)
+
         return os.path.join('contracts', str(self.booking.lodging.uid),
                             "%s_%s.pdf" % (self.booking.begin_date.isoformat(),
-                                           self.booking.guest_name.replace(" ", "_")))
+                                           multiple_replace(self.booking.guest_name, {
+                                               " ": "_",
+                                               ",": "_",
+                                               ";": "_",
+                                           })))
 
 
 class ContractTemplate(models.Model):
