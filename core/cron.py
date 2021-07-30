@@ -29,7 +29,7 @@ class SyncBookingsJob(CronJobBase):
             logger.info("[%s] Synchronize bookings from [%s]", sync.lodging.name, sync.channel.name)
             try:
                 retrieve_and_synchronize_bookings(sync)
-            except HTTPError as ex:
+            except (HTTPError, ConnectionError) as ex:
                 logging.warning("[%s] Request error [%s] during bookings synchronization from [%s]",
                                 sync.lodging.name, ex, sync.channel.name)
                 with transaction.atomic():

@@ -58,6 +58,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                                       deposit=0
                                       )
     sync.last_import = arrow.utcnow().datetime
+    sync.last_import_error = ""
     sync.save()
 
 
