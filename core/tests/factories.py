@@ -133,3 +133,14 @@ class BookingWithServiceFactory(BookingFactory):
         BookedServiceFactory,
         factory_related_name='booking'
     )
+
+
+class PaymentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Payment
+
+    booking = factory.SubFactory(BookingFactory)
+    description = "Solde"
+    amount = 150.0
+    method = models.Payment.PaymentMethod.TRANSFER
+    date = factory.Faker('date')

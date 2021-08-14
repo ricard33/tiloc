@@ -227,7 +227,7 @@ class Booking(models.Model):
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
-        self.guest_name, self.lodging and self.lodging.name or '--', self.begin_date, self.end_date)
+            self.guest_name, self.lodging and self.lodging.name or '--', self.begin_date, self.end_date)
 
     @property
     def price_with_options(self):

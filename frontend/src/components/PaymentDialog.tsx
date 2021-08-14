@@ -57,6 +57,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
     console.log(data);
     onAdd({
       ...data,
+      date: formatISO(data.date),
       amount: Number(data.amount)
     });
   };
@@ -83,7 +84,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             <Controller
               name="date"
               control={control}
-              defaultValue={formatISO(new Date())}
+              defaultValue={new Date().toISOString()}
               render={({ field }) => <KeyboardDatePicker
                 id="payment-date-picker"
                 KeyboardButtonProps={{
