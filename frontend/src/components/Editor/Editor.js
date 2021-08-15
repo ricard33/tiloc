@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import "./ckeditor5";  // import symbol Editor
+import "./ckeditor5/build/ckeditor";  // import symbol ClassicEditor
 import CustomFigureAttributes from './ckeditor5/plugins/custom-figure-attributes';
-import AllowImageWidth from './ckeditor5/plugins/image_width_and_height';
+// import AllowImageWidth from './ckeditor5/plugins/image_width_and_height';
 import "./Editor.css";
 
 const Editor = props => {
@@ -34,7 +34,8 @@ const Editor = props => {
               editor.ui.view.toolbar.element);
           }}
           onChange={_onChange}
-          editor={Editor}
+          // eslint-disable-next-line no-undef
+          editor={ClassicEditor}
           data={content}
           config={{
             extraPlugins: [CustomFigureAttributes,],

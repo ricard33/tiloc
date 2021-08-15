@@ -8,7 +8,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
 import InputIcon from "@material-ui/icons/Input";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
-import LogoTiLoc from "assets/images/logos/logo-tiloc.png";
+import LogoTiLoc from "../../../../assets/images/logos/logo-tiloc.png";
 import { useDispatch, useSelector } from "react-redux";
 import { getGravatarUrl } from "react-awesome-gravatar";
 import Menu from "@material-ui/core/Menu";
