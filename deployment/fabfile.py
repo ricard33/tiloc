@@ -27,12 +27,32 @@ def disk_free(c):
     err = "No idea how to get disk space on {}!".format(uname)
     raise Exit(err)
 
+@task
+def most_recent_modified(c, path):
+    print(get_most_recent_modified(path, ['node_modules']))
 
-def get_most_recent_modified(path):
-    list_of_files = glob.glob(path, recursive=True)  # * means all if need specific format then *.csv
-    latest_file = max(list_of_files, key=os.path.getctime)
-    print(latest_file, os.path.getctime(latest_file))
-    return latest_file, os.path.getctime(latest_file)
+
+def get_most_recent_modified(path, excludes=None):
+    if excludes is None:
+        excludes = []
+    excludes.extend(['.DS_Store'])
+
+    def not_in_pattern(name):
+        return (not name.startswith("webpack-stats")) and not name in excludes
+
+    list_of_files = []
+    for root, dirs, files in os.walk(path, topdown=True):
+        list_of_files.extend([os.path.join(root, name) for name in files if not_in_pattern(name)])
+        for name in excludes:
+            if name in dirs:
+                dirs.remove(name)
+
+    if list_of_files:
+        latest_file = max(list_of_files, key=os.path.getctime)
+        print(latest_file, os.path.getctime(latest_file))
+        return latest_file, os.path.getctime(latest_file)
+    print("Empty path")
+    return 0
 
 
 def write_version_properties(version):
@@ -167,11 +187,16 @@ def compile_python_files(c):
     with c.cd(TARGET_PATH):
         c.run("python -O deployment/compile.py")
 
+@task
+def need_to_rebuild(c):
+    newer_files = get_most_recent_modified(os.path.join(WORKSPACE, 'frontend'), ['node_modules', 'build'])[1] > \
+             get_most_recent_modified(os.path.join(WORKSPACE, 'frontend', 'build'))[1]
+    print(newer_files and "Frontend build is needed" or "Frontend build already up-to-date")
+    return newer_files
 
 @task
 def sync_sources(c, test_only=False):
-    if get_most_recent_modified(os.path.join(WORKSPACE, 'frontend', '**', '*.*'))[1] > \
-            get_most_recent_modified(os.path.join(WORKSPACE, 'assets', '**', '*.*'))[1]:
+    if need_to_rebuild(c):
         build_frontend(c, only_sources=True)
 
     rsync(c,
