@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import CustomeEditor from "./ckeditor5";
+import "./ckeditor5";  // import symbol Editor
 import CustomFigureAttributes from './ckeditor5/plugins/custom-figure-attributes';
 import AllowImageWidth from './ckeditor5/plugins/image_width_and_height';
 import "./Editor.css";
@@ -34,7 +34,7 @@ const Editor = props => {
               editor.ui.view.toolbar.element);
           }}
           onChange={_onChange}
-          editor={CustomeEditor}
+          editor={Editor}
           data={content}
           config={{
             extraPlugins: [CustomFigureAttributes,],

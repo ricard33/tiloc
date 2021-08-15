@@ -3,10 +3,11 @@
   "rules": {
     "comma-dangle": 0,
     "indent": [
-      2,
+      "error",
       2,
       {
-        "SwitchCase": 1
+        "SwitchCase": 1,
+        "ignoredNodes": ["TemplateLiteral"]
       }
     ],
     "jsx-quotes": 1,
@@ -68,7 +69,10 @@
     "browser": true,
     "jest": true
   },
-  "extends": "react-app",
+  "extends": [
+    "react-app",
+    "react-app/jest"
+  ],
   //  "extends": "eslint:recommended",
   //  "ecmaFeatures": {
   //    "jsx": true,

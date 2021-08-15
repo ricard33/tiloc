@@ -208,7 +208,7 @@ STATIC_URL = config.get('APP', 'STATIC_URL', '/static/')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-PROD_ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+PROD_ASSETS_DIR = os.path.join(BASE_DIR, "frontend", "build")
 if os.path.exists(PROD_ASSETS_DIR):
     STATICFILES_DIRS.append(PROD_ASSETS_DIR)
 
@@ -268,8 +268,9 @@ GRAPPELLI_ADMIN_TITLE = _("Ti Loc")
 
 WEBPACK_LOADER = {
     'DEFAULT': {
+        'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE':      os.path.join(BASE_DIR, 'webpack-stats.%s.json' % ENV),
+        'STATS_FILE':      os.path.join(BASE_DIR, 'frontend', 'webpack-stats.%s.json' % ENV),
     }
 }
 

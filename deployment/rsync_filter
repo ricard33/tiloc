@@ -1,4 +1,3 @@
-+ /assets/
 + /config/
 + /config/logging-*.default.py
 - /config/*
@@ -12,7 +11,9 @@
 + /manage.py
 + /requirement.txt
 + /frontend/
++ /frontend/build/
 + /frontend/static/
++ /frontend/webpack-stats.*
 - /frontend/*
 - /log/
 - *.pyc
