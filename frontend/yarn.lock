@@ -6006,9 +6006,9 @@ eslint-config-react-app@^6.0.0:
     confusing-browser-globals "^1.0.10"
 
 eslint-import-resolver-node@^0.3.5:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.3.5.tgz#939bbb0f74e179e757ca87f7a4a890dabed18ac4"
-  integrity sha512-XMoPKjSpXbkeJ7ZZ9icLnJMTY5Mc1kZbCakHquaFsXPpyWOwK0TK6CODO+0ca54UoM9LKOxyUNnoVZRl8TeaAg==
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.3.6.tgz#4048b958395da89668252001dbd9eca6b83bacbd"
+  integrity sha512-0En0w03NRVMn9Uiyn8YRPDKvWjxCWkslUEhGNTdGx15RvPJYQ+lbOlqrlNI2vEAs4pDYK4f/HN2TbDmk5TP0iw==
   dependencies:
     debug "^3.2.7"
     resolve "^1.20.0"
@@ -11576,6 +11576,13 @@ react-app-polyfill@^2.0.0:
     regenerator-runtime "^0.13.7"
     whatwg-fetch "^3.4.1"
 
+react-app-rewired@^2.1.8:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/react-app-rewired/-/react-app-rewired-2.1.8.tgz#e192f93b98daf96889418d33d3e86cf863812b56"
+  integrity sha512-wjXPdKPLscA7mn0I1de1NHrbfWdXz4S1ladaGgHVKdn1hTgKK5N6EdGIJM0KrS6bKnJBj7WuqJroDTsPKKr66Q==
+  dependencies:
+    semver "^5.6.0"
+
 react-awesome-gravatar@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/react-awesome-gravatar/-/react-awesome-gravatar-2.0.3.tgz#f3f8f398c1489abe8732570b1ac27e25b5ee2907"
@@ -11724,8 +11731,10 @@ react-router@5.2.0:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
-react-scripts-for-django@../../create-react-app/packages/react-scripts:
-  version "4.0.4"
+react-scripts@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-4.0.3.tgz#b1cafed7c3fa603e7628ba0f187787964cb5d345"
+  integrity sha512-S5eO4vjUzUisvkIPB7jVsKtuH2HhWcASREYWHAQ1FP5HyCv3xgn+wpILAEWkmy+A+tTNbSZClhxjT3qz6g4L1A==
   dependencies:
     "@babel/core" "7.12.3"
     "@pmmmwh/react-refresh-webpack-plugin" "0.4.3"
@@ -11782,7 +11791,6 @@ react-scripts-for-django@../../create-react-app/packages/react-scripts:
     ts-pnp "1.2.0"
     url-loader "4.1.1"
     webpack "4.44.2"
-    webpack-bundle-tracker "^1.2.0"
     webpack-dev-server "3.11.1"
     webpack-manifest-plugin "2.2.0"
     workbox-webpack-plugin "5.1.4"
