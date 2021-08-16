@@ -1,30 +1,67 @@
-const BundleTracker = require('webpack-bundle-tracker');
+const BundleTracker = require("webpack-bundle-tracker");
 var DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
-const webpack = require('webpack');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const webpack = require("webpack");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+// const removeWebpackPlugins = require("react-app-rewire-unplug");
+// const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 module.exports = {
   // The Webpack config to use when compiling your react app for development or production.
   webpack: function override(config, env) {
+    // console.log(process.env.FAST_REFRESH);
+    // console.log(config.entry);
+    // if (process.env.NODE_ENV === 'development' && process.env.FAST_REFRESH === 'false') {
+    //
+    //   config.entry = [
+    //     require.resolve('webpack-dev-server/client') + `?${process.env.PUBLIC_URL}/`,
+    //     require.resolve('webpack/hot/dev-server'),
+    //     config.entry[config.entry.length - 1]
+    //   ];
+    // }
+
     if (!config.plugins) {
       config.plugins = [];
     }
 
+    // config = removeWebpackPlugins(config, env, {
+    //   pluginNames: ["ReactRefreshPlugin"],
+    //   verbose: true
+    // });
+    //
+    // const webpackDevClientEntry = require.resolve(
+    //   "react-dev-utils/webpackHotDevClient"
+    // );
+    // const reactRefreshOverlayEntry = require.resolve(
+    //   "react-dev-utils/refreshOverlayInterop"
+    // );
+
     config.plugins.push(...[
-      (process.env.NODE_ENV === 'production') ?
-        new BundleTracker({ path: __dirname, filename: './webpack-stats.prod.json' }) :
+      (process.env.NODE_ENV === "production") ?
+        new BundleTracker({ path: __dirname, filename: "./webpack-stats.prod.json" }) :
         new BundleTracker({
           path: __dirname,
-          filename: './webpack-stats.dev.json',
+          filename: "./webpack-stats.dev.json",
           indent: 2,
           publicPath: process.env.PUBLIC_URL
         }),
 
-      process.env.NODE_ENV === 'production' && new DuplicatePackageCheckerPlugin({ verbose: true }),
-      process.env.NODE_ENV === 'production' && new webpack.optimize.AggressiveMergingPlugin(),//Merge chunks
-      process.env.NODE_ENV === 'production' && new BundleAnalyzerPlugin({
+      process.env.NODE_ENV === "production" && new DuplicatePackageCheckerPlugin({ verbose: true }),
+      process.env.NODE_ENV === "production" && new webpack.optimize.AggressiveMergingPlugin(),//Merge chunks
+      process.env.NODE_ENV === "production" && new BundleAnalyzerPlugin({
         analyzerMode: "static"
-      })
+      }),
+      // env === "development" && new ReactRefreshWebpackPlugin({
+      //   overlay: {
+      //     entry: webpackDevClientEntry,
+      //     // The expected exports are slightly different from what the overlay exports,
+      //     // so an interop is included here to enable feedback on module-level errors.
+      //     module: reactRefreshOverlayEntry,
+      //     // Since we ship a custom dev client and overlay integration,
+      //     // the bundled socket handling logic can be eliminated.
+      //     sockIntegration: false,
+      //     sockPort: 3000,
+      //   }
+      // })
     ].filter(Boolean));
     return config;
   },
@@ -46,8 +83,8 @@ module.exports = {
       const config = configFunction(proxy, allowedHost);
 
       config.headers = {
-        'Access-Control-Allow-Origin': '*'
-      }
+        "Access-Control-Allow-Origin": "*"
+      };
 
       // Return your customised Webpack Development Server config.
       return config;
