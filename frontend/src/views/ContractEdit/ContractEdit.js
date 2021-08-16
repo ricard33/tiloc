@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router-dom";
@@ -16,10 +16,11 @@ import * as selectors from "../../selectors";
 import { Grid } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import moment from "moment";
-import Editor from "../../components/Editor";
 import Alert from "@material-ui/lab/Alert";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+
+const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -183,11 +184,13 @@ const ContractEdit = props => {
           }
         </Grid>
         <Grid item xs={12}>
-          {content &&
-          <Editor
-            content={content}
-            onChange={onChange}
-          />}
+          <Suspense fallback={<div>{t("Loading...")}</div>}>
+            {content &&
+            <Editor
+              content={content}
+              onChange={onChange}
+            />}
+          </Suspense>
         </Grid>
         <Grid item container xs={12} justifyContent="space-between" alignItems="flex-start">
           <Grid item>

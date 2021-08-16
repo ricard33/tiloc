@@ -25,7 +25,8 @@ import useWindowDimensions from "../../common/windowDimensions";
 import moment from "moment";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Editor from "../Editor";
+
+const Editor = React.lazy(() => import("../Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -93,7 +94,7 @@ const ContractDialog = props => {
   }, [booking.id, loaded, dispatch]);
 
   useEffect(() => {
-    if(contract)
+    if (contract)
       setContent(contract.content);
   }, [contract]);
 
@@ -161,7 +162,7 @@ const ContractDialog = props => {
       disableAutoFocus
     >
       <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit"/>
+        <CircularProgress color="inherit" />
       </Backdrop>
 
       <DialogTitle id="simple-dialog-title">
@@ -182,11 +183,13 @@ const ContractDialog = props => {
               { modified_date: moment(contract.modified).fromNow() })}</Typography>
           </Grid>
           <Grid item xs={12}>
-            {content &&
-            <Editor
-              content={content}
-              onChange={onChange}
-            />}
+            <Suspense fallback={<div>{t("Loading...")}</div>}>
+              {content &&
+              <Editor
+                content={content}
+                onChange={onChange}
+              />}
+            </Suspense>
           </Grid>
         </Grid>
         }
@@ -197,15 +200,15 @@ const ContractDialog = props => {
           type="button"
           className={classes.deleteButton}
           color="secondary"
-          startIcon={<DeleteIcon/>}
+          startIcon={<DeleteIcon />}
           onClick={onDelete}
         >{t("Delete")}</Button>}
-        <div style={{ flex: "1 0 0" }}/>
+        <div style={{ flex: "1 0 0" }} />
         <Button
           type="button"
           color="default"
           className={classes.button}
-          startIcon={<RefreshIcon/>}
+          startIcon={<RefreshIcon />}
           onClick={regenerateContract}
         >{t("Regenerate")}</Button>
         {/*<Button*/}
@@ -220,17 +223,17 @@ const ContractDialog = props => {
           type="button"
           color="default"
           className={classes.button}
-          startIcon={<PdfIcon/>}
+          startIcon={<PdfIcon />}
           onClick={makePDF}
           title={t("PDF")}
         >{t("PDF")}</Button>
-        <div style={{ flex: "1 0 0" }}/>
+        <div style={{ flex: "1 0 0" }} />
         <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
         <Button
           type="submit"
           color="primary"
           className={classes.button}
-          startIcon={<SaveIcon/>}
+          startIcon={<SaveIcon />}
           onClick={onSave}
         >{t("Save")}</Button>
       </DialogActions>

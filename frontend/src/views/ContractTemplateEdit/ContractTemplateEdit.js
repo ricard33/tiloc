@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router-dom";
@@ -6,25 +6,21 @@ import Button from "@material-ui/core/Button";
 import {
   DeleteForever as DeleteIcon,
   PictureAsPdf as PdfIcon,
-  Refresh as RefreshIcon,
   Save as SaveIcon
 } from "@material-ui/icons";
 import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import * as selectors from "../../selectors";
 import { Grid, TextField } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import moment from "moment";
-import Editor from "../../components/Editor";
-import Alert from "@material-ui/lab/Alert";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
-import { Controller } from "react-hook-form";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -194,11 +190,13 @@ const ContractTemplateEdit = (props) => {
           }
         </Grid>
         <Grid item xs={12}>
-          {!loading &&
-          <Editor
-            content={content}
-            onChange={onChange}
-          />}
+          <Suspense fallback={<div>{t("Loading...")}</div>}>
+            {!loading &&
+            <Editor
+              content={content}
+              onChange={onChange}
+            />}
+          </Suspense>
         </Grid>
         <Grid item container xs={12} justifyContent="space-between" alignItems="flex-start">
           <Grid item>

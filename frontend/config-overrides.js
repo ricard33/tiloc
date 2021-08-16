@@ -1,4 +1,7 @@
 const BundleTracker = require('webpack-bundle-tracker');
+var DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   // The Webpack config to use when compiling your react app for development or production.
@@ -7,7 +10,7 @@ module.exports = {
       config.plugins = [];
     }
 
-    config.plugins.push(
+    config.plugins.push(...[
       (process.env.NODE_ENV === 'production') ?
         new BundleTracker({ path: __dirname, filename: './webpack-stats.prod.json' }) :
         new BundleTracker({
@@ -15,8 +18,14 @@ module.exports = {
           filename: './webpack-stats.dev.json',
           indent: 2,
           publicPath: process.env.PUBLIC_URL
-        })
-    );
+        }),
+
+      process.env.NODE_ENV === 'production' && new DuplicatePackageCheckerPlugin({ verbose: true }),
+      process.env.NODE_ENV === 'production' && new webpack.optimize.AggressiveMergingPlugin(),//Merge chunks
+      process.env.NODE_ENV === 'production' && new BundleAnalyzerPlugin({
+        analyzerMode: "static"
+      })
+    ].filter(Boolean));
     return config;
   },
   // The Jest config to use when running your jest tests - note that the normal rewires do not
