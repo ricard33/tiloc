@@ -10,8 +10,7 @@ import {
   DialogTitle, InputAdornment, MenuItem,
   TextField, Theme
 } from "@material-ui/core";
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import { KeyboardDatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core/styles";
 import { Payment, paymentMethods } from "../types/payment";
 
@@ -80,26 +79,24 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             {...register("booking")}
             defaultValue={bookingId}
           />
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <Controller
-              name="date"
-              control={control}
-              defaultValue={new Date().toISOString()}
-              render={({ field }) => <KeyboardDatePicker
-                id="payment-date-picker"
-                KeyboardButtonProps={{
-                  "aria-label": "date"
-                }}
-                format="dd/MM/yyyy"
-                label={t("date")}
-                variant="inline"
-                className={classes.date}
-                inputVariant={variant}
-                autoOk
-                {...field}
-              />}
-            />
-          </MuiPickersUtilsProvider>
+          <Controller
+            name="date"
+            control={control}
+            defaultValue={new Date().toISOString()}
+            render={({ field }) => <KeyboardDatePicker
+              id="payment-date-picker"
+              KeyboardButtonProps={{
+                "aria-label": "date"
+              }}
+              format="dd/MM/yyyy"
+              label={t("date")}
+              variant="inline"
+              className={classes.date}
+              inputVariant={variant}
+              autoOk
+              {...field}
+            />}
+          />
           <Controller
             name="description"
             control={control}

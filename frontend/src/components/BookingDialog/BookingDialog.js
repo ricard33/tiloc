@@ -37,8 +37,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import { KeyboardDatePicker } from "@material-ui/pickers";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -645,56 +644,54 @@ const BookingDialog = props => {
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
-                      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <Grid container justifyContent="space-around" alignItems="center">
-                          <Grid item sm={5} xs={12}>
-                            <Controller
-                              control={control}
-                              name="begin_date"
-                              render={({field}) => <KeyboardDatePicker
-                                format="dd/MM/yyyy"
-                                id="date-picker-start"
-                                KeyboardButtonProps={{
-                                  "aria-label": "arrival date"
-                                }}
-                                label={t("Arrival")}
-                                margin="dense"
-                                selected={field.value}
-                                variant="inline"
-                                inputVariant={variant}
-                                autoOk
-                                {...field}
-                                onChange={(date) => handleBeginDateChange(date, field.onChange)}
-                              />}
-                            />
-                          </Grid>
-                          <Hidden xsDown>
-                            <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
-                              <ForwardIcon />
-                            </Grid>
-                          </Hidden>
-                          <Grid item sm={5} xs={12}>
-                            <Controller
-                              control={control}
-                              name="end_date"
-                              render={({field}) => <KeyboardDatePicker
-                                format="dd/MM/yyyy"
-                                id="date-picker-stop"
-                                KeyboardButtonProps={{
-                                  "aria-label": "departure date"
-                                }}
-                                label={t("Departure")}
-                                margin="dense"
-                                variant="inline"
-                                inputVariant={variant}
-                                autoOk
-                                {...field}
-                                onChange={(date) => handleEndDateChange(date, field.onChange)}
-                              />}
-                            />
-                          </Grid>
+                      <Grid container justifyContent="space-around" alignItems="center">
+                        <Grid item sm={5} xs={12}>
+                          <Controller
+                            control={control}
+                            name="begin_date"
+                            render={({ field }) => <KeyboardDatePicker
+                              format="dd/MM/yyyy"
+                              id="date-picker-start"
+                              KeyboardButtonProps={{
+                                "aria-label": "arrival date"
+                              }}
+                              label={t("Arrival")}
+                              margin="dense"
+                              selected={field.value}
+                              variant="inline"
+                              inputVariant={variant}
+                              autoOk
+                              {...field}
+                              onChange={(date) => handleBeginDateChange(date, field.onChange)}
+                            />}
+                          />
                         </Grid>
-                      </MuiPickersUtilsProvider>
+                        <Hidden xsDown>
+                          <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
+                            <ForwardIcon />
+                          </Grid>
+                        </Hidden>
+                        <Grid item sm={5} xs={12}>
+                          <Controller
+                            control={control}
+                            name="end_date"
+                            render={({ field }) => <KeyboardDatePicker
+                              format="dd/MM/yyyy"
+                              id="date-picker-stop"
+                              KeyboardButtonProps={{
+                                "aria-label": "departure date"
+                              }}
+                              label={t("Departure")}
+                              margin="dense"
+                              variant="inline"
+                              inputVariant={variant}
+                              autoOk
+                              {...field}
+                              onChange={(date) => handleEndDateChange(date, field.onChange)}
+                            />}
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
                     {/* Price */}
                     <Grid

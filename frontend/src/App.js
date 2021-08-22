@@ -15,8 +15,9 @@ import theme from "./theme";
 import moment from "moment";
 import { ConfirmProvider } from "material-ui-confirm";
 import localization from "moment/locale/fr";
-import { Breadcrumbs, Link, Typography } from "@material-ui/core";
-import { Link as RouterLink } from 'react-router-dom';
+import DateFnsUtils from "@date-io/date-fns";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import frLocale from "date-fns/locale/fr";
 
 
 validate.validators = {
@@ -40,16 +41,18 @@ function App(props) {
     dispatch(actions.fetchLodgings());
     dispatch(actions.fetchServices());
   }, [dispatch, token]);
-  
+
   return (
     <ThemeProvider theme={theme}>
-      <ConfirmProvider>
-        <Router history={props.history}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={frLocale}>
+        <ConfirmProvider>
+          <Router history={props.history}>
 
-          <Routes/>
-        </Router>
-        <AlertHandler/>
-      </ConfirmProvider>
+            <Routes />
+          </Router>
+          <AlertHandler />
+        </ConfirmProvider>
+      </MuiPickersUtilsProvider>
     </ThemeProvider>
   );
 }
