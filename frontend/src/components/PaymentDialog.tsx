@@ -8,14 +8,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle, InputAdornment, MenuItem,
-  TextField, Theme
+  TextField
 } from "@material-ui/core";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core/styles";
 import { Payment, paymentMethods } from "../types/payment";
 
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((/*theme: Theme*/) => ({
   input: {
     marginLeft: "4px",
     marginRight: "4px",
@@ -83,69 +83,73 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             name="date"
             control={control}
             defaultValue={new Date().toISOString()}
-            render={({ field }) => <KeyboardDatePicker
-              id="payment-date-picker"
-              KeyboardButtonProps={{
-                "aria-label": "date"
-              }}
-              format="dd/MM/yyyy"
-              label={t("date")}
-              variant="inline"
-              className={classes.date}
-              inputVariant={variant}
-              autoOk
-              {...field}
-            />}
+            render={({ field }) =>
+              <KeyboardDatePicker
+                id="payment-date-picker"
+                KeyboardButtonProps={{
+                  "aria-label": "date"
+                }}
+                format="dd/MM/yyyy"
+                label={t("date")}
+                variant="inline"
+                className={classes.date}
+                inputVariant={variant}
+                autoOk
+                {...field}
+              />}
           />
           <Controller
             name="description"
             control={control}
             defaultValue={""}
             rules={{ required: true }}
-            render={({ field }) => <TextField
-              label={t("description")}
-              variant={variant}
-              className={classes.description}
-              error={!!errors.description}
-              helperText={errors.description?.type === "required" && t("The description is required")}
-              {...field}
-            />}
+            render={({ field }) =>
+              <TextField
+                label={t("description")}
+                variant={variant}
+                className={classes.description}
+                error={!!errors.description}
+                helperText={errors.description?.type === "required" && t("The description is required")}
+                {...field}
+              />}
           />
           <Controller
             name="method"
             control={control}
             defaultValue={""}
             rules={{ required: true }}
-            render={({ field }) => <TextField
-              label={t("payment method")}
-              variant={variant}
-              className={classes.method}
-              select
-              error={!!errors.method}
-              helperText={errors.method?.type === "required" && t("The payment method is required")}
-              {...field}
-            >
-              {paymentMethods(t).map(m => <MenuItem key={m[0]} value={m[0]}>{m[1]}</MenuItem>)}
-            </TextField>}
+            render={({ field }) =>
+              <TextField
+                label={t("payment method")}
+                variant={variant}
+                className={classes.method}
+                select
+                error={!!errors.method}
+                helperText={errors.method?.type === "required" && t("The payment method is required")}
+                {...field}
+              >
+                {paymentMethods(t).map(m => <MenuItem key={m[0]} value={m[0]}>{m[1]}</MenuItem>)}
+              </TextField>}
           />
           <Controller
             name="amount"
             control={control}
             defaultValue={0}
             rules={{ required: true }}
-            render={({ field }) => <TextField
-              label={t("amount")}
-              variant={variant}
-              className={classes.amount}
-              error={!!errors.amount}
-              helperText={errors.amount?.type === "required" && t("The amount is required")}
-              onKeyPress={handleKeyPress}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                type: "number"
-              }}
-              {...field}
-            />}
+            render={({ field }) =>
+              <TextField
+                label={t("amount")}
+                variant={variant}
+                className={classes.amount}
+                error={!!errors.amount}
+                helperText={errors.amount?.type === "required" && t("The amount is required")}
+                onKeyPress={handleKeyPress}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
+                  type: "number"
+                }}
+                {...field}
+              />}
           />
 
         </form>

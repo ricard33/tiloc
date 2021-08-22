@@ -6,7 +6,7 @@ import Product3Image from 'assets/images/products/product_3.png'
 import Product4Image from 'assets/images/products/product_4.png'
 import Product5Image from 'assets/images/products/product_5.png'
 
-export default [
+const products = [
   {
     id: uuid(),
     name: 'Dropbox',
@@ -38,3 +38,4 @@ export default [
     updatedAt: moment().subtract(9, 'hours')
   }
 ];
+export default products;

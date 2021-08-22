@@ -3,7 +3,6 @@ import classNames from "classnames";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/styles";
 import { Button, Toolbar } from "@material-ui/core";
-import { SearchInput, BookingsImportDialog } from "components";
 import { lighten } from "@material-ui/core/styles/colorManipulator";
 import { useTranslation } from "react-i18next";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -27,15 +26,6 @@ const useStyles = makeStyles(theme => ({
   },
   spacer: {
     flexGrow: 1
-  },
-  importButton: {
-    marginRight: theme.spacing(1)
-  },
-  exportButton: {
-    marginRight: theme.spacing(1)
-  },
-  searchInput: {
-    marginRight: theme.spacing(1)
   },
   highlight:
     theme.palette.type === "light"
@@ -77,12 +67,6 @@ const ContractTemplatesToolbar = props => {
           </Typography>
         )}
       </div>
-      {/*<div >*/}
-      {/*  <SearchInput*/}
-      {/*    className={classes.searchInput}*/}
-      {/*    placeholder={t("Search booking")}*/}
-      {/*  />*/}
-      {/*</div>*/}
       <span className={classes.spacer}/>
       <div className={classes.actions}>
         <Button

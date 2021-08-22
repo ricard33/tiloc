@@ -1,8 +1,8 @@
 import { LogglyTracker } from "loggly-jslogger";
 
-const logger = new LogglyTracker();
+const loggly = new LogglyTracker();
 
-logger.push({
+loggly.push({
   logglyKey: process.env.REACT_APP_LOGGLY_CUSTOMER_TOKEN,
   sendConsoleErrors: true,
   tag: process.env.REACT_APP_LOGGLY_TAG,
@@ -17,7 +17,7 @@ const logFn = (level, data, extended_data = {}, once = false) => {
   if(!process.env.REACT_APP_LOGGLY_ACTIVE)
     return;
 
-  if (!logger.key) {
+  if (!loggly.key) {
     console.warn('Loggly key not defined!');
     return;
   }
@@ -42,7 +42,7 @@ const logFn = (level, data, extended_data = {}, once = false) => {
     || previous.data.message !== data.message
     || previous.level !== level
   ) {
-    logger.track({ ...data, level });
+    loggly.track({ ...data, level });
   }
 
   previous = { data, level };
@@ -68,10 +68,12 @@ const error = (err, data = {}, once = false) => {
     }, once);
 };
 
-export default {
+const logger = {
   info,
   warn,
   warning: warn,
   error,
-  tracker: logger
+  tracker: loggly
 };
+
+export default logger;

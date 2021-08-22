@@ -4,8 +4,7 @@ import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import * as actions from "../../../actions";
 import { useDispatch, useSelector } from "react-redux";
-import orm from "orm";
-import { useTranslation } from "react-i18next";
+import orm from "../../../orm";
 import { ContractTemplatesTable, ContractTemplatesToolbar } from "./components";
 import { useHistory } from "react-router-dom";
 
@@ -25,7 +24,6 @@ const useStyles = makeStyles(theme => ({
 const ContractTemplateList = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { t } = useTranslation();
   const allTemplates = useSelector(store => orm.session(store.entities).ContractTemplate.all());
   const loading = useSelector(store => store.fetching.contract_templates.loading);
   const [selected, setSelected] = useState([]);

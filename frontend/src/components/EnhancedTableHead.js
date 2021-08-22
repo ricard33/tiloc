@@ -39,7 +39,7 @@ const EnhancedTableHead = props => {
             <TableCell
               key={col.id}
               align={col.numeric ? "right" : "left"}
-              padding={col.disablePadding ? "none" : "default"}
+              padding={col.disablePadding ? "none" : "normal"}
               sortDirection={orderBy === col.id ? order : false}
             >
               <Tooltip
