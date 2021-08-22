@@ -12,12 +12,14 @@ import "react-calendar-timeline/lib/Timeline.css";
 import { add, parseISO } from "date-fns";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import EuroIcon from '@material-ui/icons/Euro';
 import { startOfMonth } from "date-fns";
 import { makeStyles } from "@material-ui/styles";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
 import "./BookingScheduler.css";
 import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -46,7 +48,27 @@ const useStyles = makeStyles(theme => ({
   },
   dateHeader: {
     height: "10px"
-  }
+  },
+  itemContent: {
+    width: "100%",
+  },
+  itemTitle: {
+    // position: 'relative',
+  },
+  itemIcon: {
+    fontSize: '1em',
+    /* float: right, */
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    borderLeft: "1px solid black"
+  },
+  partiallyPaid:{
+    background: "orange"
+  },
+  fullyPaid:{
+    background: "rgb(182, 230, 158)"
+  },
 }));
 
 const timeSteps = {
@@ -89,7 +111,8 @@ function useWindowSize() {
 const BookingScheduler = props => {
   const {
     bookings, lodgings, beginDate,
-    onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected
+    onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
+    settings
   } = props;
   const classes = useStyles();
   const rootRef = useRef();
@@ -100,7 +123,7 @@ const BookingScheduler = props => {
   const [width, height] = useWindowSize();
   const { t } = useTranslation();
 
-  const updateLayout = (width, height) => {
+  const updateLayout = (width, /*height*/) => {
     const nbMonths = width > 1300 ? 2 : width > 700 ? 1 : 0.5;
     if (nbMonths !== horizontalMonths) {
       console.debug("Changing nb months to " + nbMonths);
@@ -175,7 +198,7 @@ const BookingScheduler = props => {
     canChangeGroup: false,
     itemProps: {
       // these optional attributes are passed to the root <div /> of each item as <div {...itemProps} />
-      "data-custom-attribute": "Random content",
+      // "data-custom-attribute": "Random content",
       "aria-hidden": true,
       onDoubleClick: () => {
         console.log("You clicked double!");
@@ -196,13 +219,13 @@ const BookingScheduler = props => {
     onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
-  function eventItemSelected(bookingId, e, time) {
+  function eventItemSelected(bookingId, /*e, time*/) {
     setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function eventItemDeselected(bookingId) {
-    setSelected(selected.filter((value, index, arr) => value === bookingId));
+    setSelected(selected.filter((value, /*index, arr*/) => value === bookingId));
     onItemDeselected && onItemDeselected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
@@ -254,7 +277,7 @@ const BookingScheduler = props => {
         </TimelineHeaders>
         <TimelineMarkers>
           <TodayMarker>
-            {({ styles, date }) =>
+            {({ styles/*, date*/ }) =>
               <div style={{ ...styles, backgroundColor: "red" }}/>
             }
           </TodayMarker>
@@ -320,16 +343,22 @@ const BookingScheduler = props => {
     const { item, itemContext, getItemProps, getResizeProps } = props;
     const { title, ...itemProps } = getItemProps(item.itemProps); // remove the title props
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
+    let totalPaid = 0;
+    item.booking.payments.forEach(p => {
+      totalPaid += Number(p.amount);
+    });
+
     return (
       <HtmlTooltip title={<BookingQuickView booking={item.booking}/>}>
         <div {...itemProps}>
           {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
           <div
-            className="rct-item-content"
+            className={clsx("rct-item-content", classes.itemContent)}
             style={{ maxHeight: `${itemContext.dimensions.height}` }}
           >
-            {itemContext.title}
+            <div className={classes.itemTitle}>{itemContext.title}</div>
+            {settings.showPaymentStatus && item.booking.price > 0 && <EuroIcon className={clsx(classes.itemIcon, item.booking.price > totalPaid ? classes.partiallyPaid : classes.fullyPaid)} style={{ height: `${itemContext.dimensions.height-2}` }}/>}
           </div>
           {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
         </div>
@@ -361,6 +390,9 @@ BookingScheduler.propTypes = {
   onItemDeselected: PropTypes.func,
   onItemSelected: PropTypes.func,
   onOpenBooking: PropTypes.func,
+  settings: PropTypes.shape({
+    showPaymentStatus: PropTypes.bool,
+  })
 };
 
 export default BookingScheduler;

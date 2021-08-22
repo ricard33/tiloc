@@ -11,7 +11,7 @@ import { useConfirm } from "material-ui-confirm";
 import { useHistory, useLocation } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import { DeleteForever as DeleteIcon, Description as DescriptionIcon, Edit as EditIcon } from "@material-ui/icons";
+import { DeleteForever as DeleteIcon, Description as DescriptionIcon, Edit as EditIcon, Settings as SettingsIcon } from "@material-ui/icons";
 import queryString from "query-string";
 import IconButton from "@material-ui/core/IconButton";
 import Card from "@material-ui/core/Card";
@@ -20,6 +20,8 @@ import Typography from "@material-ui/core/Typography";
 import NavBar from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import useInterval from "../../common/useInterval";
+import { useLocalStorage } from "../../common/useLocalStorage";
+import PlanningSettingsDialog from "./components/PlanningSettingsDialog";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -67,6 +69,9 @@ const Planning = props => {
   const [needFirstTimeEdit, setNeedFirstTimeEdit] = useState(query.edit !== undefined);
   const history = useHistory();
   const confirm = useConfirm();
+  const [settingsOpened, setSettingsOpened] = useState(false);
+  const [settings, setSettings] = useLocalStorage("planningSettings", { showPaymentStatus: true });
+
 
   // const bookings = allBookings.toModelArray();
 
@@ -139,6 +144,13 @@ const Planning = props => {
     history.push("/bookings/" + booking.id + "/contract");
   };
 
+  const onCloseSettings = (newSettings) => {
+    setSettingsOpened(false);
+    if (typeof newSettings !== "undefined") {
+      setSettings(newSettings);
+    }
+  };
+
   const bookings2 = bookings.map(booking => ({
     ...booking,
     status: bookingStatuses.filter(s => s.id === booking.status_id)[0],
@@ -171,6 +183,12 @@ const Planning = props => {
           onClick={() => onEditBooking(selected)}
           disabled={!selected}
         ><EditIcon/></IconButton>
+        <IconButton
+          type="button"
+          color="default"
+          className={classes.button}
+          onClick={() => setSettingsOpened(true)}
+        ><SettingsIcon/></IconButton>
       </div>
       <NavBar date={beginDate} onChange={(newDate) => setBeginDate(newDate)}/>
       <BookingScheduler
@@ -181,6 +199,7 @@ const Planning = props => {
         onOpenBooking={onEditBooking}
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}
+        settings={settings}
       />
       <Grid container justifyContent="space-between" alignItems="flex-start">
         <Grid item>
@@ -239,6 +258,12 @@ const Planning = props => {
         </CardContent>
       </Card>
       <div>Legend: TODO</div>
+      {settingsOpened &&
+      <PlanningSettingsDialog
+        open={settingsOpened}
+        settings={settings}
+        onClose={onCloseSettings}
+      />}
     </div>
   );
 };
