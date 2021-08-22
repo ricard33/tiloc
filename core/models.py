@@ -381,3 +381,6 @@ class Payment(models.Model):
     amount = models.DecimalField(_("amount"), max_digits=10, decimal_places=2)
     method = models.CharField(_("Payment method"), max_length=30, choices=PaymentMethod.choices)
     date = models.DateField(_("Payment date"))
+
+    class Meta:
+        ordering = ['date']

@@ -25,7 +25,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, ...pro
         setPayments([
           ...payments,
           data
-        ]);
+        ].sort((a, b) => a.date.localeCompare(b.date)));
         setOpen(false)
       });
 
