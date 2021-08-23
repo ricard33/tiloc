@@ -10,6 +10,7 @@
     "extract": "i18next -c config/i18next-parser.config.js"
   },
   "homepage": "/static/bundles/",
+  "proxy": "http://localhost:8000/",
   "eslintConfig": {
     "extends": [
       "react-app",
