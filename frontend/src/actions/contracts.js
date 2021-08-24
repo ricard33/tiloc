@@ -3,7 +3,7 @@ import * as types from "./actionTypes";
 export function fetchContracts(bookingId=null) {
   return {
     type: types.REQUEST(types.FETCH_CONTRACTS),
-    ...(bookingId !== null && {filter: "booking_id=" + bookingId}),
+    ...(bookingId !== null && {filter: {booking_id: bookingId}}),
   };
 }
 

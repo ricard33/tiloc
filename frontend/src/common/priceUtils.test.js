@@ -39,7 +39,7 @@ describe("Module priceUtils:", () => {
     });
   });
 
-  describe("Decimal precision", ()=>{
+  describe("Decimal precision", () => {
     it("should rounding value with 2 digit precision", () => {
       expect(DecimalPrecision.round(1.005)).toEqual(1.01);
       expect(DecimalPrecision.ceil(1.005)).toEqual(1.01);
@@ -47,9 +47,9 @@ describe("Module priceUtils:", () => {
       expect(DecimalPrecision.round(1.0049999)).toEqual(1.00);
       expect(DecimalPrecision.ceil(1.0049999)).toEqual(1.01);
       expect(DecimalPrecision.floor(1.0049999)).toEqual(1.00);
-      expect(DecimalPrecision.round(2.175495134384,7)).toEqual(2.1754951);
-      expect(DecimalPrecision.round(2.1753543549,8)).toEqual(2.17535435);
-      expect(DecimalPrecision.round(2.1755465135353,4)).toEqual(2.1755);
+      expect(DecimalPrecision.round(2.175495134384, 7)).toEqual(2.1754951);
+      expect(DecimalPrecision.round(2.1753543549, 8)).toEqual(2.17535435);
+      expect(DecimalPrecision.round(2.1755465135353, 4)).toEqual(2.1755);
 
     })
   })

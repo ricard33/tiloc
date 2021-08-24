@@ -11,22 +11,30 @@ import { getForBooking, Payment, paymentApi } from "../types/payment";
 
 type PaymentListProps = {
   bookingId: number;
+  onPaymentsUpdate?: (newTotal: number) => void;
 };
 
-const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, ...props }: PaymentListProps) => {
+const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, onPaymentsUpdate, ...props }: PaymentListProps) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [open, setOpen] = useState(false);
   const confirm = useConfirm();
   const { t } = useTranslation();
+  let totalPaid = 0;
+  payments.forEach(p => {
+    totalPaid += Number(p.amount);
+  });
 
   function onAddPayment(payment: Payment) {
     paymentApi.create(payment)
       .then(data => {
+        totalPaid += Number(data.amount);
         setPayments([
           ...payments,
           data
         ].sort((a, b) => a.date.localeCompare(b.date)));
-        setOpen(false)
+        setOpen(false);
+
+        if (onPaymentsUpdate) onPaymentsUpdate(totalPaid)
       });
 
   }
@@ -42,7 +50,9 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, ...pro
       .then(() => {
         paymentApi.delete(payment.id ?? 0)
           .then(response => {
+            totalPaid -= Number(payment.amount);
             setPayments(payments.filter(p => p.id !== payment.id));
+            if (onPaymentsUpdate) onPaymentsUpdate(totalPaid)
           });
       })
       .catch(() => {
@@ -53,7 +63,6 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, ...pro
   useEffect(() => {
     getForBooking(bookingId)
       .then(data => {
-        console.log(data);
         setPayments(data.results);
       });
   }, [bookingId]);

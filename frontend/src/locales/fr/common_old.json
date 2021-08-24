@@ -16,6 +16,6 @@
   "Deposit can't be higher than price": "Deposit can't be higher than price",
   "Last year": "L'année dernière",
   "Print": "Imprimer",
-  "Holidays": "Vacances",
-  "Pricing": "Tarifs"
+  "total = {{ fullPrice }} €": "total = {{ fullPrice }} €",
+  "Balance: {{amount}} €": "Solde: {{amount}} €"
 }

@@ -80,8 +80,7 @@ function* _fetchData(path, action) {
   const actionBaseName = action.type.slice(0, -8);
   try {
     const offset = 0, limit = null; // not yet used
-    let filter = action.filter ? "?" + action.filter : "";
-    const response = yield call(axios.get, template(path, action) + filter);
+    const response = yield call(axios.get, template(path, action), {params: action.filter});
     yield put({
       type: types.SUCCESS(actionBaseName),
       data: response.data,

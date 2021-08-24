@@ -1,8 +1,9 @@
 import * as types from "./actionTypes";
 
-export function fetchBookings() {
+export function fetchBookings(filter) {
   return {
-    type: types.REQUEST(types.FETCH_BOOKINGS)
+    type: types.REQUEST(types.FETCH_BOOKINGS),
+    filter
   };
 }
 

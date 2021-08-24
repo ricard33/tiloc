@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/styles";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
@@ -46,6 +46,7 @@ import { useConfirm } from "material-ui-confirm";
 import Hidden from "@material-ui/core/Hidden";
 import { formatISO } from "../../common/tzUtils";
 import Payments from "../Payments";
+import { formatCurrency } from "../../common/intlUtils";
 
 
 const AccordionSummary = withStyles({
@@ -59,12 +60,10 @@ const AccordionSummary = withStyles({
     }
   },
   content: {
-    fontWeight: "bold",
     "&$expanded": {
       margin: "3px 0"
     },
     "& p": {
-      fontWeight: "bold",
       marginBottom: 0
     }
   },
@@ -80,7 +79,14 @@ const useStyles = makeStyles(theme => ({
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular
+    fontWeight: theme.typography.fontWeightBold,
+    flexShrink: 0,
+  },
+  secondaryHeading: {
+    fontSize: theme.typography.pxToRem(15),
+    color: theme.palette.text.secondary,
+    position: 'absolute',
+    right: '60px',
   },
   formControl: {
     width: "100%"
@@ -127,6 +133,15 @@ const useStyles = makeStyles(theme => ({
   totalPrice: {},
   thirdPartyPrice: {
     fontSize: "x-small"
+  },
+  leftToPay: {
+    // color: 'orange',
+  },
+  tooPerceived: {
+    color: 'orange',
+  },
+  fullyPaid: {
+    color: 'dark green'
   }
 }));
 
@@ -143,6 +158,7 @@ const BookingDialog = props => {
   const allGuests = useSelector(store => selectors.guests(store));
   const allOptions = useSelector(store => selectors.services(store));
   // const [selectedOptions, setSelectedOptions] = useState(booking.options || [])
+  const [leftToPay, setLeftToPay] = useState(Number(booking.left_to_pay));
   const confirm = useConfirm();
   const variant = "filled";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
@@ -170,7 +186,7 @@ const BookingDialog = props => {
   let lodging = booking ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
   const formValues = getValues();
-  console.debug("formValues: ", formValues);
+  // console.debug("formValues: ", formValues);
 
   const deposit = watch("deposit", initialState.deposit);
   const existingGuest = watch("guest_name", initialState.guest_name);
@@ -181,7 +197,7 @@ const BookingDialog = props => {
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
-  console.log("options", options, fullPrice);
+  // console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
 
@@ -242,7 +258,7 @@ const BookingDialog = props => {
 
   function handleChange(data) {
     // console.debug(data);
-    console.debug("handleChange", data.target.value);
+    // console.debug("handleChange", data.target.value);
     let value = data.target.value;
     switch (data.target.name) {
       case "status_id": {
@@ -451,11 +467,11 @@ const BookingDialog = props => {
           </Grid>
           <Grid item xs={4}>
             <span className={classes.totalPrice}>
-              {t("total = {{ fullPrice }} €", { fullPrice: DecimalPrecision.round(fullPrice) })}</span>
+              {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
             {excludedFromPriceOptions > 0 && (
               <span
                 className={classes.thirdPartyPrice}
-              ><br />(+ {excludedFromPriceOptions} € {t("for third party services")})</span>)
+              ><br />(+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")})</span>)
             }
           </Grid>
         </Grid>
@@ -478,6 +494,7 @@ const BookingDialog = props => {
             defaultValue={initialState.guaranty}
           />
           <Grid container spacing={1}>
+            { /* BOOKING STATUS */ }
             <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel id="status-label">{t("Booking status")}</InputLabel>
@@ -502,6 +519,7 @@ const BookingDialog = props => {
                 />
               </FormControl>
             </Grid>
+            { /* LODGING */ }
             <Grid item sm={8} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
@@ -525,6 +543,7 @@ const BookingDialog = props => {
                 />
               </FormControl>
             </Grid>
+            { /* GUEST */ }
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="guest-header">
@@ -611,6 +630,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
+            { /* BOOKING DETAILS */ }
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="booking-header">
@@ -770,6 +790,7 @@ const BookingDialog = props => {
                         />
                       </Grid>
                     </Grid>
+                    {/* Deposit */}
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
                       <Controller
                         control={control}
@@ -803,9 +824,10 @@ const BookingDialog = props => {
                       />
                       <div className={classes.spacer} />
                       <Typography>
-                        {price ? t("Balance: {{amount}} €", { amount: price - deposit }) : ""}
+                        {price ? t("Balance: {{amount}}", { amount: formatCurrency(price - deposit) }) : ""}
                       </Typography>
                     </Grid>
+                    { /* commission fees */ }
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
                       <Controller
                         control={control}
@@ -831,7 +853,7 @@ const BookingDialog = props => {
                           />}
                       />
                     </Grid>
-                    {/*/!* number of persons *!/*/}
+                    {/* number of persons */}
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="adults">{t("Adults")}</InputLabel>
@@ -900,6 +922,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
+            { /* OPTIONS */ }
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="options-content" id="options-header">
@@ -959,7 +982,7 @@ const BookingDialog = props => {
                             </Grid>
                             <Grid item xs={2} style={{ textAlign: "left" }}>
                               {option.unit_price_ht &&
-                              <span>=&nbsp;{DecimalPrecision.round(option.unit_price_ht * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))} &euro;</span>}
+                              <span>=&nbsp;{formatCurrency(option.unit_price_ht * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))}</span>}
                             </Grid>
                             <Grid item xs={1}>
                               <Button
@@ -1002,6 +1025,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
+            { /* COMPLEMENTS */ }
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary
@@ -1057,6 +1081,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
+            { /* PAYMENTS */ }
             {booking.id &&
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
@@ -1065,9 +1090,20 @@ const BookingDialog = props => {
                   id="complements-header"
                 >
                   <Typography gutterBottom className={classes.heading}>{t("Payments")}</Typography>
+                  <Typography gutterBottom className={classes.secondaryHeading}>
+                    {leftToPay > 0 && <span className={classes.leftToPay}>{t("Left to pay: {{amount}}", {amount: formatCurrency(leftToPay)})}</span>}
+                    {leftToPay < 0 && <span className={classes.tooPerceived}>{t("Too perceived: {{amount}}", {amount: formatCurrency(-leftToPay)})}</span>}
+                    {leftToPay === 0 && t("Fully paid")}
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Payments bookingId={booking.id} />
+                  <Payments
+                    bookingId={booking.id} onPaymentsUpdate={(total) => {
+                      booking.total_payments = total;
+                      booking.left_to_pay = booking.price_with_options - total;
+                      setLeftToPay(booking.left_to_pay);
+                    }}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>}

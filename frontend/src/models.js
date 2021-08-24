@@ -228,6 +228,9 @@ export const createModels = () => {
         info: attr(),
         special_conditions: attr(),
         options: attr(),
+        total_payments: attr(),
+        left_to_pay: attr(),
+        price_with_options: attr(),
         created: attr(),
         modified: attr(),
       };

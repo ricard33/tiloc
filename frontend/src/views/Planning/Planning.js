@@ -108,6 +108,7 @@ const Planning = props => {
   };
 
   const handleCloseEdit = () => {
+    dispatch(actions.fetchBookings({id: editBooking.id}));
     setEditBooking(null);
     setSelected(null);
   };

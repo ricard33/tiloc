@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from rest_framework import serializers
 from rest_framework.fields import empty
 
@@ -124,6 +125,9 @@ class BookingSerializer(serializers.ModelSerializer):
                                                    required=False, allow_null=True)
     options = BookedServiceSerializer(source='bookedservice_set', many=True, required=False)
     payments = PaymentSubSerializer(source='payment_set', many=True, required=False, read_only=True)
+    total_payments = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    left_to_pay = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    price_with_options = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = models.Booking

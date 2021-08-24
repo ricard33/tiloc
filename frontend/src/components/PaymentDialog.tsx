@@ -13,6 +13,7 @@ import {
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core/styles";
 import { Payment, paymentMethods } from "../types/payment";
+import { parseISO } from "date-fns";
 
 
 const useStyles = makeStyles((/*theme: Theme*/) => ({
@@ -53,10 +54,11 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
   const { t } = useTranslation();
   const { register, handleSubmit, control, formState: { errors } } = useForm<Payment>();
   const onSubmit: SubmitHandler<Payment> = data => {
-    console.log(data);
+    // noinspection SuspiciousTypeOfGuard
+    const date = typeof data.date === "string" ? parseISO(data.date) : data.date;
     onAdd({
       ...data,
-      date: formatISO(data.date),
+      date: formatISO(date),
       amount: Number(data.amount)
     });
   };

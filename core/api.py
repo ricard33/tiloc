@@ -108,6 +108,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = models.Booking.objects.all().order_by('-begin_date').prefetch_related('status', 'lodging', 'source', 'options')
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
+    filterset_fields = ['id']
 
     @transaction.atomic
     @action(detail=True, methods=['post'])

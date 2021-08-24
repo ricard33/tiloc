@@ -6,6 +6,7 @@ from datetime import date
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
@@ -236,6 +237,16 @@ class Booking(models.Model):
             if option.service.unit_price_ht:
                 total += option.service.unit_price_ht * (1 + (option.service.vat or 0)) * (option.service.is_flat_rate and 1 or self.duration)
         return total
+
+    @property
+    def total_payments(self):
+        """Returns the sum of the payments already made."""
+        return self.payment_set.aggregate(total_payments=Sum('amount'))['total_payments'] or 0
+
+    @property
+    def left_to_pay(self):
+        """Returns the left to pay, including options and cleaning fees, but not excluded options."""
+        return self.price_with_options + (self.lodging.cleaning_fee or 0) - self.total_payments
 
     def get_absolute_url(self):
         return reverse('booking-detail', kwargs={'pk': self.pk})
