@@ -130,6 +130,9 @@ const useStyles = makeStyles(theme => ({
     fontSize: "small",
     textAlign: "center"
   },
+  totalWrapper: {
+    textAlign: 'right',
+  },
   totalPrice: {},
   thirdPartyPrice: {
     fontSize: "x-small"
@@ -158,7 +161,7 @@ const BookingDialog = props => {
   const allGuests = useSelector(store => selectors.guests(store));
   const allOptions = useSelector(store => selectors.services(store));
   // const [selectedOptions, setSelectedOptions] = useState(booking.options || [])
-  const [leftToPay, setLeftToPay] = useState(Number(booking.left_to_pay));
+  const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const confirm = useConfirm();
   const variant = "filled";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
@@ -197,6 +200,7 @@ const BookingDialog = props => {
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
+  const leftToPay = fullPrice - totalPayment;
   // console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
@@ -462,13 +466,13 @@ const BookingDialog = props => {
     >
       <DialogTitle id="simple-dialog-title">
         <Grid justifyContent="space-between" container spacing={4}>
-          <Grid item xs={8}>
+          <Grid item xs={6}>
             {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={6} className={classes.totalWrapper}>
             <span className={classes.totalPrice}>
               {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
-            {excludedFromPriceOptions > 0 && (
+            {(excludedFromPriceOptions) > 0 && (
               <span
                 className={classes.thirdPartyPrice}
               ><br />(+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")})</span>)
@@ -477,10 +481,6 @@ const BookingDialog = props => {
         </Grid>
       </DialogTitle>
       <DialogContent dividers>
-        {/*<DialogContentText>*/}
-        {/*  {booking && booking.id ?*/}
-        {/*    t("You can change booking details") : t("You can create a new booking") }*/}
-        {/*</DialogContentText>*/}
         {booking &&
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <input
@@ -1100,8 +1100,8 @@ const BookingDialog = props => {
                   <Payments
                     bookingId={booking.id} onPaymentsUpdate={(total) => {
                       booking.total_payments = total;
-                      booking.left_to_pay = booking.price_with_options - total;
-                      setLeftToPay(booking.left_to_pay);
+                      booking.left_to_pay = fullPrice - total;
+                      setTotalPayment(total);
                     }}
                   />
                 </AccordionDetails>

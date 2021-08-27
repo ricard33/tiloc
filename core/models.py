@@ -72,6 +72,7 @@ class Lodging(models.Model):
                                      help_text=_("Default price for one night"))
     # weekly_rate = models.DecimalField(_("weekly price"), max_digits=10, decimal_places=2, null=True, blank=True)
     guaranty = models.DecimalField(_("guaranty deposit"), max_digits=10, decimal_places=2, null=True, blank=True)
+    # NOTE should probably be removed. But how to handle different cleaning fees for different lodging ?
     cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
@@ -245,8 +246,8 @@ class Booking(models.Model):
 
     @property
     def left_to_pay(self):
-        """Returns the left to pay, including options and cleaning fees, but not excluded options."""
-        return self.price_with_options + (self.lodging.cleaning_fee or 0) - self.total_payments
+        """Returns the left to pay, with options included in price, but not excluded options."""
+        return self.price_with_options + self.total_payments
 
     def get_absolute_url(self):
         return reverse('booking-detail', kwargs={'pk': self.pk})
