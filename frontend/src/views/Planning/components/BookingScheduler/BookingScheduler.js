@@ -343,10 +343,6 @@ const BookingScheduler = props => {
     const { item, itemContext, getItemProps, getResizeProps } = props;
     const { title, ...itemProps } = getItemProps(item.itemProps); // remove the title props
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
-    let totalPaid = 0;
-    item.booking.payments.forEach(p => {
-      totalPaid += Number(p.amount);
-    });
 
     return (
       <HtmlTooltip title={<BookingQuickView booking={item.booking}/>}>
@@ -358,7 +354,7 @@ const BookingScheduler = props => {
             style={{ maxHeight: `${itemContext.dimensions.height}` }}
           >
             <div className={classes.itemTitle}>{itemContext.title}</div>
-            {settings.showPaymentStatus && item.booking.price > 0 && <EuroIcon className={clsx(classes.itemIcon, item.booking.price > totalPaid ? classes.partiallyPaid : classes.fullyPaid)} style={{ height: `${itemContext.dimensions.height-2}` }}/>}
+            {settings.showPaymentStatus && item.booking.price > 0 && <EuroIcon className={clsx(classes.itemIcon, item.booking.left_to_pay > 0 ? classes.partiallyPaid : classes.fullyPaid)} style={{ height: `${itemContext.dimensions.height-2}` }}/>}
           </div>
           {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
         </div>

@@ -3,11 +3,16 @@ import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import { useTranslation } from "react-i18next";
 import moment from "moment";
+import { formatCurrency } from "../common/intlUtils";
 
 const useStyles = makeStyles((theme) => ({
   label: {},
   value: {
     fontWeight: "bold"
+  },
+  spacer: {
+    width: '40px',
+    display: 'inline-block',
   }
 }));
 
@@ -41,7 +46,10 @@ const BookingQuickView = props => {
       </div>
       <div id="qv_price">
         <span className={classes.label}>{t("Price:")}</span>&nbsp;
-        <span className={classes.value}>{booking.price}</span>
+        <span className={classes.value}>{formatCurrency(booking.price)}</span>
+        <span className={classes.spacer} />
+        <span className={classes.label}>{t("Left to pay:")}</span>&nbsp;
+        <span className={classes.value}>{formatCurrency(booking.left_to_pay)}</span>
       </div>
       <div id="qv_guests_count">
         <span className={classes.label}>{t("Adults:")}</span>&nbsp;
