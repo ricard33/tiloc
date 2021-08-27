@@ -65,8 +65,8 @@ export const computeOptionsPrice = (options, duration) => {
   if (options) {
     for (let i = 0; i < options.length; i++) {
       const option = options[i];
-      if (option.unit_price_ht) {
-        const price = (option.vat ? option.unit_price_ht * (100 + option.vat) / 100 : option.unit_price_ht)
+      if (option.unit_price) {
+        const price = option.unit_price
           * Number(option.quantity) * (parseBool(option.is_flat_rate)? 1 : duration);
         if(parseBool(option.not_included_in_price))
           totalExclude += price;

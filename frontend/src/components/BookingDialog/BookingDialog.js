@@ -449,7 +449,7 @@ const BookingDialog = props => {
 
   function getDesignation(option) {
     return option.designation + (
-      option.unit_price_ht ? " - " + option.unit_price_ht + "€" + (
+      option.unit_price ? " - " + option.unit_price + "€" + (
         !option.is_flat_rate ? " / j" : ""
       ) : ""
     );
@@ -943,8 +943,8 @@ const BookingDialog = props => {
                               defaultValue={option.designation}
                             />
                             <input
-                              type="hidden" {...register(`options[${index}].unit_price_ht`)}
-                              defaultValue={option.unit_price_ht}
+                              type="hidden" {...register(`options[${index}].unit_price`)}
+                              defaultValue={option.unit_price}
                             />
                             <input
                               type="hidden" {...register(`options[${index}].vat`)}
@@ -959,8 +959,8 @@ const BookingDialog = props => {
                               defaultValue={option.not_included_in_price}
                             />
                             <Grid item xs={6} style={{ textAlign: "left" }}><span>{getDesignation(option)}</span></Grid>
-                            <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price_ht &&
-                            <span>{option.unit_price_ht}&nbsp;x</span>}</Grid>
+                            <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price &&
+                            <span>{option.unit_price}&nbsp;x</span>}</Grid>
                             <Grid item xs={2}>
                               <Controller
                                 control={control}
@@ -981,8 +981,8 @@ const BookingDialog = props => {
                               />
                             </Grid>
                             <Grid item xs={2} style={{ textAlign: "left" }}>
-                              {option.unit_price_ht &&
-                              <span>=&nbsp;{formatCurrency(option.unit_price_ht * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))}</span>}
+                              {option.unit_price &&
+                              <span>=&nbsp;{formatCurrency(option.unit_price * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))}</span>}
                             </Grid>
                             <Grid item xs={1}>
                               <Button

@@ -105,7 +105,7 @@ class PaymentAdmin(ImportExportModelAdmin):
 
 
 class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
-    list_display = ('reference', 'category', 'designation', 'quantity', 'unit_price_ht', 'vat', 'is_flat_rate',
+    list_display = ('reference', 'category', 'designation', 'quantity', 'unit_price', 'vat', 'is_flat_rate',
                     'included_in_booking', 'not_included_in_price', 'auto_add_booking', 'auto_add_invoice')
 
 

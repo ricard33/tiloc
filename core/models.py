@@ -120,8 +120,8 @@ class Service(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     designation = models.CharField(_("designation"), max_length=256)
     quantity = models.SmallIntegerField(_("quantity"), default=1)
-    unit_price_ht = models.DecimalField(_("unit price VAT excl."), max_digits=10, decimal_places=2, blank=True,
-                                        null=True)
+    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=10, decimal_places=2, blank=True,
+                                     null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=10, decimal_places=2, blank=True, null=True)
     is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
                                        help_text=_("Use flat rate price instead of daily price computation"))
@@ -235,8 +235,8 @@ class Booking(models.Model):
     def price_with_options(self):
         total = self.price
         for option in self.bookedservice_set.filter(service__not_included_in_price=False):
-            if option.service.unit_price_ht:
-                total += option.service.unit_price_ht * (1 + (option.service.vat or 0)) * (option.service.is_flat_rate and 1 or self.duration)
+            if option.service.unit_price:
+                total += option.service.unit_price * (option.service.is_flat_rate and 1 or self.duration)
         return total
 
     @property

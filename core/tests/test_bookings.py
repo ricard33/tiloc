@@ -40,7 +40,7 @@ class BookingTestCase(APITestCase):
         self.assertIn('reference', obj['options'][0])
         self.assertIn('designation', obj['options'][0])
         self.assertIn('quantity', obj['options'][0])
-        self.assertIn('unit_price_ht', obj['options'][0])
+        self.assertIn('unit_price', obj['options'][0])
         self.assertIn('included_in_booking', obj['options'][0])
 
     def test_create_booking(self):
@@ -84,8 +84,8 @@ class BookingTestCase(APITestCase):
             'duration':   10,
             'price':      345,
             'options': [
-                {'id': service.id, 'reference': service.reference, 'designation': service.designation,
-                 'quantity': 1, 'unit_price_ht': service.unit_price_ht, 'included_in_booking': service.included_in_booking}
+                {'id':       service.id, 'reference': service.reference, 'designation': service.designation,
+                 'quantity': 1, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
             ]
         }
         response = self.client.post('/api/booking/', data, format='json', **self.header)
@@ -107,8 +107,8 @@ class BookingTestCase(APITestCase):
         data = {
             'price':      345,
             'options': [
-                {'id': service.id, 'reference': service.reference, 'designation': service.designation,
-                 'quantity': 1, 'unit_price_ht': service.unit_price_ht, 'included_in_booking': service.included_in_booking}
+                {'id':       service.id, 'reference': service.reference, 'designation': service.designation,
+                 'quantity': 1, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
             ]
         }
         response = self.client.patch('/api/booking/%d/' % booking.id, data, format='json', **self.header)
@@ -132,8 +132,8 @@ class BookingTestCase(APITestCase):
         data = {
             'price':      345,
             'options': [
-                {'id': service.id, 'reference': service.reference, 'designation': service.designation,
-                 'quantity': 123, 'unit_price_ht': service.unit_price_ht, 'included_in_booking': service.included_in_booking}
+                {'id':       service.id, 'reference': service.reference, 'designation': service.designation,
+                 'quantity': 123, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
             ]
         }
         response = self.client.patch('/api/booking/%d/' % booking.id, data, format='json', **self.header)
@@ -157,7 +157,7 @@ class BookingModelTestCase(TestCase):
 
     def test_booking_with_options_prices(self):
         booking = factories.BookingFactory.create(price=500)
-        service = factories.ServiceFactory.create(quantity=1, unit_price_ht=40, is_flat_rate=False,
+        service = factories.ServiceFactory.create(quantity=1, unit_price=40, is_flat_rate=False,
                                                   included_in_booking=False)
         models.BookedService.objects.create(service=service, booking=booking, quantity=1)
         self.assertEqual(booking.price, 500)

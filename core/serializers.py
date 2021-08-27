@@ -90,7 +90,7 @@ class BookedServiceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='service.id')
     reference = serializers.ReadOnlyField(source='service.reference')
     designation = serializers.ReadOnlyField(source='service.designation')
-    unit_price_ht = serializers.ReadOnlyField(source='service.unit_price_ht')
+    unit_price = serializers.ReadOnlyField(source='service.unit_price')
     vat = serializers.ReadOnlyField(source='service.vat')
     is_flat_rate = serializers.ReadOnlyField(source='service.is_flat_rate')
     included_in_booking = serializers.ReadOnlyField(source='service.included_in_booking')
@@ -98,7 +98,7 @@ class BookedServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.BookedService
-        fields = ('id', 'reference', 'designation', 'unit_price_ht', 'vat',
+        fields = ('id', 'reference', 'designation', 'unit_price', 'vat',
                   'included_in_booking', 'not_included_in_price', 'is_flat_rate', 'quantity')
 
 

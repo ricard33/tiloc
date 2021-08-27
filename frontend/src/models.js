@@ -101,7 +101,7 @@ export const createModels = () => {
         category: fk('Category', 'services'),
         designation: attr(),
         quantity: attr(),
-        unit_price_ht: attr(),
+        unit_price: attr(),
         vat: attr(),
         is_flat_rate: attr(),
         included_in_booking: attr(),
