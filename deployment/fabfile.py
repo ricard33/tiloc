@@ -16,6 +16,7 @@ API_KEY = "a75560e79fd94a65a0c0dee798848aa0"
 ACCOUNT = "crd"
 SITE_ID = "590959"
 
+
 @task
 def disk_free(c):
     uname = c.run('uname -s', hide=True)
@@ -26,6 +27,7 @@ def disk_free(c):
         return free
     err = "No idea how to get disk space on {}!".format(uname)
     raise Exit(err)
+
 
 @task
 def most_recent_modified(c, path):
@@ -94,6 +96,55 @@ def get_version(c):
         version += '.dev1'
 
     return version
+
+
+def inc_version(version, pos):
+    def safe_int(s):
+        try:
+            return int(s)
+        except ValueError:
+            return 0
+
+    # major, minor, release, build, *ignored = map(safe_int, [*version.split('.'), '0', '0', '0'])
+    values = list(map(safe_int, [*version.split('.')[:pos + 1], '0', '0', '0'][:3]))
+    values[pos] += 1
+    # while values[-1] == 0:
+    #     values.pop()
+    return '.'.join(map(str, values))
+
+
+@task
+def increment_version(c):
+    version = get_version(c)
+    print("Last version was %s" % version)
+    result = ''
+
+    while result not in ['0', '1', '2', '3']:
+        print()
+        print("-------------------------------------")
+        print("Please choose the new version number:")
+        print("-------------------------------------")
+        print(" 0) No change        : %s" % version)
+        print(" 1) New major version: %s" % inc_version(version, 0))
+        print(" 2) New minor version: %s" % inc_version(version, 1))
+        print(" 3) New release      : %s" % inc_version(version, 2))
+        # print(" 4) New build        : %s" % inc_version(version, 3))
+        result = input("Select a value between 0 to 3 (default=3): ")
+        if result == '':
+            result = '3'
+
+    if result == '0':
+        return version
+    new_version = inc_version(version, int(result) - 1)
+
+    cmd = 'git tag -a %(version)s -m "Version %(version)s"' % {'version': new_version}
+    try:
+        c.local(cmd)
+    except Failure:
+        print('Unable to create version git tag')
+        raise
+
+    return new_version
 
 
 @task
@@ -187,12 +238,14 @@ def compile_python_files(c):
     with c.cd(TARGET_PATH):
         c.run("python -O deployment/compile.py")
 
+
 @task
 def need_to_rebuild(c):
     newer_files = get_most_recent_modified(os.path.join(WORKSPACE, 'frontend'), ['node_modules', 'build'])[1] > \
-             get_most_recent_modified(os.path.join(WORKSPACE, 'frontend', 'build'))[1]
+                  get_most_recent_modified(os.path.join(WORKSPACE, 'frontend', 'build'))[1]
     print(newer_files and "Frontend build is needed" or "Frontend build already up-to-date")
     return newer_files
+
 
 @task
 def sync_sources(c, test_only=False):
@@ -243,7 +296,8 @@ def deploy_location(c):
     # compile_python_files(c)
 
     with c.cd(TARGET_PATH):
-        if files.exists(c, ".env/bin/python") and not c.run('.env/bin/python -V').stdout.strip().startswith('Python 3.7'):
+        if files.exists(c, ".env/bin/python") and not c.run('.env/bin/python -V').stdout.strip().startswith(
+                'Python 3.7'):
             c.run("rm -rf .env")
         if not files.exists(c, ".env/bin/python"):
             print("create virtual env")
@@ -296,7 +350,7 @@ def restart(c):
 
 @task(default=True)
 def deploy(c):
-    version = get_version(c)
+    version = increment_version(c)
     write_version_properties(version)
     deploy_location(c)
     restart(c)
@@ -315,10 +369,9 @@ def dump_db(c):
 def load_db(c, fname):
     if os.path.exists(fname):
         with c.cd(TARGET_PATH), \
-             c.prefix('. .env/bin/activate'):
+                c.prefix('. .env/bin/activate'):
             c.put(fname, TARGET_PATH)
             c.run('python manage.py loaddata %s' % fname)
-
 
 # @task
 # def create_supervisord_config():
