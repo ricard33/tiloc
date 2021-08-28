@@ -247,7 +247,7 @@ class Booking(models.Model):
     @property
     def left_to_pay(self):
         """Returns the left to pay, with options included in price, but not excluded options."""
-        return self.price_with_options + self.total_payments
+        return self.price_with_options - self.total_payments
 
     def get_absolute_url(self):
         return reverse('booking-detail', kwargs={'pk': self.pk})

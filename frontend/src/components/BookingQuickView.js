@@ -48,8 +48,12 @@ const BookingQuickView = props => {
         <span className={classes.label}>{t("Price:")}</span>&nbsp;
         <span className={classes.value}>{formatCurrency(booking.price)}</span>
         <span className={classes.spacer} />
-        <span className={classes.label}>{t("Left to pay:")}</span>&nbsp;
-        <span className={classes.value}>{formatCurrency(booking.left_to_pay)}</span>
+        { booking.left_to_pay > 0 && <span>
+          <span className={classes.label}>{t("Left to pay:")}</span>&nbsp;
+          <span className={classes.value}>{formatCurrency(booking.left_to_pay)}</span></span>}
+        { booking.left_to_pay < 0 && <span>
+          <span className={classes.label}>{t("Too perceived:")}</span>&nbsp;
+          <span className={classes.value}>{formatCurrency(-booking.left_to_pay)}</span></span>}
       </div>
       <div id="qv_guests_count">
         <span className={classes.label}>{t("Adults:")}</span>&nbsp;
