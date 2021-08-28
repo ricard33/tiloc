@@ -141,3 +141,4 @@ frontend0/
 /backup/
 /location/version.properties
 /frontend/src/components/Editor/ckeditor5/node_modules/
+/.idea/codestream.xml
