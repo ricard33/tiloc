@@ -28,6 +28,9 @@ const useStyles = makeStyles(theme => ({
   signOutButton: {
     marginLeft: theme.spacing(1)
   },
+  appMenu: {
+    marginRight: "20px"
+  },
   appLogo: {
     verticalAlign: "text-bottom"
   },
@@ -64,7 +67,7 @@ const Topbar = props => {
   const handleSignOut = event => {
     event.preventDefault();
     dispatch(auth.logout(() => {
-      history.push('/logged-out');
+      history.push("/logged-out");
     }));
   };
 
@@ -74,6 +77,15 @@ const Topbar = props => {
       className={clsx(classes.root, className)}
     >
       <Toolbar>
+        <Hidden mdUp>
+          <IconButton
+            className={classes.appMenu}
+            color="inherit"
+            onClick={onSidebarOpen}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Hidden>
         <RouterLink to="/">
           <img
             className={classes.appLogo}
@@ -83,65 +95,55 @@ const Topbar = props => {
           />
           <span className={classes.appName}>Ti Loc</span>
         </RouterLink>
-        <div className={classes.flexGrow}/>
-        <Hidden smDown>
-          <IconButton color="inherit">
-            <Badge
-              badgeContent={notifications.length}
-              color="primary"
-              variant="dot"
-            >
-              <NotificationsIcon/>
-            </Badge>
-          </IconButton>
-          <Avatar
-            alt="Person"
-            className={classes.avatar}
-            component={IconButton}
-            src={avatar}
-            aria-controls="user-menu"
-            aria-haspopup="true"
-            onClick={handleClickUser}
-          />
-          <Menu
-            id="user-menu"
-            anchorEl={anchorEl}
-            elevation={0}
-            getContentAnchorEl={null}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "center"
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "center"
-            }}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleCloseUserMenu}
+        <div className={classes.flexGrow} />
+        <IconButton color="inherit">
+          <Badge
+            badgeContent={notifications.length}
+            color="primary"
+            variant="dot"
           >
-            <MenuItem>
-              <ListItemIcon>
-                <AccountBoxIcon fontSize="small"/>
-              </ListItemIcon>
-              <ListItemText primary={t("My account")}/>
-            </MenuItem>
-            <MenuItem onClick={handleSignOut}>
-              <ListItemIcon>
-                <InputIcon fontSize="small"/>
-              </ListItemIcon>
-              <ListItemText primary={t("Logout")}/>
-            </MenuItem>
-          </Menu>
-        </Hidden>
-        <Hidden mdUp>
-          <IconButton
-            color="inherit"
-            onClick={onSidebarOpen}
-          >
-            <MenuIcon/>
-          </IconButton>
-        </Hidden>
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        <Avatar
+          alt="Person"
+          className={classes.avatar}
+          component={IconButton}
+          src={avatar}
+          aria-controls="user-menu"
+          aria-haspopup="true"
+          onClick={handleClickUser}
+        />
+        <Menu
+          id="user-menu"
+          anchorEl={anchorEl}
+          elevation={0}
+          getContentAnchorEl={null}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center"
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center"
+          }}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleCloseUserMenu}
+        >
+          <MenuItem>
+            <ListItemIcon>
+              <AccountBoxIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t("My account")} />
+          </MenuItem>
+          <MenuItem onClick={handleSignOut}>
+            <ListItemIcon>
+              <InputIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t("Logout")} />
+          </MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

@@ -71,7 +71,7 @@ const Main = props => {
       <Sidebar
         onClose={handleSidebarClose}
         open={shouldOpenSidebar}
-        variant={isDesktop ? "persistent" : "temporary"}
+        variant={isDesktop ? "permanent" : "temporary"}
       />
       <main className={classes.content}>
         <Route>

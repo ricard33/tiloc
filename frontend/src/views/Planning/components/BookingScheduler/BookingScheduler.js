@@ -14,12 +14,13 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import EuroIcon from '@material-ui/icons/Euro';
 import { startOfMonth } from "date-fns";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles, useTheme } from "@material-ui/styles";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
 import "./BookingScheduler.css";
 import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 import clsx from "clsx";
+import { useMediaQuery } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -116,9 +117,14 @@ const BookingScheduler = props => {
   } = props;
   const classes = useStyles();
   const rootRef = useRef();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
+    defaultMatches: true
+  });
   const [horizontalMonths, setHorizontalMonths] = useState(1);
   const [lineHeight, setLineHeight] = useState(20);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsedState, setCollapsed] = useState(undefined);
+  const collapsed = typeof collapsedState === 'undefined' ? !isDesktop : collapsedState;
   const [selected, setSelected] = useState([]);
   const [width, height] = useWindowSize();
   const { t } = useTranslation();

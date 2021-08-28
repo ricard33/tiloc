@@ -131,6 +131,7 @@ const Sidebar = props => {
         <SidebarNav
           className={classes.nav}
           pages={pages}
+          onClick={onClose}
         />
         {/*<UpgradePlan />*/}
         <div className={classes.version}>
