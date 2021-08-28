@@ -72,8 +72,6 @@ class Lodging(models.Model):
                                      help_text=_("Default price for one night"))
     # weekly_rate = models.DecimalField(_("weekly price"), max_digits=10, decimal_places=2, null=True, blank=True)
     guaranty = models.DecimalField(_("guaranty deposit"), max_digits=10, decimal_places=2, null=True, blank=True)
-    # NOTE should probably be removed. But how to handle different cleaning fees for different lodging ?
-    cleaning_fee = models.DecimalField(_("cleaning fee"), max_digits=10, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
     tourist_tax = models.DecimalField(_("tourist tax"), max_digits=10, decimal_places=2, null=True, blank=True)

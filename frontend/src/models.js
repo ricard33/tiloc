@@ -59,7 +59,6 @@ export const createModels = () => {
         address: attr(),
         default_price: attr(),
         guaranty: attr(),
-        cleaning_fee: attr(),
         capacity: attr(),
         information: attr()
       };

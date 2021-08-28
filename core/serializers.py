@@ -58,7 +58,7 @@ class LodgingSerializer(serializers.ModelSerializer):
 class LodgingSubSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Lodging
-        fields = ['id', 'uid', 'active', 'shown', 'name', 'owner', 'rank', 'daily_rate', 'guaranty', 'cleaning_fee',
+        fields = ['id', 'uid', 'active', 'shown', 'name', 'owner', 'rank', 'daily_rate', 'guaranty',
                   'capacity', 'information', 'tourist_tax']
 
 
