@@ -1,10 +1,9 @@
 import * as bookings from "./bookings";
 import * as types from "./actionTypes";
 import axios from "axios";
-import thunk from "redux-thunk";
 import configureMockStore from "redux-mock-store";
 
-const middlewares = [thunk];
+const middlewares = [];
 const mockStore = configureMockStore(middlewares);
 
 jest.mock("axios");

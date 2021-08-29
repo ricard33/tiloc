@@ -60,7 +60,6 @@ axios.interceptors.response.use(
         else
           return Promise.reject(error);
       }
-      console.debug(error.response.headers);
       if (error.response.data.detail)
         store.dispatch(alert.loadErrors(error.response.data.detail, error));
       else

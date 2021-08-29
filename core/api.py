@@ -2,6 +2,7 @@ import logging
 import os
 
 import arrow
+import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
@@ -13,7 +14,7 @@ from knox.views import LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, APIException
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -27,6 +28,8 @@ from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
                           PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, ServiceSerializer,
                           UserSerializer)
+
+logger = logging.getLogger('api')
 
 
 @api_view()
@@ -125,7 +128,14 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def generate_contract(self, request, pk=None):
         booking = self.get_object()
-        contract = booking.generate_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+        try:
+            contract = booking.generate_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+        except jinja2.exceptions.TemplateError as ex:
+            logger.exception("Template generation error")
+            raise APIException(detail="Template error: " + ex.message)
+        except Exception as ex:
+            logger.exception("Unknown error during template generation")
+            raise APIException(detail=str(ex))
         serializer = ContractSerializer(instance=contract)
         return Response(serializer.data)
 
