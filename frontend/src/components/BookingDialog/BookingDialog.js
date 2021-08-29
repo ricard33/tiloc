@@ -80,13 +80,13 @@ const useStyles = makeStyles(theme => ({
   heading: {
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightBold,
-    flexShrink: 0,
+    flexShrink: 0
   },
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
     color: theme.palette.text.secondary,
-    position: 'absolute',
-    right: '60px',
+    position: "absolute",
+    right: "60px"
   },
   formControl: {
     width: "100%"
@@ -131,7 +131,7 @@ const useStyles = makeStyles(theme => ({
     textAlign: "center"
   },
   totalWrapper: {
-    textAlign: 'right',
+    textAlign: "right"
   },
   totalPrice: {},
   thirdPartyPrice: {
@@ -141,10 +141,10 @@ const useStyles = makeStyles(theme => ({
     // color: 'orange',
   },
   tooPerceived: {
-    color: 'orange',
+    color: "orange"
   },
   fullyPaid: {
-    color: 'dark green'
+    color: "dark green"
   }
 }));
 
@@ -181,7 +181,7 @@ const BookingDialog = props => {
     defaultValues: initialState
   });
   const { register, control, setValue, getValues, watch, formState } = form;
-  const { errors, dirty, /*isValid*/ } = formState;
+  const { errors, dirty /*isValid*/ } = formState;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "options"
@@ -212,6 +212,19 @@ const BookingDialog = props => {
     // dispatch(actions.fetchLodgings());
     // dispatch(actions.fetchOwners());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!booking.id) {
+      console.log("Scan for automatic options", allOptions);
+      allOptions.filter(o => o.auto_add_booking).forEach(option => {
+        if (options.filter(o => o.id === option.id).length === 0) {
+          console.log("  add automatic option:", option);
+          append(option);
+        }
+      });
+    }
+
+  }, [allOptions]);
 
   function initializeDefaults(booking) {
     if (booking) {
@@ -494,7 +507,7 @@ const BookingDialog = props => {
             defaultValue={initialState.guaranty}
           />
           <Grid container spacing={1}>
-            { /* BOOKING STATUS */ }
+            { /* BOOKING STATUS */}
             <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel id="status-label">{t("Booking status")}</InputLabel>
@@ -519,7 +532,7 @@ const BookingDialog = props => {
                 />
               </FormControl>
             </Grid>
-            { /* LODGING */ }
+            { /* LODGING */}
             <Grid item sm={8} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
@@ -527,7 +540,7 @@ const BookingDialog = props => {
                   name="lodging_id"
                   control={control}
                   rules={{ required: true }}
-                  render={({field}) =>
+                  render={({ field }) =>
                     <Select
                       label={t("Lodging")}
                       margin="dense"
@@ -543,7 +556,7 @@ const BookingDialog = props => {
                 />
               </FormControl>
             </Grid>
-            { /* GUEST */ }
+            { /* GUEST */}
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="guest-header">
@@ -581,7 +594,7 @@ const BookingDialog = props => {
                         name="guest_name"
                         control={control}
                         rules={{ required: true }}
-                        render={({field}) =>
+                        render={({ field }) =>
                           <TextField
                             fullWidth
                             error={!!errors.guest_name}
@@ -598,7 +611,7 @@ const BookingDialog = props => {
                       <Controller
                         name="guest_contact"
                         control={control}
-                        render={({field}) =>
+                        render={({ field }) =>
                           <TextField
                             fullWidth
                             label={t("Phone / email")}
@@ -614,7 +627,7 @@ const BookingDialog = props => {
                       <Controller
                         control={control}
                         name="guest_address"
-                        render={({field}) =>
+                        render={({ field }) =>
                           <TextField
                             fullWidth
                             label={t("Address")}
@@ -630,7 +643,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            { /* BOOKING DETAILS */ }
+            { /* BOOKING DETAILS */}
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="booking-header">
@@ -646,7 +659,7 @@ const BookingDialog = props => {
                           name="duration"
                           control={control}
                           rules={{ valueAsNumber: true }}
-                          render={({field}) =>
+                          render={({ field }) =>
                             <Select
                               label={t("Nights")}
                               margin="dense"
@@ -804,7 +817,7 @@ const BookingDialog = props => {
                             value: price,
                             message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
                           },
-                          valueAsNumber: true,
+                          valueAsNumber: true
                         }}
                         render={({ field }) =>
                           <TextField
@@ -827,14 +840,14 @@ const BookingDialog = props => {
                         {price ? t("Balance: {{amount}}", { amount: formatCurrency(price - deposit) }) : ""}
                       </Typography>
                     </Grid>
-                    { /* commission fees */ }
+                    { /* commission fees */}
                     <Grid item xs={12} className={classes.flexBoxAlignLeft}>
                       <Controller
                         control={control}
                         name="commission_fees"
                         rules={{
                           min: { value: 0, message: t("Commission fees can't be negative") },
-                          valueAsNumber: true,
+                          valueAsNumber: true
                         }}
                         render={({ field }) =>
                           <TextField
@@ -922,7 +935,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            { /* OPTIONS */ }
+            { /* OPTIONS */}
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="options-content" id="options-header">
@@ -966,7 +979,7 @@ const BookingDialog = props => {
                                 control={control}
                                 name={"options[" + index + "].quantity"}
                                 rules={{ valueAsNumber: true }}
-                                render={({field}) =>
+                                render={({ field }) =>
                                   <TextField
                                     InputProps={{
                                       type: "number"
@@ -1025,7 +1038,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            { /* COMPLEMENTS */ }
+            { /* COMPLEMENTS */}
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary
@@ -1043,7 +1056,7 @@ const BookingDialog = props => {
                         <Controller
                           name="source_id"
                           control={control}
-                          render={({field}) =>
+                          render={({ field }) =>
                             <Select
                               label={t("Statistics")}
                               margin="dense"
@@ -1081,7 +1094,7 @@ const BookingDialog = props => {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            { /* PAYMENTS */ }
+            { /* PAYMENTS */}
             {booking.id &&
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
@@ -1091,8 +1104,12 @@ const BookingDialog = props => {
                 >
                   <Typography gutterBottom className={classes.heading}>{t("Payments")}</Typography>
                   <Typography gutterBottom className={classes.secondaryHeading}>
-                    {leftToPay > 0 && <span className={classes.leftToPay}>{t("Left to pay: {{amount}}", {amount: formatCurrency(leftToPay)})}</span>}
-                    {leftToPay < 0 && <span className={classes.tooPerceived}>{t("Too perceived: {{amount}}", {amount: formatCurrency(-leftToPay)})}</span>}
+                    {leftToPay > 0 && <span
+                      className={classes.leftToPay}
+                    >{t("Left to pay: {{amount}}", { amount: formatCurrency(leftToPay) })}</span>}
+                    {leftToPay < 0 && <span
+                      className={classes.tooPerceived}
+                    >{t("Too perceived: {{amount}}", { amount: formatCurrency(-leftToPay) })}</span>}
                     {leftToPay === 0 && t("Fully paid")}
                   </Typography>
                 </AccordionSummary>
