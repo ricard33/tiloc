@@ -1,6 +1,3 @@
-export const SHOW_ALERT = 'SHOW_ALERT';
-export const CLEAR_ALERT = 'CLEAR_ALERT';
-
 export const USER_LOADING = "USER_LOADING";
 export const USER_LOADED = "USER_LOADED";
 export const LOGIN_REQUEST = "LOGIN_REQUEST";

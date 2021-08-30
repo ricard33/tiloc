@@ -8,7 +8,6 @@ import PropTypes from "prop-types";
 import * as actions from "./actions";
 import { auth } from "./actions";
 import "./assets/scss/index.scss";
-import AlertHandler from "./components/alertHandler";
 import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
@@ -18,7 +17,7 @@ import localization from "moment/locale/fr";
 import DateFnsUtils from "@date-io/date-fns";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import frLocale from "date-fns/locale/fr";
-
+import Notifier from './components/Notifier';
 
 validate.validators = {
   ...validate.validators,
@@ -46,11 +45,11 @@ function App(props) {
     <ThemeProvider theme={theme}>
       <MuiPickersUtilsProvider utils={DateFnsUtils} locale={frLocale}>
         <ConfirmProvider>
+          <Notifier />
           <Router history={props.history}>
 
             <Routes />
           </Router>
-          <AlertHandler />
         </ConfirmProvider>
       </MuiPickersUtilsProvider>
     </ThemeProvider>

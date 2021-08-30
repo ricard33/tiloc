@@ -1,5 +1,8 @@
 {
-  "parser": "babel-eslint",
+  "extends": [
+    "react-app",
+    "react-app/jest"
+  ],
   "rules": {
     "comma-dangle": 0,
     "indent": [
@@ -62,48 +65,11 @@
     "react/sort-comp": 0,
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
-    "semi": 0
-  },
-  "env": {
-    "es6": true,
-    "browser": true,
-    "jest": true
-  },
-  "extends": [
-    "react-app",
-    "react-app/jest"
-  ],
-  //  "extends": "eslint:recommended",
-  //  "ecmaFeatures": {
-  //    "jsx": true,
-  //    "experimentalObjectRestSpread": true
-  //  },
-  "plugins": [
-    "react",
-    "react-hooks",
-    "jest"
-  ],
-  "overrides": [
-    {
-      "files": [
-        "**/*.test.js"
-      ],
-      "env": {
-        "jest": true
-        // now **/*.test.js files' env has both es6 *and* jest
-      },
-      // Can't extend in overrides: https://github.com/eslint/eslint/issues/8813
-      // "extends": ["plugin:jest/recommended"]
-      "plugins": [
-        "jest"
-      ],
-      "rules": {
-        "jest/no-disabled-tests": "warn",
-        "jest/no-focused-tests": "error",
-        "jest/no-identical-title": "error",
-        "jest/prefer-to-have-length": "warn",
-        "jest/valid-expect": "error"
-      }
-    }
-  ]
+    "semi": 0,
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error"
+  }
 }

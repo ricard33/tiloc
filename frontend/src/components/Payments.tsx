@@ -7,36 +7,49 @@ import { parseISO } from "date-fns";
 import IconButton from "@material-ui/core/IconButton";
 import { AddCircle as AddIcon } from "@material-ui/icons";
 import PaymentDialog from "./PaymentDialog";
-import { getForBooking, Payment, paymentApi } from "../types/payment";
+import { Payment } from "../types/payment";
+import { useAddPaymentMutation, useDeletePaymentMutation, useGetPaymentsForBookingQuery } from "../services/api";
+import { useAlert } from "../common/alertUtils";
+import { apiErrorDecode } from "../common/apiUtils";
 
 type PaymentListProps = {
   bookingId: number;
   onPaymentsUpdate?: (newTotal: number) => void;
 };
 
-const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, onPaymentsUpdate, ...props }: PaymentListProps) => {
-  const [payments, setPayments] = useState<Payment[]>([]);
+const Payments: React.FunctionComponent<PaymentListProps> = ({
+  bookingId,
+  onPaymentsUpdate,
+  ...props
+}: PaymentListProps) => {
   const [open, setOpen] = useState(false);
   const confirm = useConfirm();
   const { t } = useTranslation();
+  const { data, error, isLoading } = useGetPaymentsForBookingQuery(bookingId);
+  const [addPayment, { error: addError }] = useAddPaymentMutation();
+  const [deletePayment, { error: deleteError }] = useDeletePaymentMutation();
+  const { showError, showSuccess } = useAlert();
+
   let totalPaid = 0;
-  payments.forEach(p => {
-    totalPaid += Number(p.amount);
-  });
+  if (data) {
+    data.results.forEach(p => {
+      totalPaid += Number(p.amount);
+    });
+  }
 
   function onAddPayment(payment: Payment) {
-    paymentApi.create(payment)
-      .then(data => {
-        totalPaid += Number(data.amount);
-        setPayments([
-          ...payments,
-          data
-        ].sort((a, b) => a.date.localeCompare(b.date)));
+    addPayment(payment).then((result) => {
+      if ((result as any).error) {
+        const error = (result as any).error;
+        console.error("Error during payment creation", error);
+        showError(t("Impossible to create payment: ") + apiErrorDecode(error));
+      } else {
+        totalPaid += payment.amount;
+        if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
         setOpen(false);
-
-        if (onPaymentsUpdate) onPaymentsUpdate(totalPaid)
-      });
-
+        showSuccess("Payment added");
+      }
+    });
   }
 
   function onDeletePayment(payment: Payment) {
@@ -48,40 +61,35 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({ bookingId, onPaym
       description: t("Do you really want to permanently delete this payment?")
     })
       .then(() => {
-        paymentApi.delete(payment.id ?? 0)
-          .then(response => {
+        deletePayment(payment.id ?? 0).then((result) => {
+          if ((result as any).error) {
+            const error = (result as any).error;
+            console.error("Error deleting payment", error);
+            showError(t("Impossible to delete the payment: ") + apiErrorDecode(error));
+          } else {
+            showSuccess("Payment deleted");
             totalPaid -= Number(payment.amount);
-            setPayments(payments.filter(p => p.id !== payment.id));
-            if (onPaymentsUpdate) onPaymentsUpdate(totalPaid)
-          });
-      })
-      .catch(() => {
-        console.error("can't delete payment ", payment);
+            // setPayments(payments.filter(p => p.id !== payment.id));
+            if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
+          }
+        });
       });
   }
 
-  useEffect(() => {
-    getForBooking(bookingId)
-      .then(data => {
-        setPayments(data.results);
-      });
-  }, [bookingId]);
-
   function onClose() {
-    setOpen(false)
+    setOpen(false);
   }
 
   return (
     <div>
-      <PaymentList payments={payments} onDelete={onDeletePayment} />
+      <PaymentList payments={data ? data.results : []} onDelete={onDeletePayment} />
       <IconButton edge="end" aria-label="delete" color="primary" onClick={() => setOpen(true)}>
         <AddIcon />{t("Add payment")}
       </IconButton>
       {open && <PaymentDialog open={open} bookingId={bookingId} onAdd={onAddPayment} onClose={onClose} />}
     </div>
 
-  )
-  ;
+  );
 };
 
 export default Payments;
