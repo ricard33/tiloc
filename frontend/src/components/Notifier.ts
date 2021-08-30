@@ -1,6 +1,6 @@
 import React from "react";
 import { SnackbarKey, useSnackbar } from "notistack";
-import { removeSnackbar } from "../actions";
+import { removeAlert } from "../actions";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { Notification } from "../reducers/alert";
 
@@ -41,7 +41,7 @@ const Notifier = () => {
         },
         onExited: (event, myKey) => {
           // remove this snackbar from redux store
-          dispatch(removeSnackbar(myKey));
+          dispatch(removeAlert(myKey));
           removeDisplayed(myKey);
         }
       });

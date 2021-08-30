@@ -49,16 +49,18 @@ export const api = createApi({
   endpoints: (builder) => ({
     getPaymentsForBooking: builder.query<Pagination<Payment>, number>({
       query: (bookingId) => `payment/?booking_id=${bookingId}`,
-      providesTags: (data) =>
-        // is result available?
-        data
-          ? // successful query
-          [
-            ...data.results.map(({ id }) => ({ type: "Payment", id: id } as const)),
-            { type: "Payment", id: "LIST" }
-          ]
-          : // an error occurred, but we still want to refetch this query when `{ type: 'Payment', id: 'LIST' }` is invalidated
-          [{ type: "Payment", id: "LIST" }]
+      providesTags: (data) => data ? [
+        ...data.results.map(({ id }) => ({ type: "Payment", id: id } as const)),
+        { type: "Payment", id: "LIST" }
+      ] : [{ type: "Payment", id: "LIST" }],
+      transformResponse: (response) => {
+        return {
+          ...response as Pagination<Payment>,
+          results: (response as Pagination<Payment>).results.map(p => {
+            return { ...p, amount: Number(p.amount) };
+          })
+        };
+      }
     }),
     addPayment: builder.mutation<Payment, Partial<Payment>>({
       query(body) {
@@ -68,8 +70,6 @@ export const api = createApi({
           body
         };
       },
-      // Invalidates all Post-type queries providing the `LIST` id - after all, depending of the sort order,
-      // that newly created post could show up in any lists.
       invalidatesTags: [{ type: "Payment", id: "LIST" }]
     }),
     deletePayment: builder.mutation<{ success: boolean; id: number }, number>({
@@ -79,7 +79,6 @@ export const api = createApi({
           method: "DELETE"
         };
       },
-      // Invalidates all queries that subscribe to this Post `id` only.
       invalidatesTags: (result, error, id) => [{ type: "Payment", id }]
     })
   })
