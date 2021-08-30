@@ -7,8 +7,8 @@ import { parseISO } from "date-fns";
 import IconButton from "@material-ui/core/IconButton";
 import { AddCircle as AddIcon } from "@material-ui/icons";
 import PaymentDialog from "./PaymentDialog";
-import { Payment } from "../types/payment";
-import { useAddPaymentMutation, useDeletePaymentMutation, useGetPaymentsForBookingQuery } from "../services/api";
+import { Payment } from "../types";
+import { useCreatePaymentMutation, useDeletePaymentMutation, useGetPaymentsForBookingQuery } from "../services/api";
 import { useAlert } from "../common/alertUtils";
 import { apiErrorDecode } from "../common/apiUtils";
 
@@ -25,9 +25,9 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   const [open, setOpen] = useState(false);
   const confirm = useConfirm();
   const { t } = useTranslation();
-  const { data, error, isLoading } = useGetPaymentsForBookingQuery(bookingId);
-  const [addPayment, { error: addError }] = useAddPaymentMutation();
-  const [deletePayment, { error: deleteError }] = useDeletePaymentMutation();
+  const { data } = useGetPaymentsForBookingQuery(bookingId);
+  const [createPayment] = useCreatePaymentMutation();
+  const [deletePayment] = useDeletePaymentMutation();
   const { showError, showSuccess } = useAlert();
 
   let totalPaid = 0;
@@ -37,8 +37,8 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
     });
   }
 
-  function onAddPayment(payment: Payment) {
-    addPayment(payment).then((result) => {
+  function onCreatePayment(payment: Payment) {
+    createPayment(payment).then((result) => {
       if ((result as any).error) {
         const error = (result as any).error;
         console.error("Error during payment creation", error);
@@ -86,7 +86,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
       <IconButton edge="end" aria-label="delete" color="primary" onClick={() => setOpen(true)}>
         <AddIcon />{t("Add payment")}
       </IconButton>
-      {open && <PaymentDialog open={open} bookingId={bookingId} onAdd={onAddPayment} onClose={onClose} />}
+      {open && <PaymentDialog open={open} bookingId={bookingId} onAdd={onCreatePayment} onClose={onClose} />}
     </div>
 
   );

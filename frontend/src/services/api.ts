@@ -1,14 +1,9 @@
 // Need to use the React-specific entry point to import createApi
 import { BaseQueryFn, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Payment } from "../types/payment";
+import { Headers, Pagination, Payment } from "../types";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
-export interface Pagination<T> {
-  count: number;
-  next?: string;
-  previous?: string;
-  results: T[];
-}
+export const serviceURL = "/api/";
 
 const axiosBaseQuery =
   (
@@ -36,17 +31,33 @@ const axiosBaseQuery =
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "/api/",
+    baseUrl: serviceURL,
     prepareHeaders: (headers, { getState }) => {
       const token = localStorage.getItem("token");
       if (token) {
-        headers.set("authorization", `Token ${token}`);
+        headers.set(Headers.Authorization, `Token ${token}`);
       }
+      headers.set(Headers.Accept, "application/json");
       return headers;
     }
   }),
   tagTypes: ["Payment", "Booking"],
   endpoints: (builder) => ({
+    listPayments: builder.query<Pagination<Payment>, undefined>({
+      query: () => "payment/",
+      providesTags: (data) => data ? [
+        ...data.results.map(({ id }) => ({ type: "Payment", id: id } as const)),
+        { type: "Payment", id: "LIST" }
+      ] : [{ type: "Payment", id: "LIST" }],
+      transformResponse: (response) => {
+        return {
+          ...response as Pagination<Payment>,
+          results: (response as Pagination<Payment>).results.map(p => {
+            return { ...p, amount: Number(p.amount) };
+          })
+        };
+      }
+    }),
     getPaymentsForBooking: builder.query<Pagination<Payment>, number>({
       query: (bookingId) => `payment/?booking_id=${bookingId}`,
       providesTags: (data) => data ? [
@@ -62,7 +73,7 @@ export const api = createApi({
         };
       }
     }),
-    addPayment: builder.mutation<Payment, Partial<Payment>>({
+    createPayment: builder.mutation<Payment, Partial<Payment>>({
       query(body) {
         return {
           url: `payment/`,
@@ -88,6 +99,6 @@ export const api = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useGetPaymentsForBookingQuery,
-  useAddPaymentMutation,
+  useCreatePaymentMutation,
   useDeletePaymentMutation
 } = api;

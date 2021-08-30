@@ -1,5 +1,3 @@
-import axios from "axios";
-import { makeApi, Pagination } from "./models";
 
 export interface ApiPayment {
   id?: number;
@@ -45,14 +43,3 @@ export function payment2Api(p: Payment): ApiPayment {
   };
 }
 
-export const paymentApi = makeApi<ApiPayment, Payment>("/api/payment", api2Payment, payment2Api);
-
-export function getForBooking(bookingId: number): Promise<Pagination<Payment>> {
-  return axios.get<Pagination<ApiPayment>>(`/api/payment/?booking_id=${bookingId}`)
-    .then(response => {
-      return {
-        ...response.data,
-        results: response.data.results.map(api2Payment)
-      };
-    });
-}
