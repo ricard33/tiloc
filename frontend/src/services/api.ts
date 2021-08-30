@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import createApi
 import { BaseQueryFn, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Headers, Pagination, Payment } from "../types";
+import { Headers, Pagination, Payment, Contract } from "../types";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 export const serviceURL = "/api/";
@@ -41,8 +41,10 @@ export const api = createApi({
       return headers;
     }
   }),
-  tagTypes: ["Payment", "Booking"],
+  tagTypes: ["Payment", "Booking", "Contract", "ContractTemplate"],
   endpoints: (builder) => ({
+
+    // Payment
     listPayments: builder.query<Pagination<Payment>, undefined>({
       query: () => "payment/",
       providesTags: (data) => data ? [
@@ -91,14 +93,36 @@ export const api = createApi({
         };
       },
       invalidatesTags: (result, error, id) => [{ type: "Payment", id }]
-    })
+    }),
+
+    // Contract
+    getOrGenerateContract: builder.mutation<Contract, { bookingId: number, regenerate?: boolean }>({
+      query({ bookingId, regenerate }) {
+        return {
+          url: `booking/${bookingId}/${regenerate ? "generate_contract" : "get_or_create_contract"}/`,
+          method: "POST",
+        };
+      },
+    }),
+    // generateContract: builder.mutation<Contract, number>({
+    //   query(bookingId) {
+    //     return {
+    //       url: `booking/${bookingId}/generate_contract/`,
+    //       method: "POST",
+    //     };
+    //   },
+    // }),
+
   })
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useListPaymentsQuery,
   useGetPaymentsForBookingQuery,
   useCreatePaymentMutation,
-  useDeletePaymentMutation
+  useDeletePaymentMutation,
+  useGetOrGenerateContractMutation,
+
 } = api;

@@ -1,0 +1,141 @@
+import { attr, fk, oneToOne } from "redux-orm";
+
+export interface Owner {
+  id: number;
+  active: boolean;
+  name: string;
+  email: string;
+  phone: string;
+  contact: string;
+  address: string;
+  legal: string;
+  payment: string;
+  billing: string;
+  no_vat: boolean;
+  vat_rate: number;
+  note: string;
+  invoice_label: string;
+  deposit_label: string;
+  logo: string;
+  signature: string;
+  display_week: boolean;
+}
+
+export interface Lodging {
+  id: number;
+  active: boolean;
+  shown: boolean;
+  name: string;
+  owner: number;
+  rank: number;
+  address: string;
+  default_price: number;
+  guaranty: number;
+  capacity: number;
+  information: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Service {
+  id: number;
+  reference: string;
+  category: number;
+  designation: string;
+  quantity: number;
+  unit_price: number;
+  vat: number;
+  is_flat_rate: boolean;
+  included_in_booking: boolean;
+  not_included_in_price: boolean;
+  auto_add_booking: boolean;
+  auto_add_invoice: boolean;
+}
+
+export interface BookingStatus {
+  id: number;
+  name: string;
+  color: string;
+  rank: number;
+}
+
+export interface BookingChannel {
+  id: number;
+  name: string;
+}
+
+export interface Booking {
+  id: number;
+  lodging: Lodging;
+  guest_name: string;
+  guest_contact: string;
+  status_id: number;
+  status: BookingStatus;
+  source_id: number;
+  source: BookingChannel;
+  begin_date: string;
+  end_date: string;
+  duration: number;
+  adults: number;
+  children: number;
+  babies: number;
+  catering: string;
+  daily_rate: number
+  is_flat_rate: boolean;
+  price: number;
+  deposit: number;
+  guaranty: number;
+  commission_fees: number;
+  info: string;
+  special_conditions: string;
+  options: Service[];
+  total_payments: number;
+  left_to_pay: number;
+  price_with_options: number;
+  created: string;
+  modified: string;
+}
+
+export interface ContractTemplate {
+  id: number;
+  name: string;
+  content: string;
+  created: string;
+  modified: string;
+}
+
+export interface Contract {
+  id: number;
+  booking: number;
+  content: string;
+  pdf: string;
+  pdf_created: string;
+  signed: string;
+  created: string;
+  modified: string;
+}
+
+export interface Payment {
+  id?: number;
+  booking: number;
+  description: string;
+  amount: number;
+  method: string;
+  date: string;
+}
+
+export const paymentMethods = (t: (key: string) => string) => {
+  return [
+    ["cash", t("Cash")],
+    ["bank_card", t("Bank card")],
+    ["check", t("Check")],
+    ["transfer", t("Transfer")],
+    ["paypal", t("PayPal")],
+    ["vouchers", t("Holiday vouchers")],
+    ["other", t("Other")]
+  ];
+};
+

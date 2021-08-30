@@ -1,10 +1,10 @@
-import { apiErrorDecode } from "./apiUtils";
+import { fetchErrorDecode } from "./apiUtils";
 
 describe("apiUtils", function() {
-  it("apiErrorDecode", () => {
-    expect(apiErrorDecode(parsingError)).toEqual("SyntaxError: Unexpected token P in JSON at position 0");
-    expect(apiErrorDecode(notFoundError)).toEqual("Pas trouvé.");
-    expect(apiErrorDecode(validationError)).toEqual('{"description":["Ce champ est obligatoire."],"method":["Ce champ est obligatoire."]}');
+  it("fetchErrorDecode", () => {
+    expect(fetchErrorDecode(parsingError)).toEqual("SyntaxError: Unexpected token P in JSON at position 0");
+    expect(fetchErrorDecode(notFoundError)).toEqual("Pas trouvé.");
+    expect(fetchErrorDecode(validationError)).toEqual('{"description":["Ce champ est obligatoire."],"method":["Ce champ est obligatoire."]}');
   });
 
 });

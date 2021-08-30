@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core/styles";
-import { Payment, paymentMethods } from "../types/payment";
+import { Payment, paymentMethods } from "../types";
 import { parseISO } from "date-fns";
 
 

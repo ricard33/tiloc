@@ -1,5 +1,5 @@
 import { ORM } from "redux-orm";
-import { createModels } from "./models";
+import { createModels } from "./models-orm";
 
 const orm = new ORM({
   stateSelector: state => state.entities

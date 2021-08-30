@@ -1,2 +1,2 @@
 export * from './base';
-export * from './payment';
+export * from './models';

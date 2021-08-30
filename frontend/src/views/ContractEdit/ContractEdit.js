@@ -12,13 +12,13 @@ import {
 import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import * as selectors from "../../selectors";
+import moment from "moment";
 import { Grid } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import moment from "moment";
 import Alert from "@material-ui/lab/Alert";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { useGetOrGenerateContractMutation } from "../../services/api";
 
 const Editor = React.lazy(() => import("../../components/Editor"));
 
@@ -70,24 +70,16 @@ const ContractEdit = props => {
   const classes = useStyles();
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const contract = useSelector(store => selectors.contracts(store, bookingId));
   const history = useHistory();
+  // const [loading, setLoading] = useState(true);
+  const [getOrGenerateContract, {data: contract, isLoading, isError}] = useGetOrGenerateContractMutation();
   const [content, setContent] = useState(contract ? contract.content : undefined);
-  const [loading, setLoading] = useState(true);
 
   console.assert(!!bookingId, "Booking not initialized");
 
-  const loaded = useCallback(
-    () => {
-      setLoading(false);
-    },
-    []
-  );
-
   useEffect(() => {
-    // dispatch(actions.fetchBookings());
-    dispatch(actions.getOrCreateContract(bookingId, loaded));
-  }, [bookingId, loaded, dispatch]);
+    getOrGenerateContract({bookingId});
+  }, [bookingId, getOrGenerateContract]);
 
   useEffect(() => {
     if (contract)
@@ -99,9 +91,7 @@ const ContractEdit = props => {
   }
 
   function regenerateContract() {
-    setContent(undefined);
-    setLoading(true);
-    dispatch(actions.generateContract(bookingId, loaded));
+    getOrGenerateContract({ bookingId, regenerate: true });
   }
 
   function makePDF() {
@@ -160,7 +150,7 @@ const ContractEdit = props => {
 
   return (
     <div className={classes.root}>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
 

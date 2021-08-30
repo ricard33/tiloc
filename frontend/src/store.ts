@@ -5,6 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { api } from "./services/api";
 import orm from "./orm";
+import { rtkQueryErrorLogger } from "./services/middlewares";
 
 export const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
@@ -17,7 +18,7 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([sagaMiddleware, api.middleware])
+    getDefaultMiddleware().concat([sagaMiddleware, rtkQueryErrorLogger, api.middleware])
 
 });
 

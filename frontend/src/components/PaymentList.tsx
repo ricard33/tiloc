@@ -8,7 +8,7 @@ import { DeleteForever as DeleteIcon } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
 import { parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { Payment, paymentMethods } from "../types/payment";
+import { Payment, paymentMethods } from "../types";
 
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -10,7 +10,7 @@ import PaymentDialog from "./PaymentDialog";
 import { Payment } from "../types";
 import { useCreatePaymentMutation, useDeletePaymentMutation, useGetPaymentsForBookingQuery } from "../services/api";
 import { useAlert } from "../common/alertUtils";
-import { apiErrorDecode } from "../common/apiUtils";
+import { fetchErrorDecode } from "../common/apiUtils";
 
 type PaymentListProps = {
   bookingId: number;
@@ -42,7 +42,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
       if ((result as any).error) {
         const error = (result as any).error;
         console.error("Error during payment creation", error);
-        showError(t("Impossible to create payment: ") + apiErrorDecode(error));
+        showError(t("Impossible to create payment: ") + fetchErrorDecode(error));
       } else {
         totalPaid += payment.amount;
         if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
@@ -65,7 +65,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting payment", error);
-            showError(t("Impossible to delete the payment: ") + apiErrorDecode(error));
+            showError(t("Impossible to delete the payment: ") + fetchErrorDecode(error));
           } else {
             showSuccess("Payment deleted");
             totalPaid -= Number(payment.amount);
