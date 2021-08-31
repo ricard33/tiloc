@@ -99,7 +99,6 @@ export const createModels = () => {
         reference: attr(),
         category: fk('Category', 'services'),
         designation: attr(),
-        quantity: attr(),
         unit_price: attr(),
         vat: attr(),
         is_flat_rate: attr(),

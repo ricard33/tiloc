@@ -117,9 +117,7 @@ class Service(models.Model):
     reference = models.CharField(_("reference"), blank=True, null=True, max_length=20)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     designation = models.CharField(_("designation"), max_length=256)
-    quantity = models.SmallIntegerField(_("quantity"), default=1)
-    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=10, decimal_places=2, blank=True,
-                                     null=True)
+    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=10, decimal_places=2, blank=True, null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=10, decimal_places=2, blank=True, null=True)
     is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
                                        help_text=_("Use flat rate price instead of daily price computation"))
@@ -234,7 +232,7 @@ class Booking(models.Model):
         total = self.price
         for option in self.bookedservice_set.filter(service__not_included_in_price=False):
             if option.service.unit_price:
-                total += option.service.unit_price * (option.service.is_flat_rate and 1 or self.duration)
+                total += option.unit_price * (option.is_flat_rate and 1 or self.duration)
         return total
 
     @property
@@ -338,7 +336,9 @@ class ContractTemplate(models.Model):
 class BookedService(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField(_("quantity"))
+    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=10, decimal_places=2, blank=True, null=True)
+    is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
+                                       help_text=_("Use flat rate price instead of daily price computation"))
 
     class Meta:
         verbose_name = _("Booking service")

@@ -47,6 +47,7 @@ import Hidden from "@material-ui/core/Hidden";
 import { formatISO } from "../../common/tzUtils";
 import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
+import OptionsList from "./OptionsList";
 
 
 const AccordionSummary = withStyles({
@@ -121,7 +122,7 @@ const useStyles = makeStyles(theme => ({
   priceInput: {
     width: "7em"
   },
-  quantityInput: {
+  optionPriceInput: {
     fontSize: "medium",
     width: "5em"
   },
@@ -159,7 +160,6 @@ const BookingDialog = props => {
   const lodgings = useSelector(store => selectors.lodgings(store));
   // const owners = useSelector(store => selectors.owners(store));
   const allGuests = useSelector(store => selectors.guests(store));
-  const allOptions = useSelector(store => selectors.services(store));
   // const [selectedOptions, setSelectedOptions] = useState(booking.options || [])
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const confirm = useConfirm();
@@ -182,10 +182,11 @@ const BookingDialog = props => {
   });
   const { register, control, setValue, getValues, watch, formState } = form;
   const { errors, dirty /*isValid*/ } = formState;
-  const { fields, append, remove } = useFieldArray({
+  const optionsFieldArray = useFieldArray({
     control,
     name: "options"
   });
+  const { fields } = optionsFieldArray;
   let lodging = booking ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
   const formValues = getValues();
@@ -212,19 +213,6 @@ const BookingDialog = props => {
     // dispatch(actions.fetchLodgings());
     // dispatch(actions.fetchOwners());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (!booking.id) {
-      console.log("Scan for automatic options", allOptions);
-      allOptions.filter(o => o.auto_add_booking).forEach(option => {
-        if (options.filter(o => o.id === option.id).length === 0) {
-          console.log("  add automatic option:", option);
-          append(option);
-        }
-      });
-    }
-
-  }, [allOptions]);
 
   function initializeDefaults(booking) {
     if (booking) {
@@ -264,13 +252,6 @@ const BookingDialog = props => {
       // console.debug("initialState", initialState);
       return initialState;
     }
-  }
-
-  function onAddOption(data) {
-    console.debug("ADD OPTION", data.target.value);
-    const value = Number(data.target.value);
-    const option = allOptions.filter(o => o.id === value)[0];
-    append(option);
   }
 
   function handleChange(data) {
@@ -458,14 +439,6 @@ const BookingDialog = props => {
       console.debug("Closing...");
       onClose(submittedBooking);
     });
-  }
-
-  function getDesignation(option) {
-    return option.designation + (
-      option.unit_price ? " - " + option.unit_price + "€" + (
-        !option.is_flat_rate ? " / j" : ""
-      ) : ""
-    );
   }
 
   return (
@@ -944,95 +917,7 @@ const BookingDialog = props => {
                 <AccordionDetails>
                   <Grid container spacing={1}>
                     <Grid item xs={12}>
-                      {
-                        fields.map((option, index) => (
-                          <Grid container key={option.id} className={classes.options}>
-                            <input
-                              type="hidden" {...register(`options[${index}].id`)}
-                              defaultValue={option.id}
-                            />
-                            <input
-                              type="hidden" {...register(`options[${index}].designation`)}
-                              defaultValue={option.designation}
-                            />
-                            <input
-                              type="hidden" {...register(`options[${index}].unit_price`)}
-                              defaultValue={option.unit_price}
-                            />
-                            <input
-                              type="hidden" {...register(`options[${index}].vat`)}
-                              defaultValue={option.vat}
-                            />
-                            <input
-                              type="hidden" {...register(`options[${index}].is_flat_rate`)}
-                              defaultValue={option.is_flat_rate}
-                            />
-                            <input
-                              type="hidden" {...register(`options[${index}].not_included_in_price`)}
-                              defaultValue={option.not_included_in_price}
-                            />
-                            <Grid item xs={6} style={{ textAlign: "left" }}><span>{getDesignation(option)}</span></Grid>
-                            <Grid item xs={1} style={{ textAlign: "right" }}>{option.unit_price &&
-                            <span>{option.unit_price}&nbsp;x</span>}</Grid>
-                            <Grid item xs={2}>
-                              <Controller
-                                control={control}
-                                name={"options[" + index + "].quantity"}
-                                rules={{ valueAsNumber: true }}
-                                render={({ field }) =>
-                                  <TextField
-                                    InputProps={{
-                                      type: "number"
-                                    }}
-                                    className={classes.quantityInput}
-                                    margin="dense"
-                                    defaultValue={option.quantity}
-                                    required
-                                    // variant={variant}
-                                    {...field}
-                                  />}
-                              />
-                            </Grid>
-                            <Grid item xs={2} style={{ textAlign: "left" }}>
-                              {option.unit_price &&
-                              <span>=&nbsp;{formatCurrency(option.unit_price * (options[index] ? options[index].quantity : option.quantity) * (option.is_flat_rate ? 1 : duration))}</span>}
-                            </Grid>
-                            <Grid item xs={1}>
-                              <Button
-                                type="button"
-                                className={classes.deleteButton}
-                                color="secondary"
-                                startIcon={<DeleteIcon />}
-                                onClick={() => remove(index)}
-                              />
-                            </Grid>
-                          </Grid>
-                        ))
-                      }
-                      <FormControl className={classes.formControl} variant={variant}>
-                        <InputLabel htmlFor="booking-options">{t("Options")}</InputLabel>
-                        <Select
-                          inputProps={{
-                            name: "options_select",
-                            id: "booking-options"
-                          }}
-                          label={t("Options")}
-                          margin="dense"
-                          native
-                          value={0}
-                          onChange={onAddOption}
-                        >
-                          <option key={0} value={0}>{t("-- Add an option --")}</option>
-                          {allOptions.map(option => (
-                            <option
-                              key={option.id} value={option.id}
-                              disabled={fields.filter(o => Number(o.id) === option.id).length > 0}
-                            >
-                              {getDesignation(option)}
-                            </option>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <OptionsList form={form} optionsFieldArray={optionsFieldArray} duration={duration}  bookingId={booking.id}  variant={variant}/>
                     </Grid>
                   </Grid>
                 </AccordionDetails>

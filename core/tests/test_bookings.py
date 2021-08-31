@@ -39,7 +39,7 @@ class BookingTestCase(APITestCase):
         self.assertIn('id', obj['options'][0])
         self.assertIn('reference', obj['options'][0])
         self.assertIn('designation', obj['options'][0])
-        self.assertIn('quantity', obj['options'][0])
+        self.assertIn('is_flat_rate', obj['options'][0])
         self.assertIn('unit_price', obj['options'][0])
         self.assertIn('included_in_booking', obj['options'][0])
 
@@ -85,7 +85,8 @@ class BookingTestCase(APITestCase):
             'price':      345,
             'options': [
                 {'id':       service.id, 'reference': service.reference, 'designation': service.designation,
-                 'quantity': 1, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
+                 'is_flat_rate': service.is_flat_rate, 'unit_price': service.unit_price,
+                 'included_in_booking': service.included_in_booking}
             ]
         }
         response = self.client.post('/api/booking/', data, format='json', **self.header)
@@ -108,7 +109,7 @@ class BookingTestCase(APITestCase):
             'price':      345,
             'options': [
                 {'id':       service.id, 'reference': service.reference, 'designation': service.designation,
-                 'quantity': 1, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
+                 'is_flat_rate': service.is_flat_rate, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
             ]
         }
         response = self.client.patch('/api/booking/%d/' % booking.id, data, format='json', **self.header)
@@ -125,15 +126,15 @@ class BookingTestCase(APITestCase):
         # removed service is not deleted
         self.assertEqual(models.Service.objects.count(), 2)
 
-    def test_update_quantity_fo_booking_option(self):
+    def test_update_price_for_booking_option(self):
         booking = factories.BookingWithServiceFactory.create()
         service = booking.options.first()
-        self.assertNotEqual(service.quantity, 123)
+        self.assertNotEqual(service.unit_price, 123)
         data = {
             'price':      345,
             'options': [
                 {'id':       service.id, 'reference': service.reference, 'designation': service.designation,
-                 'quantity': 123, 'unit_price': service.unit_price, 'included_in_booking': service.included_in_booking}
+                 'is_flat_rate': not service.is_flat_rate, 'unit_price': 123, 'included_in_booking': service.included_in_booking}
             ]
         }
         response = self.client.patch('/api/booking/%d/' % booking.id, data, format='json', **self.header)
@@ -146,8 +147,9 @@ class BookingTestCase(APITestCase):
         self.assertIn('options', obj)
         self.assertEqual(len(obj['options']), 1)
         self.assertEqual(obj['options'][0]['id'], service.id)
-        self.assertEqual(obj['options'][0]['quantity'], 123)
-        self.assertEqual(booking.bookedservice_set.first().quantity, 123)
+        self.assertEqual(obj['options'][0]['unit_price'], '123.00')
+        self.assertEqual(obj['options'][0]['is_flat_rate'], not service.is_flat_rate)
+        self.assertEqual(booking.bookedservice_set.first().unit_price, 123)
 
 
 class BookingModelTestCase(TestCase):
@@ -157,8 +159,8 @@ class BookingModelTestCase(TestCase):
 
     def test_booking_with_options_prices(self):
         booking = factories.BookingFactory.create(price=500)
-        service = factories.ServiceFactory.create(quantity=1, unit_price=40, is_flat_rate=False,
+        service = factories.ServiceFactory.create(unit_price=30, is_flat_rate=True,
                                                   included_in_booking=False)
-        models.BookedService.objects.create(service=service, booking=booking, quantity=1)
+        models.BookedService.objects.create(service=service, booking=booking, unit_price=40, is_flat_rate=False)
         self.assertEqual(booking.price, 500)
         self.assertEqual(booking.price_with_options, 500 + 40 * booking.duration)

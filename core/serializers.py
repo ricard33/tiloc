@@ -90,16 +90,16 @@ class BookedServiceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='service.id')
     reference = serializers.ReadOnlyField(source='service.reference')
     designation = serializers.ReadOnlyField(source='service.designation')
-    unit_price = serializers.ReadOnlyField(source='service.unit_price')
+    # unit_price = serializers.ReadOnlyField(source='service.unit_price')
     vat = serializers.ReadOnlyField(source='service.vat')
-    is_flat_rate = serializers.ReadOnlyField(source='service.is_flat_rate')
+    # is_flat_rate = serializers.ReadOnlyField(source='service.is_flat_rate')
     included_in_booking = serializers.ReadOnlyField(source='service.included_in_booking')
     not_included_in_price = serializers.ReadOnlyField(source='service.not_included_in_price')
 
     class Meta:
         model = models.BookedService
         fields = ('id', 'reference', 'designation', 'unit_price', 'vat',
-                  'included_in_booking', 'not_included_in_price', 'is_flat_rate', 'quantity')
+                  'included_in_booking', 'not_included_in_price', 'is_flat_rate')
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -137,7 +137,8 @@ class BookingSerializer(serializers.ModelSerializer):
         options = validated_data.pop('bookedservice_set', [])
         instance = super().create(validated_data)
         for option in options:
-            models.BookedService.objects.create(service_id=option['service']['id'], booking_id=instance.id, quantity=option['quantity'])
+            models.BookedService.objects.create(service_id=option['service']['id'], booking_id=instance.id,
+                                                unit_price=option['unit_price'], is_flat_rate=option['is_flat_rate'])
         return instance
 
     def update(self, instance, validated_data):
@@ -150,10 +151,13 @@ class BookingSerializer(serializers.ModelSerializer):
             all_service_ids.append(service_id)
             if service_id in existing_service_ids:
                 booked_option = instance.bookedservice_set.get(service__id=service_id)
-                booked_option.quantity = option['quantity']
-                booked_option.save(update_fields=('quantity',))
+                booked_option.unit_price = option['unit_price']
+                booked_option.is_flat_rate = option['is_flat_rate']
+                booked_option.save(update_fields=('unit_price', 'is_flat_rate'))
             else:
-                models.BookedService.objects.create(service_id=service_id, booking_id=instance.id, quantity=option['quantity'])
+                models.BookedService.objects.create(service_id=service_id, booking_id=instance.id,
+                                                    unit_price=option['unit_price'],
+                                                    is_flat_rate=option['is_flat_rate'])
         to_remove_service_ids = instance.options.exclude(id__in=all_service_ids).values_list('id', flat=True)
         instance.options.remove(*to_remove_service_ids)
         return instance

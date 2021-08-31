@@ -125,7 +125,8 @@ class BookedServiceFactory(factory.django.DjangoModelFactory):
 
     booking = factory.SubFactory(BookingFactory)
     service = factory.SubFactory(ServiceFactory)
-    quantity = 1
+    unit_price = factory.LazyAttribute(lambda bs: bs.service.unit_price)
+    is_flat_rate = factory.LazyAttribute(lambda bs: bs.service.is_flat_rate)
 
 
 class BookingWithServiceFactory(BookingFactory):

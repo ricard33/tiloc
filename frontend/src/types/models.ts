@@ -45,7 +45,6 @@ export interface Service {
   reference: string;
   category: number;
   designation: string;
-  quantity: number;
   unit_price: number;
   vat: number;
   is_flat_rate: boolean;
