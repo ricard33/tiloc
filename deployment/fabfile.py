@@ -311,8 +311,7 @@ def deploy_location(c):
             c.run('python manage.py mediabackup --clean --noinput')
 
             c.run('python manage.py migrate --noinput')
-            # run('python manage.py compilemessages --no-color')
-            c.run('python manage.py collectstatic --clear --noinput')
+            c.run('python manage.py collectstatic --clear --noinput -v 0')
 
 
 # @task
