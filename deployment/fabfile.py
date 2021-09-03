@@ -306,6 +306,10 @@ def deploy_location(c):
         with c.prefix('. .env/bin/activate'):
             c.run('pip install pip --upgrade')
             c.run('pip install -r requirements.txt --upgrade')
+
+            c.run('python manage.py dbbackup --clean --noinput')
+            c.run('python manage.py mediabackup --clean --noinput')
+
             c.run('python manage.py migrate --noinput')
             # run('python manage.py compilemessages --no-color')
             c.run('python manage.py collectstatic --clear --noinput')

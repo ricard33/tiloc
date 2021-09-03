@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'django.forms',
     'django_filters',
     'rest_framework',
+    'dbbackup',
     'corsheaders',
     'import_export',
     'knox',
@@ -284,5 +285,9 @@ CRON_CLASSES = [
 
 WKHTMLTOPDF_PATH = config.get('PDF', 'WKHTMLTOPDF_PATH', 'wkhtmltopdf')
 
-# Activate Django-Heroku.
-# django_heroku.settings(locals())
+from . import __version__
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
+DBBACKUP_FILENAME_TEMPLATE = lambda **kwargs: \
+    'tiloc-{servername}-{datetime}-v{version}.{extension}'.format(
+        **dict(kwargs, **{'version': __version__}))
