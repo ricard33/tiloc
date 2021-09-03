@@ -69,17 +69,17 @@ def export_calendar(request, uid):
 @transaction.atomic
 def export_full_planning(request, owner_id=None):
     user = None
-    if not request.user.is_authenticated:
-        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-        if auth_header:
-            token_type, _, credentials = auth_header.partition(' ')
-            import base64
-            username, password = base64.b64decode(credentials).decode().split(':', 1)
-            user = authenticate(request, username=username, password=password)
-        if not user:
-            r = HttpResponse(status=401)
-            r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
-            return r
+    # if not request.user.is_authenticated:
+    #     auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+    #     if auth_header:
+    #         token_type, _, credentials = auth_header.partition(' ')
+    #         import base64
+    #         username, password = base64.b64decode(credentials).decode().split(':', 1)
+    #         user = authenticate(request, username=username, password=password)
+    #     if not user:
+    #         r = HttpResponse(status=401)
+    #         r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
+    #         return r
     owner = owner_id and get_object_or_404(models.Owner, id=owner_id) or None
     if owner and owner_id != request.user.id and not request.user.is_superuser:
         raise Http404('No owner matches the given query.')

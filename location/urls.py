@@ -54,8 +54,9 @@ urlpatterns = [
 
     path(r'calendar/<uuid:uid>/', views.export_calendar, name="calendar_sync"),
     path(r'calendar/<uuid:uid>.ics', views.export_calendar, name="calendar_sync"),
-    path(r'full_planning/', views.export_full_planning),
-    path(r'full_planning/<int:owner_id>/', views.export_full_planning),
+    # path(r'full_planning/', views.export_full_planning),
+    # path(r'full_planning/<int:owner_id>/', views.export_full_planning),
+    # path(r'full_planning/fbf830a8-7e47-43c6-9f25-d1734d1fc07d/', views.export_full_planning),
     path(r'stats/filling_rate/', views.filling_rate),
     path(r'stats/filling_rate/<str:begin>/<str:end>/', views.filling_rate),
     path(r'stats/channel_distribution/', views.channel_distribution),
