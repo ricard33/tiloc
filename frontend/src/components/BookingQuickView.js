@@ -69,10 +69,10 @@ const BookingQuickView = props => {
           <span className={classes.value}>{booking.guest_contact}</span>
         </div>
         : ""}
-      {booking.special_conditions ?
+      {booking.notes ?
         <div id="qv_conditions">
           <span className={classes.label}>{t("Remarks:")}</span>&nbsp;
-          <span className={classes.value}>{booking.special_conditions}</span>
+          <span className={classes.value}>{booking.notes}</span>
         </div>
         : ""}
     </React.Fragment>
@@ -97,7 +97,7 @@ BookingQuickView.propTypes = {
     adults: PropTypes.number,
     children: PropTypes.number,
     babies: PropTypes.number,
-    special_conditions: PropTypes.string,
+    notes: PropTypes.string,
   })
 };
 

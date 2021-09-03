@@ -23,10 +23,10 @@ class BookingResource(resources.ModelResource):
             'guest_name', 'guest_contact', 'guest_address', 'source',
             'begin_date', 'end_date', 'duration', 'adults', 'children', 'babies', 'catering',
             'daily_rate', 'price', 'is_flat_rate', 'deposit', 'guaranty',
-            'info', 'special_conditions',)  # 'options')
+            'notes',)  # 'options')
         export_order = (
             'id', 'lodging', 'status',
             'guest_name', 'guest_contact', 'guest_address', 'source',
             'begin_date', 'end_date', 'duration', 'adults', 'children', 'babies', 'catering',
             'daily_rate', 'price', 'is_flat_rate', 'deposit', 'guaranty',
-            'info', 'special_conditions',)  # 'options')
+            'notes',)  # 'options')

@@ -961,11 +961,11 @@ const BookingDialog = props => {
                     <Grid item xs={12}>
                       <Controller
                         control={control}
-                        name="special_conditions"
+                        name="notes"
                         render={({ field }) =>
                           <TextField
                             fullWidth
-                            inputRef={register("special_conditions")}
+                            inputRef={register("notes")}
                             label={t("Further information")}
                             margin="dense"
                             multiline

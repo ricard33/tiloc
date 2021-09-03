@@ -99,7 +99,7 @@ def export_full_planning(request, owner_id=None):
         e.location = booking.lodging.name
         e.begin = booking.begin_date
         e.end = booking.end_date
-        e.description = booking.special_conditions
+        e.description = booking.notes
         e.make_all_day()
         c.events.add(e)
     response = HttpResponse(c, content_type="text/calendar")

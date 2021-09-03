@@ -30,9 +30,8 @@ export const bookingType = PropTypes.shape({
   price: PropTypes.string,
   deposit: PropTypes.string,
   guaranty: PropTypes.string,
-  info: PropTypes.string,
   contract: PropTypes.string,
   contract_date: isoDateValidation(),
-  special_conditions: PropTypes.string,
+  notes: PropTypes.string,
   options: PropTypes.array
 });

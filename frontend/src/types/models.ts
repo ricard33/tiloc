@@ -88,8 +88,7 @@ export interface Booking {
   deposit: number;
   guaranty: number;
   commission_fees: number;
-  info: string;
-  special_conditions: string;
+  notes: string;
   options: Service[];
   total_payments: number;
   left_to_pay: number;

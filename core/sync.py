@@ -53,7 +53,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                                       begin_date=event.begin.date(),
                                       end_date=event.end.date(),
                                       duration=(event.end.date() - event.begin.date()).days,
-                                      special_conditions=event.description,
+                                      notes=event.description,
                                       price=0,
                                       deposit=0
                                       )

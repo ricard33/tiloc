@@ -211,9 +211,8 @@ class Booking(models.Model):
     deposit = models.DecimalField(_("deposit"), max_digits=10, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("guaranty"), max_digits=10, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=10, decimal_places=2, blank=True, null=True)
-    info = models.TextField(_("info"), blank=True, null=True)
 
-    special_conditions = models.TextField(_("Special conditions"), blank=True, null=True)
+    notes = models.TextField(_("Notes"), blank=True, null=True)
     options = models.ManyToManyField(Service, through='BookedService')
 
     created = models.DateTimeField(auto_now_add=True)
