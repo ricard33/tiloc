@@ -17,7 +17,7 @@ import localization from "moment/locale/fr";
 import DateFnsUtils from "@date-io/date-fns";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import frLocale from "date-fns/locale/fr";
-import Notifier from './components/Notifier';
+import Notifier from "./components/Notifier";
 
 validate.validators = {
   ...validate.validators,
@@ -33,12 +33,14 @@ function App(props) {
 
   useEffect(() => {
     dispatch(auth.loadUser(token));
-    dispatch(actions.fetchOwners());
-    dispatch(actions.fetchBookings());
-    dispatch(actions.fetchBookingStatuses());
-    dispatch(actions.fetchBookingChannels());
-    dispatch(actions.fetchLodgings());
-    dispatch(actions.fetchServices());
+    if (token) {
+      dispatch(actions.fetchOwners());
+      dispatch(actions.fetchBookings());
+      dispatch(actions.fetchBookingStatuses());
+      dispatch(actions.fetchBookingChannels());
+      dispatch(actions.fetchLodgings());
+      dispatch(actions.fetchServices());
+    }
   }, [dispatch, token]);
 
   return (

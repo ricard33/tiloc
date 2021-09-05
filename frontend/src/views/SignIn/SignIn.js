@@ -152,6 +152,13 @@ const SignIn = props => {
     }));
   }, [formState.values]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.debug("Redirect to", from);
+      history.replace(from);
+    }
+  }, [isAuthenticated]);
+
   const handleBack = () => {
     history.goBack();
   };
@@ -177,16 +184,11 @@ const SignIn = props => {
 
   const handleSignIn = event => {
     event.preventDefault();
-    dispatch(auth.login(formState.values.email, formState.values.password,
-      () => {
-        console.debug("Redirect to", from);
-        history.replace(from);
-      }));
-    // history.push('/');
+    dispatch(auth.login(formState.values.email, formState.values.password));
   };
 
   const hasError = field =>
-    formState.touched[field] && formState.errors[field] ? true : false;
+    !!(formState.touched[field] && formState.errors[field]);
 
   if (isAuthenticated) {
     return <Redirect to="/" />

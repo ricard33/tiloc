@@ -39,12 +39,12 @@ function loginFromApi(username, password) {
 }
 
 function* login(action) {
-  const { username, password, callback } = action;
+  const { username, password } = action;
 
   try {
     const res = yield call(loginFromApi, username, password);
+    localStorage.setItem("token", res.data.token);
     yield put({ type: actionTypes.LOGIN_SUCCESSFUL, data: res.data });
-    yield call(callback);
   } catch (reason) {
     console.error("LOGIN ERROR", reason);
     logger.error(reason)
@@ -59,18 +59,18 @@ function* login(action) {
 }
 
 function* logout(action) {
-  const { callback } = action;
-
   yield call(axios.post, "/api/auth/logout/");
 
   try {
     yield put({ type: actionTypes.LOGOUT_SUCCESSFUL });
-    if(callback)
-      yield call(callback);
   } catch (reason) {
     console.error("LOGOUT ERROR", reason);
     logger.error(reason)
   }
+}
+
+function deleteToken(action) {
+  localStorage.removeItem("token");
 }
 
 
@@ -175,6 +175,11 @@ export default function* rootSaga() {
     yield takeEvery(actionTypes.USER_LOADING, loadUser),
     yield takeEvery(actionTypes.LOGIN_REQUEST, login),
     yield takeEvery(actionTypes.LOGOUT_REQUEST, logout),
+    yield takeEvery([
+      actionTypes.AUTHENTICATION_ERROR,
+      actionTypes.LOGIN_FAILED,
+      actionTypes.LOGOUT_SUCCESSFUL,
+      actionTypes.AUTH_TOKEN_EXPIRED], deleteToken),
     yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKINGS), _fetchData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_BOOKING), _createData, "/api/booking/"),
     yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_BOOKING), _updateData, "/api/booking/"),

@@ -7,25 +7,22 @@ export function loadUser(token) {
   };
 }
 
-export function login(username, password, callback) {
+export function login(username, password) {
   return {
     type: actionTypes.LOGIN_REQUEST,
     username,
     password,
-    callback
   };
 }
 
-export function logout(callback) {
+export function logout() {
   return {
     type: actionTypes.LOGOUT_REQUEST,
-    callback
   };
 }
 
 export function tokenExpired() {
   return {
     type: actionTypes.AUTH_TOKEN_EXPIRED,
-    // callback
   };
 }

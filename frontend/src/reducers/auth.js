@@ -20,8 +20,6 @@ export default function auth(state=initialState, action) {
       return {...state, isAuthenticated: true, isLoading: false, user: action.user};
 
     case actionTypes.LOGIN_SUCCESSFUL:
-      // TODO Should use subscribe() or middleware instead of reducer
-      localStorage.setItem("token", action.data.token);
       return {...state, ...action.data, isAuthenticated: true, isLoading: false, errors: null};
 
     case actionTypes.AUTHENTICATION_ERROR:

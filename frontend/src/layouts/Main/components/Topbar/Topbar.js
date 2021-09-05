@@ -66,9 +66,9 @@ const Topbar = props => {
 
   const handleSignOut = event => {
     event.preventDefault();
-    dispatch(auth.logout(() => {
-      history.push("/logged-out");
-    }));
+    dispatch(auth.logout());
+    console.log("Logged out!")
+    history.push("/logged-out");
   };
 
   return (
