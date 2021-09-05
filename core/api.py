@@ -120,7 +120,14 @@ class BookingViewSet(viewsets.ModelViewSet):
         if models.Contract.objects.filter(booking=booking).exists():
             contract = booking.contract
         else:
-            contract = booking.generate_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+            try:
+                contract = booking.generate_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+            except jinja2.exceptions.TemplateError as ex:
+                logger.exception("Template generation error")
+                raise APIException(detail="Template error: " + ex.message)
+            except Exception as ex:
+                logger.exception("Unknown error during template generation")
+                raise APIException(detail=str(ex))
         serializer = ContractSerializer(instance=contract)
         return Response(serializer.data)
 
