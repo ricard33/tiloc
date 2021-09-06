@@ -1,46 +1,44 @@
 // Need to use the React-specific entry point to import createApi
-import { BaseQueryFn, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Headers, Pagination, Payment, Contract } from "../types";
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
+import { Pagination, Payment, Contract } from "../types";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export const serviceURL = "/api/";
+
+type AxiosArgs = {
+    url: string
+    method: AxiosRequestConfig["method"]
+    params?: AxiosRequestConfig["params"]
+    data?: AxiosRequestConfig["data"]
+  }
+type AxiosQueryMeta = { request: AxiosRequestConfig; response?: AxiosResponse }
 
 const axiosBaseQuery =
   (
     { baseUrl }: { baseUrl: string } = { baseUrl: "" }
-  ): BaseQueryFn<{
-    url: string
-    method: AxiosRequestConfig["method"]
-    data?: AxiosRequestConfig["data"]
-  },
+  ): BaseQueryFn<
+    string | AxiosArgs,
     unknown,
-    unknown> =>
-    async ({ url, method, data }) => {
+    AxiosError,
+    {},
+    AxiosQueryMeta> =>
+    async (arg) => {
+      const { url, method = 'get', params = undefined, data = undefined } = typeof arg == 'string' ? { url: arg } : arg;
+      let meta: AxiosQueryMeta | undefined
+      const requestArgs: AxiosRequestConfig = { url: baseUrl + url, method, params, data };
+      meta = { request: requestArgs }
       try {
-        const result = await axios({ url: baseUrl + url, method, data });
-        return { data: result.data };
+        return await axios(requestArgs);
       } catch (axiosError) {
         let err = axiosError as AxiosError;
-        return {
-          error: { status: err.response?.status, data: err.response?.data }
-        };
+        return { error: err, meta };
       }
     };
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: serviceURL,
-    prepareHeaders: (headers, { getState }) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set(Headers.Authorization, `Token ${token}`);
-      }
-      headers.set(Headers.Accept, "application/json");
-      return headers;
-    }
-  }),
+  baseQuery: axiosBaseQuery({baseUrl: serviceURL}),
   tagTypes: ["Payment", "Booking", "Contract", "ContractTemplate"],
   endpoints: (builder) => ({
 
@@ -80,7 +78,7 @@ export const api = createApi({
         return {
           url: `payment/`,
           method: "POST",
-          body
+          data: body
         };
       },
       invalidatesTags: [{ type: "Payment", id: "LIST" }]

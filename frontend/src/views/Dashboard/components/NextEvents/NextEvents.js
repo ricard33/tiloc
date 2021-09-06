@@ -58,7 +58,7 @@ const NextEvents = props => {
   const { t } = useTranslation();
   const events = useSelector(store => selectors.nextEvents(store));
 
-  console.log(events);
+  // console.log(events);
 
   return (
     <Card
