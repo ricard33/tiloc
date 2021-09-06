@@ -57,7 +57,7 @@ export const createModels = () => {
         owner: fk("Owner", "lodgings"),
         rank: attr(),
         address: attr(),
-        default_price: attr(),
+        daily_rate: attr(),
         guaranty: attr(),
         capacity: attr(),
         information: attr()

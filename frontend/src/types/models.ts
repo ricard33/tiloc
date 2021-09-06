@@ -1,5 +1,3 @@
-import { attr, fk, oneToOne } from "redux-orm";
-
 export interface Owner {
   id: number;
   active: boolean;
@@ -29,10 +27,12 @@ export interface Lodging {
   owner: number;
   rank: number;
   address: string;
-  default_price: number;
+  daily_rate: number;
   guaranty: number;
   capacity: number;
   information: string;
+  tourist_tax: number;
+  description: string;
 }
 
 export interface Category {
@@ -67,14 +67,15 @@ export interface BookingChannel {
 }
 
 export interface Booking {
-  id: number;
-  lodging: Lodging;
-  guest_name: string;
-  guest_contact: string;
+  id?: number;
+  lodging?: Lodging;
+  guest_name?: string;
+  guest_contact?: string;
+  guest_address?: string;
   status_id: number;
   status: BookingStatus;
-  source_id: number;
-  source: BookingChannel;
+  source_id?: number;
+  source?: BookingChannel;
   begin_date: string;
   end_date: string;
   duration: number;
@@ -82,13 +83,13 @@ export interface Booking {
   children: number;
   babies: number;
   catering: string;
-  daily_rate: number
+  daily_rate?: number
   is_flat_rate: boolean;
-  price: number;
-  deposit: number;
-  guaranty: number;
-  commission_fees: number;
-  notes: string;
+  price?: number;
+  deposit?: number;
+  guaranty?: number;
+  commission_fees?: number;
+  notes?: string;
   options: Service[];
   total_payments: number;
   left_to_pay: number;

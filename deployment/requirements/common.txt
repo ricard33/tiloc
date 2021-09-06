@@ -6,6 +6,7 @@ django-cron==0.5.1
 django-constance[database]==2.8.0
 django-cors-headers==3.8.0
 django-dbbackup==3.3.0
+django-filter==2.4.0
 django-grappelli==2.15.1
 django-heroku
 django-import-export==2.5.0

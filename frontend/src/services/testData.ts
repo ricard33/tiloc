@@ -8,7 +8,7 @@ export const initialState: Partial<RootState> = {
   api: {
     queries: {},
     mutations: {},
-    provided: { Payment: {}, Booking: {}, Contract: {}, ContractTemplate: {}},
+    provided: { Payment: {}, Booking: {}, Contract: {}, ContractTemplate: {}, Lodging: {}, BookingStatus: {}},
     subscriptions: {},
     config: {
       refetchOnFocus: false,

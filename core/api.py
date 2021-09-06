@@ -21,6 +21,7 @@ from rest_framework.response import Response
 from location import __date__, __version__
 
 from . import models
+from .filters import BookingFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
@@ -111,7 +112,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = models.Booking.objects.all().order_by('-begin_date').prefetch_related('status', 'lodging', 'source', 'options')
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
-    filterset_fields = ['id']
+    filterset_class = BookingFilter
 
     @transaction.atomic
     @action(detail=True, methods=['post'])
@@ -166,6 +167,7 @@ class LodgingViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     queryset = models.Lodging.objects.all().order_by('name')
     serializer_class = LodgingSerializer
+    filterset_fields = ['shown']
 
     @action(detail=True, methods=['get'])
     @transaction.atomic
