@@ -23,12 +23,6 @@ import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles(theme => ({
   root: {},
-  content: {
-    padding: 0
-  },
-  inner: {
-    minWidth: 1050
-  },
   nameContainer: {
     display: "flex",
     alignItems: "center"
@@ -42,14 +36,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingsTable = props => {
-  const { className, bookings, onEdit, onSelectionChange, ...rest } = props;
+  const { className, bookings, onEdit, onSelectionChange, ordering, onChangeOrdering, ...rest } = props;
 
   const { t } = useTranslation();
   const classes = useStyles();
   const [selectedBookings, setSelectedUsers] = useState([]);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [page, setPage] = useState(0);
-  const [ordering, setOrdering] = useState({ orderBy: "begin_date", order: "asc" });
 
   const handleSelectAll = event => {
     const { bookings } = props;
@@ -87,14 +78,6 @@ const BookingsTable = props => {
     onSelectionChange(newSelectedUsers);
   };
 
-  const handlePageChange = (event, page) => {
-    setPage(page);
-  };
-
-  const handleRowsPerPageChange = event => {
-    setRowsPerPage(event.target.value);
-  };
-
   function handleRowClick(event, booking) {
     // history.push("/bookings/" + id);
     onEdit && onEdit(booking);
@@ -102,14 +85,7 @@ const BookingsTable = props => {
 
   const isSelected = id => selectedBookings.indexOf(id) !== -1;
   const handleRequestSort = (event, property) => {
-    const orderBy = property;
-    let order = "desc";
-
-    if (ordering.orderBy === property && ordering.order === "desc") {
-      order = "asc";
-    }
-
-    setOrdering({ order, orderBy });
+    onChangeOrdering && onChangeOrdering(property);
   };
 
   function desc(a, b, orderBy) {
@@ -139,101 +115,84 @@ const BookingsTable = props => {
   }
 
   return (
-    <Card
-      {...rest}
-      className={clsx(classes.root, className)}
-    >
-      <CardContent className={classes.content}>
-        <PerfectScrollbar>
-          <div className={classes.inner}>
-            <Table>
-              <EnhancedTableHead
-                columns={[
-                  { id: "begin_date", numeric: false, disablePadding: false, label: t("From") },
-                  { id: "end_date", numeric: false, disablePadding: false, label: t("To") },
-                  { id: "guest_name", numeric: false, disablePadding: false, label: t("Guest") },
-                  { id: "lodging", numeric: false, disablePadding: false, label: t("Lodging") },
-                  { id: "status", numeric: false, disablePadding: false, label: t("Status") },
-                  { id: "price", numeric: false, disablePadding: false, label: t("Price") },
-                  { id: "action", numeric: false, disablePadding: false, label: t("Actions") }
-                ]}
-                numSelected={selectedBookings.length}
-                order={ordering.order}
-                orderBy={ordering.orderBy}
-                onSelectAllClick={handleSelectAll}
-                onRequestSort={handleRequestSort}
-                rowCount={bookings.length}
-              />
-              <TableBody>
-                {stableSort(bookings, getSorting(ordering.order, ordering.orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map(booking => (
-                    <TableRow
-                      className={classes.tableRow}
-                      hover
-                      key={booking.id}
-                      selected={isSelected(booking.id)}
-                      role="checkbox"
-                      aria-checked={isSelected(booking.id)}
-                      tabIndex={-1}
-                      onClick={event => handleRowClick(event, booking)}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedBookings.indexOf(booking.id) !== -1}
-                          color="primary"
-                          onClick={event => handleSelectOne(event, booking.id)}
-                          value="true"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {moment(booking.begin_date).format("DD/MM/YYYY")}
-                      </TableCell>
-                      <TableCell>
-                        {moment(booking.end_date).format("DD/MM/YYYY")}
-                      </TableCell>
-                      <TableCell>
-                        <div className={classes.nameContainer}>
-                          <Typography variant="body1">{booking.guest_name}</Typography>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {booking.lodging ? booking.lodging.name : ""}
-                      </TableCell>
-                      <TableCell>{booking.status.name}</TableCell>
-                      <TableCell>{booking.price}</TableCell>
-                      <TableCell>
-                        {onEdit && (<Button onClick={event => handleRowClick(event, booking)}>
-                          <EditIcon/>
-                        </Button>)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
-        </PerfectScrollbar>
-      </CardContent>
-      <CardActions className={classes.actions}>
-        <TablePagination
-          component="div"
-          count={bookings.length}
-          onChangePage={handlePageChange}
-          onChangeRowsPerPage={handleRowsPerPageChange}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-        />
-      </CardActions>
-    </Card>
+    <Table>
+      <EnhancedTableHead
+        columns={[
+          { id: "begin_date", numeric: false, disablePadding: false, label: t("From") },
+          { id: "end_date", numeric: false, disablePadding: false, label: t("To") },
+          { id: "guest_name", numeric: false, disablePadding: false, label: t("Guest") },
+          { id: "lodging", numeric: false, disablePadding: false, label: t("Lodging") },
+          { id: "status", numeric: false, disablePadding: false, label: t("Status") },
+          { id: "price", numeric: false, disablePadding: false, label: t("Price") },
+          { id: "action", numeric: false, disablePadding: false, label: t("Actions") }
+        ]}
+        numSelected={selectedBookings.length}
+        order={ordering.order}
+        orderBy={ordering.orderBy}
+        onSelectAllClick={handleSelectAll}
+        onRequestSort={handleRequestSort}
+        rowCount={bookings.length}
+      />
+      <TableBody>
+        {stableSort(bookings, getSorting(ordering.order, ordering.orderBy))
+          // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map(booking => (
+            <TableRow
+              className={classes.tableRow}
+              hover
+              key={booking.id}
+              selected={isSelected(booking.id)}
+              role="checkbox"
+              aria-checked={isSelected(booking.id)}
+              tabIndex={-1}
+              onClick={event => handleRowClick(event, booking)}
+            >
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={selectedBookings.indexOf(booking.id) !== -1}
+                  color="primary"
+                  onClick={event => handleSelectOne(event, booking.id)}
+                  value="true"
+                />
+              </TableCell>
+              <TableCell>
+                {moment(booking.begin_date).format("DD/MM/YYYY")}
+              </TableCell>
+              <TableCell>
+                {moment(booking.end_date).format("DD/MM/YYYY")}
+              </TableCell>
+              <TableCell>
+                <div className={classes.nameContainer}>
+                  <Typography variant="body1">{booking.guest_name}</Typography>
+                </div>
+              </TableCell>
+              <TableCell>
+                {booking.lodging ? booking.lodging.name : ""}
+              </TableCell>
+              <TableCell>{booking.status.name}</TableCell>
+              <TableCell>{booking.price}</TableCell>
+              <TableCell>
+                {onEdit && (<Button onClick={event => handleRowClick(event, booking)}>
+                  <EditIcon />
+                </Button>)}
+              </TableCell>
+            </TableRow>
+          ))}
+      </TableBody>
+    </Table>
   );
 };
 
 BookingsTable.propTypes = {
   bookings: PropTypes.array.isRequired,
   className: PropTypes.string,
+  onChangeOrdering: PropTypes.func,
   onEdit: PropTypes.func,
-  onSelectionChange: PropTypes.func
+  onSelectionChange: PropTypes.func,
+  ordering: PropTypes.shape({
+    order: PropTypes.string,
+    orderBy: PropTypes.string,
+  }),
 };
 
 export default BookingsTable;

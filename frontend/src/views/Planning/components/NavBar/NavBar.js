@@ -39,6 +39,7 @@ const NavBar = props => {
   const monthFormat = isPhone ? "MMM" : "MMMM Y";
 
   const onPrevNextClick = (months) => {
+    console.log(performance.now().toFixed(2), "onPrevNextClick");
     const newDate = add(date, {months: months});
     setCurrentDate(newDate)
     onChange(newDate);

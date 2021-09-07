@@ -55,15 +55,15 @@ const ContractTemplatesTable = props => {
   const handleSelectAll = event => {
     const { templates } = props;
 
-    let selectedUsers;
+    let selectedTemplates;
 
     if (event.target.checked) {
-      selectedUsers = templates.map(user => user.id);
+      selectedTemplates = templates.map(template => template.id);
     } else {
-      selectedUsers = [];
+      selectedTemplates = [];
     }
 
-    setSelectedTemplates(selectedUsers);
+    setSelectedTemplates(selectedTemplates);
   };
 
   const handleSelectOne = (event, id) => {
@@ -210,8 +210,8 @@ const ContractTemplatesTable = props => {
         <TablePagination
           component="div"
           count={templates.length}
-          onChangePage={handlePageChange}
-          onChangeRowsPerPage={handleRowsPerPageChange}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
           page={page}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[5, 10, 25]}

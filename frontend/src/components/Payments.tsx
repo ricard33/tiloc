@@ -47,7 +47,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
         totalPaid += payment.amount;
         if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
         setOpen(false);
-        showSuccess("Payment added");
+        showSuccess(t("Payment added"));
       }
     });
   }
@@ -67,7 +67,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
             console.error("Error deleting payment", error);
             showError(t("Impossible to delete the payment: ") + fetchErrorDecode(error));
           } else {
-            showSuccess("Payment deleted");
+            showSuccess(t("Payment deleted"));
             totalPaid -= Number(payment.amount);
             // setPayments(payments.filter(p => p.id !== payment.id));
             if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);

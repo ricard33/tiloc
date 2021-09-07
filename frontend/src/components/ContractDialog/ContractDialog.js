@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
@@ -15,16 +15,20 @@ import {
   Refresh as RefreshIcon,
   Save as SaveIcon
 } from "@material-ui/icons";
-import * as actions from "../../actions";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import * as selectors from "../../selectors";
 import { Grid } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import useWindowDimensions from "../../common/windowDimensions";
 import moment from "moment";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {
+  useGetOrGenerateContractMutation,
+  useUpdateContractMutation,
+  useDeleteContractMutation,
+} from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 
 const Editor = React.lazy(() => import("../Editor"));
 
@@ -73,25 +77,19 @@ const useStyles = makeStyles(theme => ({
 const ContractDialog = props => {
   const { booking, onClose } = props;
   const classes = useStyles();
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const contract = useSelector(store => selectors.contracts(store, booking.id));
+  const [getOrGenerateContract, {data: contract, isLoading}] = useGetOrGenerateContractMutation();
+  const [ updateContract ] = useUpdateContractMutation();
+  const [ deleteContract ] = useDeleteContractMutation();
   const [content, setContent] = useState(contract ? contract.content : undefined);
-  const [loading, setLoading] = useState(true);
+  const { showError, showSuccess } = useAlert();
 
   console.assert(!!booking, "Booking not initialized");
 
-  const loaded = useCallback(
-    () => {
-      setLoading(false);
-    },
-    []
-  );
-
   useEffect(() => {
-    dispatch(actions.getOrCreateContract(booking.id, loaded));
-  }, [booking.id, loaded, dispatch]);
+    getOrGenerateContract({bookingId: booking.id});
+  }, [booking.id, getOrGenerateContract]);
 
   useEffect(() => {
     if (contract)
@@ -104,8 +102,7 @@ const ContractDialog = props => {
 
   function regenerateContract() {
     setContent(undefined);
-    setLoading(true);
-    dispatch(actions.generateContract(booking.id, loaded));
+    getOrGenerateContract({bookingId: booking.id, regenerate: true});
   }
 
   function makePDF() {
@@ -132,10 +129,10 @@ const ContractDialog = props => {
 
   function onDelete() {
     if (contract.id)
-      dispatch(actions.deleteContract(contract.id, () => {
+      deleteContract(contract.id).then(() => {
         console.debug("Closing...");
         onClose();
-      }));
+      });
   }
 
   function onSave() {
@@ -143,10 +140,16 @@ const ContractDialog = props => {
       id: contract.id,
       content: content
     };
-    const action = actions.updateContract;
-    dispatch(action(submittedContract, () => {
-      onClose(submittedContract);
-    }));
+    updateContract(submittedContract).then((result) => {
+      const {error} = result;
+      if (error) {
+        console.error("Error during contract saving", error);
+        showError(t("Impossible to save contract: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Contract saved"));
+        onClose(submittedContract);
+      }
+    });
   }
 
   return (
@@ -161,7 +164,7 @@ const ContractDialog = props => {
       disablePortal
       disableAutoFocus
     >
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
 

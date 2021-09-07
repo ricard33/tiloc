@@ -1,10 +1,7 @@
-import React, { useEffect } from "react";
+import React, { } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { useDispatch, useSelector } from "react-redux";
 import { Typography } from "@material-ui/core";
 // import { useTranslation } from "react-i18next";
-import * as actions from "../../actions";
-import * as selectors from "../../selectors";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,16 +18,7 @@ const useStyles = makeStyles(theme => ({
 
 const TestPage = () => {
   const classes = useStyles();
-  const dispatch = useDispatch();
   // const { t } = useTranslation();
-  // const booking = useSelector(store => selectors.bookings(store, 1));
-  const contract = useSelector(store => selectors.contracts(store, 66));
-
-  console.log(contract);
-  useEffect(() => {
-    dispatch(actions.fetchBookings());
-    dispatch(actions.fetchContracts());
-  }, [dispatch]);
 
   return (
     <div className={classes.root}>

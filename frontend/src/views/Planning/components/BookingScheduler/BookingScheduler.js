@@ -24,6 +24,9 @@ import { useMediaQuery } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {},
+  disabled: {
+    opacity: "0.3",
+  },
   collapseButton: {
     width: "100%",
     minWidth: "inherit",
@@ -113,10 +116,9 @@ const BookingScheduler = props => {
   const {
     bookings, lodgings, beginDate,
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
-    settings
+    settings, disabled
   } = props;
   const classes = useStyles();
-  const rootRef = useRef();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
     defaultMatches: true
@@ -141,7 +143,7 @@ const BookingScheduler = props => {
   };
   updateLayout(width, height);
 
-  lodgings.sort((a, b) => a.rank - b.rank);
+  lodgings && lodgings.sort((a, b) => a.rank - b.rank);
   let groups = lodgings.map(lodging => ({
     id: lodging.id,
     title: lodging.name,
@@ -192,7 +194,7 @@ const BookingScheduler = props => {
   //   className: classes.specialGroup
   // });
 
-  const items = bookings.map(booking => ({
+  const items = (bookings ?? []).map(booking => ({
     id: booking.id,
     group: booking.lodging_id > 0 ? booking.lodging_id : -3,
     title: booking.guest_name,
@@ -307,7 +309,7 @@ const BookingScheduler = props => {
   }
 
   return (
-    <div className={classes.root} ref={rootRef}>
+    <div className={clsx(classes.root , disabled && classes.disabled)}>
       {/*<Grid container justifyContent="space-between">*/}
       {/*  <Grid item>*/}
       {/*    <NavButton onClick={() => onPrevNextClick(-1)}>*/}
@@ -387,6 +389,7 @@ BookingScheduler.defaultProps = {
 BookingScheduler.propTypes = {
   beginDate: PropTypes.instanceOf(Date),
   bookings: PropTypes.array.isRequired,
+  disabled: PropTypes.bool,
   lodgings: PropTypes.array.isRequired,
   onCreateBooking: PropTypes.func,
   onItemDeselected: PropTypes.func,

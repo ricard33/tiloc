@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router-dom";
@@ -8,9 +8,6 @@ import {
   PictureAsPdf as PdfIcon,
   Save as SaveIcon
 } from "@material-ui/icons";
-import * as actions from "../../actions";
-import { useDispatch, useSelector } from "react-redux";
-import * as selectors from "../../selectors";
 import { Grid, TextField } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import moment from "moment";
@@ -20,6 +17,13 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import {
+  useCreateContractTemplateMutation, useDeleteContractTemplateMutation,
+  useGetContractTemplateQuery,
+  useListLodgingsQuery, useUpdateContractTemplateMutation
+} from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
@@ -63,31 +67,18 @@ const ContractTemplateEdit = (props) => {
   templateId = Number(templateId);
   const classes = useStyles();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const template = useSelector(store => selectors.contractTemplates(store, templateId));
-  const lodgings = useSelector(store => selectors.lodgings(store));
+  const {data: template, isLoading} = useGetContractTemplateQuery(templateId, {skip: typeof templateId === 'undefined'});
+  const { data: lodgings, isLoading: isLoadingLodgings } = useListLodgingsQuery({ shown: true });
+  const [ createContractTemplate ] = useCreateContractTemplateMutation();
+  const [ updateContractTemplate ] = useUpdateContractTemplateMutation();
+  const [ deleteContractTemplate ] = useDeleteContractTemplateMutation();
   const history = useHistory();
   const [content, setContent] = useState(template ? template.content : undefined);
-  const [name, setName] = useState(template ? template.name : undefined);
-  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState(template ? template.name : "");
   const [lodgingId, setLodgingId] = useState(0);
+  const { showError, showSuccess } = useAlert();
 
   // console.assert(!!templateId, "Template id not initialized");
-
-  const loaded = useCallback(
-    () => {
-      setLoading(false);
-    },
-    []
-  );
-
-  useEffect(() => {
-    // dispatch(actions.fetchBookings());
-    if (templateId)
-      dispatch(actions.getContractTemplate(templateId, loaded));
-    else
-      loaded()
-  }, [templateId, loaded, dispatch]);
 
   useEffect(() => {
     if (template) {
@@ -120,10 +111,10 @@ const ContractTemplateEdit = (props) => {
 
   function onDelete() {
     if (template.id)
-      dispatch(actions.deleteContractTemplate(template.id, () => {
+      deleteContractTemplate(template.id).then(() => {
         console.debug("Closing...");
         onClose();
-      }));
+      });
   }
 
   function onSave() {
@@ -144,21 +135,28 @@ const ContractTemplateEdit = (props) => {
       name: name,
       content: content
     };
-    const action = template && template.id ? actions.updateContractTemplate : actions.createContractTemplate;
-    dispatch(action(submittedTemplate, (data) => {
-      if (!template || !template.id) {
-        console.debug('change url')
-        templateId = data.id;
-        history.replace({ pathname: `/settings/contract-templates/${templateId}`})
+    const action = template && template.id ? updateContractTemplate : createContractTemplate;
+    action(submittedTemplate).then((result) => {
+      const {data, error} = result;
+      if (error) {
+        console.error("Error during template saving", error);
+        showError(t("Impossible to save template: ") + fetchErrorDecode(error));
+      } else {
+        if (!template || !template.id) {
+          console.debug('change url')
+          templateId = data.id;
+          history.replace({ pathname: `/settings/contract-templates/${templateId}` })
+        }
+        showSuccess(t("Template saved"));
+        if(callback) callback(submittedTemplate);
       }
-      callback(submittedTemplate);
-    }));
+    });
   }
 
 
   return (
     <div className={classes.root}>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
@@ -191,7 +189,7 @@ const ContractTemplateEdit = (props) => {
         </Grid>
         <Grid item xs={12}>
           <Suspense fallback={<div>{t("Loading...")}</div>}>
-            {!loading &&
+            {!isLoading &&
             <Editor
               content={content}
               onChange={onChange}
@@ -221,7 +219,7 @@ const ContractTemplateEdit = (props) => {
                 onChange={onLodgingChange}
               >
                 <MenuItem key={0} value={0}>{t("--- select a lodging ---")}</MenuItem>
-                {lodgings.map(lodging => (
+                {lodgings && lodgings.map(lodging => (
                   <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
                 ))}
               </Select>

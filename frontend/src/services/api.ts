@@ -1,6 +1,16 @@
 // Need to use the React-specific entry point to import createApi
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
-import { Pagination, Payment, Contract, Booking, Lodging, BookingStatus } from "../types";
+import {
+  Pagination,
+  Payment,
+  Contract,
+  Booking,
+  Lodging,
+  BookingStatus,
+  BookingChannel,
+  Guest,
+  ContractTemplate
+} from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { api2Booking, api2Lodging, api2Payment } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
@@ -112,7 +122,7 @@ function makeUpdateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
     query(body) {
       return {
         url: `${url}${body.id}/`,
-        method: "PUT",
+        method: "PATCH",
         data: body
       };
     },
@@ -151,12 +161,16 @@ const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
+const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
+const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate");
+const contractApi = makeApi<Contract>("contract/", "Contract");
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery({ baseUrl: serviceURL }),
-  tagTypes: ["Payment", "Lodging", "Booking", "BookingStatus", "Contract", "ContractTemplate"],
+  tagTypes: ["Payment", "Lodging", "Booking", "BookingStatus", "BookingChannel", "Contract", "ContractTemplate",
+    "Guest", "ContractTemplate"],
   endpoints: (builder) => ({
 
     // BookingStatus
@@ -165,6 +179,13 @@ export const api = createApi({
     createBookingStatus: bookingStatusApi.create(builder),
     updateBookingStatus: bookingStatusApi.update(builder),
     deleteBookingStatus: bookingStatusApi.delete(builder),
+
+    // BookingChannel
+    listBookingChannels: bookingChannelApi.list(builder),
+    getBookingChannel: bookingChannelApi.get(builder),
+    createBookingChannel: bookingChannelApi.create(builder),
+    updateBookingChannel: bookingChannelApi.update(builder),
+    deleteBookingChannel: bookingChannelApi.delete(builder),
 
     // Lodging
     listLodgings: lodgingApi.list(builder),
@@ -180,6 +201,10 @@ export const api = createApi({
     createBooking: bookingApi.create(builder),
     updateBooking: bookingApi.update(builder),
     deleteBooking: bookingApi.delete(builder),
+    allGuests: builder.query<Guest[], undefined>({
+      query: () => 'booking/all_guests/',
+      providesTags: ["Guest"],
+    }),
 
     // Payment
     getPaymentsForBooking: builder.query<Pagination<Payment>, number>({
@@ -209,7 +234,20 @@ export const api = createApi({
           method: "POST"
         };
       }
-    })
+    }),
+    listContracts: contractApi.list(builder),
+    getContract: contractApi.get(builder),
+    createContract: contractApi.create(builder),
+    updateContract: contractApi.update(builder),
+    deleteContract: contractApi.delete(builder),
+
+    // Contract template
+    listContractTemplates: contractTemplateApi.list(builder),
+    getContractTemplate: contractTemplateApi.get(builder),
+    createContractTemplate: contractTemplateApi.create(builder),
+    updateContractTemplate: contractTemplateApi.update(builder),
+    deleteContractTemplate: contractTemplateApi.delete(builder),
+
 
   })
 });
@@ -224,6 +262,12 @@ export const {
   useUpdateBookingStatusMutation,
   useDeleteBookingStatusMutation,
 
+  useListBookingChannelsQuery,
+  useGetBookingChannelQuery,
+  useCreateBookingChannelMutation,
+  useUpdateBookingChannelMutation,
+  useDeleteBookingChannelMutation,
+
   useListLodgingsQuery,
   useGetLodgingQuery,
   useCreateLodgingMutation,
@@ -236,6 +280,7 @@ export const {
   useCreateBookingMutation,
   useUpdateBookingMutation,
   useDeleteBookingMutation,
+  useAllGuestsQuery,
 
   useGetPaymentsForBookingQuery,
   useGetPaymentQuery,
@@ -244,6 +289,17 @@ export const {
   useUpdatePaymentMutation,
   useDeletePaymentMutation,
 
-  useGetOrGenerateContractMutation
+  useGetOrGenerateContractMutation,
+  useGetContractQuery,
+  useListContractsQuery,
+  useCreateContractMutation,
+  useUpdateContractMutation,
+  useDeleteContractMutation,
+
+  useGetContractTemplateQuery,
+  useListContractTemplatesQuery,
+  useCreateContractTemplateMutation,
+  useUpdateContractTemplateMutation,
+  useDeleteContractTemplateMutation,
 
 } = api;

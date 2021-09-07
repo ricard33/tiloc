@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import * as actions from "../../../actions";
-import { useDispatch, useSelector } from "react-redux";
-import orm from "../../../orm";
 import { ContractTemplatesTable, ContractTemplatesToolbar } from "./components";
 import { useHistory } from "react-router-dom";
+import { useListContractTemplatesQuery } from "../../../services/api";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -23,17 +21,10 @@ const useStyles = makeStyles(theme => ({
 
 const ContractTemplateList = () => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const allTemplates = useSelector(store => orm.session(store.entities).ContractTemplate.all());
-  const loading = useSelector(store => store.fetching.contract_templates.loading);
+  const { data: allTemplates, isLoading } = useListContractTemplatesQuery();
   const [selected, setSelected] = useState([]);
   const numSelected = selected.length;
   const history = useHistory();
-
-  useEffect(() => {
-    dispatch(actions.fetchContractTemplates());
-    dispatch(actions.fetchLodgings());
-  }, [dispatch]);
 
   const onSelectionChange = (newSelection) => {
     setSelected(newSelection);
@@ -48,11 +39,11 @@ const ContractTemplateList = () => {
       <ContractTemplatesToolbar numSelected={numSelected}/>
       <div className={classes.content}>
         <ContractTemplatesTable
-          templates={allTemplates.toModelArray() || []}
+          templates={allTemplates || []}
           onEdit={onEditTemplate}
           onSelectionChange={onSelectionChange}
         />
-        <Backdrop className={classes.backdrop} open={loading} timeout={0}>
+        <Backdrop className={classes.backdrop} open={isLoading} timeout={0}>
           <CircularProgress color="inherit"/>
         </Backdrop>
       </div>

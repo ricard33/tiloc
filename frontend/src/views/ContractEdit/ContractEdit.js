@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router-dom";
@@ -9,8 +9,6 @@ import {
   Refresh as RefreshIcon,
   Save as SaveIcon
 } from "@material-ui/icons";
-import * as actions from "../../actions";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import moment from "moment";
 import { Grid } from "@material-ui/core";
@@ -18,7 +16,13 @@ import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { useGetOrGenerateContractMutation } from "../../services/api";
+import {
+  useDeleteContractMutation,
+  useGetOrGenerateContractMutation,
+  useUpdateContractMutation
+} from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 
 const Editor = React.lazy(() => import("../../components/Editor"));
 
@@ -65,15 +69,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ContractEdit = props => {
+const ContractEdit = () => {
   let { bookingId } = useParams();
   const classes = useStyles();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const history = useHistory();
   // const [loading, setLoading] = useState(true);
-  const [getOrGenerateContract, {data: contract, isLoading, isError}] = useGetOrGenerateContractMutation();
+  const [getOrGenerateContract, {data: contract, isLoading}] = useGetOrGenerateContractMutation();
+  const [ updateContract ] = useUpdateContractMutation();
+  const [ deleteContract ] = useDeleteContractMutation();
   const [content, setContent] = useState(contract ? contract.content : undefined);
+  const { showError, showSuccess } = useAlert();
 
   console.assert(!!bookingId, "Booking not initialized");
 
@@ -122,10 +128,16 @@ const ContractEdit = props => {
 
   function onDelete() {
     if (contract.id)
-      dispatch(actions.deleteContract(contract.id, () => {
-        console.debug("Closing...");
-        onClose();
-      }));
+      deleteContract(contract.id).then((result) => {
+        const {error} = result;
+        if (error) {
+          console.error("Error deleting contract", error);
+          showError(t("Impossible to delete contract: ") + fetchErrorDecode(error));
+        } else {
+          onClose();
+          showSuccess(t("Contract deleted"));
+        }
+      });
   }
 
   function onSave() {
@@ -141,10 +153,16 @@ const ContractEdit = props => {
       id: contract.id,
       content: content
     };
-    const action = actions.updateContract;
-    dispatch(action(submittedContract, () => {
-      callback(submittedContract);
-    }));
+    updateContract(submittedContract).then((result) => {
+      const {error} = result;
+      if (error) {
+        console.error("Error during contract saving", error);
+        showError(t("Impossible to save contract: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Contract saved"));
+        if(callback) callback(submittedContract);
+      }
+    });
   }
 
 

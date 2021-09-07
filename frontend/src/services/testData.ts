@@ -8,7 +8,8 @@ export const initialState: Partial<RootState> = {
   api: {
     queries: {},
     mutations: {},
-    provided: { Payment: {}, Booking: {}, Contract: {}, ContractTemplate: {}, Lodging: {}, BookingStatus: {}},
+    provided: { Payment: {}, Booking: {}, Contract: {}, ContractTemplate: {}, Lodging: {}, BookingStatus: {},
+      BookingChannel: {}, Guest: {}},
     subscriptions: {},
     config: {
       refetchOnFocus: false,
@@ -27,13 +28,13 @@ export const payment: Payment = {
   id: 1,
   booking: 22,
   amount: 0,
-  date: "15-01-2021",
+  date: "2021-01-15",
   description: "",
   method: "cash",
 }
 
 export const paymentsList: Pagination<Payment> = {
-  count: 0,
+  count: 1,
   results: [payment]
 }
 
@@ -41,7 +42,7 @@ export const paymentsList: Pagination<Payment> = {
 export const newPayment: Payment = {
   booking: 22,
   amount: 0,
-  date: "15-01-2021",
+  date: "2021-01-15",
   description: "",
   method: "cash",
 }

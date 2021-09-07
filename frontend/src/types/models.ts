@@ -138,3 +138,8 @@ export const paymentMethods = (t: (key: string) => string) => {
   ];
 };
 
+export interface Guest {
+  name: string;
+  contact: string;
+  address: string;
+}

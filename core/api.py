@@ -6,6 +6,7 @@ import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
+from django.db.models import Min, Max
 from django.http import Http404, HttpResponse
 from knox.auth import TokenAuthentication
 from knox.models import AuthToken
@@ -28,7 +29,7 @@ from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
                           PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, ServiceSerializer,
-                          UserSerializer)
+                          UserSerializer, GuestSerializer)
 
 logger = logging.getLogger('api')
 
@@ -90,6 +91,7 @@ class LoginAPI(KnoxLoginView):
 
 
 class LogoutAPI(KnoxLogoutView):
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         logout(request)
@@ -113,6 +115,16 @@ class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
     filterset_class = BookingFilter
+
+    @action(detail=False, methods=['get'])
+    def all_guests(self, request, pk=None):
+        serializer = GuestSerializer(models.Booking.objects.all().order_by('guest_name')
+                                     .values('guest_name')
+                                     # .values(name=F('guest_name'), contact=F('guest_contact'), address=F('guest_address'))
+                                     .annotate(name=Min('guest_name'), contact=Max('guest_contact'), address=Max('guest_address'))
+                                     # .distinct(),
+                                     , many=True)
+        return Response(serializer.data)
 
     @transaction.atomic
     @action(detail=True, methods=['post'])

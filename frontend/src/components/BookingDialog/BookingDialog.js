@@ -17,10 +17,7 @@ import {
   Save as SaveIcon,
   ExpandMore as ExpandMoreIcon
 } from "@material-ui/icons";
-import * as actions from "../../actions";
-import { useDispatch, useSelector } from "react-redux";
 import { Controller, useForm, useFieldArray } from "react-hook-form";
-import * as selectors from "../../selectors";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
 import { getDepositLabel } from "../../common/ownerPrefsUtils";
@@ -48,6 +45,14 @@ import { formatISO } from "../../common/tzUtils";
 import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
+import {
+  useAllGuestsQuery, useCreateBookingMutation, useDeleteBookingMutation,
+  useListBookingChannelsQuery,
+  useListBookingStatusesQuery,
+  useListLodgingsQuery, useUpdateBookingMutation
+} from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 
 
 const AccordionSummary = withStyles({
@@ -154,19 +159,18 @@ const BookingDialog = props => {
   const classes = useStyles();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
-  const bookingChannels = useSelector(store => selectors.bookingChannels(store));
-  const lodgings = useSelector(store => selectors.lodgings(store));
-  // const owners = useSelector(store => selectors.owners(store));
-  const allGuests = useSelector(store => selectors.guests(store));
-  // const [selectedOptions, setSelectedOptions] = useState(booking.options || [])
+  const { showError, showSuccess } = useAlert();
+  const { data: bookingStatuses } = useListBookingStatusesQuery();
+  const { data: bookingChannels } = useListBookingChannelsQuery();
+  const { data: lodgings } = useListLodgingsQuery({ shown: true });
+  const { data: allGuests } = useAllGuestsQuery();
+  const [ createBooking ] = useCreateBookingMutation();
+  const [ updateBooking ] = useUpdateBookingMutation();
+  const [ deleteBooking ] = useDeleteBookingMutation();
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const confirm = useConfirm();
   const variant = "filled";
   const depositPercent = 30; // TODO load this from owner or lodging prefs
-
-  bookingStatuses.sort((a, b) => a.rank - b.rank);
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -174,6 +178,8 @@ const BookingDialog = props => {
   const setMultipleValues = object => Object.keys(object).forEach(function(key) {
     setValue(key, object[key]);
   });
+
+  let lodging = booking?.lodging;
 
   const initialState = initializeDefaults(booking);
 
@@ -187,7 +193,6 @@ const BookingDialog = props => {
     name: "options"
   });
   const { fields } = optionsFieldArray;
-  let lodging = booking ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
   const formValues = getValues();
   // console.debug("formValues: ", formValues);
@@ -207,12 +212,10 @@ const BookingDialog = props => {
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
 
   useEffect(() => {
-    // dispatch(actions.fetchBookings());
-    // dispatch(actions.fetchBookingStatuses());
-    // dispatch(actions.fetchBookingChannels());
-    // dispatch(actions.fetchLodgings());
-    // dispatch(actions.fetchOwners());
-  }, [dispatch]);
+    if (formValues.status_id === undefined && bookingStatuses) {
+      setValue('status_id', bookingStatuses[0].id);
+    }
+  }, [bookingStatuses, formValues.status_id, setValue]);
 
   function initializeDefaults(booking) {
     if (booking) {
@@ -222,13 +225,11 @@ const BookingDialog = props => {
         //   source: { ...bookingChannels.filter(x => x.id === booking.source_id)[0] }
       };
 
-      const lodging = { ...lodgings.filter(x => x.id === booking.lodging_id)[0] };
-
       // Provide defaults for new bookings
-      if (initialState.status_id === undefined) {
-        initialState.status_id = bookingStatuses[0].id;
-        initialState.status = bookingStatuses[0];
-      }
+      // if (initialState.status_id === undefined) {
+      //   initialState.status_id = bookingStatuses[0].id;
+      //   initialState.status = bookingStatuses[0];
+      // }
       if (initialState.lodging_id === null)
         initialState.lodging_id = 0;
       initialState.guest_contact = booking.guest_contact || "";
@@ -236,12 +237,12 @@ const BookingDialog = props => {
       initialState.begin_date = parseISO(booking.begin_date || format(new Date(), "yyyy-MM-yy"));
       initialState.end_date = parseISO(booking.end_date || format(addDays(initialState.begin_date, initialState.duration || 7), "yyyy-MM-dd"));
       initialState.duration = booking.duration || differenceInCalendarDays(initialState.end_date, initialState.begin_date);
-      initialState.daily_rate = booking.daily_rate || lodging.daily_rate;
+      initialState.daily_rate = booking.daily_rate || lodging?.daily_rate;
       initialState.is_flat_rate = booking.is_flat_rate || false;
       if (initialState.price === undefined)
         Object.assign(initialState, computeBookingPrice(initialState.begin_date, initialState.end_date,
           initialState.daily_rate, 0, 0, [], depositPercent));
-      initialState.guaranty = booking.guaranty || lodging.guaranty;
+      initialState.guaranty = booking.guaranty || lodging?.guaranty;
       initialState.commission_fees = booking.commission_fees || 0;
       initialState.adults = booking.adults || 2;
       initialState.children = booking.children || 0;
@@ -410,9 +411,16 @@ const BookingDialog = props => {
       description: t("Do you really want to permanently delete this booking?")
     })
       .then(() => {
-        dispatch(actions.deleteBooking(booking.id, () => {
-          onClose();
-        }));
+        deleteBooking(booking.id).then((result) => {
+          if (result.error) {
+            const error = result.error;
+            console.error("Error deleting booking", error);
+            showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Booking deleted"));
+            onClose();
+          }
+        });
       })
       .catch(() => { /* ... */
       });
@@ -426,11 +434,18 @@ const BookingDialog = props => {
       end_date: formatISO(data.end_date),
       lodging_id: data.lodging_id > 0 ? data.lodging_id : null
     };
-    const action = booking.id ? actions.updateBooking : actions.createBooking;
-    dispatch(action(submittedBooking, () => {
-      if (callback)
-        callback(submittedBooking);
-    }));
+    const action = booking.id ? updateBooking : createBooking;
+    action(submittedBooking).then((result) => {
+      if (result.error) {
+        const error = result.error;
+        console.error("Error saving booking", error);
+        showError(t("Impossible to save the booking: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Booking saved"));
+        if (callback)
+          callback(submittedBooking);
+      }
+    });
 
   }
 
@@ -484,6 +499,7 @@ const BookingDialog = props => {
             <Grid item sm={4} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel id="status-label">{t("Booking status")}</InputLabel>
+                {bookingStatuses &&
                 <Controller
                   name="status_id"
                   control={control}
@@ -502,13 +518,14 @@ const BookingDialog = props => {
                         </MenuItem>
                       ))}
                     </Select>}
-                />
+                />}
               </FormControl>
             </Grid>
             { /* LODGING */}
             <Grid item sm={8} xs={12}>
               <FormControl className={classes.formControl} variant={variant}>
                 <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
+                {lodgings &&
                 <Controller
                   name="lodging_id"
                   control={control}
@@ -526,7 +543,7 @@ const BookingDialog = props => {
                       <MenuItem value="" disabled>---</MenuItem>
                       <MenuItem value="0">{t("Cancellation / Waiting")}</MenuItem>
                     </Select>}
-                />
+                />}
               </FormControl>
             </Grid>
             { /* GUEST */}
@@ -543,6 +560,7 @@ const BookingDialog = props => {
                     <Grid item xs={11}>
                       <FormControl className={classes.formControl} variant={variant}>
                         <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
+                        {allGuests &&
                         <Select
                           inputProps={{
                             name: "existing-guest",
@@ -558,7 +576,7 @@ const BookingDialog = props => {
                           {allGuests.map(guest => (
                             <option key={guest.name} value={guest.name}>{guest.name}</option>
                           ))}
-                        </Select>
+                        </Select>}
                         <FormHelperText>{t("Select an existing guest to automatically fill its information")}</FormHelperText>
                       </FormControl>
                     </Grid>
@@ -938,6 +956,7 @@ const BookingDialog = props => {
                     <Grid item xs={12}>
                       <FormControl className={classes.formControl} variant={variant}>
                         <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
+                        {bookingChannels &&
                         <Controller
                           name="source_id"
                           control={control}
@@ -954,7 +973,7 @@ const BookingDialog = props => {
                                 <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
                               ))}
                             </Select>}
-                        />
+                        />}
                       </FormControl>
                     </Grid>
                     {/* notes */}
@@ -989,10 +1008,12 @@ const BookingDialog = props => {
                 >
                   <Typography gutterBottom className={classes.heading}>{t("Payments")}</Typography>
                   <Typography gutterBottom className={classes.secondaryHeading}>
-                    {leftToPay > 0 && <span
+                    {leftToPay > 0 &&
+                    <span
                       className={classes.leftToPay}
                     >{t("Left to pay: {{amount}}", { amount: formatCurrency(leftToPay) })}</span>}
-                    {leftToPay < 0 && <span
+                    {leftToPay < 0 &&
+                    <span
                       className={classes.tooPerceived}
                     >{t("Too perceived: {{amount}}", { amount: formatCurrency(-leftToPay) })}</span>}
                     {leftToPay === 0 && t("Fully paid")}

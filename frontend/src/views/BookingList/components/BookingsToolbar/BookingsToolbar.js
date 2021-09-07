@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingsToolbar = props => {
-  const { className, numSelected, ...rest } = props;
+  const { className, numSelected, onCreateBooking, ...rest } = props;
 
   const classes = useStyles();
   const [openImport, setOpenImport] = React.useState(false);
@@ -103,6 +103,7 @@ const BookingsToolbar = props => {
         <Button
           color="primary"
           variant="contained"
+          onClick={onCreateBooking}
         >
           {t("Add booking")}
         </Button>
@@ -127,7 +128,8 @@ const BookingsToolbar = props => {
 
 BookingsToolbar.propTypes = {
   className: PropTypes.string,
-  numSelected: PropTypes.number
+  numSelected: PropTypes.number,
+  onCreateBooking: PropTypes.func
 };
 
 export default BookingsToolbar;

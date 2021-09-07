@@ -191,3 +191,10 @@ class ContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Contract
         fields = '__all__'
+
+
+class GuestSerializer(serializers.Serializer):
+    name = serializers.CharField(read_only=True)
+    contact = serializers.CharField(read_only=True)
+    address = serializers.CharField(read_only=True)
+

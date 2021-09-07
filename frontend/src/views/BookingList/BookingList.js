@@ -3,11 +3,13 @@ import { BookingsTable, BookingsToolbar } from "./components";
 import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import * as actions from "../../actions";
-import { useDispatch, useSelector } from "react-redux";
-import orm from "orm";
 // import { useTranslation } from "react-i18next";
 import { BookingDialog } from "../../components";
+import { useListBookingsPaginatedQuery } from "../../services/api";
+import { Card, CardActions, TablePagination } from "@material-ui/core";
+import CardContent from "@material-ui/core/CardContent";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import { formatISO } from "../../common/tzUtils";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -15,6 +17,12 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     marginTop: theme.spacing(2)
+  },
+  cardContent: {
+    padding: 0
+  },
+  inner: {
+    minWidth: 1050
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -24,43 +32,91 @@ const useStyles = makeStyles(theme => ({
 
 const BookingList = () => {
   const classes = useStyles();
-  const dispatch = useDispatch();
   // const { t } = useTranslation();
-  // const allBookings = useSelector(store => selectors.bookings(store));
-  const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
-  const loading = useSelector(store => store.fetching.bookings.loading);
   const [selected, setSelected] = useState([]);
   const [editBooking, setEditBooking] = useState(null);
   const numSelected = selected.length;
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(0);
+  const [ordering, setOrdering] = useState({ orderBy: "begin_date", order: "asc" });
+  const { data: bookings, isLoading: isLoadingBookings, isFetching: isFetchingBookings, refetch } = useListBookingsPaginatedQuery({
+    page_size: rowsPerPage,
+    page: page+1,
+    ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy
+  });
 
-  useEffect(() => {
-    dispatch(actions.fetchBookings());
-  }, [dispatch]);
 
   const onSelectionChange = (newSelection) => {
     setSelected(newSelection);
   };
 
+  const onCreateBooking = () => {
+    setEditBooking({
+      lodging_id: undefined,
+      begin_date: formatISO(new Date())
+    });
+  };
+
   const onEditBooking = (booking) => {
-    setEditBooking(booking.ref);
+    console.log(booking);
+    setEditBooking(booking);
   };
 
   const handleCloseEdit = () => {
     setEditBooking(null);
   };
+  const handlePageChange = (event, page) => {
+    setPage(page);
+  };
+
+  const handleRowsPerPageChange = event => {
+    setRowsPerPage(event.target.value);
+  };
+
+  const onChangeOrdering = (property) => {
+    const orderBy = property;
+    let order = "desc";
+
+    if (ordering.orderBy === property && ordering.order === "desc") {
+      order = "asc";
+    }
+
+    setOrdering({ order, orderBy });
+  };
 
   return (
     <div className={classes.root}>
-      <BookingsToolbar numSelected={numSelected}/>
+      <BookingsToolbar numSelected={numSelected} onCreateBooking={onCreateBooking}/>
       <div className={classes.content}>
-        <BookingsTable
-          bookings={allBookings.toModelArray() || []}
-          onEdit={onEditBooking}
-          onSelectionChange={onSelectionChange}
-        />
-        <Backdrop className={classes.backdrop} open={loading} timeout={0}>
-          <CircularProgress color="inherit"/>
-        </Backdrop>
+        <Card>
+          <CardContent className={classes.cardContent}>
+            <PerfectScrollbar>
+              <div className={classes.inner}>
+                <BookingsTable
+                  bookings={bookings?.results || []}
+                  onEdit={onEditBooking}
+                  onSelectionChange={onSelectionChange}
+                  ordering={ordering}
+                  onChangeOrdering={onChangeOrdering}
+                />
+                <Backdrop className={classes.backdrop} open={isLoadingBookings} timeout={0}>
+                  <CircularProgress color="inherit"/>
+                </Backdrop>
+              </div>
+            </PerfectScrollbar>
+          </CardContent>
+          <CardActions className={classes.actions}>
+            <TablePagination
+              component="div"
+              count={bookings ? bookings.count : 0}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+            />
+          </CardActions>
+        </Card>
       </div>
       {editBooking &&
       <BookingDialog

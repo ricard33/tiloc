@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { startOfMonth, parse } from "date-fns";
+import { startOfMonth, parse, add } from "date-fns";
 import { BookingScheduler } from "./components";
 import * as actions from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +22,14 @@ import { formatISO } from "../../common/tzUtils";
 import useInterval from "../../common/useInterval";
 import { useLocalStorage } from "../../common/useLocalStorage";
 import PlanningSettingsDialog from "./components/PlanningSettingsDialog";
+import {
+  useDeleteBookingMutation,
+  useListBookingsQuery,
+  useListBookingStatusesQuery,
+  useListLodgingsQuery
+} from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -51,19 +59,19 @@ const useStyles = makeStyles(theme => ({
 const Planning = props => {
   const classes = useStyles();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const location = useLocation();
   const query = queryString.parse(location.search);
   let requestedDate = parse(query.start, "yyyy-MM", new Date());
   if (isNaN(requestedDate))
     requestedDate = new Date();
 
+  const { showError, showSuccess } = useAlert();
   const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
-  // const allBookings = useSelector(store => orm.session(store.entities).Booking.all());
-  const bookings = useSelector(store => selectors.bookings(store));
-  const lodgings = useSelector(store => selectors.lodgings(store));
-  const bookingChannels = useSelector(store => selectors.bookingChannels(store));
-  const bookingStatuses = useSelector(store => selectors.bookingStatuses(store));
+  const dateFilter = formatISO(beginDate) + ":" + formatISO(add(beginDate, {years: 1}))
+  const { data: bookings, isLoading: isLoadingBookings, isFetching: isFetchingBookings, refetch } = useListBookingsQuery({for_dates: dateFilter}, {pollingInterval: 60000});
+  const { data: lodgings, isLoading: isLoadingLodgings } = useListLodgingsQuery({ shown: true });
+  const { data: bookingStatuses } = useListBookingStatusesQuery();
+  const [ deleteBooking ] = useDeleteBookingMutation();
   const [selected, setSelected] = useState(null);
   const [editBooking, setEditBooking] = useState(null);
   const [needFirstTimeEdit, setNeedFirstTimeEdit] = useState(query.edit !== undefined);
@@ -72,7 +80,11 @@ const Planning = props => {
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [settings, setSettings] = useLocalStorage("planningSettings", { showPaymentStatus: true });
 
+  console.log(performance.now().toFixed(2), "Planning", bookings?.length);
 
+  useEffect(() => {
+    console.log(performance.now().toFixed(2), "fetching", isFetchingBookings);
+  }, [isFetchingBookings])
   // const bookings = allBookings.toModelArray();
 
   if (needFirstTimeEdit && !editBooking && bookings && bookings.filter(b => b.id === Number(query.edit)).length) {
@@ -80,17 +92,6 @@ const Planning = props => {
     setEditBooking(bookings.filter(b => b.id === Number(query.edit))[0]);
     setNeedFirstTimeEdit(false);
   }
-
-  useEffect(() => {
-    // dispatch(actions.fetchBookings());
-    // dispatch(actions.fetchBookingStatuses());
-    // dispatch(actions.fetchBookingChannels());
-    // dispatch(actions.fetchLodgings());
-  }, [dispatch]);
-
-  useInterval(() => {
-    dispatch(actions.fetchBookings());
-  }, 60000);
 
   const onEditBooking = (booking) => {
     console.debug("EDIT ", booking.id);
@@ -108,7 +109,6 @@ const Planning = props => {
   };
 
   const handleCloseEdit = () => {
-    dispatch(actions.fetchBookings({id: editBooking.id}));
     setEditBooking(null);
     setSelected(null);
   };
@@ -132,8 +132,15 @@ const Planning = props => {
     })
       .then(() => {
         setSelected(null);
-        dispatch(actions.deleteBooking(booking.id, () => {
-        }));
+        deleteBooking(booking.id).then((result) => {
+          if (result.error) {
+            const error = result.error;
+            console.error("Error deleting booking", error);
+            showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Booking deleted"));
+          }
+        });
       })
       .catch(() => { /* ... */
       });
@@ -152,12 +159,12 @@ const Planning = props => {
     }
   };
 
-  const bookings2 = bookings.map(booking => ({
-    ...booking,
-    status: bookingStatuses.filter(s => s.id === booking.status_id)[0],
-    lodging: lodgings.filter(l => l.id === booking.lodging_id)[0],
-    source: booking.source_id ? bookingChannels.filter(c => c.id === booking.source_id)[0] : undefined
-  }));
+  // const bookings2 = bookings.map(booking => ({
+  //   ...booking,
+  //   status: bookingStatuses.filter(s => s.id === booking.status_id)[0],
+  //   lodging: lodgings.filter(l => l.id === booking.lodging_id)[0],
+  //   source: booking.source_id ? bookingChannels.filter(c => c.id === booking.source_id)[0] : undefined
+  // }));
 
   return (
     <div className={classes.root}>
@@ -191,17 +198,23 @@ const Planning = props => {
           onClick={() => setSettingsOpened(true)}
         ><SettingsIcon/></IconButton>
       </div>
-      <NavBar date={beginDate} onChange={(newDate) => setBeginDate(newDate)}/>
-      <BookingScheduler
-        bookings={bookings2}
-        lodgings={lodgings.filter(b => b.shown)}
+      <NavBar
+        date={beginDate} onChange={(newDate) => {
+          setBeginDate(newDate);
+          refetch();
+        }}
+      />
+      {<BookingScheduler
+        bookings={bookings ?? []}
+        lodgings={[...(lodgings ?? [])]}
         beginDate={beginDate}
         onCreateBooking={onCreateBooking}
         onOpenBooking={onEditBooking}
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}
         settings={settings}
-      />
+        disabled={isFetchingBookings}
+      />}
       <Grid container justifyContent="space-between" alignItems="flex-start">
         <Grid item>
           <Button
@@ -248,7 +261,7 @@ const Planning = props => {
           <Typography variant="h5" component="h2">
             {t("Legend")}
           </Typography>
-          {bookingStatuses.map(status => {
+          {bookingStatuses && bookingStatuses.map(status => {
             return (
               <span
                 key={status.id}
