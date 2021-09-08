@@ -14,11 +14,10 @@ import {
 } from "@material-ui/core";
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-import { useSelector } from "react-redux";
-import * as selectors from "../../../../selectors";
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDistanceToNow } from "../../../../common/dateUtils";
 import { NavLink } from "react-router-dom";
+import { useListBookingsQuery } from "../../../../services/api";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -49,8 +48,12 @@ const LatestBookings = props => {
 
   const classes = useStyles();
   const { t } = useTranslation();
-  const bookings = useSelector(store =>  selectors.lastBookings(store));
   const count = 3;
+  const { data: bookings } = useListBookingsQuery({
+    lodging__isnull: false,
+    ordering: "-created",
+    page_size: count
+  });
 
   return (
     <Card
@@ -72,7 +75,7 @@ const LatestBookings = props => {
       <Divider />
       <CardContent className={classes.content}>
         <List>
-          {bookings.slice(0, count).map((booking, i) => (
+          {bookings && bookings.map((booking, i) => (
             <ListItem
               className={classes.listItem}
               divider={i < count - 1}

@@ -1,3 +1,6 @@
+import json
+
+import arrow
 from django.test import TestCase
 from knox.models import AuthToken
 from rest_framework import status
@@ -150,6 +153,58 @@ class BookingTestCase(APITestCase):
         self.assertEqual(obj['options'][0]['unit_price'], '123.00')
         self.assertEqual(obj['options'][0]['is_flat_rate'], not service.is_flat_rate)
         self.assertEqual(booking.bookedservice_set.first().unit_price, 123)
+
+
+class BookingQueriesTestCase(APITestCase):
+    def setUp(self) -> None:
+        factories.BookingStatusFactory.create_batch(4)
+        self.lodging = factories.LodgingFactory.create()
+        self.user = factories.AdminFactory.create()
+        self.client.force_login(self.user)
+        instance, token = AuthToken.objects.create(self.user)
+        self.header = {'HTTP_AUTHORIZATION': "Token " + token}
+
+    def testAllGuests(self):
+        for name in ['Alain DELON', 'Franck HERBERT', 'Pablo PICASSO']:
+            factories.BookingFactory.create(guest_name=name)
+
+        response = self.client.get('/api/booking/all_guests/', **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        guests = response.data
+        self.assertEqual(len(guests), 3, guests)
+        self.assertIn('Alain DELON', map(lambda g: g['name'], guests), json.dumps(guests))
+
+    def testAllGuestsDeduplicate(self):
+        for name in ['Alain DELON', 'Franck HERBERT', 'Pablo PICASSO', 'Franck HERBERT']:
+            factories.BookingFactory.create(guest_name=name)
+
+        response = self.client.get('/api/booking/all_guests/', **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        guests = response.data
+        self.assertEqual(len(guests), 3, json.dumps(guests))
+        self.assertIn('Franck HERBERT', map(lambda g: g['name'], guests), json.dumps(guests))
+
+    def testNextEvents(self):
+        now = arrow.utcnow()
+        # test bookings can't be less than 7 days nor more than 21 days
+        for i, date in enumerate([now.shift(days=-30), now.shift(days=-4), now.shift(days=+1), now.shift(days=+30), now.shift(days=+35), ]):
+            factories.BookingFactory.create(begin_date=date.date(), guest_name='guest %d' % (i+1))
+
+        response = self.client.get('/api/booking/next_events/?count=5', **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        events = response.data
+        self.assertEqual(len(events), 5, json.dumps(events))
+        self.assertEqual(events[0]['guest_name'], 'guest 3', json.dumps(events))
+        self.assertEqual(events[0]['event_type'], 'CHECKIN', json.dumps(events))
+        self.assertEqual(events[1]['guest_name'], 'guest 2', json.dumps(events))
+        self.assertEqual(events[1]['event_type'], 'CHECKOUT', json.dumps(events))
+        self.assertEqual(events[2]['guest_name'], 'guest 3', json.dumps(events))
+        self.assertEqual(events[2]['event_type'], 'CHECKOUT', json.dumps(events))
+        self.assertEqual(events[3]['guest_name'], 'guest 4', json.dumps(events))
+        self.assertEqual(events[3]['event_type'], 'CHECKIN', json.dumps(events))
+        self.assertEqual(events[4]['guest_name'], 'guest 5', json.dumps(events))
+        self.assertEqual(events[4]['event_type'], 'CHECKIN', json.dumps(events))
+
 
 
 class BookingModelTestCase(TestCase):

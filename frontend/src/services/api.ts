@@ -9,7 +9,7 @@ import {
   BookingStatus,
   BookingChannel,
   Guest,
-  ContractTemplate
+  ContractTemplate, NextEvent
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { api2Booking, api2Lodging, api2Payment } from "../types/models-convertion";
@@ -169,8 +169,7 @@ const contractApi = makeApi<Contract>("contract/", "Contract");
 export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery({ baseUrl: serviceURL }),
-  tagTypes: ["Payment", "Lodging", "Booking", "BookingStatus", "BookingChannel", "Contract", "ContractTemplate",
-    "Guest", "ContractTemplate"],
+  tagTypes: ["Payment", "Lodging", "Booking", "BookingStatus", "BookingChannel", "Contract", "ContractTemplate", ],
   endpoints: (builder) => ({
 
     // BookingStatus
@@ -203,7 +202,9 @@ export const api = createApi({
     deleteBooking: bookingApi.delete(builder),
     allGuests: builder.query<Guest[], undefined>({
       query: () => 'booking/all_guests/',
-      providesTags: ["Guest"],
+    }),
+    nextEvents: builder.query<NextEvent[], number>({
+      query: (count) => 'booking/next_events/?count='+count,
     }),
 
     // Payment
@@ -248,7 +249,6 @@ export const api = createApi({
     updateContractTemplate: contractTemplateApi.update(builder),
     deleteContractTemplate: contractTemplateApi.delete(builder),
 
-
   })
 });
 
@@ -281,6 +281,7 @@ export const {
   useUpdateBookingMutation,
   useDeleteBookingMutation,
   useAllGuestsQuery,
+  useNextEventsQuery,
 
   useGetPaymentsForBookingQuery,
   useGetPaymentQuery,

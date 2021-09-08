@@ -143,3 +143,12 @@ export interface Guest {
   contact: string;
   address: string;
 }
+
+export interface NextEvent {
+  id: number;
+  date: string;
+  Lodging_name: string;
+  event_type: string;
+  guest_name: string;
+  booking_channel: string;
+}

@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import * as selectors from "../../../../selectors";
 import { NavLink } from "react-router-dom";
+import { useNextEventsQuery } from "../../../../services/api";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -56,7 +57,8 @@ const NextEvents = props => {
   const { className, ...rest } = props;
   const classes = useStyles();
   const { t } = useTranslation();
-  const events = useSelector(store => selectors.nextEvents(store));
+  const { data: events } = useNextEventsQuery(5);
+  // const events = useSelector(store => selectors.nextEvents(store));
 
   // console.log(events);
 
@@ -104,7 +106,7 @@ const NextEvents = props => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {events.slice(0, 5).map(event => (
+                {events && events.map(event => (
                   <TableRow
                     hover
                     key={event.event_type + event.id}
@@ -112,7 +114,7 @@ const NextEvents = props => {
                     <TableCell>
                       {moment(event.date).format('LL')}
                     </TableCell>
-                    <TableCell>{event.lodging ? event.lodging.name : "-"}</TableCell>
+                    <TableCell>{event.lodging_name}</TableCell>
                     <TableCell>
                       <div className={classes.statusContainer}>
                         <StatusBullet
@@ -124,7 +126,7 @@ const NextEvents = props => {
                       </div>
                     </TableCell>
                     <TableCell>{event.guest_name}</TableCell>
-                    <TableCell>{event.source ? event.source.name : "-"}</TableCell>
+                    <TableCell>{event.booking_channel ?? "-"}</TableCell>
                     {/*<TableCell>*/}
                     {/*  <div className={classes.statusContainer}>*/}
                     {/*    <StatusBullet*/}

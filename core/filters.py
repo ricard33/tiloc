@@ -16,7 +16,7 @@ class BookingFilter(filters.FilterSet):
         model = Booking
         fields = {
             'id':         ['exact'],
-            'lodging':    ['exact'],
+            'lodging':    ['exact', 'isnull', 'in'],
             'begin_date': ['lte', 'gte'],
             'end_date':   ['lte', 'gte'],
         }

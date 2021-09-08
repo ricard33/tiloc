@@ -29,7 +29,7 @@ const Footer = props => {
         >
           Gecko Conception
         </Link>
-        . 2020
+        . 2020-{new Date().getFullYear()}
       </Typography>
       <Typography variant="caption">
         Created with love for the environment.

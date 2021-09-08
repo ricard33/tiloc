@@ -68,8 +68,8 @@ const Planning = props => {
   const { showError, showSuccess } = useAlert();
   const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   const dateFilter = formatISO(beginDate) + ":" + formatISO(add(beginDate, {years: 1}))
-  const { data: bookings, isLoading: isLoadingBookings, isFetching: isFetchingBookings, refetch } = useListBookingsQuery({for_dates: dateFilter}, {pollingInterval: 60000});
-  const { data: lodgings, isLoading: isLoadingLodgings } = useListLodgingsQuery({ shown: true });
+  const { data: bookings, isFetching: isFetchingBookings, refetch } = useListBookingsQuery({for_dates: dateFilter}, {pollingInterval: 60000});
+  const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const [ deleteBooking ] = useDeleteBookingMutation();
   const [selected, setSelected] = useState(null);

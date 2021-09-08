@@ -6,8 +6,9 @@ import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
-from django.db.models import Min, Max
+from django.db.models import Min, Max, F, Value
 from django.http import Http404, HttpResponse
+from django.utils import timezone
 from knox.auth import TokenAuthentication
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
@@ -29,7 +30,7 @@ from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
                           PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, ServiceSerializer,
-                          UserSerializer, GuestSerializer)
+                          UserSerializer, GuestSerializer, NextEventSerializer)
 
 logger = logging.getLogger('api')
 
@@ -124,6 +125,19 @@ class BookingViewSet(viewsets.ModelViewSet):
                                      .annotate(name=Min('guest_name'), contact=Max('guest_contact'), address=Max('guest_address'))
                                      # .distinct(),
                                      , many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def next_events(self, request, pk=None):
+        qs1 = models.Booking.objects.filter(begin_date__gte=timezone.now()).annotate(date=F('begin_date'), event_type=Value('CHECKIN')) \
+            .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
+                    lodging_name=F('lodging__name'), booking_channel=F('source__name'))
+        qs2 = models.Booking.objects.filter(end_date__gte=timezone.now()).annotate(date=F('end_date'), event_type=Value('CHECKOUT')) \
+            .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
+                    lodging_name=F('lodging__name'), booking_channel=F('source__name'))
+        qs = qs1.union(qs2).order_by('date')
+        count = int(self.request.query_params.get('count', 10))
+        serializer = NextEventSerializer(qs[:count], many=True)
         return Response(serializer.data)
 
     @transaction.atomic
