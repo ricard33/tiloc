@@ -20,7 +20,6 @@ type PaymentListProps = {
 const Payments: React.FunctionComponent<PaymentListProps> = ({
   bookingId,
   onPaymentsUpdate,
-  ...props
 }: PaymentListProps) => {
   const [open, setOpen] = useState(false);
   const confirm = useConfirm();

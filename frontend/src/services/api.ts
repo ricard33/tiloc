@@ -170,7 +170,9 @@ const serviceApi = makeApi<Service>("service/", "Service");
 export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery({ baseUrl: serviceURL }),
-  tagTypes: ["Payment", "Lodging", "Booking", "BookingStatus", "BookingChannel", "Contract", "ContractTemplate", ],
+  tagTypes: [
+    "Payment", "Lodging", "Booking", "BookingStatus", "BookingChannel", "Contract", "ContractTemplate", "Service",
+  ],
   endpoints: (builder) => ({
 
     // BookingStatus
@@ -201,7 +203,7 @@ export const api = createApi({
     createBooking: bookingApi.create(builder),
     updateBooking: bookingApi.update(builder),
     deleteBooking: bookingApi.delete(builder),
-    allGuests: builder.query<Guest[], undefined>({
+    allGuests: builder.query<Guest[], void>({
       query: () => 'booking/all_guests/',
     }),
     nextEvents: builder.query<NextEvent[], number>({

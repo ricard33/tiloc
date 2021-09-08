@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/styles";
-import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
-import { bookingType } from "../../common/propTypesUtils";
+import { bookingType, lodgingType } from "../../common/propTypesUtils";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import {
@@ -46,10 +45,10 @@ import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
 import {
-  useAllGuestsQuery, useCreateBookingMutation, useDeleteBookingMutation,
+  useCreateBookingMutation, useDeleteBookingMutation,
   useListBookingChannelsQuery,
   useListBookingStatusesQuery,
-  useListLodgingsQuery, useUpdateBookingMutation
+  useUpdateBookingMutation
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
@@ -155,22 +154,20 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingDialog = props => {
-  const { className, booking, onClose, onOpenContract } = props;
+  const { booking, lodgings, guests: allGuests, onClose, onOpenContract } = props;
   const classes = useStyles();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const { data: bookingChannels } = useListBookingChannelsQuery();
-  const { data: lodgings } = useListLodgingsQuery({ shown: true });
-  const { data: allGuests } = useAllGuestsQuery();
   const [ createBooking ] = useCreateBookingMutation();
   const [ updateBooking ] = useUpdateBookingMutation();
   const [ deleteBooking ] = useDeleteBookingMutation();
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const confirm = useConfirm();
   const variant = "filled";
-  const depositPercent = 30; // TODO load this from owner or lodging prefs
+  const depositPercent = 30; // TODO load this from owner or lodging preferences
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -224,6 +221,8 @@ const BookingDialog = props => {
         //   status: { ...bookingStatuses.filter(x => x.id === booking.status_id)[0] },
         //   source: { ...bookingChannels.filter(x => x.id === booking.source_id)[0] }
       };
+
+      const lodging = { ...lodgings.filter(x => x.id === booking.lodging_id)[0] };
 
       // Provide defaults for new bookings
       // if (initialState.status_id === undefined) {
@@ -458,7 +457,7 @@ const BookingDialog = props => {
 
   return (
     <Dialog
-      className={clsx(classes.root, className)}
+      className={classes.root}
       onClose={onClose}
       aria-labelledby="simple-dialog-title"
       open={!!booking}
@@ -1075,7 +1074,12 @@ const BookingDialog = props => {
 
 BookingDialog.propTypes = {
   booking: bookingType,
-  className: PropTypes.string,
+  guests: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string,
+    contact: PropTypes.string,
+    address: PropTypes.string,
+  })),
+  lodgings: PropTypes.arrayOf(lodgingType),
   onClose: PropTypes.func.isRequired,
   onOpenContract: PropTypes.func
 };

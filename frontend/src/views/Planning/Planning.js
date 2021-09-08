@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/styles";
 import { startOfMonth, parse, add } from "date-fns";
 import { BookingScheduler } from "./components";
 import { useTranslation } from "react-i18next";
-import { BookingDialog } from "../../components";
 import { useConfirm } from "material-ui-confirm";
 import { useHistory, useLocation } from "react-router-dom";
 import { Grid } from "@material-ui/core";
@@ -26,6 +25,7 @@ import {
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -176,7 +176,6 @@ const Planning = () => {
         <IconButton
           type="button"
           color="default"
-          className={classes.button}
           onClick={() => onEditContract(selected)}
           title={t("Contract")}
           disabled={!selected}
@@ -184,14 +183,12 @@ const Planning = () => {
         <IconButton
           type="submit"
           color="primary"
-          className={classes.button}
           onClick={() => onEditBooking(selected)}
           disabled={!selected}
         ><EditIcon/></IconButton>
         <IconButton
           type="button"
           color="default"
-          className={classes.button}
           onClick={() => setSettingsOpened(true)}
         ><SettingsIcon/></IconButton>
       </div>
@@ -226,7 +223,6 @@ const Planning = () => {
           <Button
             type="button"
             color="default"
-            className={classes.button}
             startIcon={<DescriptionIcon/>}
             onClick={() => onEditContract(selected)}
             title={t("Contract")}
@@ -237,7 +233,6 @@ const Planning = () => {
           <Button
             type="submit"
             color="primary"
-            className={classes.button}
             startIcon={<EditIcon/>}
             onClick={() => onEditBooking(selected)}
             disabled={!selected}
@@ -245,7 +240,7 @@ const Planning = () => {
         </Grid>
       </Grid>
       {editBooking &&
-      <BookingDialog
+      <BookingDialogLoader
         booking={editBooking}
         onClose={handleCloseEdit}
         onOpenContract={onEditContract}

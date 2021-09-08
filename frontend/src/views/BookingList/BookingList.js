@@ -4,12 +4,13 @@ import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 // import { useTranslation } from "react-i18next";
-import { BookingDialog } from "../../components";
 import { useListBookingsPaginatedQuery } from "../../services/api";
 import { Card, CardActions, TablePagination } from "@material-ui/core";
 import CardContent from "@material-ui/core/CardContent";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { formatISO } from "../../common/tzUtils";
+import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,6 +45,7 @@ const BookingList = () => {
     page: page+1,
     ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy
   });
+  const history = useHistory();
 
 
   const onSelectionChange = (newSelection) => {
@@ -65,6 +67,12 @@ const BookingList = () => {
   const handleCloseEdit = () => {
     setEditBooking(null);
   };
+
+  const onEditContract = (booking) => {
+    setEditBooking(null);
+    history.push("/bookings/" + booking.id + "/contract");
+  };
+
   const handlePageChange = (event, page) => {
     setPage(page);
   };
@@ -105,7 +113,7 @@ const BookingList = () => {
               </div>
             </PerfectScrollbar>
           </CardContent>
-          <CardActions className={classes.actions}>
+          <CardActions>
             <TablePagination
               component="div"
               count={bookings ? bookings.count : 0}
@@ -119,9 +127,10 @@ const BookingList = () => {
         </Card>
       </div>
       {editBooking &&
-      <BookingDialog
+      <BookingDialogLoader
         booking={editBooking}
         onClose={handleCloseEdit}
+        onOpenContract={onEditContract}
       />}
     </div>
   );

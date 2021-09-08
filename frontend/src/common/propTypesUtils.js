@@ -11,6 +11,10 @@ export function isoDateValidation() {
   };
 }
 
+export const lodgingType = PropTypes.shape({
+
+});
+
 export const bookingType = PropTypes.shape({
   id: PropTypes.number,
   lodging_id: PropTypes.number,
