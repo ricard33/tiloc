@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * @link https://github.com/mui-org/material-ui/blob/master/packages/material-ui/src/Snackbar/Snackbar.js
  */
@@ -6,6 +7,7 @@ import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { REASONS } from "../utils/constants";
 import useEventCallback from "../utils/useEventCallback";
 
+// eslint-disable-next-line react/display-name
 const Snackbar = React.forwardRef((props, ref) => {
   const {
     children,

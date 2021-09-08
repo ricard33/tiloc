@@ -54,7 +54,8 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDe
                 aria-label="delete"
                 className={classes.deleteButton}
                 onClick={() => onDelete(p)}
-                size="large">
+                size="large"
+              >
                 <DeleteIcon />
               </IconButton>
             </TableCell>

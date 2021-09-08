@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 import { emphasize, styled } from "@mui/material/styles";
@@ -200,7 +201,7 @@ const SnackbarItem: React.FC<SnackbarItemProps> = ({ classes: propClasses, ...pr
     content = content(key, snack.message);
   }
 
-  // eslint-disable-next-line operator-linebreak
+  // eslint-disable-next-line operator-linebreak,no-unused-vars
   const callbacks: { [key in keyof TransitionHandlerProps]?: any } =
     ["onEnter", "onEntering", "onEntered", "onExit", "onExiting", "onExited"].reduce((acc, cbName) => ({
       ...acc,

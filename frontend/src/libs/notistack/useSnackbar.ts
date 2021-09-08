@@ -2,4 +2,5 @@ import { useContext } from 'react';
 import SnackbarContext from './SnackbarContext';
 import { ProviderContext } from '.';
 
-export default (): ProviderContext => useContext(SnackbarContext);
+const useSnackbar = (): ProviderContext => useContext(SnackbarContext);
+export default useSnackbar;

@@ -111,11 +111,7 @@ describe("Create Payment", () => {
         api.endpoints.createPayment.initiate(newPayment)
       )
       .then((action: any) => {
-        const {
-          status,
-          error: { error },
-          isError,
-        } = action;
+        const { error: { error } } = action;
         // expect(status).toBe("rejected");
         // expect(isError).toBe(true);
         expect(error).toBe("Error: Internal Server Error");

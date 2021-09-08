@@ -216,19 +216,22 @@ const ContractEdit = () => {
               type="button"
               className={classes.button}
               startIcon={<RefreshIcon />}
-              onClick={regenerateContract}>{t("Regenerate")}</Button>
+              onClick={regenerateContract}
+            >{t("Regenerate")}</Button>
             <Button
               type="button"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={makePDF}
-              title={t("PDF")}>{t("PDF")}</Button>
+              title={t("PDF")}
+            >{t("PDF")}</Button>
             <Button
               type="button"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
-              title={t("PDF")}>{t("Save and make PDF")}</Button>
+              title={t("PDF")}
+            >{t("Save and make PDF")}</Button>
           </Grid>
           <Grid item>
             <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>

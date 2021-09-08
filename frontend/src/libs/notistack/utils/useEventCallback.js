@@ -1,3 +1,5 @@
+// noinspection CommaExpressionJS
+
 /**
  * @link https://github.com/mui-org/material-ui/blob/master/packages/material-ui/src/utils/useEventCallback.js
  */
@@ -10,5 +12,6 @@ export default function useEventCallback(fn) {
   useEnhancedEffect(() => {
     ref.current = fn;
   });
+  // eslint-disable-next-line no-sequences
   return React.useCallback((...args) => (0, ref.current)(...args), []);
 }

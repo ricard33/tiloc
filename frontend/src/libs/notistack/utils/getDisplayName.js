@@ -37,7 +37,7 @@ const ForwardRef = () => {
  * @param {React.ReactType} Component
  * @returns {string | undefined}
  */
-export default (Component) => {
+const getDisplayName = (Component) => {
   if (Component == null) {
     return undefined;
   }
@@ -61,3 +61,5 @@ export default (Component) => {
 
   return undefined;
 };
+
+export default getDisplayName;

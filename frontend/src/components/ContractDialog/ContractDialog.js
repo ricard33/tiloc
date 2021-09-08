@@ -211,7 +211,8 @@ const ContractDialog = props => {
           type="button"
           className={classes.button}
           startIcon={<RefreshIcon />}
-          onClick={regenerateContract}>{t("Regenerate")}</Button>
+          onClick={regenerateContract}
+        >{t("Regenerate")}</Button>
         {/*<Button*/}
         {/*  type="button"*/}
         {/*  color="default"*/}
@@ -225,7 +226,8 @@ const ContractDialog = props => {
           className={classes.button}
           startIcon={<PdfIcon />}
           onClick={makePDF}
-          title={t("PDF")}>{t("PDF")}</Button>
+          title={t("PDF")}
+        >{t("PDF")}</Button>
         <div style={{ flex: "1 0 0" }} />
         <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>
         <Button

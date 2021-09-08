@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useCallback, Fragment } from "react";
 import ConfirmContext from "./ConfirmContext";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -48,6 +49,7 @@ const ConfirmProvider = (props) => {
       setOptions(buildOptions(defaultOptions, options));
       setResolveReject([resolve, reject]);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleClose = useCallback(() => {

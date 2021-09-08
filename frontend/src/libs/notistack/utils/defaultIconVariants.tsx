@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React from "react";
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 import { IconVariant } from "../index";

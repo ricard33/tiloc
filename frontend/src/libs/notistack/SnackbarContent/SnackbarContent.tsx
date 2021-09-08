@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { forwardRef } from "react";
 import clsx from "clsx";
 import { styled } from "@mui/material/styles";
@@ -21,6 +22,7 @@ const Root = styled("div")(({ theme }) => ({
   }
 }));
 
+// eslint-disable-next-line react/display-name
 const SnackbarContent = forwardRef<HTMLDivElement, SnackbarContentProps>(({ className, ...props }, ref) => (
   <Root ref={ref} className={clsx(classes.root, className)} {...props} />
 ));

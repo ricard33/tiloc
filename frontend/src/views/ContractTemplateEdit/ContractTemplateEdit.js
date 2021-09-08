@@ -24,6 +24,7 @@ import {
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+
 const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
@@ -62,16 +63,19 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const ContractTemplateEdit = (props) => {
+const ContractTemplateEdit = (/*props*/) => {
   let { templateId } = useParams();
   templateId = Number(templateId);
   const classes = useStyles();
   const { t } = useTranslation();
-  const {data: template, isLoading} = useGetContractTemplateQuery(templateId, {skip: typeof templateId === 'undefined'});
+  const {
+    data: template,
+    isLoading
+  } = useGetContractTemplateQuery(templateId, { skip: typeof templateId === "undefined" });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
-  const [ createContractTemplate ] = useCreateContractTemplateMutation();
-  const [ updateContractTemplate ] = useUpdateContractTemplateMutation();
-  const [ deleteContractTemplate ] = useDeleteContractTemplateMutation();
+  const [createContractTemplate] = useCreateContractTemplateMutation();
+  const [updateContractTemplate] = useUpdateContractTemplateMutation();
+  const [deleteContractTemplate] = useDeleteContractTemplateMutation();
   const history = useHistory();
   const [content, setContent] = useState(template ? template.content : undefined);
   const [name, setName] = useState(template ? template.name : "");
@@ -98,7 +102,7 @@ const ContractTemplateEdit = (props) => {
   }
 
   function makePDF() {
-    window.open("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, '_blank');
+    window.open("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, "_blank");
   }
 
   function onClose() {
@@ -137,18 +141,18 @@ const ContractTemplateEdit = (props) => {
     };
     const action = template && template.id ? updateContractTemplate : createContractTemplate;
     action(submittedTemplate).then((result) => {
-      const {data, error} = result;
+      const { data, error } = result;
       if (error) {
         console.error("Error during template saving", error);
         showError(t("Impossible to save template: ") + fetchErrorDecode(error));
       } else {
         if (!template || !template.id) {
-          console.debug('change url')
+          console.debug("change url");
           templateId = data.id;
-          history.replace({ pathname: `/settings/contract-templates/${templateId}` })
+          history.replace({ pathname: `/settings/contract-templates/${templateId}` });
         }
         showSuccess(t("Template saved"));
-        if(callback) callback(submittedTemplate);
+        if (callback) callback(submittedTemplate);
       }
     });
   }
@@ -230,14 +234,16 @@ const ContractTemplateEdit = (props) => {
               startIcon={<PdfIcon />}
               onClick={makePDF}
               disabled={!lodgingId}
-              title={t("PDF")}>{t("PDF")}</Button>
+              title={t("PDF")}
+            >{t("PDF")}</Button>
             <Button
               type="button"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
               disabled={!lodgingId}
-              title={t("PDF")}>{t("Save and make PDF")}</Button>
+              title={t("PDF")}
+            >{t("Save and make PDF")}</Button>
           </Grid>
           <Grid item>
             <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>

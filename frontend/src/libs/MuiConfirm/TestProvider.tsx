@@ -7,7 +7,7 @@ type TestProviderProps = {
 const TestProvider: React.FunctionComponent<TestProviderProps> = ({
   ...props
 }: TestProviderProps) => {
-  const [state, setState] = useState(false);
+  const [state] = useState(false);
   const { t } = useTranslation();
 
   return (
