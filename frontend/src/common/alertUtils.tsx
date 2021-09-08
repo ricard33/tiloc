@@ -17,6 +17,7 @@ export const useAlert = () => {
     return (message: string) =>
       enqueueSnackbar(message, {
         variant: variant,
+        // eslint-disable-next-line react/display-name
         action: (key) => (
           <Button onClick={() => closeSnackbar(key)}>{t("dismiss")}</Button>
         ),

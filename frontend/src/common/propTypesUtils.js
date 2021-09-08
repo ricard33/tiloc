@@ -33,5 +33,5 @@ export const bookingType = PropTypes.shape({
   contract: PropTypes.string,
   contract_date: isoDateValidation(),
   notes: PropTypes.string,
-  options: PropTypes.array
+  options: PropTypes.array,
 });

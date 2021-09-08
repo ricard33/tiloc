@@ -157,7 +157,7 @@ const SignIn = props => {
       console.debug("Redirect to", from);
       history.replace(from);
     }
-  }, [isAuthenticated]);
+  }, [from, history, isAuthenticated]);
 
   const handleBack = () => {
     history.goBack();

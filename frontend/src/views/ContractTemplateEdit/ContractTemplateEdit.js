@@ -68,7 +68,7 @@ const ContractTemplateEdit = (props) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const {data: template, isLoading} = useGetContractTemplateQuery(templateId, {skip: typeof templateId === 'undefined'});
-  const { data: lodgings, isLoading: isLoadingLodgings } = useListLodgingsQuery({ shown: true });
+  const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const [ createContractTemplate ] = useCreateContractTemplateMutation();
   const [ updateContractTemplate ] = useUpdateContractTemplateMutation();
   const [ deleteContractTemplate ] = useDeleteContractTemplateMutation();

@@ -1,4 +1,3 @@
-import * as types from "../actions/actionTypes";
 import { ENQUEUE_SNACKBAR, CLOSE_SNACKBAR, REMOVE_SNACKBAR, AlertAction } from "../actions";
 import { OptionsObject, SnackbarKey } from "notistack";
 

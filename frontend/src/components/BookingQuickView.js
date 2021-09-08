@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { formatCurrency } from "../common/intlUtils";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((/*theme*/) => ({
   label: {},
   value: {
     fontWeight: "bold"
@@ -98,6 +98,7 @@ BookingQuickView.propTypes = {
     children: PropTypes.number,
     babies: PropTypes.number,
     notes: PropTypes.string,
+    left_to_pay: PropTypes.number,
   })
 };
 

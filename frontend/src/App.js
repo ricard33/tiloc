@@ -5,7 +5,6 @@ import validate from "validate.js";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import * as actions from "./actions";
 import { auth } from "./actions";
 import "./assets/scss/index.scss";
 import validators from "./common/validators";

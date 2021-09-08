@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PaymentList from "./PaymentList";
 import { useConfirm } from "material-ui-confirm";
 import { useTranslation } from "react-i18next";

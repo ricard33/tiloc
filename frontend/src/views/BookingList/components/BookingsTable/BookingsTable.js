@@ -1,20 +1,14 @@
 import React, { useState } from "react";
-import clsx from "clsx";
 import PropTypes from "prop-types";
 import moment from "moment";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import { makeStyles } from "@material-ui/styles";
 import {
-  Card,
-  CardActions,
-  CardContent,
   Checkbox,
   Table,
   TableBody,
   TableCell,
   TableRow,
   Typography,
-  TablePagination
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import { useTranslation } from "react-i18next";
@@ -36,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingsTable = props => {
-  const { className, bookings, onEdit, onSelectionChange, ordering, onChangeOrdering, ...rest } = props;
+  const { bookings, onEdit, onSelectionChange, ordering, onChangeOrdering } = props;
 
   const { t } = useTranslation();
   const classes = useStyles();

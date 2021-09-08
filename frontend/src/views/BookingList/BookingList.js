@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { BookingsTable, BookingsToolbar } from "./components";
 import { makeStyles } from "@material-ui/styles";
 import Backdrop from "@material-ui/core/Backdrop";
@@ -39,7 +39,7 @@ const BookingList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [ordering, setOrdering] = useState({ orderBy: "begin_date", order: "asc" });
-  const { data: bookings, isLoading: isLoadingBookings, isFetching: isFetchingBookings, refetch } = useListBookingsPaginatedQuery({
+  const { data: bookings, isLoading: isLoadingBookings } = useListBookingsPaginatedQuery({
     page_size: rowsPerPage,
     page: page+1,
     ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy
