@@ -9,7 +9,7 @@ export const initialState: Partial<RootState> = {
     queries: {},
     mutations: {},
     provided: { Payment: {}, Booking: {}, Contract: {}, ContractTemplate: {}, Lodging: {}, BookingStatus: {},
-      BookingChannel: {}, Guest: {}},
+      BookingChannel: {}, },
     subscriptions: {},
     config: {
       refetchOnFocus: false,

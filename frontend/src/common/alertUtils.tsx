@@ -1,6 +1,6 @@
 import { store } from "../store";
-import { alert, enqueueAlert } from "../actions";
-import React, { useEffect, useState } from "react";
+import { alert } from "../actions";
+import React from "react";
 import { useSnackbar, VariantType } from "notistack";
 import { Button } from "@material-ui/core";
 import { useTranslation } from "react-i18next";

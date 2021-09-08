@@ -23,8 +23,6 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
 import { StatusBullet } from 'components';
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import * as selectors from "../../../../selectors";
 import { NavLink } from "react-router-dom";
 import { useNextEventsQuery } from "../../../../services/api";
 
@@ -58,7 +56,6 @@ const NextEvents = props => {
   const classes = useStyles();
   const { t } = useTranslation();
   const { data: events } = useNextEventsQuery(5);
-  // const events = useSelector(store => selectors.nextEvents(store));
 
   // console.log(events);
 

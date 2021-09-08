@@ -9,7 +9,7 @@ import {
   BookingStatus,
   BookingChannel,
   Guest,
-  ContractTemplate, NextEvent
+  ContractTemplate, NextEvent, Service
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { api2Booking, api2Lodging, api2Payment } from "../types/models-convertion";
@@ -49,7 +49,7 @@ type ApiModel = Record<string, any>;
 type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unknown, AxiosError, {}, AxiosQueryMeta>, string, "api">;
 
 function makeListApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
-  return builder.query<T[], Record<string, any>>({
+  return builder.query<T[], Record<string, any> | void>({
     query: (params?) => {
       return {
         url,
@@ -164,6 +164,7 @@ const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatu
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate");
 const contractApi = makeApi<Contract>("contract/", "Contract");
+const serviceApi = makeApi<Service>("service/", "Service");
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
@@ -249,6 +250,13 @@ export const api = createApi({
     updateContractTemplate: contractTemplateApi.update(builder),
     deleteContractTemplate: contractTemplateApi.delete(builder),
 
+    // Contract template
+    listServices: serviceApi.list(builder),
+    getService: serviceApi.get(builder),
+    createService: serviceApi.create(builder),
+    updateService: serviceApi.update(builder),
+    deleteService: serviceApi.delete(builder),
+
   })
 });
 
@@ -302,5 +310,11 @@ export const {
   useCreateContractTemplateMutation,
   useUpdateContractTemplateMutation,
   useDeleteContractTemplateMutation,
+
+  useGetServiceQuery,
+  useListServicesQuery,
+  useCreateServiceMutation,
+  useUpdateServiceMutation,
+  useDeleteServiceMutation,
 
 } = api;

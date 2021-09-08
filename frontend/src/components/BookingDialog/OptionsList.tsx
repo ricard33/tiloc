@@ -14,8 +14,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
-import { useSelector } from "react-redux";
-import * as selectors from "../../selectors";
+import { useListServicesQuery } from "../../services/api";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -58,10 +57,10 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
   const { register, control, watch } = form;
   const { fields, append, remove } = optionsFieldArray;
   const options = watch("options", fields);
-  const allOptions = useSelector(store => selectors.services(store));
+  const { data: allOptions } = useListServicesQuery();
 
   useEffect(() => {
-    if (!bookingId) {
+    if (!bookingId && allOptions) {
       console.log("Scan for automatic options", allOptions);
       allOptions.filter((o: Service) => o.auto_add_booking).forEach((option: Service) => {
         if (options.filter((o: Service) => o.id === option.id).length === 0) {
@@ -83,10 +82,12 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
 
 
   function onAddOption(data: any) {
-    console.debug("ADD OPTION", data.target.value);
-    const value = Number(data.target.value);
-    const option = allOptions.filter((o: Service) => o.id === value)[0];
-    append(option);
+    if(allOptions) {
+      console.debug("ADD OPTION", data.target.value);
+      const value = Number(data.target.value);
+      const option = allOptions.filter((o: Service) => o.id === value)[0];
+      append(option);
+    }
   }
 
 
@@ -185,7 +186,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 onChange={onAddOption}
               >
                 <option key={0} value={0}>{t("-- Add an option --")}</option>
-                {allOptions.map((option: Service) => (
+                {allOptions && allOptions.map((option: Service) => (
                   <option
                     key={option.id} value={option.id}
                     disabled={fields.filter((o: Service) => Number(o.id) === option.id).length > 0}

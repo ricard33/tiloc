@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { startOfMonth, parse, add } from "date-fns";
 import { BookingScheduler } from "./components";
-import * as actions from "../../actions";
-import { useDispatch, useSelector } from "react-redux";
-import * as selectors from "../../selectors";
 import { useTranslation } from "react-i18next";
 import { BookingDialog } from "../../components";
 import { useConfirm } from "material-ui-confirm";
@@ -19,7 +16,6 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import NavBar from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
-import useInterval from "../../common/useInterval";
 import { useLocalStorage } from "../../common/useLocalStorage";
 import PlanningSettingsDialog from "./components/PlanningSettingsDialog";
 import {
@@ -56,7 +52,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Planning = props => {
+const Planning = () => {
   const classes = useStyles();
   const { t } = useTranslation();
   const location = useLocation();
@@ -68,7 +64,7 @@ const Planning = props => {
   const { showError, showSuccess } = useAlert();
   const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   const dateFilter = formatISO(beginDate) + ":" + formatISO(add(beginDate, {years: 1}))
-  const { data: bookings, isFetching: isFetchingBookings, refetch } = useListBookingsQuery({for_dates: dateFilter}, {pollingInterval: 60000});
+  const { data: bookings, isLoading: isLoadingBookings, isFetching: IsFetchingBooking } = useListBookingsQuery({for_dates: dateFilter}, {pollingInterval: 60000});
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const [ deleteBooking ] = useDeleteBookingMutation();
@@ -79,12 +75,13 @@ const Planning = props => {
   const confirm = useConfirm();
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [settings, setSettings] = useLocalStorage("planningSettings", { showPaymentStatus: true });
+  // const [manualFetching, setManualFetching] = useState(false);
 
   console.log(performance.now().toFixed(2), "Planning", bookings?.length);
 
   useEffect(() => {
-    console.log(performance.now().toFixed(2), "fetching", isFetchingBookings);
-  }, [isFetchingBookings])
+    console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
+  }, [IsFetchingBooking])
   // const bookings = allBookings.toModelArray();
 
   if (needFirstTimeEdit && !editBooking && bookings && bookings.filter(b => b.id === Number(query.edit)).length) {
@@ -118,7 +115,7 @@ const Planning = props => {
     setSelected(booking);
   };
 
-  const onDeselectBooking = (booking) => {
+  const onDeselectBooking = () => {
     setSelected(null);
   };
 
@@ -201,10 +198,9 @@ const Planning = props => {
       <NavBar
         date={beginDate} onChange={(newDate) => {
           setBeginDate(newDate);
-          refetch();
         }}
       />
-      {<BookingScheduler
+      <BookingScheduler
         bookings={bookings ?? []}
         lodgings={[...(lodgings ?? [])]}
         beginDate={beginDate}
@@ -213,8 +209,8 @@ const Planning = props => {
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}
         settings={settings}
-        disabled={isFetchingBookings}
-      />}
+        disabled={isLoadingBookings}
+      />
       <Grid container justifyContent="space-between" alignItems="flex-start">
         <Grid item>
           <Button

@@ -1,8 +1,6 @@
 import { all, apply, call, put, takeEvery } from "redux-saga/effects";
-import * as types from "./actions/actionTypes";
 import * as actionTypes from "./actions/actionTypes";
 import axios from "axios";
-import { template } from "./common/stringUtils";
 import logger from './common/logger';
 
 // const delay = (ms) => new Promise(res => setTimeout(res, ms));
@@ -73,101 +71,6 @@ function deleteToken(action) {
   localStorage.removeItem("token");
 }
 
-
-function* _fetchData(path, action) {
-  if(!action.type.endsWith("_REQUEST"))
-    throw new Error("fetchData: Action types have to finish by '_REQUEST' string");
-  const actionBaseName = action.type.slice(0, -8);
-  try {
-    const offset = 0, limit = null; // not yet used
-    const response = yield call(axios.get, template(path, action), {params: action.filter});
-    yield put({
-      type: types.SUCCESS(actionBaseName),
-      data: response.data,
-      query: {offset, limit}
-    });
-    if(action.callback) {
-      yield call(action.callback, response.data);
-    }
-  } catch (error) {
-    console.error(types.FAILURE(actionBaseName), error);
-    logger.error(error, {action})
-    yield put({
-      type: types.FAILURE(actionBaseName),
-      error
-    });
-  }
-}
-
-function* _createData(path, action) {
-  if(!action.type.endsWith("_REQUEST"))
-    throw new Error("createData: Action types have to finish by '_REQUEST' string");
-  const actionBaseName = action.type.slice(0, -8);
-  try {
-    const response = yield call(axios.post, template(path, action.urlParams), action.data);
-    yield put({
-      type: types.SUCCESS(actionBaseName),
-      data: response.data,
-    });
-    if(action.callback) {
-      yield call(action.callback, response.data);
-    }
-  } catch (error) {
-    console.error(types.FAILURE(actionBaseName), error);
-    logger.error(error, {action})
-    yield put({
-      type: types.FAILURE(actionBaseName),
-      error
-    });
-  }
-}
-
-function* _updateData(path, action) {
-  if(!action.type.endsWith("_REQUEST"))
-    throw new Error("updateData: Action types have to finish by '_REQUEST' string");
-  const actionBaseName = action.type.slice(0, -8);
-  try {
-    const response = yield call(axios.patch, path + action.id + "/", action.data);
-    yield put({
-      type: types.SUCCESS(actionBaseName),
-      data: response.data,
-    });
-    if(action.callback) {
-      yield call(action.callback, response.data);
-    }
-  } catch (error) {
-    console.error(types.FAILURE(actionBaseName), error);
-    logger.error(error, {action})
-    yield put({
-      type: types.FAILURE(actionBaseName),
-      error
-    });
-  }
-}
-
-function* _deleteData(path, action) {
-  if(!action.type.endsWith("_REQUEST"))
-    throw new Error("deleteData: Action types have to finish by '_REQUEST' string");
-  const actionBaseName = action.type.slice(0, -8);
-  try {
-    const response = yield call(axios.delete, path + action.id + "/");
-    yield put({
-      type: types.SUCCESS(actionBaseName),
-      id: action.id,
-    });
-    if(action.callback) {
-      yield call(action.callback, response.data);
-    }
-  } catch (error) {
-    console.error(types.FAILURE(actionBaseName), error);
-    logger.error(error, {action})
-    yield put({
-      type: types.FAILURE(actionBaseName),
-      error
-    });
-  }
-}
-
 // notice how we now only export the rootSaga
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
@@ -180,24 +83,5 @@ export default function* rootSaga() {
       actionTypes.LOGIN_FAILED,
       actionTypes.LOGOUT_SUCCESSFUL,
       actionTypes.AUTH_TOKEN_EXPIRED], deleteToken),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKINGS), _fetchData, "/api/booking/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_BOOKING), _createData, "/api/booking/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_BOOKING), _updateData, "/api/booking/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_BOOKING), _deleteData, "/api/booking/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKING_STATUSES), _fetchData, "/api/booking_status/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_BOOKING_CHANNELS), _fetchData, "/api/booking_channel/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_SERVICES), _fetchData, "/api/service/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_LODGINGS), _fetchData, "/api/lodging/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_OWNERS), _fetchData, "/api/owner/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_CONTRACTS), _fetchData, "/api/contract/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.GET_OR_CREATE_CONTRACT), _createData, "/api/booking/${bookingId}/get_or_create_contract/"), // eslint-disable-line no-template-curly-in-string
-    yield takeEvery(actionTypes.REQUEST(actionTypes.GENERATE_CONTRACT), _createData, "/api/booking/${bookingId}/generate_contract/"),// eslint-disable-line no-template-curly-in-string
-    yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_CONTRACT), _updateData, "/api/contract/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_CONTRACT), _deleteData, "/api/contract/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.FETCH_CONTRACT_TEMPLATES), _fetchData, "/api/contract_template/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.GET_CONTRACT_TEMPLATE), _fetchData, "/api/contract_template/${id}/"), // eslint-disable-line no-template-curly-in-string
-    yield takeEvery(actionTypes.REQUEST(actionTypes.CREATE_CONTRACT_TEMPLATE), _createData, "/api/contract_template/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.UPDATE_CONTRACT_TEMPLATE), _updateData, "/api/contract_template/"),
-    yield takeEvery(actionTypes.REQUEST(actionTypes.DELETE_CONTRACT_TEMPLATE), _deleteData, "/api/contract_template/"),
   ]);
 }

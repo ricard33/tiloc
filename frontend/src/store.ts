@@ -1,10 +1,8 @@
 import * as reducers from "./reducers";
-import { createReducer } from "redux-orm";
 import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { api } from "./services/api";
-import orm from "./orm";
 import { rtkQueryErrorLogger } from "./services/middlewares";
 
 export const sagaMiddleware = createSagaMiddleware();
@@ -12,9 +10,6 @@ export const store = configureStore({
   reducer: {
     alert: reducers.alert,
     auth: reducers.auth,
-    fetching: reducers.fetching,
-    // @ts-ignore
-    entities: createReducer(orm),
     [api.reducerPath]: api.reducer
   },
   middleware: (getDefaultMiddleware) =>
