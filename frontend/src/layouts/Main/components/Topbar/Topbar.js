@@ -29,6 +29,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(1)
   },
   appMenu: {
+    color: "white",
     marginRight: "20px"
   },
   appLogo: {
@@ -80,7 +81,6 @@ const Topbar = props => {
         <Hidden mdUp>
           <IconButton
             className={classes.appMenu}
-            color="inherit"
             onClick={onSidebarOpen}
             size="large"
           >

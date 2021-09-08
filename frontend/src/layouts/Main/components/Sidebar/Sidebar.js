@@ -21,6 +21,8 @@ import { formatDate } from "../../../../common/dateUtils";
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: 160,
+    marginTop: 48,
+    height: 'calc(100% - 48px)',
     [theme.breakpoints.up('md')]: {
       marginTop: 64,
       height: 'calc(100% - 64px)'
