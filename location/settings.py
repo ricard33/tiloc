@@ -19,6 +19,8 @@ from django.utils.translation import gettext_lazy as _
 from my_django_tweaks.logging_config import configure_logging
 from smartconfigparser import Config
 
+from . import __version__
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'config')
@@ -288,9 +290,11 @@ CRON_CLASSES = [
 
 WKHTMLTOPDF_PATH = config.get('PDF', 'WKHTMLTOPDF_PATH', 'wkhtmltopdf')
 
-from . import __version__
+
+def get_backup_filename(**kwargs):
+    return 'tiloc-{servername}-{datetime}-v{version}.{extension}'.format(**dict(kwargs, **{'version': __version__}))
+
+
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
-DBBACKUP_FILENAME_TEMPLATE = lambda **kwargs: \
-    'tiloc-{servername}-{datetime}-v{version}.{extension}'.format(
-        **dict(kwargs, **{'version': __version__}))
+DBBACKUP_FILENAME_TEMPLATE = get_backup_filename

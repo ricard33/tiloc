@@ -188,7 +188,7 @@ class BookingQueriesTestCase(APITestCase):
         now = arrow.utcnow()
         # test bookings can't be less than 7 days nor more than 21 days
         for i, date in enumerate([now.shift(days=-30), now.shift(days=-4), now.shift(days=+1), now.shift(days=+30), now.shift(days=+35), ]):
-            factories.BookingFactory.create(begin_date=date.date(), guest_name='guest %d' % (i+1))
+            factories.BookingFactory.create(begin_date=date.date(), guest_name='guest %d' % (i + 1))
 
         response = self.client.get('/api/booking/next_events/?count=5', **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
@@ -204,7 +204,6 @@ class BookingQueriesTestCase(APITestCase):
         self.assertEqual(events[3]['event_type'], 'CHECKIN', json.dumps(events))
         self.assertEqual(events[4]['guest_name'], 'guest 5', json.dumps(events))
         self.assertEqual(events[4]['event_type'], 'CHECKIN', json.dumps(events))
-
 
 
 class BookingModelTestCase(TestCase):

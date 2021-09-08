@@ -206,4 +206,3 @@ class NextEventSerializer(serializers.Serializer):
     event_type = serializers.CharField(read_only=True)
     guest_name = serializers.CharField(read_only=True)
     booking_channel = serializers.CharField(read_only=True)
-

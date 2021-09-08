@@ -1,3 +1,4 @@
+import unittest
 from datetime import date
 
 import arrow
@@ -180,6 +181,7 @@ class ExportCalendarTestCase(TestCase):
         self.assertEqual(e.end.date(), date(year_, 8, 12))
 
 
+@unittest.skip("Security hole: Endpoint removed because not used")
 class ExportFullPlanningTestCase(TestCase):
     def setUp(self) -> None:
         for name in ['option', 'contract sent', 'deposit paid', 'paid']:

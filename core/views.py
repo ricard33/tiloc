@@ -68,7 +68,7 @@ def export_calendar(request, uid):
 @never_cache
 @transaction.atomic
 def export_full_planning(request, owner_id=None):
-    user = None
+    # user = None
     # if not request.user.is_authenticated:
     #     auth_header = request.META.get('HTTP_AUTHORIZATION', '')
     #     if auth_header:

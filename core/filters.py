@@ -30,5 +30,5 @@ class BookingFilter(filters.FilterSet):
             end = arrow.get(end)
             return queryset.filter(begin_date__lte=end.date(),
                                    end_date__gte=begin.date())
-        except:
+        except Exception:
             logger.warning("Badly formatted filter 'for_dates' for 'booking' request: %s", value)

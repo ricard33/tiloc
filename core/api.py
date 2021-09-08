@@ -6,7 +6,7 @@ import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
-from django.db.models import Min, Max, F, Value
+from django.db.models import F, Max, Min, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from knox.auth import TokenAuthentication
@@ -16,7 +16,7 @@ from knox.views import LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import AuthenticationFailed, APIException
+from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -28,9 +28,9 @@ from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
 from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
-                          HolidaysSerializer, LodgingSerializer, LoginUserSerializer, OwnerSerializer,
-                          PaymentSerializer, PricingSerializer, SeasonalVariationSerializer, ServiceSerializer,
-                          UserSerializer, GuestSerializer, NextEventSerializer)
+                          GuestSerializer, HolidaysSerializer, LodgingSerializer, LoginUserSerializer,
+                          NextEventSerializer, OwnerSerializer, PaymentSerializer, PricingSerializer,
+                          SeasonalVariationSerializer, ServiceSerializer, UserSerializer)
 
 logger = logging.getLogger('api')
 
@@ -39,7 +39,7 @@ logger = logging.getLogger('api')
 @permission_classes([AllowAny])
 def version_view(request, *args, **kwargs):
     return Response({
-        'version': __version__,
+        'version':    __version__,
         'build_date': __date__.isoformat(timespec='seconds'),
     })
 
@@ -55,7 +55,7 @@ class RegistrationAPI(generics.GenericAPIView):
         user = serializer.save()
         auth_token, token = AuthToken.objects.create(user)
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "user":  UserSerializer(user, context=self.get_serializer_context()).data,
             "token": token
         })
 
@@ -72,7 +72,7 @@ class LoginAPI_(generics.GenericAPIView):
             raise AuthenticationFailed()
         auth_token, token = AuthToken.objects.create(user)
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "user":  UserSerializer(user, context=self.get_serializer_context()).data,
             "token": token
         })
 
@@ -112,7 +112,8 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows bookings to be viewed or edited.
     """
-    queryset = models.Booking.objects.all().order_by('-begin_date').prefetch_related('status', 'lodging', 'source', 'options')
+    queryset = models.Booking.objects.all().order_by('-begin_date').prefetch_related('status', 'lodging', 'source',
+                                                                                     'options')
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
     filterset_class = BookingFilter
@@ -121,18 +122,19 @@ class BookingViewSet(viewsets.ModelViewSet):
     def all_guests(self, request, pk=None):
         serializer = GuestSerializer(models.Booking.objects.all().order_by('guest_name')
                                      .values('guest_name')
-                                     # .values(name=F('guest_name'), contact=F('guest_contact'), address=F('guest_address'))
-                                     .annotate(name=Min('guest_name'), contact=Max('guest_contact'), address=Max('guest_address'))
-                                     # .distinct(),
-                                     , many=True)
+                                     .annotate(name=Min('guest_name'), contact=Max('guest_contact'),
+                                               address=Max('guest_address')),
+                                     many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
     def next_events(self, request, pk=None):
-        qs1 = models.Booking.objects.filter(begin_date__gte=timezone.now()).annotate(date=F('begin_date'), event_type=Value('CHECKIN')) \
+        qs1 = models.Booking.objects.filter(begin_date__gte=timezone.now()).annotate(date=F('begin_date'),
+                                                                                     event_type=Value('CHECKIN')) \
             .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
                     lodging_name=F('lodging__name'), booking_channel=F('source__name'))
-        qs2 = models.Booking.objects.filter(end_date__gte=timezone.now()).annotate(date=F('end_date'), event_type=Value('CHECKOUT')) \
+        qs2 = models.Booking.objects.filter(end_date__gte=timezone.now()).annotate(date=F('end_date'),
+                                                                                   event_type=Value('CHECKOUT')) \
             .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
                     lodging_name=F('lodging__name'), booking_channel=F('source__name'))
         qs = qs1.union(qs2).order_by('date')
@@ -148,7 +150,8 @@ class BookingViewSet(viewsets.ModelViewSet):
             contract = booking.contract
         else:
             try:
-                contract = booking.generate_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+                contract = booking.generate_contract(
+                    request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
             except jinja2.exceptions.TemplateError as ex:
                 logger.exception("Template generation error")
                 raise APIException(detail="Template error: " + ex.message)
@@ -205,8 +208,9 @@ class LodgingViewSet(viewsets.ModelViewSet):
         sid = transaction.savepoint()
         if request.GET.get('template_id'):
             lodging.contract_template_id = request.GET.get('template_id')
-        generate_pdf(lodging.generate_empty_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost')),
-                     full_path)
+        generate_pdf(
+            lodging.generate_empty_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost')),
+            full_path)
         transaction.savepoint_rollback(sid)
 
         if os.path.exists(full_path):
