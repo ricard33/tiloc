@@ -1,9 +1,9 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import { makeStyles } from '@mui/styles';
+import { Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 const useStyles = makeStyles(theme => ({
   root: {

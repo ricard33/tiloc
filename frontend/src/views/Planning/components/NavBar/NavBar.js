@@ -1,12 +1,12 @@
 /* eslint-disable react/no-multi-comp */
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Grid, useMediaQuery } from "@material-ui/core";
+import { Grid, useMediaQuery } from "@mui/material";
 import { add, startOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import { formatDate } from "../../../../common/dateUtils";
-import { useTheme } from "@material-ui/styles";
+import { useTheme } from "@mui/styles";
 
 
 const NavButton = (props) => {
@@ -33,7 +33,7 @@ const NavBar = props => {
   const [currentDate, setCurrentDate] = useState(startOfMonth(date));
   const { t } = useTranslation();
   const theme = useTheme();
-  const isPhone = useMediaQuery(theme.breakpoints.down("xs"), {
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'), {
     defaultMatches: true
   });
   const monthFormat = isPhone ? "MMM" : "MMMM Y";

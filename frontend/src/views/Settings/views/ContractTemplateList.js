@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/styles";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { makeStyles } from "@mui/styles";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import { ContractTemplatesTable, ContractTemplatesToolbar } from "./components";
 import { useHistory } from "react-router-dom";
 import { useListContractTemplatesQuery } from "../../../services/api";

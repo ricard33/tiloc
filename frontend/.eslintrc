@@ -3,6 +3,9 @@
     "react-app",
     "react-app/jest"
   ],
+  "globals": {
+    "JSX": "readonly"
+  },
   "rules": {
     "comma-dangle": 0,
     "indent": [

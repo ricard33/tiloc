@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import {
   Card,
   CardActions,
@@ -14,11 +14,11 @@ import {
   TableRow,
   Typography,
   TablePagination
-} from "@material-ui/core";
-import EditIcon from "@material-ui/icons/Edit";
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { useTranslation } from "react-i18next";
 import { EnhancedTableHead } from "components";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import { parseISO } from 'date-fns';
 import { formatDate, formatDistanceToNow } from "../../../../../common/dateUtils";
 

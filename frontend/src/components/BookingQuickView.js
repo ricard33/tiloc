@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from "react-i18next";
 import moment from "moment";
 import { formatCurrency } from "../common/intlUtils";

@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
 import { bookingType, lodgingType } from "../../common/propTypesUtils";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
 import {
   Contacts as ContactsIcon,
   DeleteForever as DeleteIcon,
@@ -15,7 +10,7 @@ import {
   PictureAsPdf as PdfIcon,
   Save as SaveIcon,
   ExpandMore as ExpandMoreIcon
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import { Controller, useForm, useFieldArray } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
@@ -23,23 +18,28 @@ import { getDepositLabel } from "../../common/ownerPrefsUtils";
 import {
   Accordion,
   AccordionDetails,
-  AccordionSummary as MuiAccordionSummary,
+  AccordionSummary,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Grid,
-  TextField
-} from "@material-ui/core";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import Typography from "@material-ui/core/Typography";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+  FormHelperText,
+  InputAdornment,
+  FormControlLabel,
+  Checkbox,
+  Hidden
+} from "@mui/material";
+import DatePicker from '@mui/lab/DatePicker';
 import useWindowDimensions from "../../common/windowDimensions";
-import { useConfirm } from "material-ui-confirm";
-import Hidden from "@material-ui/core/Hidden";
+import { useConfirm } from "../../libs/MuiConfirm";
 import { formatISO } from "../../common/tzUtils";
 import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
@@ -52,110 +52,32 @@ import {
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import './BookingDialog.scss';
 
 
-const AccordionSummary = withStyles({
-  root: {
-    backgroundColor: "rgba(0, 0, 0, .03)",
-    borderBottom: "1px solid rgba(0, 0, 0, .125)",
-    marginBottom: -1,
-    minHeight: 56,
-    "&$expanded": {
-      minHeight: 38
-    }
-  },
-  content: {
-    "&$expanded": {
-      margin: "3px 0"
-    },
-    "& p": {
-      marginBottom: 0
-    }
-  },
-  expanded: {}
-})(MuiAccordionSummary);
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(1)
-  },
-  content: {
-    marginTop: theme.spacing(2)
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightBold,
-    flexShrink: 0
-  },
-  secondaryHeading: {
-    fontSize: theme.typography.pxToRem(15),
-    color: theme.palette.text.secondary,
-    position: "absolute",
-    right: "60px"
-  },
-  formControl: {
-    width: "100%"
-  },
-  flexBoxAlignLeft: {
-    display: "flex",
-    alignItems: "baseline"
-    // justifyContent: "stretch"
-  },
-  flexBoxStretched: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between"
-  },
-  spacer: {
-    flexBasis: "2em"
-  },
-  button: {
-    margin: theme.spacing(1)
-  },
-  statusItem: {
-    width: "-webkit-fill-available"
-    // width: "stretch",
-    // padding: theme.spacing(1)
-    // height: "1em",
-    // marginRight: "5px"
-  },
-  deleteButton: {
-    color: "red",
-    margin: theme.spacing(1)
-  },
-  priceInput: {
-    width: "7em"
-  },
-  optionPriceInput: {
-    fontSize: "medium",
-    width: "5em"
-  },
-  options: {
-    alignItems: "center",
-    fontSize: "small",
-    textAlign: "center"
-  },
-  totalWrapper: {
-    textAlign: "right"
-  },
-  totalPrice: {},
-  thirdPartyPrice: {
-    fontSize: "x-small"
-  },
-  leftToPay: {
-    // color: 'orange',
-  },
-  tooPerceived: {
-    color: "orange"
-  },
-  fullyPaid: {
-    color: "dark green"
-  }
-}));
+// const AccordionSummary = withStyles({
+//   root: {
+//     backgroundColor: "rgba(0, 0, 0, .03)",
+//     borderBottom: "1px solid rgba(0, 0, 0, .125)",
+//     marginBottom: -1,
+//     minHeight: 56,
+//     "&$expanded": {
+//       minHeight: 38
+//     }
+//   },
+//   content: {
+//     "&$expanded": {
+//       margin: "3px 0"
+//     },
+//     "& p": {
+//       marginBottom: 0
+//     }
+//   },
+//   expanded: {}
+// })(MuiAccordionSummary);
 
 const BookingDialog = props => {
   const { booking, lodgings, guests: allGuests, onClose, onOpenContract } = props;
-  const classes = useStyles();
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
@@ -248,6 +170,7 @@ const BookingDialog = props => {
       initialState.babies = booking.babies || 0;
       initialState.source_id = booking.source_id || "";
       initialState.options = booking.options || [];
+      initialState.notes = booking.notes ?? "";
 
       // console.debug("initialState", initialState);
       return initialState;
@@ -457,7 +380,7 @@ const BookingDialog = props => {
 
   return (
     <Dialog
-      className={classes.root}
+      className="booking-dialog"
       onClose={onClose}
       aria-labelledby="simple-dialog-title"
       open={!!booking}
@@ -469,12 +392,12 @@ const BookingDialog = props => {
           <Grid item xs={6}>
             {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
           </Grid>
-          <Grid item xs={6} className={classes.totalWrapper}>
-            <span className={classes.totalPrice}>
+          <Grid item xs={6} className="total-wrapper">
+            <span className="total-price">
               {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
             {(excludedFromPriceOptions) > 0 && (
               <span
-                className={classes.thirdPartyPrice}
+                className="third-party-price"
               ><br />(+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")})</span>)
             }
           </Grid>
@@ -496,7 +419,7 @@ const BookingDialog = props => {
           <Grid container spacing={1}>
             { /* BOOKING STATUS */}
             <Grid item sm={4} xs={12}>
-              <FormControl className={classes.formControl} variant={variant}>
+              <FormControl className="full-width" variant={variant}>
                 <InputLabel id="status-label">{t("Booking status")}</InputLabel>
                 {bookingStatuses &&
                 <Controller
@@ -506,12 +429,13 @@ const BookingDialog = props => {
                     <Select
                       labelId="status-label"
                       margin="dense"
+                      className="booking-status-select"
                       {...field}
                     >
                       {bookingStatuses.map(status => (
                         <MenuItem key={status.id} value={status.id}>
                           <span
-                            className={classes.statusItem}
+                            className="booking-status-item"
                             style={{ background: "#" + status.color }}
                           >{status.name}</span>
                         </MenuItem>
@@ -522,7 +446,7 @@ const BookingDialog = props => {
             </Grid>
             { /* LODGING */}
             <Grid item sm={8} xs={12}>
-              <FormControl className={classes.formControl} variant={variant}>
+              <FormControl className="full-width" variant={variant}>
                 <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
                 {lodgings &&
                 <Controller
@@ -549,7 +473,7 @@ const BookingDialog = props => {
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="guest-header">
-                  <Typography gutterBottom className={classes.heading}>{t("Guest")}</Typography>
+                  <Typography gutterBottom className="accordion-heading">{t("Guest")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={1}>
@@ -557,7 +481,7 @@ const BookingDialog = props => {
                       <ContactsIcon />
                     </Grid>
                     <Grid item xs={11}>
-                      <FormControl className={classes.formControl} variant={variant}>
+                      <FormControl className="full-width" variant={variant}>
                         <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
                         {allGuests &&
                         <Select
@@ -637,13 +561,13 @@ const BookingDialog = props => {
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="booking-header">
-                  <Typography gutterBottom className={classes.heading}>{t("Booking details")}</Typography>
+                  <Typography gutterBottom className="accordion-heading">{t("Booking details")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={1}>
                     {/* Dates and nights */}
                     <Grid item xs={12}>
-                      <FormControl className={classes.formControl} variant={variant}>
+                      <FormControl className="full-width" variant={variant}>
                         <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
                         <Controller
                           name="duration"
@@ -673,24 +597,17 @@ const BookingDialog = props => {
                             control={control}
                             name="begin_date"
                             render={({ field }) =>
-                              <KeyboardDatePicker
+                              <DatePicker
                                 format="dd/MM/yyyy"
-                                id="date-picker-start"
-                                KeyboardButtonProps={{
-                                  "aria-label": "arrival date"
-                                }}
-                                label={t("Arrival")}
+                                renderInput={(props) => <TextField label={t("Arrival")} variant={variant} {...props} />}
                                 margin="dense"
                                 selected={field.value}
-                                variant="inline"
-                                inputVariant={variant}
-                                autoOk
                                 {...field}
                                 onChange={(date) => handleBeginDateChange(date, field.onChange)}
                               />}
                           />
                         </Grid>
-                        <Hidden xsDown>
+                        <Hidden smDown>
                           <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>
                             <ForwardIcon />
                           </Grid>
@@ -700,17 +617,10 @@ const BookingDialog = props => {
                             control={control}
                             name="end_date"
                             render={({ field }) =>
-                              <KeyboardDatePicker
+                              <DatePicker
                                 format="dd/MM/yyyy"
-                                id="date-picker-stop"
-                                KeyboardButtonProps={{
-                                  "aria-label": "departure date"
-                                }}
-                                label={t("Departure")}
+                                renderInput={(props) => <TextField label={t("Departure")} variant={variant} {...props} />}
                                 margin="dense"
-                                variant="inline"
-                                inputVariant={variant}
-                                autoOk
                                 {...field}
                                 onChange={(date) => handleEndDateChange(date, field.onChange)}
                               />}
@@ -725,7 +635,7 @@ const BookingDialog = props => {
                       justifyContent={!isFlatRate ? "space-around" : "flex-start"}
                     >
                       {!isFlatRate &&
-                      <Grid item sm={7} xs={12} className={classes.flexBoxStretched}>
+                      <Grid item sm={7} xs={12} className="flex-box-stretched">
                         <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
                         <Controller
                           name="daily_rate"
@@ -733,7 +643,7 @@ const BookingDialog = props => {
                           rules={{ min: 1, valueAsNumber: true }}
                           render={({ field }) =>
                             <TextField
-                              className={classes.priceInput}
+                              className="price-input"
                               label={t("Daily rate")}
                               error={!!errors.daily_rate}
                               margin="dense"
@@ -747,18 +657,18 @@ const BookingDialog = props => {
                             />}
                           required
                         />
-                        <div className={classes.spacer} />
+                        <div className="spacer" />
                         =
-                        <div className={classes.spacer} />
+                        <div className="spacer" />
                       </Grid>}
-                      <Grid item sm={5} xs={12} className={classes.flexBoxAlignLeft}>
+                      <Grid item sm={5} xs={12} className="flex-box-align-left">
                         <Controller
                           control={control}
                           name="price"
                           rules={{ valueAsNumber: true }}
                           render={({ field }) =>
                             <TextField
-                              className={classes.priceInput}
+                              className="price-input"
                               InputProps={{
                                 endAdornment: <InputAdornment position="end">€</InputAdornment>,
                                 type: "number"
@@ -771,7 +681,7 @@ const BookingDialog = props => {
                               onChange={event => field.onChange(handleChange(event))}
                             />}
                         />
-                        <div className={classes.spacer} />
+                        <div className="spacer" />
                         <FormControlLabel
                           control={
                             <Controller
@@ -794,7 +704,7 @@ const BookingDialog = props => {
                       </Grid>
                     </Grid>
                     {/* Deposit */}
-                    <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+                    <Grid item xs={12} className="flex-box-align-left">
                       <Controller
                         control={control}
                         name="deposit"
@@ -813,7 +723,7 @@ const BookingDialog = props => {
                           <TextField
                             error={!!errors.deposit}
                             helperText={errors.deposit && errors.deposit.message}
-                            className={classes.priceInput}
+                            className="price-input"
                             InputProps={{
                               endAdornment: <InputAdornment position="end">€</InputAdornment>,
                               type: "number"
@@ -825,13 +735,13 @@ const BookingDialog = props => {
                             onChange={event => field.onChange(handleChange(event))}
                           />}
                       />
-                      <div className={classes.spacer} />
+                      <div className="spacer" />
                       <Typography>
                         {price ? t("Balance: {{amount}}", { amount: formatCurrency(price - deposit) }) : ""}
                       </Typography>
                     </Grid>
                     { /* commission fees */}
-                    <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+                    <Grid item xs={12} className="flex-box-align-left">
                       <Controller
                         control={control}
                         name="commission_fees"
@@ -843,7 +753,7 @@ const BookingDialog = props => {
                           <TextField
                             error={!!errors.commission_fees}
                             helperText={errors.commission_fees && errors.commission_fees.message}
-                            className={classes.priceInput}
+                            className="price-input"
                             InputProps={{
                               endAdornment: <InputAdornment position="end">€</InputAdornment>,
                               type: "number"
@@ -857,7 +767,7 @@ const BookingDialog = props => {
                       />
                     </Grid>
                     {/* number of persons */}
-                    <Grid item xs={12} className={classes.flexBoxAlignLeft}>
+                    <Grid item xs={12} className="flex-box-align-left">
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="adults">{t("Adults")}</InputLabel>
                         <Controller
@@ -878,7 +788,7 @@ const BookingDialog = props => {
                             </Select>}
                         />
                       </FormControl>
-                      <div className={classes.spacer} />
+                      <div className="spacer" />
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="children">{t("Children")}</InputLabel>
                         <Controller
@@ -899,7 +809,7 @@ const BookingDialog = props => {
                             </Select>}
                         />
                       </FormControl>
-                      <div className={classes.spacer} />
+                      <div className="spacer" />
                       <FormControl variant={variant}>
                         <InputLabel htmlFor="babies">{t("Babies")}</InputLabel>
                         <Controller
@@ -929,7 +839,7 @@ const BookingDialog = props => {
             <Grid item lg={6} xs={12}>
               <Accordion defaultExpanded>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="options-content" id="options-header">
-                  <Typography gutterBottom className={classes.heading}>{t("Options")}</Typography>
+                  <Typography gutterBottom className="accordion-heading">{t("Options")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={1}>
@@ -947,13 +857,13 @@ const BookingDialog = props => {
                   expandIcon={<ExpandMoreIcon />} aria-controls="complements-content"
                   id="complements-header"
                 >
-                  <Typography gutterBottom className={classes.heading}>{t("Complements")}</Typography>
+                  <Typography gutterBottom className="accordion-heading">{t("Complements")}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={1}>
                     {/* statistics */}
                     <Grid item xs={12}>
-                      <FormControl className={classes.formControl} variant={variant}>
+                      <FormControl className="full-width" variant={variant}>
                         <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
                         {bookingChannels &&
                         <Controller
@@ -1005,15 +915,15 @@ const BookingDialog = props => {
                   expandIcon={<ExpandMoreIcon />} aria-controls="complements-content"
                   id="complements-header"
                 >
-                  <Typography gutterBottom className={classes.heading}>{t("Payments")}</Typography>
-                  <Typography gutterBottom className={classes.secondaryHeading}>
+                  <Typography gutterBottom className="accordion-heading">{t("Payments")}</Typography>
+                  <Typography gutterBottom className="accordion-secondary-heading">
                     {leftToPay > 0 &&
                     <span
-                      className={classes.leftToPay}
+                      className="left-to-pay"
                     >{t("Left to pay: {{amount}}", { amount: formatCurrency(leftToPay) })}</span>}
                     {leftToPay < 0 &&
                     <span
-                      className={classes.tooPerceived}
+                      className="too-perceived"
                     >{t("Too perceived: {{amount}}", { amount: formatCurrency(-leftToPay) })}</span>}
                     {leftToPay === 0 && t("Fully paid")}
                   </Typography>
@@ -1039,7 +949,7 @@ const BookingDialog = props => {
             {booking && booking.id &&
             <Button
               type="button"
-              className={classes.deleteButton}
+              className="delete-button"
               color="secondary"
               startIcon={<DeleteIcon />}
               onClick={onDelete}
@@ -1049,19 +959,18 @@ const BookingDialog = props => {
             {onOpenContract &&
             <Button
               type="button"
-              color="default"
               disabled={!booking || !booking.id}
-              className={classes.button}
+              className="button"
               startIcon={<PdfIcon />}
               onClick={form.handleSubmit(openContract)}
             >{t("Contract")}</Button>}
           </Grid>
           <Grid item>
-            <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+            <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>
             <Button
               type="submit"
               color="primary"
-              className={classes.button}
+              className="button"
               startIcon={<SaveIcon />}
               onClick={form.handleSubmit(onSubmit)}
             >{t("Save")}</Button>

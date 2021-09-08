@@ -2,9 +2,9 @@ import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/styles";
-import { Avatar, Typography } from "@material-ui/core";
-import { getGravatarUrl } from "react-awesome-gravatar";
+import { makeStyles } from "@mui/styles";
+import { Avatar, Typography } from "@mui/material";
+import { getGravatarUrl } from "../../../../../../components/Gravatar";
 import { useSelector } from "react-redux";
 
 const useStyles = makeStyles(theme => ({

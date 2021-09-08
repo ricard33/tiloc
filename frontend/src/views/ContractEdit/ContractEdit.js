@@ -1,21 +1,21 @@
 import React, { useEffect, useState, Suspense } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router-dom";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
   PictureAsPdf as PdfIcon,
   Refresh as RefreshIcon,
   Save as SaveIcon
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import axios from "axios";
 import moment from "moment";
-import { Grid } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import Alert from "@material-ui/lab/Alert";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { Grid } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Alert from '@mui/material/Alert';
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   useDeleteContractMutation,
   useGetOrGenerateContractMutation,
@@ -214,30 +214,24 @@ const ContractEdit = () => {
           <Grid item>
             <Button
               type="button"
-              color="default"
               className={classes.button}
               startIcon={<RefreshIcon />}
-              onClick={regenerateContract}
-            >{t("Regenerate")}</Button>
+              onClick={regenerateContract}>{t("Regenerate")}</Button>
             <Button
               type="button"
-              color="default"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={makePDF}
-              title={t("PDF")}
-            >{t("PDF")}</Button>
+              title={t("PDF")}>{t("PDF")}</Button>
             <Button
               type="button"
-              color="default"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
-              title={t("PDF")}
-            >{t("Save and make PDF")}</Button>
+              title={t("PDF")}>{t("Save and make PDF")}</Button>
           </Grid>
           <Grid item>
-            <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+            <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>
             <Button
               type="submit"
               color="primary"
@@ -249,7 +243,6 @@ const ContractEdit = () => {
         </Grid>
       </Grid>
     </div>
-
   );
 };
 

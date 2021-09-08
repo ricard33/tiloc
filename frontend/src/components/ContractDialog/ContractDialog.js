@@ -1,27 +1,27 @@
 import React, { useEffect, useState, Suspense } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
 import { bookingType } from "../../common/propTypesUtils";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
   PictureAsPdf as PdfIcon,
   Refresh as RefreshIcon,
   Save as SaveIcon
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import axios from "axios";
-import { Grid } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+import { Grid } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import useWindowDimensions from "../../common/windowDimensions";
 import moment from "moment";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   useGetOrGenerateContractMutation,
   useUpdateContractMutation,
@@ -209,11 +209,9 @@ const ContractDialog = props => {
         <div style={{ flex: "1 0 0" }} />
         <Button
           type="button"
-          color="default"
           className={classes.button}
           startIcon={<RefreshIcon />}
-          onClick={regenerateContract}
-        >{t("Regenerate")}</Button>
+          onClick={regenerateContract}>{t("Regenerate")}</Button>
         {/*<Button*/}
         {/*  type="button"*/}
         {/*  color="default"*/}
@@ -224,14 +222,12 @@ const ContractDialog = props => {
         {/*/>*/}
         <Button
           type="button"
-          color="default"
           className={classes.button}
           startIcon={<PdfIcon />}
           onClick={makePDF}
-          title={t("PDF")}
-        >{t("PDF")}</Button>
+          title={t("PDF")}>{t("PDF")}</Button>
         <div style={{ flex: "1 0 0" }} />
-        <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+        <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>
         <Button
           type="submit"
           color="primary"
@@ -241,7 +237,6 @@ const ContractDialog = props => {
         >{t("Save")}</Button>
       </DialogActions>
     </Dialog>
-
   );
 };
 

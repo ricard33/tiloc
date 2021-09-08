@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Dropzone from "components/Dropzone";
 import "./Upload.css";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import CheckIcon from '@material-ui/icons/Check';
+import LinearProgress from "@mui/material/LinearProgress";
+import CheckIcon from '@mui/icons-material/Check';
 import { withTranslation } from 'react-i18next';
 import PropTypes from "prop-types";
 

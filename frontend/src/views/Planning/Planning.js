@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import { startOfMonth, parse, add } from "date-fns";
 import { BookingScheduler } from "./components";
 import { useTranslation } from "react-i18next";
-import { useConfirm } from "material-ui-confirm";
+import { useConfirm } from "../../libs/MuiConfirm";
 import { useHistory, useLocation } from "react-router-dom";
-import { Grid } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import { DeleteForever as DeleteIcon, Description as DescriptionIcon, Edit as EditIcon, Settings as SettingsIcon } from "@material-ui/icons";
+import { Grid } from "@mui/material";
+import Button from "@mui/material/Button";
+import { DeleteForever as DeleteIcon, Description as DescriptionIcon, Edit as EditIcon, Settings as SettingsIcon } from "@mui/icons-material";
 import queryString from "query-string";
-import IconButton from "@material-ui/core/IconButton";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
+import IconButton from "@mui/material/IconButton";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
 import NavBar from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import { useLocalStorage } from "../../common/useLocalStorage";
@@ -172,6 +172,7 @@ const Planning = () => {
           color="secondary"
           onClick={() => onDeleteBooking(selected)}
           disabled={!selected}
+          size="large"
         ><DeleteIcon/></IconButton>
         <IconButton
           type="button"
@@ -179,17 +180,20 @@ const Planning = () => {
           onClick={() => onEditContract(selected)}
           title={t("Contract")}
           disabled={!selected}
+          size="large"
         ><DescriptionIcon/></IconButton>
         <IconButton
           type="submit"
           color="primary"
           onClick={() => onEditBooking(selected)}
           disabled={!selected}
+          size="large"
         ><EditIcon/></IconButton>
         <IconButton
           type="button"
           color="default"
           onClick={() => setSettingsOpened(true)}
+          size="large"
         ><SettingsIcon/></IconButton>
       </div>
       <NavBar
@@ -222,7 +226,6 @@ const Planning = () => {
         <Grid item>
           <Button
             type="button"
-            color="default"
             startIcon={<DescriptionIcon/>}
             onClick={() => onEditContract(selected)}
             title={t("Contract")}

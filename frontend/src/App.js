@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Router } from "react-router-dom";
-import { ThemeProvider } from "@material-ui/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import validate from "validate.js";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,12 +11,12 @@ import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
 import moment from "moment";
-import { ConfirmProvider } from "material-ui-confirm";
 import localization from "moment/locale/fr";
-import DateFnsUtils from "@date-io/date-fns";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import frLocale from "date-fns/locale/fr";
 import Notifier from "./components/Notifier";
+import { LocalizationProvider } from "@mui/lab";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import { ConfirmProvider } from "./libs/MuiConfirm";
 
 validate.validators = {
   ...validate.validators,
@@ -35,8 +35,9 @@ function App(props) {
   }, [dispatch, token]);
 
   return (
+    // <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>
-      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={frLocale}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} locale={frLocale}>
         <ConfirmProvider>
           <Notifier />
           <Router history={props.history}>
@@ -44,8 +45,9 @@ function App(props) {
             <Routes />
           </Router>
         </ConfirmProvider>
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
     </ThemeProvider>
+    // </StyledEngineProvider>
   );
 }
 

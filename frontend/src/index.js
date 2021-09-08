@@ -13,7 +13,7 @@ import { store, sagaMiddleware } from "./store";
 import "./index.css";
 import { createBrowserHistory } from "history";
 import logger from "./common/logger";
-import { SnackbarProvider } from 'notistack';
+import { SnackbarProvider } from './libs/notistack';
 import { dispatchError } from "./common/alertUtils";
 
 const browserHistory = createBrowserHistory();

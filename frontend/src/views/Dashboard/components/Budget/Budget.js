@@ -1,10 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import MoneyIcon from '@material-ui/icons/Money';
+import { makeStyles } from '@mui/styles';
+import { Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import MoneyIcon from '@mui/icons-material/Money';
 
 const useStyles = makeStyles(theme => ({
   root: {

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { BookingsTable, BookingsToolbar } from "./components";
-import { makeStyles } from "@material-ui/styles";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { makeStyles } from "@mui/styles";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 // import { useTranslation } from "react-i18next";
 import { useListBookingsPaginatedQuery } from "../../services/api";
-import { Card, CardActions, TablePagination } from "@material-ui/core";
-import CardContent from "@material-ui/core/CardContent";
+import { Card, CardActions, TablePagination } from "@mui/material";
+import CardContent from "@mui/material/CardContent";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";

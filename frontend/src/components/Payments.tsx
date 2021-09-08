@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import PaymentList from "./PaymentList";
-import { useConfirm } from "material-ui-confirm";
+import { useConfirm } from "../libs/MuiConfirm";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../common/dateUtils";
 import { parseISO } from "date-fns";
-import IconButton from "@material-ui/core/IconButton";
-import { AddCircle as AddIcon } from "@material-ui/icons";
+import IconButton from "@mui/material/IconButton";
+import { AddCircle as AddIcon } from "@mui/icons-material";
 import PaymentDialog from "./PaymentDialog";
 import { Payment } from "../types";
 import { useCreatePaymentMutation, useDeletePaymentMutation, useGetPaymentsForBookingQuery } from "../services/api";
@@ -82,12 +82,17 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   return (
     <div>
       <PaymentList payments={data ? data.results : []} onDelete={onDeletePayment} />
-      <IconButton edge="end" aria-label="delete" color="primary" onClick={() => setOpen(true)}>
+      <IconButton
+        edge="end"
+        aria-label="delete"
+        color="primary"
+        onClick={() => setOpen(true)}
+        size="large"
+      >
         <AddIcon />{t("Add payment")}
       </IconButton>
       {open && <PaymentDialog open={open} bookingId={bookingId} onAdd={onCreatePayment} onClose={onClose} />}
     </div>
-
   );
 };
 

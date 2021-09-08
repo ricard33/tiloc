@@ -1,10 +1,10 @@
 import React from "react";
-import { makeStyles } from "@material-ui/styles";
-import { Typography } from "@material-ui/core";
+import { makeStyles } from "@mui/styles";
+import { Typography } from "@mui/material";
 import { SidebarNav } from "../../layouts/Main/components/Sidebar/components";
 import { useTranslation } from "react-i18next";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import SettingsIcon from "@material-ui/icons/Settings";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const useStyles = makeStyles(theme => ({
   root: {

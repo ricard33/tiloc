@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
   Card,
   CardHeader,
@@ -14,9 +14,9 @@ import {
   ListItemAvatar,
   ListItemText,
   IconButton
-} from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+} from '@mui/material';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import mockData from './data';
 

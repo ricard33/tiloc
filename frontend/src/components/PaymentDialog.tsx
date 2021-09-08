@@ -9,9 +9,9 @@ import {
   DialogContent,
   DialogTitle, InputAdornment, MenuItem,
   TextField
-} from "@material-ui/core";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import DatePicker from '@mui/lab/DatePicker';
+import makeStyles from '@mui/styles/makeStyles';
 import { Payment, paymentMethods } from "../types";
 import { parseISO } from "date-fns";
 
@@ -86,17 +86,10 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
             control={control}
             defaultValue={new Date().toISOString()}
             render={({ field }) =>
-              <KeyboardDatePicker
-                id="payment-date-picker"
-                KeyboardButtonProps={{
-                  "aria-label": "date"
-                }}
-                format="dd/MM/yyyy"
-                label={t("date")}
-                variant="inline"
+              <DatePicker
+                inputFormat="dd/MM/yyyy"
+                renderInput={(props) => <TextField label={t("date")} variant={variant} {...props} />}
                 className={classes.date}
-                inputVariant={variant}
-                autoOk
                 {...field}
               />}
           />
@@ -157,15 +150,15 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="default">
+        <Button onClick={onClose}>
           {t("Cancel")}
         </Button>
         <Button onClick={handleSubmit(onSubmit)} color="primary" type="submit">
           {t("Add")}
         </Button>
       </DialogActions>
-    </Dialog>)
-  ;
+    </Dialog>
+  );
 };
 
 export default PaymentDialog;

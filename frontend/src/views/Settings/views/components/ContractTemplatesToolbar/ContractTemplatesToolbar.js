@@ -1,15 +1,15 @@
 import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/styles";
-import { Button, Toolbar } from "@material-ui/core";
-import { lighten } from "@material-ui/core/styles/colorManipulator";
+import { makeStyles } from "@mui/styles";
+import { Button, Toolbar } from "@mui/material";
+import { lighten } from '@mui/material/styles';
 import { useTranslation } from "react-i18next";
-import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import Typography from "@material-ui/core/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import Typography from "@mui/material/Typography";
 import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1
   },
   highlight:
-    theme.palette.type === "light"
+    theme.palette.mode === "light"
       ? {
         color: theme.palette.secondary.main,
         backgroundColor: lighten(theme.palette.secondary.light, 0.85)
@@ -79,13 +79,13 @@ const ContractTemplatesToolbar = props => {
         </Button>
         {numSelected > 0 ? (
           <Tooltip title="Delete">
-            <IconButton aria-label="Delete">
+            <IconButton aria-label="Delete" size="large">
               <DeleteIcon/>
             </IconButton>
           </Tooltip>
         ) : (
           <Tooltip title="Filter list">
-            <IconButton aria-label="Filter list">
+            <IconButton aria-label="Filter list" size="large">
               <FilterListIcon/>
             </IconButton>
           </Tooltip>

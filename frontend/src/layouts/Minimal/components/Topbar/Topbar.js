@@ -2,8 +2,8 @@ import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/styles";
-import { AppBar, Toolbar } from "@material-ui/core";
+import { makeStyles } from "@mui/styles";
+import { AppBar, Toolbar } from "@mui/material";
 import LogoTiLoc from "../../../../assets/images/logos/logo-tiloc.png";
 
 const useStyles = makeStyles(() => ({

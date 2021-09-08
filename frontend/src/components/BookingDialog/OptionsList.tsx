@@ -1,19 +1,19 @@
 import React, { useEffect } from "react";
-import { Table, TableBody, TableCell, TableFooter, TextField, Theme } from "@material-ui/core";
-import TableRow from "@material-ui/core/TableRow";
-import IconButton from "@material-ui/core/IconButton";
-import { DeleteForever as DeleteIcon } from "@material-ui/icons";
-import { makeStyles } from "@material-ui/styles";
+import { Table, TableBody, TableCell, TableFooter, TextField, Theme } from "@mui/material";
+import TableRow from "@mui/material/TableRow";
+import IconButton from "@mui/material/IconButton";
+import { DeleteForever as DeleteIcon } from "@mui/icons-material";
+import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { Controller } from "react-hook-form";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import InputAdornment from "@mui/material/InputAdornment";
 import { formatCurrency } from "../../common/intlUtils";
 import { Service } from "../../types";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
 import { useListServicesQuery } from "../../services/api";
 
 
@@ -60,8 +60,8 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
   const { data: allOptions } = useListServicesQuery();
 
   useEffect(() => {
-    if (!bookingId && allOptions) {
-      console.log("Scan for automatic options", allOptions);
+    if (!bookingId && allOptions && options.length === 0) {
+      console.log("Scan for automatic options", allOptions, options);
       allOptions.filter((o: Service) => o.auto_add_booking).forEach((option: Service) => {
         if (options.filter((o: Service) => o.id === option.id).length === 0) {
           console.log("  add automatic option:", option);
@@ -86,34 +86,36 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
       console.debug("ADD OPTION", data.target.value);
       const value = Number(data.target.value);
       const option = allOptions.filter((o: Service) => o.id === value)[0];
+      console.debug("  --> ", option);
       append(option);
     }
   }
 
-
+  console.log(options)
   return (
     <Table className={classes.table} aria-label="simple table">
       <TableBody>
         {
           fields.map((option: Service, index: number) => (
             <TableRow key={option.id}>
-              <input
-                type="hidden" {...register(`options[${index}].id`)}
-                defaultValue={option.id}
-              />
-              <input
-                type="hidden" {...register(`options[${index}].designation`)}
-                defaultValue={option.designation}
-              />
-              <input
-                type="hidden" {...register(`options[${index}].vat`)}
-                defaultValue={option.vat}
-              />
-              <input
-                type="hidden" {...register(`options[${index}].not_included_in_price`)}
-                defaultValue={option.not_included_in_price}
-              />
-              <TableCell>{option.designation}</TableCell>
+              <TableCell>
+                <input
+                  type="hidden" {...register(`options[${index}].id`)}
+                  defaultValue={option.id}
+                />
+                <input
+                  type="hidden" {...register(`options[${index}].designation`)}
+                  defaultValue={option.designation}
+                />
+                <input
+                  type="hidden" {...register(`options[${index}].vat`)}
+                  defaultValue={option.vat}
+                />
+                <input
+                  type="hidden" {...register(`options[${index}].not_included_in_price`)}
+                  defaultValue={option.not_included_in_price}
+                />
+                {option.designation}</TableCell>
               <TableCell>{options[index].unit_price && !options[index].is_flat_rate &&
               <span>{duration}&nbsp;x</span>}</TableCell>
               <TableCell>
@@ -130,7 +132,6 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                       }}
                       className={classes.optionPriceInput}
                       margin="dense"
-                      defaultValue={option.unit_price}
                       required
                       // variant={variant}
                       {...field}
@@ -162,7 +163,13 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
               </TableCell>
               <TableCell>
-                <IconButton edge="end" aria-label="delete" className={classes.deleteButton} onClick={() => remove(index)}>
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  className={classes.deleteButton}
+                  onClick={() => remove(index)}
+                  size="large"
+                >
                   <DeleteIcon />
                 </IconButton>
               </TableCell>

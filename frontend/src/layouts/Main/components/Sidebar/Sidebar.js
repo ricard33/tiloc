@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { Drawer } from '@material-ui/core';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import GroupIcon from '@material-ui/icons/Group';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
-import SettingsIcon from '@material-ui/icons/Settings';
-import CalendarIcon from '@material-ui/icons/CalendarToday';
-import ListIcon from '@material-ui/icons/List';
-import MoneyIcon from '@material-ui/icons/AttachMoney';
-import LocalLaundryServiceIcon from '@material-ui/icons/LocalLaundryService';
+import { makeStyles } from '@mui/styles';
+import { Drawer } from '@mui/material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import GroupIcon from '@mui/icons-material/Group';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CalendarIcon from '@mui/icons-material/CalendarToday';
+import ListIcon from '@mui/icons-material/List';
+import MoneyIcon from '@mui/icons-material/AttachMoney';
+import LocalLaundryServiceIcon from '@mui/icons-material/LocalLaundryService';
 import { parseISO } from "date-fns";
 
 import { SidebarNav } from './components';

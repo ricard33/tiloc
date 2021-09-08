@@ -7,9 +7,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle, FormControlLabel,
-} from "@material-ui/core";
-// import { makeStyles } from "@material-ui/core/styles";
-import Checkbox from "@material-ui/core/Checkbox";
+} from "@mui/material";
+// import { makeStyles } from "@mui/material/styles";
+import Checkbox from "@mui/material/Checkbox";
 
 export type PlanningSettings = {
   showPaymentStatus: boolean;
@@ -60,7 +60,7 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose()} color="default">
+        <Button onClick={() => onClose()}>
           {t("Cancel")}
         </Button>
         <Button onClick={handleSubmit(onSubmit)} color="primary" type="submit">

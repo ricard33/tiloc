@@ -1,6 +1,6 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/styles';
-import { Grid, Typography } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Grid, Typography } from '@mui/material';
 import PageNotFound from 'assets/images/undraw_page_not_found_su7k.svg';
 
 const useStyles = makeStyles(theme => ({

@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
   Card,
   CardActions,
@@ -18,8 +18,8 @@ import {
   TableRow,
   Tooltip,
   TableSortLabel
-} from "@material-ui/core";
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+} from "@mui/material";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 import { StatusBullet } from 'components';
 import { useTranslation } from "react-i18next";

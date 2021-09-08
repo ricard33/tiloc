@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import {
   Card,
   CardHeader,
   CardContent,
   IconButton,
   Divider,
-} from '@material-ui/core';
-import RefreshIcon from '@material-ui/icons/Refresh';
+} from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import axios from "axios";

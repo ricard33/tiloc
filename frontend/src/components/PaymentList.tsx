@@ -1,11 +1,11 @@
 import React from "react";
-import { Table, TableBody, TableCell, Theme } from "@material-ui/core";
-import TableRow from "@material-ui/core/TableRow";
+import { Table, TableBody, TableCell, Theme } from "@mui/material";
+import TableRow from "@mui/material/TableRow";
 import { formatDate } from "../common/dateUtils";
 import { DecimalPrecision } from "../common/priceUtils";
-import IconButton from "@material-ui/core/IconButton";
-import { DeleteForever as DeleteIcon } from "@material-ui/icons";
-import { makeStyles } from "@material-ui/styles";
+import IconButton from "@mui/material/IconButton";
+import { DeleteForever as DeleteIcon } from "@mui/icons-material";
+import { makeStyles } from "@mui/styles";
 import { parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Payment, paymentMethods } from "../types";
@@ -49,7 +49,12 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDe
             <TableCell>{paymentLabels[p.method]}</TableCell>
             <TableCell>{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>
             <TableCell>
-              <IconButton edge="end" aria-label="delete" className={classes.deleteButton} onClick={() => onDelete(p)}>
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                className={classes.deleteButton}
+                onClick={() => onDelete(p)}
+                size="large">
                 <DeleteIcon />
               </IconButton>
             </TableCell>

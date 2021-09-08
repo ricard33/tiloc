@@ -1,5 +1,5 @@
 import React from "react";
-import { SnackbarKey, useSnackbar } from "notistack";
+import { SnackbarKey, useSnackbar } from "../libs/notistack";
 import { removeAlert } from "../actions";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { Notification } from "../reducers/alert";

@@ -1,8 +1,8 @@
 import { store } from "../store";
 import { alert } from "../actions";
 import React from "react";
-import { useSnackbar, VariantType } from "notistack";
-import { Button } from "@material-ui/core";
+import { useSnackbar, VariantType } from "../libs/notistack";
+import { Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 export function dispatchError(message: string ) {

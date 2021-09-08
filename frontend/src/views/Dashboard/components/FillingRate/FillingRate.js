@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import axios from "axios";
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
   Card,
   CardHeader,
@@ -11,8 +11,8 @@ import {
   CardActions,
   Divider,
   Button
-} from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+} from '@mui/material';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 import { get_options } from './chart';
 import { useDispatch } from "react-redux";

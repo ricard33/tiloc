@@ -10,17 +10,17 @@ import Timeline, {
 } from "react-calendar-timeline";
 import "react-calendar-timeline/lib/Timeline.css";
 import { add, parseISO } from "date-fns";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import EuroIcon from '@material-ui/icons/Euro';
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import EuroIcon from '@mui/icons-material/Euro';
 import { startOfMonth } from "date-fns";
-import { makeStyles, useTheme } from "@material-ui/styles";
+import { makeStyles, useTheme } from "@mui/styles";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
 import "./BookingScheduler.css";
 import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 import clsx from "clsx";
-import { useMediaQuery } from "@material-ui/core";
+import { useMediaQuery } from "@mui/material";
 
 const useStyles = makeStyles(theme => ({
   root: {},

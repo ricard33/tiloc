@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
   Card,
   CardContent,
@@ -9,8 +9,8 @@ import {
   Typography,
   Avatar,
   LinearProgress
-} from '@material-ui/core';
-import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
+} from '@mui/material';
+import InsertChartIcon from '@mui/icons-material/InsertChartOutlined';
 
 const useStyles = makeStyles(theme => ({
   root: {

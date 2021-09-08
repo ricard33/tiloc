@@ -1,22 +1,22 @@
 import React, { useEffect, useState, Suspense } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { useHistory, useParams } from "react-router-dom";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
   PictureAsPdf as PdfIcon,
   Save as SaveIcon
-} from "@material-ui/icons";
-import { Grid, TextField } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+} from "@mui/icons-material";
+import { Grid, TextField } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import moment from "moment";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import {
   useCreateContractTemplateMutation, useDeleteContractTemplateMutation,
   useGetContractTemplateQuery,
@@ -226,25 +226,21 @@ const ContractTemplateEdit = (props) => {
             </FormControl>
             <Button
               type="button"
-              color="default"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={makePDF}
               disabled={!lodgingId}
-              title={t("PDF")}
-            >{t("PDF")}</Button>
+              title={t("PDF")}>{t("PDF")}</Button>
             <Button
               type="button"
-              color="default"
               className={classes.button}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
               disabled={!lodgingId}
-              title={t("PDF")}
-            >{t("Save and make PDF")}</Button>
+              title={t("PDF")}>{t("Save and make PDF")}</Button>
           </Grid>
           <Grid item>
-            <Button type="button" color="default" onClick={onCancel}>{t("Cancel")}</Button>
+            <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>
             <Button
               type="submit"
               color="primary"
@@ -263,7 +259,6 @@ const ContractTemplateEdit = (props) => {
         </Grid>
       </Grid>
     </div>
-
   );
 };
 

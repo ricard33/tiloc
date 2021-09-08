@@ -1,8 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import { Typography, Button, colors } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { Typography, Button, colors } from '@mui/material';
 import ResumeFolderSvg from 'assets/images/undraw_resume_folder_2_arse.svg';
 
 const useStyles = makeStyles(theme => ({

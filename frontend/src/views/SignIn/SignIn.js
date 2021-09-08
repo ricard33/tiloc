@@ -3,7 +3,7 @@ import { Link as RouterLink, Redirect, withRouter, useLocation } from "react-rou
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from 'prop-types';
 import validate from 'validate.js';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
   Grid,
   Button,
@@ -11,8 +11,8 @@ import {
   TextField,
   Link,
   Typography
-} from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { auth } from "../../actions";
 import { useTranslation } from "react-i18next";
@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     height: '100%'
   },
   quoteContainer: {
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       display: 'none'
     }
   },
@@ -93,7 +93,7 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     display: 'flex',
     alignItems: 'center',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       justifyContent: 'center'
     }
   },
@@ -102,7 +102,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: 100,
     paddingBottom: 125,
     flexBasis: 700,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       paddingLeft: theme.spacing(2),
       paddingRight: theme.spacing(2)
     }
@@ -208,7 +208,7 @@ const SignIn = props => {
         >
           <div className={classes.content}>
             <div className={classes.contentHeader}>
-              <IconButton onClick={handleBack}>
+              <IconButton onClick={handleBack} size="large">
                 <ArrowBackIcon />
               </IconButton>
             </div>

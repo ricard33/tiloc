@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import './Dropzone.css'
 import PropTypes from "prop-types";
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 class Dropzone extends Component {
   constructor(props) {

@@ -1,5 +1,5 @@
 import { ENQUEUE_SNACKBAR, CLOSE_SNACKBAR, REMOVE_SNACKBAR, AlertAction } from "../actions";
-import { OptionsObject, SnackbarKey } from "notistack";
+import { OptionsObject, SnackbarKey } from "../libs/notistack";
 
 export interface Notification {
   key: SnackbarKey,

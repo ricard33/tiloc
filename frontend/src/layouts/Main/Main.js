@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { makeStyles, useTheme } from "@material-ui/styles";
-import { Breadcrumbs, Link, Typography, useMediaQuery } from "@material-ui/core";
+import { makeStyles, useTheme } from "@mui/styles";
+import { Breadcrumbs, Link, Typography, useMediaQuery } from "@mui/material";
 import { Sidebar, Topbar, Footer } from "./components";
 import { Route, Link as RouterLink } from "react-router-dom";
 
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     height: "100%"
   },
   breadcrumb: {
-    padding: `0 ${theme.spacing(1)}px`,
+    padding: `0 ${theme.spacing(1)}`,
   }
 }));
 

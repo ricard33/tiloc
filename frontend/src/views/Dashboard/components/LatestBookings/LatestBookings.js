@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { parse, parseISO } from 'date-fns';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import {
   Card,
   CardActions,
@@ -11,8 +11,8 @@ import {
   Button,
   Divider,
   List, ListItem, ListItemText
-} from "@material-ui/core";
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+} from "@mui/material";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 import { useTranslation } from "react-i18next";
 import { formatDate, formatDistanceToNow } from "../../../../common/dateUtils";

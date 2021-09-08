@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import { Link as RouterLink, useHistory } from "react-router-dom";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/styles";
-import { AppBar, Avatar, Badge, Hidden, IconButton, Toolbar } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
-import InputIcon from "@material-ui/icons/Input";
-import AccountBoxIcon from "@material-ui/icons/AccountBox";
+import { makeStyles } from "@mui/styles";
+import { AppBar, Avatar, Badge, Hidden, IconButton, Toolbar } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
+import InputIcon from "@mui/icons-material/Input";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoTiLoc from "../../../../assets/images/logos/logo-tiloc.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getGravatarUrl } from "react-awesome-gravatar";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import { getGravatarUrl } from "../../../../components/Gravatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import { useTranslation } from "react-i18next";
 import { auth } from "../../../../actions";
 
@@ -82,6 +82,7 @@ const Topbar = props => {
             className={classes.appMenu}
             color="inherit"
             onClick={onSidebarOpen}
+            size="large"
           >
             <MenuIcon />
           </IconButton>
@@ -96,7 +97,7 @@ const Topbar = props => {
           <span className={classes.appName}>Ti Loc</span>
         </RouterLink>
         <div className={classes.flexGrow} />
-        <IconButton color="inherit">
+        <IconButton color="inherit" size="large">
           <Badge
             badgeContent={notifications.length}
             color="primary"
@@ -118,7 +119,6 @@ const Topbar = props => {
           id="user-menu"
           anchorEl={anchorEl}
           elevation={0}
-          getContentAnchorEl={null}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "center"

@@ -1,7 +1,7 @@
 import React from "react";
 import { Booking } from "../../types";
 import { BookingDialog } from "../index";
-import { Backdrop } from "@material-ui/core";
+import { Backdrop } from "@mui/material";
 import {
   useAllGuestsQuery,
   useListLodgingsQuery
