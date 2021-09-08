@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import { bookingType, lodgingType } from "../../common/propTypesUtils";
@@ -54,27 +53,6 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import './BookingDialog.scss';
 
-
-// const AccordionSummary = withStyles({
-//   root: {
-//     backgroundColor: "rgba(0, 0, 0, .03)",
-//     borderBottom: "1px solid rgba(0, 0, 0, .125)",
-//     marginBottom: -1,
-//     minHeight: 56,
-//     "&$expanded": {
-//       minHeight: 38
-//     }
-//   },
-//   content: {
-//     "&$expanded": {
-//       margin: "3px 0"
-//     },
-//     "& p": {
-//       marginBottom: 0
-//     }
-//   },
-//   expanded: {}
-// })(MuiAccordionSummary);
 
 const BookingDialog = props => {
   const { booking, lodgings, guests: allGuests, onClose, onOpenContract } = props;

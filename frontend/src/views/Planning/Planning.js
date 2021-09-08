@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@mui/styles";
 import { startOfMonth, parse, add } from "date-fns";
 import { BookingScheduler } from "./components";
 import { useTranslation } from "react-i18next";
@@ -26,34 +25,10 @@ import {
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
+import "./Planning.scss";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(3)
-  },
-  content: {
-    marginTop: theme.spacing(2)
-  },
-  toolbar: {
-    textAlign: "right"
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  },
-  deleteButton: {
-    color: "red"
-  },
-  statusLegend: {
-    border: "solid 1px",
-    fontSize: "x-small",
-    margin: "5px",
-    padding: "0 4px"
-  }
-}));
 
 const Planning = () => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const location = useLocation();
   const query = queryString.parse(location.search);
@@ -164,11 +139,11 @@ const Planning = () => {
   // }));
 
   return (
-    <div className={classes.root}>
-      <div className={classes.toolbar}>
+    <div className="planning">
+      <div className="toolbar">
         <IconButton
           type="button"
-          className={classes.deleteButton}
+          className="delete-button"
           color="secondary"
           onClick={() => onDeleteBooking(selected)}
           disabled={!selected}
@@ -216,7 +191,7 @@ const Planning = () => {
         <Grid item>
           <Button
             type="button"
-            className={classes.deleteButton}
+            className="delete-button"
             color="secondary"
             startIcon={<DeleteIcon/>}
             onClick={() => onDeleteBooking(selected)}
@@ -250,7 +225,7 @@ const Planning = () => {
       />}
 
       <br/>
-      <Card className={classes.root}>
+      <Card className="planning-legend">
         <CardContent>
           <Typography variant="h5" component="h2">
             {t("Legend")}
@@ -259,7 +234,7 @@ const Planning = () => {
             return (
               <span
                 key={status.id}
-                className={classes.statusLegend}
+                className="status-legend"
                 style={{ background: "#" + status.color }}
               >{status.name}</span>);
           })}

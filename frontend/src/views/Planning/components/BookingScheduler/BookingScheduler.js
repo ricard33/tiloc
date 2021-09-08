@@ -12,68 +12,14 @@ import "react-calendar-timeline/lib/Timeline.css";
 import { add, parseISO } from "date-fns";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import EuroIcon from '@mui/icons-material/Euro';
+import EuroIcon from "@mui/icons-material/Euro";
 import { startOfMonth } from "date-fns";
-import { makeStyles, useTheme } from "@mui/styles";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
 import { useTranslation } from "react-i18next";
-import "./BookingScheduler.css";
+import "./BookingScheduler.scss";
 import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 import clsx from "clsx";
-import { useMediaQuery } from "@mui/material";
-
-const useStyles = makeStyles(theme => ({
-  root: {},
-  disabled: {
-    opacity: "0.3",
-  },
-  collapseButton: {
-    width: "100%",
-    minWidth: "inherit",
-    padding: "inherit",
-    height: "fill-available"
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  },
-  lodging: {
-    textOverflow: "ellipsis"
-  },
-  groupSeparator: {},
-  specialGroup: {
-    fontWeight: "bold"
-  },
-  timeline: {
-    marginBottom: '10px',
-  },
-  timelineHeader: {
-    height: "30px"
-  },
-  dateHeader: {
-    height: "10px"
-  },
-  itemContent: {
-    width: "100%",
-  },
-  itemTitle: {
-    // position: 'relative',
-  },
-  itemIcon: {
-    fontSize: '1em',
-    /* float: right, */
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    borderLeft: "1px solid black"
-  },
-  partiallyPaid:{
-    background: "orange"
-  },
-  fullyPaid:{
-    background: "rgb(182, 230, 158)"
-  },
-}));
+import useWindowDimensions from "../../../../common/windowDimensions";
 
 const timeSteps = {
   second: 0,
@@ -118,28 +64,25 @@ const BookingScheduler = props => {
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
     settings, disabled
   } = props;
-  const classes = useStyles();
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
-    defaultMatches: true
-  });
+  const { width: windowWidth } = useWindowDimensions();
+  const isDesktop = windowWidth >= 900;
   const [horizontalMonths, setHorizontalMonths] = useState(1);
   const [lineHeight, setLineHeight] = useState(20);
   const [collapsedState, setCollapsed] = useState(undefined);
-  const collapsed = typeof collapsedState === 'undefined' ? !isDesktop : collapsedState;
+  const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
   const [selected, setSelected] = useState([]);
   const [width, height] = useWindowSize();
   const { t } = useTranslation();
 
-  const updateLayout = (width, /*height*/) => {
+  const updateLayout = (width /*height*/) => {
     const nbMonths = width > 1300 ? 2 : width > 700 ? 1 : 0.5;
     if (nbMonths !== horizontalMonths) {
       console.debug("Changing nb months to " + nbMonths);
       setHorizontalMonths(nbMonths);
     }
     const newLineHeight = nbMonths < 1 ? 30 : 20;
-    if(newLineHeight !== lineHeight)
-      setLineHeight(newLineHeight)
+    if (newLineHeight !== lineHeight)
+      setLineHeight(newLineHeight);
   };
   updateLayout(width, height);
 
@@ -150,7 +93,7 @@ const BookingScheduler = props => {
     // rightTitle: "title in the right sidebar",
     stackItems: true,
     tip: lodging.name,
-    className: classes.lodging
+    className: "lodging"
     // height?: 30
   }));
 
@@ -159,7 +102,7 @@ const BookingScheduler = props => {
     title: "",
     tip: "",
     stackItems: false,
-    className: classes.groupSeparator,
+    className: "group-separator",
     height: 10
   });
   // groups.push({
@@ -167,7 +110,7 @@ const BookingScheduler = props => {
   //   title: t("Holidays"),
   //   tip: t("Holidays"),
   //   stackItems: true,
-  //   className: classes.specialGroup
+  //   className: 'special-group'
   //   // height: 25
   // });
   groups.push({
@@ -175,7 +118,7 @@ const BookingScheduler = props => {
     title: t("Cancellation / Waiting"),
     tip: t("Cancellation / Waiting"),
     stackItems: true,
-    className: classes.specialGroup
+    className: "special-group"
     // height: 25
   });
   // groups.push({
@@ -183,7 +126,7 @@ const BookingScheduler = props => {
   //   title: "",
   //   tip: "",
   //   stackItems: false,
-  //   className: classes.groupSeparator,
+  //   className: 'group-separator',
   //   height: 10
   // });
   // groups.push({
@@ -191,7 +134,7 @@ const BookingScheduler = props => {
   //   title: t("Pricing"),
   //   tip: t("Pricing"),
   //   stackItems: true,
-  //   className: classes.specialGroup
+  //   className: 'special-group'
   // });
 
   const items = (bookings ?? []).map(booking => ({
@@ -214,7 +157,7 @@ const BookingScheduler = props => {
       style: {
         background: "#" + booking.status.color,
         color: "black",
-        opacity: booking.lodging_id > 0 ? undefined : '50%'
+        opacity: booking.lodging_id > 0 ? undefined : "50%"
       }
     },
     booking
@@ -227,13 +170,13 @@ const BookingScheduler = props => {
     onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
-  function eventItemSelected(bookingId, /*e, time*/) {
+  function eventItemSelected(bookingId /*e, time*/) {
     setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function eventItemDeselected(bookingId) {
-    setSelected(selected.filter((value, /*index, arr*/) => value === bookingId));
+    setSelected(selected.filter((value /*index, arr*/) => value === bookingId));
     onItemDeselected && onItemDeselected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
@@ -276,20 +219,20 @@ const BookingScheduler = props => {
         groupRenderer={renderGroup}
         itemRenderer={renderItem}
       >
-        <TimelineHeaders className={"sticky " + classes.timelineHeader}>
+        <TimelineHeaders className={"sticky timeline-header"}>
           <SidebarHeader>
             {renderSidebarHeader}
           </SidebarHeader>
-          <DateHeader unit="month" className={classes.dateHeader} height={15}/>
-          <DateHeader unit="day" className={classes.dateHeader} height={15}/>
+          <DateHeader unit="month" className="date-header" height={15} />
+          <DateHeader unit="day" className="date-header" height={15} />
         </TimelineHeaders>
         <TimelineMarkers>
           <TodayMarker>
             {({ styles/*, date*/ }) =>
-              <div style={{ ...styles, backgroundColor: "red" }}/>
+              <div style={{ ...styles, backgroundColor: "red" }} />
             }
           </TodayMarker>
-          <CursorMarker/>
+          <CursorMarker />
         </TimelineMarkers>
       </Timeline>
     );
@@ -300,16 +243,16 @@ const BookingScheduler = props => {
   for (var i = 0; i < 12; i += horizontalMonths) {
     var start = add(beginDate, { months: Math.trunc(i), days: 30 * (i % 1) });
     timelines.push(
-      <div key={i} className={classes.timeline}>
+      <div key={i} className="timeline">
         {renderTimeline(
           start.valueOf(),
-          add(start, horizontalMonths < 1 ? { days: 32 * horizontalMonths} : { months: horizontalMonths }).valueOf())}
+          add(start, horizontalMonths < 1 ? { days: 32 * horizontalMonths } : { months: horizontalMonths }).valueOf())}
       </div>
     );
   }
 
   return (
-    <div className={clsx(classes.root , disabled && classes.disabled)}>
+    <div className={clsx({ "booking-scheduler": true, disabled: disabled })}>
       {/*<Grid container justifyContent="space-between">*/}
       {/*  <Grid item>*/}
       {/*    <NavButton onClick={() => onPrevNextClick(-1)}>*/}
@@ -334,13 +277,13 @@ const BookingScheduler = props => {
   function renderSidebarHeader({ getRootProps }) {
     return <div {...getRootProps()}>
       <button
-        className={classes.collapseButton}
+        className="collapse-button"
         onClick={() => {
           setCollapsed(!collapsed);
           window.setTimeout(() => window.dispatchEvent(new Event("resize")));
         }}
       >
-        {collapsed ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
+        {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </button>
     </div>;
   }
@@ -353,16 +296,20 @@ const BookingScheduler = props => {
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
 
     return (
-      <HtmlTooltip title={<BookingQuickView booking={item.booking}/>}>
+      <HtmlTooltip title={<BookingQuickView booking={item.booking} />}>
         <div {...itemProps}>
           {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
           <div
-            className={clsx("rct-item-content", classes.itemContent)}
+            className="rct-item-content item-content"
             style={{ maxHeight: `${itemContext.dimensions.height}` }}
           >
-            <div className={classes.itemTitle}>{itemContext.title}</div>
-            {settings.showPaymentStatus && item.booking.price > 0 && <EuroIcon className={clsx(classes.itemIcon, item.booking.left_to_pay > 0 ? classes.partiallyPaid : classes.fullyPaid)} style={{ height: `${itemContext.dimensions.height-2}` }}/>}
+            <div className="item-title">{itemContext.title}</div>
+            {settings.showPaymentStatus && item.booking.price > 0 &&
+            <EuroIcon
+              className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
+              style={{ height: `${itemContext.dimensions.height - 2}` }}
+            />}
           </div>
           {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
         </div>
@@ -396,7 +343,7 @@ BookingScheduler.propTypes = {
   onItemSelected: PropTypes.func,
   onOpenBooking: PropTypes.func,
   settings: PropTypes.shape({
-    showPaymentStatus: PropTypes.bool,
+    showPaymentStatus: PropTypes.bool
   })
 };
 

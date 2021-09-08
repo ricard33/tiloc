@@ -1,12 +1,12 @@
 /* eslint-disable react/no-multi-comp */
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Grid, useMediaQuery } from "@mui/material";
+import { Grid } from "@mui/material";
 import { add, startOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
 import Button from "@mui/material/Button";
 import { formatDate } from "../../../../common/dateUtils";
-import { useTheme } from "@mui/styles";
+import useWindowDimensions from "../../../../common/windowDimensions";
 
 
 const NavButton = (props) => {
@@ -32,10 +32,8 @@ const NavBar = props => {
   const {date, onChange} = props;
   const [currentDate, setCurrentDate] = useState(startOfMonth(date));
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isPhone = useMediaQuery(theme.breakpoints.down('sm'), {
-    defaultMatches: true
-  });
+  const { width: windowWidth } = useWindowDimensions();
+  const isPhone = windowWidth < 600;
   const monthFormat = isPhone ? "MMM" : "MMMM Y";
 
   const onPrevNextClick = (months) => {

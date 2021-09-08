@@ -1,0 +1,22 @@
+.planning {
+  padding: 24px;
+
+  .planning-legend {
+    padding: 24px;
+  }
+
+  .toolbar {
+    text-align: right
+  }
+
+  .deleteButton {
+    color: red;
+  }
+
+  .statusLegend {
+    border: solid 1px;
+    font-size: x-small;
+    margin: 5px;
+    padding: 0 4px
+  }
+}
