@@ -909,8 +909,6 @@ const BookingDialog = props => {
                 <AccordionDetails>
                   <Payments
                     bookingId={booking.id} onPaymentsUpdate={(total) => {
-                      booking.total_payments = total;
-                      booking.left_to_pay = fullPrice - total;
                       setTotalPayment(total);
                     }}
                   />

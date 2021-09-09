@@ -1,23 +1,14 @@
 import React from "react";
-import { Table, TableBody, TableCell, Theme } from "@mui/material";
+import { Table, TableBody, TableCell } from "@mui/material";
 import TableRow from "@mui/material/TableRow";
 import { formatDate } from "../common/dateUtils";
 import { DecimalPrecision } from "../common/priceUtils";
 import IconButton from "@mui/material/IconButton";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
-import { makeStyles } from "@mui/styles";
 import { parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Payment, paymentMethods } from "../types";
 
-
-const useStyles = makeStyles((theme: Theme) => ({
-  table: {},
-  deleteButton: {
-    color: "red",
-    margin: theme.spacing(1)
-  }
-}));
 
 type PaymentListProps = {
   payments: Payment[];
@@ -25,7 +16,6 @@ type PaymentListProps = {
 };
 
 const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDelete }: PaymentListProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   function ccyFormat(num: number) {
@@ -40,7 +30,7 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDe
   const paymentLabels = paymentMethods(t).reduce<Record<string, string>>((obj, cur) => ({...obj, [cur[0]]: cur[1]}), {});
 
   return (
-    <Table className={classes.table} aria-label="simple table">
+    <Table aria-label="simple table">
       <TableBody>
         {payments && payments.map(p => (
           <TableRow key={p.id}>
@@ -52,7 +42,10 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDe
               <IconButton
                 edge="end"
                 aria-label="delete"
-                className={classes.deleteButton}
+                sx={{
+                  color: "red",
+                  margin: 0,
+                }}
                 onClick={() => onDelete(p)}
                 size="large"
               >
