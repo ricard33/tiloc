@@ -2,8 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from "react-i18next";
-import moment from "moment";
 import { formatCurrency } from "../common/intlUtils";
+import { formatDate } from "../common/dateUtils";
+import { parseISO } from "date-fns";
 
 const useStyles = makeStyles((/*theme*/) => ({
   label: {},
@@ -34,11 +35,11 @@ const BookingQuickView = props => {
       </div>
       <div id="qv_begin">
         <span className={classes.label}>{t("From:")}</span>&nbsp;
-        <span className={classes.value}>{moment(booking.begin_date).format("dddd LL")}</span>
+        <span className={classes.value}>{formatDate(parseISO(booking.begin_date), "PPPP")}</span>
       </div>
       <div id="qv_end">
         <span className={classes.label}>{t("To:")}</span>&nbsp;
-        <span className={classes.value}>{moment(booking.end_date).format("dddd LL")}</span>
+        <span className={classes.value}>{formatDate(parseISO(booking.end_date), "PPPP")}</span>
       </div>
       <div id="qv_nights">
         <span className={classes.label}>{t("Nights:")}</span>&nbsp;

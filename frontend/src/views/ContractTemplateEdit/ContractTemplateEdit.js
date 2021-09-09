@@ -10,7 +10,6 @@ import {
 } from "@mui/icons-material";
 import { Grid, TextField } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import moment from "moment";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import FormControl from "@mui/material/FormControl";
@@ -24,6 +23,8 @@ import {
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { formatDistanceToNow } from "../../common/dateUtils";
+import { parseISO } from "date-fns";
 
 const Editor = React.lazy(() => import("../../components/Editor"));
 
@@ -187,7 +188,7 @@ const ContractTemplateEdit = (/*props*/) => {
           {template &&
           <Typography variant="caption" display="block" gutterBottom>
             {t("Template saved {{modified_date}}.",
-              { modified_date: moment(template.modified).fromNow() })}
+              { modified_date: formatDistanceToNow(parseISO(template.modified)) })}
           </Typography>
           }
         </Grid>

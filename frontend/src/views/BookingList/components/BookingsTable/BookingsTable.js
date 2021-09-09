@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
 import { makeStyles } from "@mui/styles";
 import {
   Checkbox,
@@ -12,8 +11,10 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTranslation } from "react-i18next";
-import { EnhancedTableHead } from "components";
+import { EnhancedTableHead } from "../../../../components";
 import Button from "@mui/material/Button";
+import { formatDate } from "../../../../common/dateUtils";
+import { parseISO } from "date-fns";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -150,10 +151,10 @@ const BookingsTable = props => {
                 />
               </TableCell>
               <TableCell>
-                {moment(booking.begin_date).format("DD/MM/YYYY")}
+                {formatDate(parseISO(booking.begin_date), "dd/MM/yyyy")}
               </TableCell>
               <TableCell>
-                {moment(booking.end_date).format("DD/MM/YYYY")}
+                {formatDate(parseISO(booking.end_date), "dd/MM/yyyy")}
               </TableCell>
               <TableCell>
                 <div className={classes.nameContainer}>

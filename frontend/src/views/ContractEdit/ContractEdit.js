@@ -10,7 +10,6 @@ import {
   Save as SaveIcon
 } from "@mui/icons-material";
 import axios from "axios";
-import moment from "moment";
 import { Grid } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Alert from '@mui/material/Alert';
@@ -23,6 +22,8 @@ import {
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { formatDistanceToNow } from "../../common/dateUtils";
+import { parseISO } from "date-fns";
 
 const Editor = React.lazy(() => import("../../components/Editor"));
 
@@ -187,7 +188,7 @@ const ContractEdit = () => {
           {contract &&
           <Typography variant="caption" display="block" gutterBottom>
             {t("Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
-              { modified_date: moment(contract.modified).fromNow() })}
+              { modified_date: formatDistanceToNow(parseISO(contract.modified)) })}
           </Typography>
           }
         </Grid>

@@ -10,8 +10,6 @@ import "./assets/scss/index.scss";
 import validators from "./common/validators";
 import Routes from "./Routes";
 import theme from "./theme";
-import moment from "moment";
-import localization from "moment/locale/fr";
 import frLocale from "date-fns/locale/fr";
 import Notifier from "./components/Notifier";
 import { LocalizationProvider } from "@mui/lab";
@@ -27,8 +25,6 @@ validate.validators = {
 function App(props) {
   const dispatch = useDispatch();
   const token = useSelector(store => store.auth.token);
-  moment.updateLocale("fr", localization);
-  moment.locale("fr");
 
   useEffect(() => {
     dispatch(auth.loadUser(token));

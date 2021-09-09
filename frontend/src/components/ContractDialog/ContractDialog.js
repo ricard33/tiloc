@@ -19,7 +19,6 @@ import axios from "axios";
 import { Grid } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import useWindowDimensions from "../../common/windowDimensions";
-import moment from "moment";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -29,6 +28,8 @@ import {
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { formatDistanceToNow } from "../../common/dateUtils";
+import { parseISO } from "date-fns";
 
 const Editor = React.lazy(() => import("../Editor"));
 
@@ -183,7 +184,7 @@ const ContractDialog = props => {
         >
           <Grid item xs={12}>
             <Typography>{t("Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
-              { modified_date: moment(contract.modified).fromNow() })}</Typography>
+              { modified_date: formatDistanceToNow(parseISO(contract.modified)) })}</Typography>
           </Grid>
           <Grid item xs={12}>
             <Suspense fallback={<div>{t("Loading...")}</div>}>

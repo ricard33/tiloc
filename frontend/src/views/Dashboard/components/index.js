@@ -1,7 +1,6 @@
 export { default as Budget } from './Budget';
 export { default as LatestBookings } from './LatestBookings';
 export { default as NextEvents } from './NextEvents';
-export { default as LatestProducts } from './LatestProducts';
 export { default as FillingRate } from './FillingRate';
 export { default as TasksProgress } from './TasksProgress';
 export { default as TotalProfit } from './TotalProfit';

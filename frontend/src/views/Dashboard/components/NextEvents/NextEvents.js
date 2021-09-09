@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
@@ -25,6 +24,8 @@ import { StatusBullet } from 'components';
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { useNextEventsQuery } from "../../../../services/api";
+import { formatDate } from "../../../../common/dateUtils";
+import { parseISO } from "date-fns";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -109,7 +110,7 @@ const NextEvents = props => {
                     key={event.event_type + event.id}
                   >
                     <TableCell>
-                      {moment(event.date).format('LL')}
+                      {formatDate(parseISO(event.date), 'PP')}
                     </TableCell>
                     <TableCell>{event.lodging_name}</TableCell>
                     <TableCell>

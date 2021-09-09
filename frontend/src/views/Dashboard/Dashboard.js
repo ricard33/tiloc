@@ -9,7 +9,6 @@ import {
   // TotalProfit,
   FillingRate,
   UsersByDevice,
-  // LatestProducts,
   LatestBookings,
   NextEvents
 } from './components';
@@ -93,15 +92,7 @@ const Dashboard = () => {
         >
           <UsersByDevice />
         </Grid>
-        {/*<Grid*/}
-        {/*  item*/}
-        {/*  lg={4}*/}
-        {/*  md={6}*/}
-        {/*  xl={3}*/}
-        {/*  xs={12}*/}
-        {/*>*/}
-        {/*  <LatestProducts />*/}
-        {/*</Grid>*/}
+
         {/*<Grid*/}
         {/*  item*/}
         {/*  lg={8}*/}
