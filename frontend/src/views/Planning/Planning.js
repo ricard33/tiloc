@@ -49,7 +49,10 @@ const Planning = () => {
   const history = useHistory();
   const confirm = useConfirm();
   const [settingsOpened, setSettingsOpened] = useState(false);
-  const [settings, setSettings] = useLocalStorage("planningSettings", { showPaymentStatus: true });
+  const [settings, setSettings] = useLocalStorage("planningSettings", {
+    showPaymentStatus: true,
+    monthsToDisplay: 12,
+  });
   // const [manualFetching, setManualFetching] = useState(false);
 
   console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -232,11 +235,11 @@ const Planning = () => {
           </Typography>
           {bookingStatuses && bookingStatuses.map(status => {
             return (
-              <span
+              <span><span
                 key={status.id}
                 className="status-legend"
                 style={{ background: "#" + status.color }}
-              >{status.name}</span>);
+              >{status.name}</span> </span> );
           })}
         </CardContent>
       </Card>

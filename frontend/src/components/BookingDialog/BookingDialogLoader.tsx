@@ -1,7 +1,7 @@
 import React from "react";
 import { Booking } from "../../types";
 import { BookingDialog } from "../index";
-import { Backdrop } from "@mui/material";
+import { Backdrop, CircularProgress } from "@mui/material";
 import {
   useAllGuestsQuery,
   useListLodgingsQuery
@@ -18,7 +18,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: allGuests } = useAllGuestsQuery();
 
-  if(booking && lodgings && allGuests)
+  if (booking && lodgings && allGuests)
     return (
       <BookingDialog
         booking={booking}
@@ -28,7 +28,11 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
         onOpenContract={onOpenContract}
       />
     );
-  return <Backdrop open />
+  return (
+    <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open>
+      <CircularProgress color="inherit" />
+    </Backdrop>
+  );
 };
 
 export default BookingDialogLoader;

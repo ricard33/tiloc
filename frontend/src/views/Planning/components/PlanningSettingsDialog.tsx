@@ -6,16 +6,15 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle, FormControlLabel,
+  DialogTitle, FormControlLabel, TextField
 } from "@mui/material";
-// import { makeStyles } from "@mui/material/styles";
 import Checkbox from "@mui/material/Checkbox";
 
 export type PlanningSettings = {
   showPaymentStatus: boolean;
+  monthsToDisplay: number;
 }
 
-// const useStyles = makeStyles((/*theme: Theme*/) => ({}));
 
 type Props = {
   open: boolean;
@@ -26,15 +25,20 @@ type Props = {
 const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings, onClose }: Props) => {
   // const classes = useStyles();
   const { t } = useTranslation();
-  const { handleSubmit, control } = useForm<PlanningSettings>({
+  const { handleSubmit, control, formState } = useForm<PlanningSettings>({
     defaultValues: {
-      showPaymentStatus: true
+      showPaymentStatus: settings.showPaymentStatus,
+      monthsToDisplay: settings.monthsToDisplay,
     }
   });
+  const { errors } = formState;
 
   const onSubmit: SubmitHandler<PlanningSettings> = data => {
     console.log(data);
-    onClose(data);
+    onClose({
+      ...data,
+      monthsToDisplay: Number(data.monthsToDisplay),
+    });
   };
 
   return (
@@ -47,7 +51,6 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
               <Controller
                 control={control}
                 name="showPaymentStatus"
-                // defaultValue={settings.showPaymentStatus}
                 render={({ field }) =>
                   <Checkbox
                     defaultChecked={settings.showPaymentStatus}
@@ -56,6 +59,34 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
               />
             }
             label={t("Show payment status on bookings")}
+          />
+          <FormControlLabel
+            control={
+              <Controller
+                control={control}
+                name="monthsToDisplay"
+                defaultValue={settings.monthsToDisplay}
+                rules={{
+                  min: {
+                    value: 1,
+                    message: t("Minimum 1 month")
+                  },
+                  max: {
+                    value: 12,
+                    message: t("Maximum 12 month")
+                  },
+                  // valueAsNumber: true
+                }}
+                render={({ field }) =>
+                  <TextField
+                    error={!!errors.monthsToDisplay}
+                    helperText={errors.monthsToDisplay && errors.monthsToDisplay.message}
+                    InputProps={{ type: "number" }}
+                    {...field}
+                  />}
+              />
+            }
+            label={t("Number of months to display")}
           />
         </form>
       </DialogContent>

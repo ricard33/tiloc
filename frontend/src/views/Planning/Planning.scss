@@ -1,4 +1,6 @@
 .planning {
+  position: relative;
+  top: -50px;
   padding: 24px;
 
   .planning-legend {
@@ -9,14 +11,16 @@
     text-align: right
   }
 
-  .deleteButton {
+  .delete-button {
     color: red;
   }
 
-  .statusLegend {
+  .status-legend {
     border: solid 1px;
     font-size: x-small;
-    margin: 5px;
-    padding: 0 4px
+    margin: 4px 5px;
+    padding: 4px;
+    white-space: nowrap;
+    line-height: 3em;
   }
 }

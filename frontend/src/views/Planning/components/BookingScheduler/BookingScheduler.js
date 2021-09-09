@@ -240,7 +240,7 @@ const BookingScheduler = props => {
 
   var timelines = [];
 
-  for (var i = 0; i < 12; i += horizontalMonths) {
+  for (var i = 0; i < (settings.monthsToDisplay ?? 12); i += horizontalMonths) {
     var start = add(beginDate, { months: Math.trunc(i), days: 30 * (i % 1) });
     timelines.push(
       <div key={i} className="timeline">
@@ -343,7 +343,8 @@ BookingScheduler.propTypes = {
   onItemSelected: PropTypes.func,
   onOpenBooking: PropTypes.func,
   settings: PropTypes.shape({
-    showPaymentStatus: PropTypes.bool
+    showPaymentStatus: PropTypes.bool,
+    monthsToDisplay: PropTypes.number,
   })
 };
 
