@@ -79,8 +79,8 @@ class BookingFactory(factory.django.DjangoModelFactory):
     guest_address = factory.Faker("address")
     status = factory.LazyFunction(lambda: models.BookingStatus.objects.first())
     begin_date = factory.Faker('date_between', start_date='-5d', end_date='+1y')
-    end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=random.randint(7, 21)).date())
-    duration = factory.LazyAttribute(lambda b: (b.end_date - b.begin_date).days)
+    duration = factory.LazyAttribute(lambda b: random.randint(7, 21))
+    end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=b.duration).date())
     daily_rate = factory.LazyAttribute(lambda b: b.lodging and b.lodging.daily_rate or 50)
     price = factory.LazyAttribute(lambda b: b.daily_rate * b.duration)
 

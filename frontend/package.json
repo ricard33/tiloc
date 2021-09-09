@@ -36,7 +36,6 @@
     "@ckeditor/ckeditor5-image": "^29.0.0",
     "@ckeditor/ckeditor5-react": "^3.0.2",
     "@ckeditor/ckeditor5-table": "^29.0.0",
-    "@date-io/date-fns": "1.x",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@mui/icons-material": "^5.0.0-rc.0",
