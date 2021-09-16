@@ -7,8 +7,8 @@ import Timeline, {
   TimelineHeaders,
   TimelineMarkers,
   TodayMarker
-} from "react-calendar-timeline";
-import "react-calendar-timeline/lib/Timeline.css";
+} from "@gecko-conception/react-calendar-timeline";
+import "@gecko-conception/react-calendar-timeline/lib/Timeline.css";
 import { add, parseISO } from "date-fns";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";

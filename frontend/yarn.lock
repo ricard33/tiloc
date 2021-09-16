@@ -1866,6 +1866,17 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@gecko-conception/react-calendar-timeline@^0.30.0":
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/@gecko-conception/react-calendar-timeline/-/react-calendar-timeline-0.30.0.tgz#aae5c980398fe41f8dd7539218ca2d0c681c6891"
+  integrity sha512-wv8alGlZeNDb3tA0wdd3fSgx9NSUqBvZpE9VpSF4uAqQcMDbuZKazH36pt3mDYELOmjNQUq/U9REdZQ/6tNHZQ==
+  dependencies:
+    classnames "^2.2.6"
+    create-react-context "^0.3.0"
+    element-resize-detector "^1.1.12"
+    lodash.isequal "^4.5.0"
+    memoize-one "^5.1.1"
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"
@@ -5801,9 +5812,9 @@ electron-to-chromium@^1.3.723:
   integrity sha512-296P577qmXQHgLa3zAYdB9zOhqzt7lckmbLAJO78lIXGBhYA5NVI2WRwyYJPZ614eJxd0Bew7RA72vFOFXyogA==
 
 element-resize-detector@^1.1.12:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/element-resize-detector/-/element-resize-detector-1.2.1.tgz#b0305194447a4863155e58f13323a0aef30851d1"
-  integrity sha512-BdFsPepnQr9fznNPF9nF4vQ457U/ZJXQDSNF1zBe7yaga8v9AdZf3/NElYxFdUh7SitSGt040QygiTo6dtatIw==
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/element-resize-detector/-/element-resize-detector-1.2.3.tgz#5078d9b99398fe4c589f8c8df94ff99e5d413ff3"
+  integrity sha512-+dhNzUgLpq9ol5tyhoG7YLoXL3ssjfFW+0gpszXPwRU6NjGr1fVHMEAF8fVzIiRJq57Nre0RFeIjJwI8Nh2NmQ==
   dependencies:
     batch-processor "1.0.0"
 
@@ -9352,9 +9363,9 @@ media-typer@0.3.0:
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
 memoize-one@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.1.1.tgz#047b6e3199b508eaec03504de71229b8eb1d75c0"
-  integrity sha512-HKeeBpWvqiVJD57ZUAsJNm71eHTykffzcLZVYWiVfQeI1rJtuEaS7hQiEpWfVVk18donPwJEcFKIkCmPJNOhHA==
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.2.1.tgz#8337aa3c4335581839ec01c3d594090cebe8f00e"
+  integrity sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==
 
 memory-fs@^0.4.1:
   version "0.4.1"
@@ -11547,17 +11558,6 @@ react-app-rewired@^2.1.8:
   integrity sha512-wjXPdKPLscA7mn0I1de1NHrbfWdXz4S1ladaGgHVKdn1hTgKK5N6EdGIJM0KrS6bKnJBj7WuqJroDTsPKKr66Q==
   dependencies:
     semver "^5.6.0"
-
-react-calendar-timeline@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/react-calendar-timeline/-/react-calendar-timeline-0.27.0.tgz#25305cd2342db413c53ca4e94805c0df57d940ee"
-  integrity sha512-LOC7yrLT5bkfZAhfUKDhDkxyYd14dMnb3jXJzkpOyciPJyUwYWhxCDhjxwddfXjcB317NJVpszcqpk7xJw0mQg==
-  dependencies:
-    classnames "^2.2.6"
-    create-react-context "^0.3.0"
-    element-resize-detector "^1.1.12"
-    lodash.isequal "^4.5.0"
-    memoize-one "^5.1.1"
 
 react-chartjs-2@^3.0.4:
   version "3.0.4"
