@@ -1,4 +1,4 @@
-import { OptionsObject, SnackbarKey } from "../libs/notistack";
+import { OptionsObject, SnackbarKey } from "notistack";
 
 export const ENQUEUE_SNACKBAR = "ENQUEUE_SNACKBAR";
 export const CLOSE_SNACKBAR = "CLOSE_SNACKBAR";
