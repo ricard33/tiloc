@@ -99,11 +99,12 @@ const BookingDialog = props => {
   const isFlatRate = watch("is_flat_rate", initialState.is_flat_rate);
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
+  const commissionFees = watch("commission_fees", initialState.price);
   const options = watch("options", fields);
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
-  const leftToPay = fullPrice - totalPayment;
+  const leftToPay = fullPrice - totalPayment - commissionFees;
   // console.log("options", options, fullPrice);
 
   const depositLabel = getDepositLabel(t, lodging && lodging.owner && lodging.owner.deposit_label) || t("Deposit");
