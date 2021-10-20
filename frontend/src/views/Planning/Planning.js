@@ -235,11 +235,11 @@ const Planning = () => {
           </Typography>
           {bookingStatuses && bookingStatuses.map(status => {
             return (
-              <span><span
-                key={status.id}
-                className="status-legend"
-                style={{ background: "#" + status.color }}
-              >{status.name}</span> </span> );
+              <span key={status.id}>
+                <span
+                  className="status-legend"
+                  style={{ background: "#" + status.color }}
+                >{status.name}</span> </span> );
           })}
         </CardContent>
       </Card>

@@ -1,3 +1,19 @@
+export interface LoginInfo {
+  expiry: string;
+  token: string;
+  user: User;
+}
+
+export interface User {
+  id: number;
+  is_active: boolean;
+  username: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  email: string;
+}
+
 export interface Owner {
   id: number;
   active: boolean;

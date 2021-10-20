@@ -4,7 +4,7 @@ import {
   Middleware,
 } from '@reduxjs/toolkit'
 import { dispatchError } from "../common/alertUtils";
-import { apiErrorDecode } from "../common/apiUtils";
+import { fetchErrorDecode } from "../common/apiUtils";
 
 /**
  * Log a warning and show a toast!
@@ -15,7 +15,7 @@ export const rtkQueryErrorLogger: Middleware =
     if (isRejectedWithValue(action)) {
       console.warn('We got a rejected action!', action)
       if(action.payload && action.payload.data) {
-        dispatchError("SERVER ERROR: " + apiErrorDecode(action.payload.data));
+        dispatchError("SERVER ERROR: " + fetchErrorDecode(action.payload.data));
       } else if (action.error) {
         if( action.error.message)
           dispatchError('Async error! ' + action.error.message);

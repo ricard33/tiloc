@@ -1,23 +1,42 @@
 import * as actionTypes from "./actionTypes";
 
-export function loadUser(token) {
+export function userLoading() {
   return {
     type: actionTypes.USER_LOADING,
-    token: token
   };
 }
 
-export function login(username, password) {
+export function userLoaded(user) {
   return {
-    type: actionTypes.LOGIN_REQUEST,
-    username,
-    password,
+    type: actionTypes.USER_LOADED,
+    user
   };
 }
 
-export function logout() {
+export function loginSuccessful(data) {
   return {
-    type: actionTypes.LOGOUT_REQUEST,
+    type: actionTypes.LOGIN_SUCCESSFUL,
+    data,
+  };
+}
+
+export function authenticationError(data) {
+  return {
+    type: actionTypes.AUTHENTICATION_ERROR,
+    data,
+  };
+}
+
+export function loginFailed(data) {
+  return {
+    type: actionTypes.LOGIN_FAILED,
+    data,
+  };
+}
+
+export function logoutSuccessful() {
+  return {
+    type: actionTypes.LOGOUT_SUCCESSFUL,
   };
 }
 

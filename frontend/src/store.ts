@@ -3,7 +3,7 @@ import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { api } from "./services/api";
-import { rtkQueryErrorLogger } from "./services/middlewares";
+// import { rtkQueryErrorLogger } from "./services/middlewares";
 
 export const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
@@ -13,7 +13,7 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([sagaMiddleware, rtkQueryErrorLogger, api.middleware])
+    getDefaultMiddleware().concat([sagaMiddleware, /*rtkQueryErrorLogger, */api.middleware])
 
 });
 

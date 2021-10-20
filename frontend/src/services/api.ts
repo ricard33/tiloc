@@ -1,15 +1,19 @@
 // Need to use the React-specific entry point to import createApi
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import {
+  Booking,
+  BookingChannel,
+  BookingStatus,
+  Contract,
+  ContractTemplate,
+  Guest,
+  Lodging,
+  LoginInfo,
+  NextEvent,
   Pagination,
   Payment,
-  Contract,
-  Booking,
-  Lodging,
-  BookingStatus,
-  BookingChannel,
-  Guest,
-  ContractTemplate, NextEvent, Service
+  Service,
+  User
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { api2Booking, api2Lodging, api2Payment } from "../types/models-convertion";
@@ -25,20 +29,60 @@ type AxiosArgs = {
 }
 type AxiosQueryMeta = { request: AxiosRequestConfig; response?: AxiosResponse }
 
+// Error types
+// -----------
+export interface ApiError {
+  detail: string;
+}
+
+export interface ValidationError {
+  [field: string]: string[];
+}
+
+export type QueryError = {
+  message: string;
+  status?: number;
+  data?: ApiError | ValidationError;
+  meta?: AxiosQueryMeta;
+}
 const axiosBaseQuery =
   (
     { baseUrl }: { baseUrl: string } = { baseUrl: "" }
-  ): BaseQueryFn<string | AxiosArgs, unknown, AxiosError, {}, AxiosQueryMeta> =>
+  ): BaseQueryFn<string | AxiosArgs, unknown, QueryError, {}, AxiosQueryMeta> =>
     async (arg) => {
       const { url, method = "get", params = undefined, data = undefined } = typeof arg == "string" ? { url: arg } : arg;
-      let meta: AxiosQueryMeta | undefined;
+      let meta: AxiosQueryMeta;
       const requestArgs: AxiosRequestConfig = { url: baseUrl + url, method, params, data };
       meta = { request: requestArgs };
       try {
-        return await axios(requestArgs);
+        const result = await axios(requestArgs);
+        return { data: result.data };
       } catch (axiosError) {
         let err = axiosError as AxiosError;
-        return { error: err, meta };
+        if(err.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          return {
+            error: {
+              message: typeof err.response?.data === 'string' ? err.response?.data
+                : typeof err.response?.data === 'object' ? JSON.stringify(err.response?.data)
+                  : err.response?.statusText,
+              status: err.response?.status,
+              data: err.response?.data,
+              meta
+            }
+          };
+        } else if (err.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.error("Error sending request: ", err.request);
+          return { error: { message: err.code ?? err.message, meta } };
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error('Error', err.message);
+          return { error: { message: err.code ?? err.message, meta } };
+        }
       }
     };
 
@@ -46,7 +90,7 @@ interface BaseModel {
   id?: number;
 }
 type ApiModel = Record<string, any>;
-type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unknown, AxiosError, {}, AxiosQueryMeta>, string, "api">;
+type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unknown, QueryError, {}, AxiosQueryMeta>, string, "api">;
 
 function makeListApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
   return builder.query<T[], Record<string, any> | void>({
@@ -175,6 +219,29 @@ export const api = createApi({
   ],
   endpoints: (builder) => ({
 
+    // Sign in
+    currentUser: builder.query<User, void>({
+      query: () => `auth/user/`,
+    }),
+    login: builder.mutation<LoginInfo, { username: string, password: string }>({
+      query(args) {
+        return {
+          url: `auth/login/`,
+          method: "POST",
+          data: args
+        };
+      }
+    }),
+    logout: builder.mutation<LoginInfo, void>({
+      query() {
+        return {
+          url: `auth/logout/`,
+          method: "POST",
+        };
+      }
+    }),
+
+
     // BookingStatus
     listBookingStatuses: bookingStatusApi.list(builder),
     getBookingStatus: bookingStatusApi.get(builder),
@@ -266,6 +333,10 @@ export const api = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useCurrentUserQuery,
+  useLoginMutation,
+  useLogoutMutation,
+
   useListBookingStatusesQuery,
   useGetBookingStatusQuery,
   useCreateBookingStatusMutation,

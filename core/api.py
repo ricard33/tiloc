@@ -84,10 +84,10 @@ class LoginAPI(KnoxLoginView):
         serializer = LoginUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = authenticate(**serializer.validated_data)
-        logging.getLogger('auth').info("User %s successfully logged." % user.email)
-        login(request, user)
         if not user or not user.is_active:
             raise AuthenticationFailed()
+        logging.getLogger('auth').info("User %s successfully logged." % user.email)
+        login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
 
@@ -95,8 +95,9 @@ class LogoutAPI(KnoxLogoutView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
+        response = super(LogoutAPI, self).post(request, format=None)
         logout(request)
-        return super(LogoutAPI, self).post(request, format=None)
+        return response
 
 
 class UserAPI(generics.RetrieveAPIView):

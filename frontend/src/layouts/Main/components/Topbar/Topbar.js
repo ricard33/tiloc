@@ -17,6 +17,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useTranslation } from "react-i18next";
 import { auth } from "../../../../actions";
+import { useLogoutMutation } from "../../../../services/api";
+import { fetchErrorDecode } from "../../../../common/apiUtils";
+import { useAlert } from "../../../../common/alertUtils";
+import logger from "../../../../common/logger";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -52,6 +56,8 @@ const Topbar = props => {
   const user = useSelector(store => store.auth.user);
   const dispatch = useDispatch();
   const history = useHistory();
+  const [doLogout, ] = useLogoutMutation();
+  const { showError } = useAlert();
 
   const avatar = getGravatarUrl(user.email, {
     default: "mp"
@@ -67,9 +73,19 @@ const Topbar = props => {
 
   const handleSignOut = event => {
     event.preventDefault();
-    dispatch(auth.logout());
-    console.log("Logged out!")
-    history.push("/logged-out");
+    doLogout().then((result)=> {
+      const {error} = result;
+      if(error) {
+        showError(t("Logout error: ") + fetchErrorDecode(error));
+        console.error(result);
+        logger.error(result)
+      }
+      else {
+        dispatch(auth.logoutSuccessful());
+        console.log("Logged out!")
+        history.push("/logged-out");
+      }
+    })
   };
 
   return (

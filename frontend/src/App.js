@@ -15,6 +15,7 @@ import Notifier from "./components/Notifier";
 import { LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { ConfirmProvider } from "./libs/MuiConfirm";
+import { useCurrentUserQuery } from "./services/api";
 
 validate.validators = {
   ...validate.validators,
@@ -25,10 +26,24 @@ validate.validators = {
 function App(props) {
   const dispatch = useDispatch();
   const token = useSelector(store => store.auth.token);
+  const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
 
   useEffect(() => {
-    dispatch(auth.loadUser(token));
-  }, [dispatch, token]);
+    console.log("useEffect token", token);
+    dispatch(auth.userLoading());
+    refetchUser();
+  }, [dispatch, refetchUser, token]);
+
+  useEffect(() => {
+    console.log("useEffect user", currentUser);
+    if(currentUser)
+      dispatch(auth.userLoaded(currentUser));
+  }, [dispatch, currentUser, token]);
+
+  useEffect(() => {
+    if(userLoadingError)
+      dispatch(auth.authenticationError(userLoadingError));
+  }, [dispatch, userLoadingError]);
 
   return (
     // <StyledEngineProvider injectFirst>

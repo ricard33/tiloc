@@ -1,5 +1,5 @@
 import { api, serviceURL } from './api';
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { setupApiStore } from "../common/testUtils2";
 import { auth as authReducer } from '../reducers';
 import { newPayment, payment, paymentsList } from "./testData";
@@ -50,21 +50,18 @@ describe("List Payments", () => {
   test("unsuccessful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockRejectedValue(new Error("Internal Server Error"));
+    axiosMock.mockRejectedValue({ response: {status: 400, statusText: "Internal Server Error"}});
 
     return storeRef.store
       .dispatch<any>(
         api.endpoints.listPayments.initiate({})
       )
       .then((action: any) => {
-        const {
-          status,
-          error: { error },
-          isError,
-        } = action;
+        const { status, error, isError } = action;
         expect(status).toBe("rejected");
         expect(isError).toBe(true);
-        expect(error).toBe("Error: Internal Server Error");
+        expect(error.status).toBe(400);
+        expect(error.message).toBe("Internal Server Error");
       });
   });
 });
@@ -104,17 +101,16 @@ describe("Create Payment", () => {
   test("unsuccessful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockRejectedValue(new Error("Internal Server Error"));
+    axiosMock.mockRejectedValue({ response: {status: 400, statusText: "Internal Server Error"}});
 
     return storeRef.store
       .dispatch<any>(
         api.endpoints.createPayment.initiate(newPayment)
       )
       .then((action: any) => {
-        const { error: { error } } = action;
-        // expect(status).toBe("rejected");
-        // expect(isError).toBe(true);
-        expect(error).toBe("Error: Internal Server Error");
+        const { error } = action;
+        expect(error.status).toBe(400);
+        expect(error.message).toBe("Internal Server Error");
       });
   });
 });

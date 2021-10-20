@@ -16,6 +16,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { auth } from "../../actions";
 import { useTranslation } from "react-i18next";
+import { useLoginMutation } from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 
 const schema = {
   email: {
@@ -35,44 +38,12 @@ const schema = {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
+    // backgroundColor: theme.palette.background.default,
     height: '100%'
   },
   grid: {
     height: '100%'
   },
-  quoteContainer: {
-    [theme.breakpoints.down('lg')]: {
-      display: 'none'
-    }
-  },
-  quote: {
-    backgroundColor: theme.palette.neutral,
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundImage: 'url(/images/auth.jpg)',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center'
-  },
-  quoteInner: {
-    textAlign: 'center',
-    flexBasis: '600px'
-  },
-  quoteText: {
-    color: theme.palette.white,
-    fontWeight: 300
-  },
-  name: {
-    marginTop: theme.spacing(3),
-    color: theme.palette.white
-  },
-  bio: {
-    color: theme.palette.white
-  },
-  contentContainer: {},
   content: {
     height: '100%',
     display: 'flex',
@@ -85,9 +56,6 @@ const useStyles = makeStyles(theme => ({
     paddingBototm: theme.spacing(2),
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2)
-  },
-  logoImage: {
-    marginLeft: theme.spacing(4)
   },
   contentBody: {
     flexGrow: 1,
@@ -110,15 +78,6 @@ const useStyles = makeStyles(theme => ({
   title: {
     marginTop: theme.spacing(3)
   },
-  socialButtons: {
-    marginTop: theme.spacing(3)
-  },
-  socialIcon: {
-    marginRight: theme.spacing(1)
-  },
-  sugestion: {
-    marginTop: theme.spacing(2)
-  },
   textField: {
     marginTop: theme.spacing(2)
   },
@@ -131,6 +90,7 @@ const SignIn = props => {
   const { history } = props;
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(store => store.auth.isAuthenticated);
+  const [doLogin, ] = useLoginMutation();
   const classes = useStyles();
   let location = useLocation();
   let { from } = location.state || { from: { pathname: "/" } };
@@ -141,13 +101,14 @@ const SignIn = props => {
     errors: {}
   });
   const { t } = useTranslation();
+  const { showError } = useAlert();
 
   useEffect(() => {
     const errors = validate(formState.values, schema);
 
     setFormState(formState => ({
       ...formState,
-      isValid: errors ? false : true,
+      isValid: !errors,
       errors: errors || {}
     }));
   }, [formState.values]);
@@ -184,7 +145,18 @@ const SignIn = props => {
 
   const handleSignIn = event => {
     event.preventDefault();
-    dispatch(auth.login(formState.values.email, formState.values.password));
+    doLogin({username: formState.values.email, password: formState.values.password}).then((result)=> {
+      const {data, error} = result;
+      if(error) {
+        showError(t("Login error: ") + fetchErrorDecode(error));
+        console.log(result);
+        dispatch(auth.loginFailed(data));
+      }
+      else {
+
+        dispatch(auth.loginSuccessful(data));
+      }
+    })
   };
 
   const hasError = field =>
@@ -223,49 +195,6 @@ const SignIn = props => {
                 >
                   {t("Sign in")}
                 </Typography>
-                { /*
-                <Typography
-                  color="textSecondary"
-                  gutterBottom
-                >
-                  Sign in with social media
-                </Typography>
-                <Grid
-                  className={classes.socialButtons}
-                  container
-                  spacing={2}
-                >
-                  <Grid item>
-                    <Button
-                      color="primary"
-                      onClick={handleSignIn}
-                      size="large"
-                      variant="contained"
-                    >
-                      <FacebookIcon className={classes.socialIcon} />
-                      Login with Facebook
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      onClick={handleSignIn}
-                      size="large"
-                      variant="contained"
-                    >
-                      <GoogleIcon className={classes.socialIcon} />
-                      Login with Google
-                    </Button>
-                  </Grid>
-                </Grid>
-                <Typography
-                  align="center"
-                  className={classes.sugestion}
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  or login with email address
-                </Typography>
-                */}
                 <Typography
                   color="textSecondary"
                   gutterBottom
@@ -282,7 +211,7 @@ const SignIn = props => {
                   label={t("Email address")}
                   name="email"
                   onChange={handleChange}
-                  type="text"
+                  type="email"
                   value={formState.values.email || ''}
                   variant="outlined"
                 />
@@ -307,7 +236,7 @@ const SignIn = props => {
                   fullWidth
                   size="large"
                   type="submit"
-                  variant="contained"
+                  // variant="contained"
                 >
                   {t("Sign in now")}
                 </Button>
