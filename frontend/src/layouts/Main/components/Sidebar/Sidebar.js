@@ -73,7 +73,7 @@ const Sidebar = props => {
     },
     {
       title: t('Cleanings'),
-      href: {pathname: "https://www.dropbox.com/scl/fi/xe72bjehbqml88s8awx7b/Planning-m-nages-locations.gsheet?dl=0&rlkey=k0coe99vb9in9xbqk4a261lv5" },
+      href: {pathname: "https://docs.google.com/spreadsheets/d/1ucUML5Voeydfnss2udi4XZ-Yrb6p8qRXv7VPgAgGwjw/edit?usp=sharing" },
       icon: <LocalLaundryServiceIcon />,
       disabled: false,
       external: true,
