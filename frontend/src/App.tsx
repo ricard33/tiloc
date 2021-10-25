@@ -4,7 +4,6 @@ import { ThemeProvider } from "@mui/material/styles";
 import validate from "validate.js";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
-import PropTypes from "prop-types";
 import { auth } from "./actions";
 import "./assets/scss/index.scss";
 import validators from "./common/validators";
@@ -16,16 +15,21 @@ import { LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
+import { History } from "history";
+import { RootState } from "./store";
 
 validate.validators = {
   ...validate.validators,
   ...validators
 };
 
+type Props = {
+  history: History<unknown>
+};
 
-function App(props) {
+function App(props: Props) {
   const dispatch = useDispatch();
-  const token = useSelector(store => store.auth.token);
+  const token = useSelector<RootState>((store) => store.auth.token);
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
 
   useEffect(() => {
@@ -62,7 +66,4 @@ function App(props) {
   );
 }
 
-App.propTypes = {
-  history: PropTypes.object.isRequired
-};
 export default App;

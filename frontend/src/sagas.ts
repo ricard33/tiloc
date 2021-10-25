@@ -3,11 +3,11 @@ import * as actionTypes from "./actions/actionTypes";
 
 // const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
-function setAuthToken(action) {
+function setAuthToken(action: {type: string, data:{token: string}}) {
   localStorage.setItem("token", action.data.token);
 }
 
-function deleteToken(action) {
+function deleteToken() {
   localStorage.removeItem("token");
 }
 
@@ -15,8 +15,8 @@ function deleteToken(action) {
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
   yield all([
-    yield takeEvery(actionTypes.LOGIN_SUCCESSFUL, setAuthToken),
-    yield takeEvery([
+    takeEvery(actionTypes.LOGIN_SUCCESSFUL, setAuthToken),
+    takeEvery([
       actionTypes.AUTHENTICATION_ERROR,
       actionTypes.LOGIN_FAILED,
       actionTypes.LOGOUT_SUCCESSFUL,
