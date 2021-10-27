@@ -53,4 +53,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Build
-      run: yarn build
+      run: CI='' yarn build
