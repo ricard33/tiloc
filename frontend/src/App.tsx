@@ -17,6 +17,7 @@ import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
 import { History } from "history";
 import { RootState } from "./store";
+import { DateProvider } from "@gecko-conception/react-calendar-timeline";
 
 validate.validators = {
   ...validate.validators,
@@ -53,13 +54,15 @@ function App(props: Props) {
     // <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns} locale={frLocale}>
-        <ConfirmProvider>
-          <Notifier />
-          <Router history={props.history}>
+        <DateProvider locale={frLocale}>
+          <ConfirmProvider>
+            <Notifier />
+            <Router history={props.history}>
 
-            <Routes />
-          </Router>
-        </ConfirmProvider>
+              <Routes />
+            </Router>
+          </ConfirmProvider>
+        </DateProvider>
       </LocalizationProvider>
     </ThemeProvider>
     // </StyledEngineProvider>
