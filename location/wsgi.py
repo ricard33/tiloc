@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/
 
 import os
 
-from django.core.wsgi import get_wsgi_application
 import newrelic.agent
+from django.core.wsgi import get_wsgi_application
 from smartconfigparser import Config
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'location.settings')
