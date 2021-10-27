@@ -144,3 +144,4 @@ frontend0/
 /.idea/codestream.xml
 !/backups/
 /TODO.md
+/test-reports/
