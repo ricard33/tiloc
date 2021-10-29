@@ -34,6 +34,7 @@ RouteWithLayout.defaultProps = {
 
 RouteWithLayout.propTypes = {
   component: PropTypes.any.isRequired,
+  exact: PropTypes.bool,
   layout: PropTypes.any.isRequired,
   needAuthentication: PropTypes.bool,
   path: PropTypes.string,
