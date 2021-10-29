@@ -285,8 +285,8 @@ def empty_folder(c):
 #     with cd(TARGET_PATH):
 #         put(tar_gz_build_file, TARGET_PATH)
 #         run('tar -xzvf ' + tar_gz_file_name)
-#
-#
+
+
 @task
 def deploy_location(c):
     c.run("mkdir -p %s" % TARGET_PATH)
