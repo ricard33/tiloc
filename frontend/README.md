@@ -1,5 +1,16 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Private package
+
+This project depends on a private package : tiloc-ckeditor5
+As this package is not published on npmjs.com, you have to link locally to it.
+
+* get the source code: `git clone git@github.com:ricard33/tiloc-ckeditor.git`
+* go to the package folder: `cd tiloc-ckeditor`
+* make the global link : `yarn link`
+* go to tiloc project, into the `frontend` subfolder
+* link to tiloc-ckeditor package: `yarn link "tiloc-ckeditor5"`
+
 ## Available Scripts
 
 In the project directory, you can run:

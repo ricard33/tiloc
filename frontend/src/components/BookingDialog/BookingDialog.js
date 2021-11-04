@@ -10,7 +10,7 @@ import {
   Save as SaveIcon,
   ExpandMore as ExpandMoreIcon
 } from "@mui/icons-material";
-import { Controller, useForm, useFieldArray } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
 import { getDepositLabel } from "../../common/ownerPrefsUtils";
