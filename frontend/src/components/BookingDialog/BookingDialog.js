@@ -85,11 +85,6 @@ const BookingDialog = props => {
   });
   const { register, control, setValue, getValues, watch, formState } = form;
   const { errors, dirty /*isValid*/ } = formState;
-  const optionsFieldArray = useFieldArray({
-    control,
-    name: "options"
-  });
-  const { fields } = optionsFieldArray;
 
   const formValues = getValues();
   // console.debug("formValues: ", formValues);
@@ -100,7 +95,7 @@ const BookingDialog = props => {
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
   const commissionFees = watch("commission_fees", initialState.price);
-  const options = watch("options", fields);
+  const options = watch("options");
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
@@ -823,7 +818,7 @@ const BookingDialog = props => {
                 <AccordionDetails>
                   <Grid container spacing={1}>
                     <Grid item xs={12}>
-                      <OptionsList form={form} optionsFieldArray={optionsFieldArray} duration={duration}  bookingId={booking.id}  variant={variant}/>
+                      <OptionsList form={form} duration={duration}  bookingId={booking.id}  variant={variant}/>
                     </Grid>
                   </Grid>
                 </AccordionDetails>

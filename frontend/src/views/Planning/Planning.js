@@ -55,10 +55,10 @@ const Planning = () => {
   });
   // const [manualFetching, setManualFetching] = useState(false);
 
-  console.log(performance.now().toFixed(2), "Planning", bookings?.length);
+  // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
 
   useEffect(() => {
-    console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
+    // console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
   }, [IsFetchingBooking])
   // const bookings = allBookings.toModelArray();
 

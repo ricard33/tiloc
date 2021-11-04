@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
-import { Controller } from "react-hook-form";
+import { Controller, FieldArrayWithId, useFieldArray } from "react-hook-form";
 import InputAdornment from "@mui/material/InputAdornment";
 import { formatCurrency } from "../../common/intlUtils";
 import { Service } from "../../types";
@@ -40,7 +40,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 type OptionsListProps = {
   bookingId: number;
   form: any;
-  optionsFieldArray: any;
   duration: number;
   variant: "filled" | "standard" | "outlined" | undefined;
 };
@@ -48,15 +47,19 @@ type OptionsListProps = {
 const OptionsList: React.FunctionComponent<OptionsListProps> = ({
   bookingId,
   form,
-  optionsFieldArray,
   duration,
   variant
 }: OptionsListProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const { register, control, watch } = form;
+  const optionsFieldArray = useFieldArray({
+    control,
+    name: "options",
+    keyName: "key"
+  });
   const { fields, append, remove } = optionsFieldArray;
-  const options = watch("options", fields);
+  const options = watch("options");
   const { data: allOptions } = useListServicesQuery();
 
   useEffect(() => {
@@ -96,33 +99,33 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
     <Table className={classes.table} aria-label="simple table">
       <TableBody>
         {
-          fields.map((option: Service, index: number) => (
-            <TableRow key={option.id}>
+          fields.map((option: FieldArrayWithId<Service, never, string>, index: number) => (
+            <TableRow key={option.key}>
               <TableCell>
                 <input
-                  type="hidden" {...register(`options[${index}].id`)}
+                  type="hidden" {...register(`options.${index}.id` as const)}
                   defaultValue={option.id}
                 />
                 <input
-                  type="hidden" {...register(`options[${index}].designation`)}
+                  type="hidden" {...register(`options.${index}.designation` as const)}
                   defaultValue={option.designation}
                 />
                 <input
-                  type="hidden" {...register(`options[${index}].vat`)}
+                  type="hidden" {...register(`options.${index}.vat` as const)}
                   defaultValue={option.vat}
                 />
                 <input
-                  type="hidden" {...register(`options[${index}].not_included_in_price`)}
+                  type="hidden" {...register(`options.${index}.not_included_in_price` as const)}
                   defaultValue={option.not_included_in_price}
                 />
                 {option.designation}</TableCell>
-              <TableCell>{options[index].unit_price && !options[index].is_flat_rate &&
+              <TableCell>{option.unit_price && !options[index].is_flat_rate &&
               <span>{duration}&nbsp;x</span>}</TableCell>
               <TableCell>
-                {options[index].unit_price &&
+                {option.unit_price &&
                 <Controller
                   control={control}
-                  name={"options[" + index + "].unit_price"}
+                  name={`options.${index}.unit_price`}
                   // rules={{ valueAsNumber: true }}
                   render={({ field }) =>
                     <TextField
@@ -139,12 +142,12 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 />}
               </TableCell>
               <TableCell>
-                {options[index].unit_price &&
+                {option.unit_price &&
                 <FormControlLabel
                   control={
                     <Controller
                       control={control}
-                      name={"options[" + index + "].is_flat_rate"}
+                      name={`options.${index}.is_flat_rate`}
                       defaultValue={option.is_flat_rate}
                       render={({ field }) =>
                         <Checkbox
@@ -159,7 +162,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 />}
               </TableCell>
               <TableCell>
-                {options[index].unit_price &&
+                {option.unit_price &&
                 <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
               </TableCell>
               <TableCell>
@@ -196,7 +199,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 {allOptions && allOptions.map((option: Service) => (
                   <option
                     key={option.id} value={option.id}
-                    disabled={fields.filter((o: Service) => Number(o.id) === option.id).length > 0}
+                    disabled={options.filter((o: Service) => Number(o.id) === option.id).length > 0}
                   >
                     {getDesignation(option)}
                   </option>
