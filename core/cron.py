@@ -1,9 +1,11 @@
 import logging
 import os
 from datetime import timedelta
+from ssl import SSLError
 from time import time
 
 import arrow
+import urllib3
 from django.conf import settings
 from django.db import transaction
 from django_cron import CronJobBase, Schedule
@@ -29,7 +31,7 @@ class SyncBookingsJob(CronJobBase):
             logger.info("[%s] Synchronize bookings from [%s]", sync.lodging.name, sync.channel.name)
             try:
                 retrieve_and_synchronize_bookings(sync)
-            except (HTTPError, ConnectionError) as ex:
+            except (HTTPError, SSLError, urllib3.exceptions.HTTPError, ConnectionError) as ex:
                 logging.warning("[%s] Request error [%s] during bookings synchronization from [%s]",
                                 sync.lodging.name, ex, sync.channel.name)
                 with transaction.atomic():
