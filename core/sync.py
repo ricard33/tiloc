@@ -27,11 +27,11 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
     for event in c.events:
 
         # HACK Ignoring fake event created by Airbnb. Until we find other cases like this, we can keep this simple hack
-        if event.name in ['Airbnb (Not available)']:
+        if event.summary in ['Airbnb (Not available)']:
             continue
 
         if event.uid and models.Booking.objects.filter(lodging=lodging, source_uid=event.uid).exists():
-            logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.name)
+            logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.summary)
             continue
 
         same_bookings = models.Booking.objects.filter(lodging=lodging, source_uid__isnull=True,
@@ -39,16 +39,16 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
 
         if same_bookings.exists():
             booking = same_bookings.first()
-            logger.info("Found booking with same dates for event [%s -> %s: %s]", event.begin, event.end, event.name)
+            logger.info("Found booking with same dates for event [%s -> %s: %s]", event.begin, event.end, event.summary)
             booking.source_uid = event.uid
             booking.save()
             continue
 
-        logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.name)
+        logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.summary)
         models.Booking.objects.create(lodging=lodging,
                                       source=channel,
                                       source_uid=event.uid,
-                                      guest_name=event.name,
+                                      guest_name=event.summary,
                                       status=channel.default_booking_status or models.BookingStatus.objects.first(),
                                       begin_date=event.begin.date(),
                                       end_date=event.end.date(),

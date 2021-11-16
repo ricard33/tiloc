@@ -51,15 +51,16 @@ def export_calendar(request, uid):
         sync.save()
     else:
         logger.info("Full calendar requested for lodging [%s]", lodging.name)
-    c = Calendar(creator="-//Gecko Conception//Location")
+    c = Calendar(creator="-//Gecko Conception//Ti Loc//EN")
+    c.scale = 'GREGORIAN'
     for booking in qs.order_by('begin_date'):
         e = Event()
         e.uid = str(booking.uid)
-        e.name = booking.guest_name.split()[0]  # only first word (= first name)
+        e.summary = booking.guest_name.split()[0]  # only first word (= first name)
         e.begin = booking.begin_date
-        e.end = arrow.get(booking.end_date).shift(days=-1)  # make_all_day() will add 1 day
+        e.end = arrow.get(booking.end_date).date()
         e.make_all_day()
-        c.events.add(e)
+        c.events.append(e)
     response = HttpResponse(c, content_type="text/calendar")
     response['Content-Disposition'] = 'attachment; filename="{}"'.format("%s.ics" % uid)
     return response

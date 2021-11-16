@@ -221,6 +221,7 @@ class Booking(models.Model):
 
     class Meta:
         verbose_name = _("Booking")
+        ordering = ('-begin_date',)
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (

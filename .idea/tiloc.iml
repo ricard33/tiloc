@@ -27,7 +27,7 @@
       <excludeFolder url="file://$MODULE_DIR$/frontend/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/test-reports" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (loc)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="@types/jest" level="application" />
   </component>

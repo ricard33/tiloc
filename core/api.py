@@ -130,12 +130,12 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def next_events(self, request, pk=None):
-        qs1 = models.Booking.objects.filter(begin_date__gte=timezone.now(), lodging__isnull=False).annotate(
+        qs1 = models.Booking.objects.filter(begin_date__gte=timezone.now(), lodging__isnull=False).order_by().annotate(
             date=F('begin_date'),
             event_type=Value('CHECKIN')) \
             .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
                     lodging_name=F('lodging__name'), booking_channel=F('source__name'))
-        qs2 = models.Booking.objects.filter(end_date__gte=timezone.now(), lodging__isnull=False).annotate(
+        qs2 = models.Booking.objects.filter(end_date__gte=timezone.now(), lodging__isnull=False).order_by().annotate(
             date=F('end_date'),
             event_type=Value('CHECKOUT')) \
             .values('id', 'date', 'guest_name', 'event_type', 'guest_name',

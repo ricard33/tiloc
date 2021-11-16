@@ -136,8 +136,9 @@ class ExportCalendarTestCase(TestCase):
         self.assertEqual(r['content-type'], "text/calendar")
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
+        self.assertEqual('GREGORIAN', c.scale)
         e = c.events.pop()
-        self.assertEqual(e.name, "Cédric")
+        self.assertEqual(e.summary, "Cédric")
 
     def test_secondary_export_url(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
