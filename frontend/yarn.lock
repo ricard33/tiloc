@@ -1877,6 +1877,11 @@
     lodash.isequal "^4.5.0"
     memoize-one "^5.1.1"
 
+"@gecko-conception/tiloc-ckeditor5@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@gecko-conception/tiloc-ckeditor5/-/tiloc-ckeditor5-0.0.1.tgz#44d1eef6f5ae7ae90d43c97b2cf5c109c7bfb39c"
+  integrity sha512-0pUVrG1Yto6z90iwn9Borr9OqeGzgo7ofI2sH0HPpEFbs9jnF96N+OFnTJR6noKNHhu7Hc+AviB7N4CJnwyhGQ==
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"

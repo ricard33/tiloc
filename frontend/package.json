@@ -39,6 +39,7 @@
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@gecko-conception/react-calendar-timeline": "^0.30.2",
+    "@gecko-conception/tiloc-ckeditor5": "^0.0.1",
     "@mui/icons-material": "^5.0.1",
     "@mui/lab": "^5.0.0-alpha.49",
     "@mui/material": "^5.0.2",
