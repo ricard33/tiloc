@@ -157,7 +157,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                         />}
                     />
                   }
-                  label={t("Flat rate")}
+                  label={t<string>("Flat rate")}
                   labelPlacement="start"
                 />}
               </TableCell>

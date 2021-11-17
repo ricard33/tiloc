@@ -58,7 +58,7 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
                   />}
               />
             }
-            label={t("Show payment status on bookings")}
+            label={t<string>("Show payment status on bookings")}
           />
           <FormControlLabel
             control={
@@ -86,7 +86,7 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
                   />}
               />
             }
-            label={t("Number of months to display")}
+            label={t<string>("Number of months to display")}
           />
         </form>
       </DialogContent>
