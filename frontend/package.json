@@ -32,10 +32,7 @@
     ]
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-core": "^29.0.0",
-    "@ckeditor/ckeditor5-image": "^29.0.0",
     "@ckeditor/ckeditor5-react": "^3.0.2",
-    "@ckeditor/ckeditor5-table": "^29.0.0",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@gecko-conception/react-calendar-timeline": "^0.30.2",
