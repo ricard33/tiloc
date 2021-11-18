@@ -13,8 +13,8 @@ i18n
   .init({
     debug: true,
     lng: "fr",
-    whitelist: ["fr", "en"],
-    nonExplicitWhitelist: true,
+    supportedLngs: ["fr", "en"],
+    nonExplicitSupportedLngs: true,
     load: "languageOnly",
     fallbackLng: "en", // use en if detected lng is not available
     // saveMissing: true, // send not translated keys to endpoint

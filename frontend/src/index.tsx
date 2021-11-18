@@ -1,7 +1,7 @@
 import "typeface-roboto";
 import React from "react";
 import ReactDOM from "react-dom";
-import axios from "axios";
+import axios, { AxiosRequestHeaders } from "axios";
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import App from "./App";
@@ -28,6 +28,8 @@ axios.interceptors.request.use(
     // Do something before request is sent
     const token = localStorage.getItem("token");
     if (token) {
+      if (typeof config.headers === 'undefined')
+        config.headers = {};
       config.headers.Authorization = `Token ${token}`;
     }
     return config;
