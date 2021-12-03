@@ -1,13 +1,14 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.db.models import Sum
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, ngettext
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from rest_framework.reverse import reverse
 from simple_history.admin import SimpleHistoryAdmin
 
 from core import models
 from core.imp_exp_resources import BookingResource
+from core.sync import retrieve_and_synchronize_bookings
 
 
 class PaymentInlineAdmin(TabularInline):
@@ -50,6 +51,7 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
                     'last_import_error')
     list_display_links = ('channel', 'lodging')
     list_filter = ('lodging', 'lodging__owner', 'channel', 'active')
+    actions = ['synchronize']
 
     def get_queryset(self, request):
         qs = super(BookingChannelSyncAdmin, self).get_queryset(request)
@@ -59,6 +61,17 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
     def url_for_remote(self, obj):
         return reverse('calendar_sync', kwargs={'uid': obj.lodging.uid},
                        request=self.request) + '?s=%d' % obj.id
+
+    @admin.action(description='Run synchronization')
+    def synchronize(self, request, queryset):
+        count = queryset.count()
+        for sync in queryset:
+            retrieve_and_synchronize_bookings(sync)
+        self.message_user(request, ngettext(
+            '%d channel was successfully synchronized.',
+            '%d channels were successfully synchronized.',
+            count,
+        ) % count, messages.SUCCESS)
 
 
 class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
