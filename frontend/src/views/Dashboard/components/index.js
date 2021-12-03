@@ -5,4 +5,4 @@ export { default as FillingRate } from './FillingRate';
 export { default as TasksProgress } from './TasksProgress';
 export { default as TotalProfit } from './TotalProfit';
 export { default as TotalUsers } from './TotalUsers';
-export { default as UsersByDevice } from './ChannelsDistribution';
+export { default as ChannelsDistribution } from './ChannelsDistribution';

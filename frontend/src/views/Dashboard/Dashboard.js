@@ -8,7 +8,7 @@ import {
   // TasksProgress,
   // TotalProfit,
   FillingRate,
-  UsersByDevice,
+  ChannelsDistribution,
   LatestBookings,
   NextEvents
 } from './components';
@@ -90,7 +90,7 @@ const Dashboard = () => {
           xl={3}
           xs={12}
         >
-          <UsersByDevice />
+          <ChannelsDistribution />
         </Grid>
 
         {/*<Grid*/}

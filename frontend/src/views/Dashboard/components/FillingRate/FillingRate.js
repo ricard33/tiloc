@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import clsx from 'clsx';
 import axios from "axios";
 import PropTypes from 'prop-types';
+import 'chart.js/auto';
 import { Bar } from 'react-chartjs-2';
 import { makeStyles } from '@mui/styles';
 import {
@@ -14,7 +15,6 @@ import {
 } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
-import { get_options } from './chart';
 import { useDispatch } from "react-redux";
 import palette from "../../../../theme/palette";
 import { useTranslation } from "react-i18next";
@@ -36,7 +36,7 @@ const FillingRate = props => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const [data, setData] = useState({});
+  const [data, setData] = useState({labels: [], datasets: []});
   const [loaded, setLoaded] = useState(false);
 
   // console.debug(data);
@@ -100,7 +100,7 @@ const FillingRate = props => {
           {loaded &&
           <Bar
             data={data}
-            options={get_options()}
+            type="line"
           />}
         </div>
       </CardContent>

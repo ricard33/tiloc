@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import 'chart.js/auto';
 import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
@@ -44,7 +45,7 @@ const ChannelsDistribution = props => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const [data, setData] = useState({});
+  const [data, setData] = useState({labels: [], datasets: []});
 
   const options = {
     legend: {
