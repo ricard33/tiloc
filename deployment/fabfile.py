@@ -2,18 +2,13 @@ import os
 from datetime import datetime
 
 from fabric import task
-from invoke import Exit, Failure
+from invoke import Exit, Failure, Collection
 from patchwork import files
 from patchwork.transfers import rsync
 
 # c = Connection('ssh-crd.alwaysdata.net')
 FAB_PATH = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE = os.path.normpath(os.path.join(FAB_PATH, ".."))
-TARGET_PATH = '~/www/location/'
-
-API_KEY = "a75560e79fd94a65a0c0dee798848aa0"
-ACCOUNT = "crd"
-SITE_ID = "590959"
 
 
 @task
@@ -116,7 +111,7 @@ def inc_version(version, pos):
 def increment_version(c):
     version = get_version(c)
     print("Last version was %s" % version)
-    result = ''
+    result = hasattr(c, 'VERSION_INC') and c.VERSION_INC or ''
 
     while result not in ['0', '1', '2', '3']:
         print()
@@ -234,7 +229,7 @@ def run_frontend_tests(c):
 
 
 def compile_python_files(c):
-    with c.cd(TARGET_PATH):
+    with c.cd(c.TARGET_PATH):
         c.run("python -O deployment/compile.py")
 
 
@@ -253,7 +248,7 @@ def sync_sources(c, test_only=False):
 
     rsync(c,
           WORKSPACE + "/",
-          TARGET_PATH,
+          c.TARGET_PATH,
           delete=True,
           rsync_opts='-ci --filter=". %s"' % os.path.join(FAB_PATH, "rsync_filter") + (
                   test_only and " --dry-run" or ""),
@@ -262,14 +257,14 @@ def sync_sources(c, test_only=False):
 
 def clean_compiled_files(c):
     # cleanup *.pyc / *.pyo files
-    with c.cd(TARGET_PATH):
+    with c.cd(c.TARGET_PATH):
         c.run("python deployment/compile.py -c")
 
 
 @task
 def empty_folder(c):
     # with settings(warn_only=True, user=APIDAE_USER):
-    with c.cd(TARGET_PATH):
+    with c.cd(c.TARGET_PATH):
         c.run('find . -type f -name \'*.tar.gz\' | xargs rm -rf')
         c.run(
             'rm -rf app assets authentication core deployment frontend legacy locale location static staticfiles templates ')
@@ -282,25 +277,25 @@ def empty_folder(c):
 #     tar_gz_build_file = tar_gz_build_files[0]
 #     tar_gz_file_name = tar_gz_build_file.split(os.path.sep)[-1]
 #
-#     with cd(TARGET_PATH):
-#         put(tar_gz_build_file, TARGET_PATH)
+#     with cd(c.TARGET_PATH):
+#         put(tar_gz_build_file, c.TARGET_PATH)
 #         run('tar -xzvf ' + tar_gz_file_name)
 
 
 @task
 def deploy_location(c):
-    c.run("mkdir -p %s" % TARGET_PATH)
+    c.run("mkdir -p %s" % c.TARGET_PATH)
     sync_sources(c)
     clean_compiled_files(c)
     # compile_python_files(c)
 
-    with c.cd(TARGET_PATH):
+    with c.cd(c.TARGET_PATH):
         if files.exists(c, ".env/bin/python") and not c.run('.env/bin/python -V').stdout.strip().startswith(
-                'Python 3.7'):
+                'Python %s' % c.PYTHON_VERSION):
             c.run("rm -rf .env")
         if not files.exists(c, ".env/bin/python"):
             print("create virtual env")
-            c.run("python3.7 -m venv .env")
+            c.run("python%s -m venv .env" % c.PYTHON_VERSION)
 
         c.run('rm -rf www/static')
         with c.prefix('. .env/bin/activate'):
@@ -317,7 +312,7 @@ def deploy_location(c):
 # @task
 # def load_initial_data():
 #     with settings(user=APIDAE_USER),\
-#          cd(TARGET_PATH):
+#          cd(c.TARGET_PATH):
 #         with prefix('. .env/bin/activate'):
 #             run("python ./manage.py loaddata deployment/fixtures/initial_data.json")
 #             run('python manage.py createsuperuser')
@@ -325,7 +320,7 @@ def deploy_location(c):
 
 @task
 def create_superuser(c):
-    with c.cd(TARGET_PATH):
+    with c.cd(c.TARGET_PATH):
         with c.prefix('. .env/bin/activate'):
             c.run('python manage.py createsuperuser', pty=True)
 
@@ -347,7 +342,7 @@ def create_superuser(c):
 def restart(c):
     c.local("curl --basic --user \"%(API_KEY)s account=%(ACCOUNT)s:\" --data ''"
             " --request POST https://api.alwaysdata.com/v1/site/%(SITE_ID)s/restart/"
-            % {'API_KEY': API_KEY, 'ACCOUNT': ACCOUNT, 'SITE_ID': SITE_ID})
+            % {'API_KEY': c.API_KEY, 'ACCOUNT': c.ACCOUNT, 'SITE_ID': c.SITE_ID})
 
 
 @task(default=True)
@@ -360,20 +355,25 @@ def deploy(c):
 
 @task
 def dump_db(c):
-    with c.cd(TARGET_PATH):
+    with c.cd(c.TARGET_PATH):
         with c.prefix('. .env/bin/activate'):
             fname = 'dump-%s.json' % datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-            c.run('python manage.py dumpdata > %s' % fname)
+            c.run('python manage.py dumpdata --exclude auth.permission --exclude contenttypes --output %s' % fname)
             c.get(fname)
 
 
 @task
 def load_db(c, fname):
+    print(os.getcwd())
+    # fname = os.path.abspath(fname)
+    print(fname)
     if os.path.exists(fname):
-        with c.cd(TARGET_PATH), \
+        with c.cd(c.TARGET_PATH), \
                 c.prefix('. .env/bin/activate'):
-            c.put(fname, TARGET_PATH)
+            c.put(fname, os.path.join(c.TARGET_PATH, fname))
             c.run('python manage.py loaddata %s' % fname)
+    else:
+        print("'%s' not found" % fname)
 
 # @task
 # def create_supervisord_config():
@@ -410,6 +410,11 @@ def load_db(c, fname):
 # @task
 # def pip_freeze():
 #     with settings(user=APIDAE_USER),\
-#          cd(TARGET_PATH):
+#          cd(c.TARGET_PATH):
 #         with prefix('. .env/bin/activate'):
 #             run("pip freeze")
+
+@task
+def debug(c):
+    print(c.run('uname -a'))
+    print(c.TARGET_PATH)
