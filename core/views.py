@@ -140,7 +140,7 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
 
 
 @api_view(['GET', ])
-def channel_distribution(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
+def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arrow.utcnow().shift(years=5)):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')
     data = []

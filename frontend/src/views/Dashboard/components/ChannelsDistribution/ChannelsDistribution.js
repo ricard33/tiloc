@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import 'chart.js/auto';
 import { Doughnut } from 'react-chartjs-2';
 import clsx from 'clsx';
@@ -12,7 +12,6 @@ import {
   Divider,
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 
@@ -43,7 +42,6 @@ const ChannelsDistribution = props => {
 
   const classes = useStyles();
   const theme = useTheme();
-  const dispatch = useDispatch();
   const { t } = useTranslation();
   const [data, setData] = useState({labels: [], datasets: []});
 
@@ -69,7 +67,7 @@ const ChannelsDistribution = props => {
     }
   };
 
-  useEffect(() => {
+  const loadChannelsDistribution = useCallback(() => {
     axios.get("stats/channel_distribution/")
       .then(response => {
         // console.debug(response);
@@ -91,7 +89,11 @@ const ChannelsDistribution = props => {
       })
       .catch(() => {
       });
-  }, [dispatch, t, theme.palette.white]);
+  }, [t, theme.palette.white]);
+
+  useEffect(() => {
+    loadChannelsDistribution();
+  }, [loadChannelsDistribution]);
 
   return (
     <Card
@@ -100,7 +102,7 @@ const ChannelsDistribution = props => {
     >
       <CardHeader
         action={
-          <IconButton size="small">
+          <IconButton size="small" onClick={() => loadChannelsDistribution()}>
             <RefreshIcon />
           </IconButton>
         }
