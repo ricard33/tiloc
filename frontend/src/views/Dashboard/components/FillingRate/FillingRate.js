@@ -14,16 +14,20 @@ import {
   Button
 } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-
 import { useDispatch } from "react-redux";
 import palette from "../../../../theme/palette";
 import { useTranslation } from "react-i18next";
+import { get_options } from './chart_options';
 
 const useStyles = makeStyles(() => ({
   root: {},
   chartContainer: {
-    height: 400,
-    position: 'relative'
+    // height: 400,
+    position: 'relative',
+    "& canvas": {
+      // height: "400px !important",
+    }
+
   },
   actions: {
     justifyContent: 'flex-end'
@@ -50,7 +54,7 @@ const FillingRate = props => {
           datasets: [
             {
               label: t("Filling rate"),
-              yAxisID: "y-axis-filling-rate",
+              yAxisID: "yAxisFillingRate",
               backgroundColor: palette.primary.main,
               // barThickness: 12,
               maxBarThickness: 10,
@@ -61,7 +65,7 @@ const FillingRate = props => {
             },
             {
               label: t("Turnover"),
-              yAxisID: "y-axis-turnover",
+              yAxisID: "yAxisTurnover",
               backgroundColor: palette.warning.main,
               borderColor: palette.warning.main,
               type: "line",
@@ -101,6 +105,7 @@ const FillingRate = props => {
           <Bar
             data={data}
             type="line"
+            options={get_options()}
           />}
         </div>
       </CardContent>
