@@ -296,7 +296,7 @@ const BookingScheduler = props => {
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
 
     return (
-      <HtmlTooltip title={<BookingQuickView booking={item.booking} />}>
+      <HtmlTooltip title={<BookingQuickView booking={item.booking} />} enterDelay={1000} arrow>
         <div {...itemProps}>
           {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
