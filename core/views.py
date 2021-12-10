@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from ics import Calendar, Event
+from ics import Calendar, Event, ContentLine
 from proxy.views import proxy_view
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -52,7 +52,10 @@ def export_calendar(request, uid):
     else:
         logger.info("Full calendar requested for lodging [%s]", lodging.name)
     c = Calendar(creator="-//Gecko Conception//Ti Loc//EN")
-    c.scale = 'GREGORIAN'
+    c.extra.extend([
+        ContentLine(name='CALSCALE', value='GREGORIAN')
+    ])
+    c.extra_params['PRODID'] = {'X-RICAL-TZSOURCE': ['TZINFO']}
     for booking in qs.order_by('begin_date'):
         e = Event()
         e.uid = str(booking.uid)
@@ -61,7 +64,7 @@ def export_calendar(request, uid):
         e.end = arrow.get(booking.end_date).date()
         e.make_all_day()
         c.events.append(e)
-    response = HttpResponse(c, content_type="text/calendar")
+    response = HttpResponse(c.serialize() + '\n', content_type="text/calendar")
     response['Content-Disposition'] = 'attachment; filename="{}"'.format("%s.ics" % uid)
     return response
 
@@ -147,7 +150,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     dates_range = [begin.date(), end.date()]
     booking_count = Count('booking',
                           filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
-                                & Q(booking__lodging__isnull=False))  # noqa: E127
+                                 & Q(booking__lodging__isnull=False))  # noqa: E127
     channels = models.BookingChannel.objects.annotate(booking_count=booking_count)
     for row in channels:
         data.append({'channel': row.name, 'count': row.booking_count})

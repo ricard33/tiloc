@@ -136,7 +136,7 @@ class ExportCalendarTestCase(TestCase):
         self.assertEqual(r['content-type'], "text/calendar")
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
-        self.assertEqual('GREGORIAN', c.scale)
+        self.assertEqual('GREGORIAN', c.extra['CALSCALE'][0].value)
         e = c.events.pop()
         self.assertEqual(e.summary, "Cédric")
 
