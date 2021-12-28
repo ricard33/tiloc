@@ -19,6 +19,7 @@ class BookingFilter(filters.FilterSet):
             'lodging':    ['exact', 'isnull', 'in'],
             'begin_date': ['lte', 'gte'],
             'end_date':   ['lte', 'gte'],
+            'guest_name': ['exact', 'icontains']
         }
 
     def for_dates_filter(self, queryset, name, value):

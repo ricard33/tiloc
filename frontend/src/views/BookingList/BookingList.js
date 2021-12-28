@@ -40,10 +40,12 @@ const BookingList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [ordering, setOrdering] = useState({ orderBy: "begin_date", order: "asc" });
+  const [search, setSearch] = useState("");
   const { data: bookings, isLoading: isLoadingBookings } = useListBookingsPaginatedQuery({
     page_size: rowsPerPage,
     page: page+1,
-    ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy
+    ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy,
+    guest_name__icontains: search
   });
   const history = useHistory();
 
@@ -92,9 +94,13 @@ const BookingList = () => {
     setOrdering({ order, orderBy });
   };
 
+  const onSearch = (value) => {
+    setSearch(value);
+  };
+
   return (
     <div className={classes.root}>
-      <BookingsToolbar numSelected={numSelected} onCreateBooking={onCreateBooking}/>
+      <BookingsToolbar numSelected={numSelected} onCreateBooking={onCreateBooking} onSearch={onSearch}/>
       <div className={classes.content}>
         <Card>
           <CardContent className={classes.cardContent}>
