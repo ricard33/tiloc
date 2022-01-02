@@ -1,6 +1,6 @@
 arrow==0.14.7
 babel==2.9.1
-django==3.2.7
+django==3.2.10
 djangorestframework==3.12.4
 django-cron==0.5.1
 django-constance[database]==2.8.0
