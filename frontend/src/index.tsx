@@ -1,7 +1,7 @@
 import "typeface-roboto";
 import React from "react";
 import ReactDOM from "react-dom";
-import axios, { AxiosRequestHeaders } from "axios";
+import axios from "axios";
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import App from "./App";

@@ -18,5 +18,11 @@
   "Last year": "Last year",
   "Print": "Print",
   "total = {{ fullPrice }} €": "total = {{ fullPrice }} €",
-  "Balance: {{amount}} €": "Balance: {{amount}} €"
+  "Balance: {{amount}} €": "Balance: {{amount}} €",
+  "{{count}} night": "{{count}} night",
+  "{{count}} night_plural": "{{count}} nights",
+  "{{count}} selected": "{{count}} selected",
+  "{{count}} selected_plural": "{{count}} selected",
+  "{{ duration }} nights - {{ count }} guests": "{{ duration }} nights - {{ count }} guests",
+  "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nights - {{ count }} guests"
 }

@@ -11,6 +11,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import { useHistory } from "react-router-dom";
+import { endOfMonth, startOfMonth } from "date-fns";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,11 +42,15 @@ const BookingList = () => {
   const [page, setPage] = useState(0);
   const [ordering, setOrdering] = useState({ orderBy: "begin_date", order: "asc" });
   const [search, setSearch] = useState("");
+  const today = new Date();
+  const [dateRange, setDateRange] = useState({startDate: startOfMonth(today), endDate: endOfMonth(today)});
+  const dateFilter = formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate)
   const { data: bookings, isLoading: isLoadingBookings } = useListBookingsPaginatedQuery({
     page_size: rowsPerPage,
     page: page+1,
     ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy,
-    guest_name__icontains: search
+    guest_name__icontains: search,
+    for_dates: dateFilter
   });
   const history = useHistory();
 
@@ -98,9 +103,16 @@ const BookingList = () => {
     setSearch(value);
   };
 
+  const onDateRangeChange = (range) => {
+    setDateRange(range);
+  };
+
   return (
     <div className={classes.root}>
-      <BookingsToolbar numSelected={numSelected} onCreateBooking={onCreateBooking} onSearch={onSearch}/>
+      <BookingsToolbar
+        numSelected={numSelected} onCreateBooking={onCreateBooking} onSearch={onSearch}
+        dateRange={dateRange} onDateRangeChange={onDateRangeChange}
+      />
       <div className={classes.content}>
         <Card>
           <CardContent className={classes.cardContent}>

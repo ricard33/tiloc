@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
 import { Button, Toolbar } from "@mui/material";
 import { SearchInput, BookingsImportDialog } from "components";
-import { lighten } from '@mui/material/styles';
+import { lighten } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Typography from "@mui/material/Typography";
+import DateRangeSelector from "../../../components/DateRangeSelector";
 
 const useStyles = makeStyles(theme => ({
   root: { paddingRight: theme.spacing(1) },
@@ -53,10 +54,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BookingsToolbar = props => {
-  const { className, numSelected, onCreateBooking, ...rest } = props;
+  const { className, numSelected, onCreateBooking, onSearch, dateRange, onDateRangeChange, ...rest } = props;
 
   const classes = useStyles();
-  const [openImport, setOpenImport] = React.useState(false);
+  const [openImport, setOpenImport] = useState(false);
   const { t } = useTranslation();
 
   const handleClickOpen = () => {
@@ -77,7 +78,7 @@ const BookingsToolbar = props => {
       <div className={classes.title}>
         {numSelected > 0 ? (
           <Typography color="inherit" variant="subtitle1">
-            {t("{{count}} selected", {count: numSelected})}
+            {t("{{count}} selected", { count: numSelected })}
           </Typography>
         ) : (
           <Typography variant="h3" id="tableTitle">
@@ -85,13 +86,17 @@ const BookingsToolbar = props => {
           </Typography>
         )}
       </div>
-      <div >
+      <div>
         <SearchInput
           className={classes.searchInput}
           placeholder={t("Search booking")}
+          onChange={event => onSearch(event.target.value)}
         />
       </div>
-      <span className={classes.spacer}/>
+      <div>
+        <DateRangeSelector startDate={dateRange.startDate} endDate={dateRange.endDate} onChange={onDateRangeChange} />
+      </div>
+      <span className={classes.spacer} />
       <div className={classes.actions}>
         <Button
           className={classes.importButton}
@@ -101,8 +106,8 @@ const BookingsToolbar = props => {
           Import</Button>
         <Button className={classes.exportButton} disabled>Export</Button>
         <Button
-          color="primary"
-          variant="contained"
+          // color="primary"
+          // variant="contained"
           onClick={onCreateBooking}
         >
           {t("Add booking")}
@@ -110,13 +115,13 @@ const BookingsToolbar = props => {
         {numSelected > 0 ? (
           <Tooltip title="Delete">
             <IconButton aria-label="Delete" size="large">
-              <DeleteIcon/>
+              <DeleteIcon />
             </IconButton>
           </Tooltip>
         ) : (
           <Tooltip title="Filter list">
             <IconButton aria-label="Filter list" size="large">
-              <FilterListIcon/>
+              <FilterListIcon />
             </IconButton>
           </Tooltip>
         )}
@@ -128,8 +133,15 @@ const BookingsToolbar = props => {
 
 BookingsToolbar.propTypes = {
   className: PropTypes.string,
+  dateRange: PropTypes.shape({
+    startDate: PropTypes.instanceOf(Date),
+    endDate: PropTypes.instanceOf(Date),
+  }),
   numSelected: PropTypes.number,
-  onCreateBooking: PropTypes.func
-};
+  onCreateBooking: PropTypes.func,
+  onDateRangeChange: PropTypes.func,
+  onSearch: PropTypes.func
+}
+;
 
 export default BookingsToolbar;

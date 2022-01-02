@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTranslation } from "react-i18next";
-import { EnhancedTableHead } from "../../../../components";
+import { EnhancedTableHead } from "../../../components";
 import Button from "@mui/material/Button";
-import { formatDate } from "../../../../common/dateUtils";
+import { formatDate } from "../../../common/dateUtils";
 import { parseISO } from "date-fns";
 
 const useStyles = makeStyles(theme => ({
