@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from ics import Calendar, Event, ContentLine
+from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
 from rest_framework.decorators import api_view
 from rest_framework.response import Response

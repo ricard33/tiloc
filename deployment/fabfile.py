@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from fabric import task
-from invoke import Exit, Failure, Collection
+from invoke import Exit, Failure
 from patchwork import files
 from patchwork.transfers import rsync
 
