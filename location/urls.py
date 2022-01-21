@@ -16,10 +16,10 @@ Including another URLconf
 import os
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.views.decorators.cache import never_cache
 from rest_framework import routers
 
@@ -44,13 +44,13 @@ router.register(r'payment', api.PaymentViewSet, 'payment')
 
 urlpatterns = [
     path('api/', include((router.urls, 'drf'), namespace='api')),
-    url(r'^api/info/', api.version_view, name='version'),
+    re_path(r'^api/info/', api.version_view, name='version'),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # url("^api/auth/register/$", api.RegistrationAPI.as_view()),
-    url("^api/auth/login/$", api.LoginAPI.as_view()),
-    url("^api/auth/logout/$", api.LogoutAPI.as_view()),
-    url("^api/auth/user/$", api.UserAPI.as_view()),
-    url(r'^api/auth/', include('knox.urls')),
+    # re_path("^api/auth/register/$", api.RegistrationAPI.as_view()),
+    re_path("^api/auth/login/$", api.LoginAPI.as_view()),
+    re_path("^api/auth/logout/$", api.LogoutAPI.as_view()),
+    re_path("^api/auth/user/$", api.UserAPI.as_view()),
+    re_path(r'^api/auth/', include('knox.urls')),
 
     path(r'calendar/<uuid:uid>/', views.export_calendar, name="calendar_sync"),
     path(r'calendar/<uuid:uid>.ics', views.export_calendar, name="calendar_sync"),
@@ -65,9 +65,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),  # grappelli URLS
     # path('', include('frontend.urls')),
-    # url(r'^', IndexPage.as_view(template_name="index.html")),
+    # re_path(r'^', IndexPage.as_view(template_name="index.html")),
 
-    url('loggly/(?P<path>.*)', views.loggly_proxy),
+    re_path('loggly/(?P<path>.*)', views.loggly_proxy),
 ]
 
 if settings.ENV == 'dev':
@@ -80,7 +80,7 @@ if settings.ENV == 'dev':
             fullpath = os.path.join(root, name)
             relative_path = os.path.relpath(fullpath, public_path)
             # print(relative_path)
-            urlpatterns.insert(-1, url(relative_path, never_cache(serve_static_file),
+            urlpatterns.insert(-1, re_path(relative_path, never_cache(serve_static_file),
                                        kwargs={'document_path': fullpath}))
 
-urlpatterns.append(url(r'^', IndexPage.as_view(template_name="index.html"), name="home"))
+urlpatterns.append(re_path(r'^', IndexPage.as_view(template_name="index.html"), name="home"))

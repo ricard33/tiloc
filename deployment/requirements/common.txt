@@ -1,30 +1,31 @@
-arrow==0.14.7
+arrow==1.2.1
 babel==2.9.1
-django==3.2.7
-djangorestframework==3.12.4
-django-cron==0.5.1
+django==4.0.1
+djangorestframework==3.13.1
+django-cron @ git+https://github.com/ricard33/django-cron.git
 django-constance[database]==2.8.0
-django-cors-headers==3.8.0
-django-dbbackup==3.3.0
-django-filter==2.4.0
-django-grappelli==2.15.1
+django-cors-headers==3.11.0
+django-dbbackup @ git+https://github.com/jazzband/django-dbbackup.git@c8df2cd3403f91b8494da12f7570127c0b1c63e7
+# django-dbbackup==3.3.0
+django-filter==21.1
+django-grappelli==3.0.1
 django-heroku
-django-import-export==2.5.0
+django-import-export==2.7.1
 django-picklefield==3.0.1
 django-proxy==1.2.1
-django-rest-knox==4.1.0
+django-rest-knox @ git+https://github.com/James1345/django-rest-knox.git@7abaefaa762f10385bfe27a2d5ecfe92c3921ecb
 django-simple-history==3.0.0
-django-webpack-loader==1.1.0
+django-webpack-loader==1.4.1
 gunicorn>=20.0.4
-git+https://github.com/ricard33/ics-py@more-permissive-parsing#egg=ics
+ics @ git+https://github.com/ricard33/ics-py@more-permissive-parsing
 invoke==1.6.0
-jinja2==3.0.1
-JSON-log-formatter==0.4.0
+jinja2==3.0.3
+JSON-log-formatter==0.5.1
 loggly-python-handler==1.0.1
 my-django-tweaks
-Pillow==8.3.2
-pdfkit==0.6.1
-requests==2.26.0
+Pillow==9.0.0
+pdfkit==1.0.0
+requests==2.27.1
 smartconfigparser==1.0.0
 whitenoise[brotli]==5.3.0
 newrelic

@@ -6,7 +6,7 @@ import stat
 
 from django.http import FileResponse, Http404, HttpResponseNotModified
 from django.utils.http import http_date
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
 
 
