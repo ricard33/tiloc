@@ -14,7 +14,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import EuroIcon from "@mui/icons-material/Euro";
 import { startOfMonth } from "date-fns";
-import { BookingQuickView, HtmlTooltip, Tooltip } from "components";
+import { BookingQuickView, HtmlTooltip, Tooltip } from "../../../../components";
 import { useTranslation } from "react-i18next";
 import "./BookingScheduler.scss";
 import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";

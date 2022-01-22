@@ -1,6 +1,6 @@
-import palette from "theme/palette";
+import palette from "../../../../theme/palette";
 import { formatCurrency } from "../../../../common/intlUtils";
-import i18n from "i18n";
+import i18n from "../../../../i18n";
 
 export const get_options = () => {
   return {

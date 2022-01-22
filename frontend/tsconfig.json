@@ -1,16 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "target": "es5",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
-    ],
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules"
-      }
     ],
     "allowJs": true,
     "skipLibCheck": true,

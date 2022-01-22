@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
-import { StatusBullet } from 'components';
+import { StatusBullet } from '../../../../components';
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { useNextEventsQuery } from "../../../../services/api";

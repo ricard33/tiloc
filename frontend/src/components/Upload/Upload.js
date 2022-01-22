@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Dropzone from "components/Dropzone";
+import Dropzone from "../Dropzone";
 import "./Upload.css";
 import LinearProgress from "@mui/material/LinearProgress";
 import CheckIcon from '@mui/icons-material/Check';

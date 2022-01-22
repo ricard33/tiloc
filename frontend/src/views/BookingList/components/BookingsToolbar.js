@@ -3,7 +3,7 @@ import classNames from "classnames";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
 import { Button, Toolbar } from "@mui/material";
-import { SearchInput, BookingsImportDialog } from "components";
+import { SearchInput, BookingsImportDialog } from "../../../components";
 import { lighten } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import Tooltip from "@mui/material/Tooltip";
