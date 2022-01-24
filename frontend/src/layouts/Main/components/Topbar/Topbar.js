@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link as RouterLink, useHistory } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
@@ -55,7 +55,7 @@ const Topbar = props => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const user = useSelector(store => store.auth.user);
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [doLogout, ] = useLogoutMutation();
   const { showError } = useAlert();
 
@@ -83,7 +83,7 @@ const Topbar = props => {
       else {
         dispatch(auth.logoutSuccessful());
         console.log("Logged out!")
-        history.push("/logged-out");
+        navigate("/logged-out");
       }
     })
   };

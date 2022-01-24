@@ -1,7 +1,6 @@
 import React from "react";
-import { Redirect, Switch } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
-import { RouteWithLayout } from "./components";
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
 import {
@@ -15,88 +14,134 @@ import {
   TestPage,
   Settings,
   ContractTemplateList,
-  ContractTemplateEdit,
+  ContractTemplateEdit
 } from "./views";
+import { useSelector } from "react-redux";
+import { RootState } from "./store";
 
-const Routes = () => {
+const MyRoutes = () => {
   return (
-    <Switch>
-      <Redirect
-        exact
-        from="/"
-        to="/dashboard"
+    <Routes>
+      <Route
+        path="/"
+        element={<Navigate to={"/dashboard"} replace />}
       />
-      <RouteWithLayout
-        component={SignIn}
-        exact
-        layout={MinimalLayout}
-        needAuthentication={false}
-        path="/login"
+      <Route
+        path="/login" element={
+          <MinimalLayout>
+            <SignIn />
+          </MinimalLayout>
+        }
       />
-      <RouteWithLayout
-        component={LoggedOut}
-        exact
-        layout={MinimalLayout}
-        needAuthentication={false}
-        path="/logged-out"
+      <Route
+        path="/logged-out" element={
+          <MinimalLayout>
+            <LoggedOut />
+          </MinimalLayout>
+        }
       />
-      <RouteWithLayout
-        component={DashboardView}
-        exact
-        layout={MainLayout}
-        path="/dashboard"
+      <Route
+        path="/dashboard" element={
+          <RequireAuth>
+            <MainLayout>
+              <DashboardView />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={PlanningView}
-        exact
-        layout={MainLayout}
-        path="/planning"
+      <Route
+        path="/planning" element={
+          <RequireAuth>
+            <MainLayout>
+              <PlanningView />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={BookingView}
-        exact
-        layout={MainLayout}
-        path="/bookings"
+      <Route
+        path="/bookings" element={
+          <RequireAuth>
+            <MainLayout>
+              <BookingView />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={ContractEdit}
-        exact
-        layout={MainLayout}
-        path="/bookings/:bookingId/contract"
+      <Route
+        path="/bookings/:bookingId/contract" element={
+          <RequireAuth>
+            <MainLayout>
+              <ContractEdit />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={Settings}
-        exact
-        layout={MainLayout}
-        path="/settings/"
+      <Route
+        path="/settings/" element={
+          <RequireAuth>
+            <MainLayout>
+              <Settings />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={ContractTemplateList}
-        exact
-        layout={MainLayout}
-        path="/settings/contract-templates"
+      <Route
+        path="/settings/contract-templates" element={
+          <RequireAuth>
+            <MainLayout>
+              <ContractTemplateList />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={ContractTemplateEdit}
-        exact
-        layout={MainLayout}
-        path="/settings/contract-templates/:templateId"
+      <Route
+        path="/settings/contract-templates/:templateId" element={
+          <RequireAuth>
+            <MainLayout>
+              <ContractTemplateEdit />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={TestPage}
-        exact
-        layout={MainLayout}
-        path="/test-page"
+      <Route
+        path="/test-page" element={
+          <RequireAuth>
+            <MainLayout>
+              <TestPage />
+            </MainLayout>
+          </RequireAuth>
+        }
       />
-      <RouteWithLayout
-        component={NotFoundView}
-        exact
-        layout={MinimalLayout}
-        path="/not-found"
+      <Route
+        path="/not-found" element={
+          <MinimalLayout>
+            <NotFoundView />
+          </MinimalLayout>
+        }
       />
-      <Redirect to="/not-found"/>
-    </Switch>
+      <Route
+        path="*" element={
+          <MinimalLayout>
+            <NotFoundView />
+          </MinimalLayout>
+        }
+      />
+    </Routes>
   );
 };
 
-export default Routes;
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const auth = useSelector<RootState>(store => store.auth) as { isLoading: boolean, isAuthenticated: boolean };
+  const location = useLocation();
+  if (auth.isLoading) {
+    return <em>Loading...</em>;
+  } else if (!auth.isAuthenticated) {
+    return <Navigate to={"/login"} state={{ from: location }} replace />;
+  } else {
+    return (
+      children
+    );
+  }
+}
+
+export default MyRoutes;

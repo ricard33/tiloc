@@ -3,7 +3,7 @@ import { startOfMonth, parse, add } from "date-fns";
 import { BookingScheduler } from "./components";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "../../libs/MuiConfirm";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Grid } from "@mui/material";
 import Button from "@mui/material/Button";
 import { DeleteForever as DeleteIcon, Description as DescriptionIcon, Edit as EditIcon, Settings as SettingsIcon } from "@mui/icons-material";
@@ -46,7 +46,7 @@ const Planning = () => {
   const [selected, setSelected] = useState(null);
   const [editBooking, setEditBooking] = useState(null);
   const [needFirstTimeEdit, setNeedFirstTimeEdit] = useState(query.edit !== undefined);
-  const history = useHistory();
+  const navigate = useNavigate();
   const confirm = useConfirm();
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [settings, setSettings] = useLocalStorage("planningSettings", {
@@ -124,7 +124,7 @@ const Planning = () => {
   const onEditContract = (booking) => {
     setEditBooking(null);
     // setEditContract(booking);
-    history.push("/bookings/" + booking.id + "/contract");
+    navigate("/bookings/" + booking.id + "/contract");
   };
 
   const onCloseSettings = (newSettings) => {

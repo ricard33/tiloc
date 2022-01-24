@@ -65,17 +65,16 @@ const SidebarNav = props => {
           disableGutters
           key={page.title}
         >
-          <Button
-            activeClassName={classes.active}
-            className={classes.button}
+          <CustomRouterLink
+            className={({isActive}) => classes.button + (isActive ? (" " + classes.active) : "")}
             target={page.external ? '_blank' : ''}
-            component={CustomRouterLink}
+            // component={CustomRouterLink}
             to={page.href}
             disabled={page.disabled}
           >
             <div className={classes.icon}>{page.icon}</div>
             {page.title}
-          </Button>
+          </CustomRouterLink>
         </ListItem>
       ))}
     </List>

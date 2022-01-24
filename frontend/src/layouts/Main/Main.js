@@ -5,16 +5,16 @@ import clsx from "clsx";
 import { makeStyles, useTheme } from "@mui/styles";
 import { Breadcrumbs, Link, Typography, useMediaQuery } from "@mui/material";
 import { Sidebar, Topbar, Footer } from "./components";
-import { Route, Link as RouterLink } from "react-router-dom";
+import { Route, Link as RouterLink, useLocation } from "react-router-dom";
 
 
 const breadcrumbNameMap = {
-  '/dashboard': 'Dashboard',
-  '/planning': 'Planning',
-  '/bookings': 'Bookings',
-  '/settings': 'Settings',
-  'contract-templates': 'Contract templates',
-  'contract': 'Contract',
+  "/dashboard": "Dashboard",
+  "/planning": "Planning",
+  "/bookings": "Bookings",
+  "/settings": "Settings",
+  "contract-templates": "Contract templates",
+  "contract": "Contract"
 };
 
 
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     height: "100%"
   },
   breadcrumb: {
-    padding: `0 ${theme.spacing(1)}`,
+    padding: `0 ${theme.spacing(1)}`
   }
 }));
 
@@ -44,6 +44,7 @@ const Main = props => {
 
   const classes = useStyles();
   const theme = useTheme();
+  const location = useLocation();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
     defaultMatches: true
   });
@@ -59,6 +60,7 @@ const Main = props => {
   };
 
   const shouldOpenSidebar = isDesktop ? true : openSidebar;
+  const pathnames = location.pathname.split("/").filter((x) => x);
 
   return (
     <div
@@ -74,33 +76,25 @@ const Main = props => {
         variant={isDesktop ? "permanent" : "temporary"}
       />
       <main className={classes.content}>
-        <Route>
-          {({ location }) => {
-            const pathnames = location.pathname.split("/").filter((x) => x);
+        <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
+          <LinkRouter color="inherit" to="/">
+            Home
+          </LinkRouter>
+          {pathnames.map((value, index) => {
+            const last = index === pathnames.length - 1;
+            const to = `/${pathnames.slice(0, index + 1).join("/")}/`;
 
-            return (
-              <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
-                <LinkRouter color="inherit" to="/">
-                  Home
-                </LinkRouter>
-                {pathnames.map((value, index) => {
-                  const last = index === pathnames.length - 1;
-                  const to = `/${pathnames.slice(0, index + 1).join("/")}/`;
-
-                  return last ? (
-                    <Typography color="textPrimary" key={to}>
-                      {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
-                    </Typography>
-                  ) : (
-                    <LinkRouter color="inherit" to={to} key={to}>
-                      {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
-                    </LinkRouter>
-                  );
-                })}
-              </Breadcrumbs>
+            return last ? (
+              <Typography color="textPrimary" key={to}>
+                {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
+              </Typography>
+            ) : (
+              <LinkRouter color="inherit" to={to} key={to}>
+                {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
+              </LinkRouter>
             );
-          }}
-        </Route>
+          })}
+        </Breadcrumbs>
         {children}
         <Footer />
       </main>

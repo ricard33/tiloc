@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link as RouterLink, Redirect, withRouter, useLocation } from "react-router-dom";
+import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from 'prop-types';
 import validate from 'validate.js';
@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const SignIn = props => {
-  const { history } = props;
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(store => store.auth.isAuthenticated);
   const [doLogin, ] = useLoginMutation();
@@ -116,12 +116,12 @@ const SignIn = props => {
   useEffect(() => {
     if (isAuthenticated) {
       console.debug("Redirect to", from);
-      history.replace(from);
+      navigate(from, {replace: true});
     }
-  }, [from, history, isAuthenticated]);
+  }, [from, navigate, isAuthenticated]);
 
   const handleBack = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   const handleChange = event => {
@@ -163,7 +163,7 @@ const SignIn = props => {
     !!(formState.touched[field] && formState.errors[field]);
 
   if (isAuthenticated) {
-    return <Redirect to="/" />
+    return <Navigate to="/" />
   }
 
   return (
@@ -263,7 +263,6 @@ const SignIn = props => {
 };
 
 SignIn.propTypes = {
-  history: PropTypes.object
 };
 
-export default withRouter(SignIn);
+export default SignIn;

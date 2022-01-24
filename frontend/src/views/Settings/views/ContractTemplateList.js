@@ -3,7 +3,7 @@ import { makeStyles } from "@mui/styles";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import { ContractTemplatesTable, ContractTemplatesToolbar } from "./components";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useListContractTemplatesQuery } from "../../../services/api";
 
 const useStyles = makeStyles(theme => ({
@@ -24,14 +24,14 @@ const ContractTemplateList = () => {
   const { data: allTemplates, isLoading } = useListContractTemplatesQuery();
   const [selected, setSelected] = useState([]);
   const numSelected = selected.length;
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const onSelectionChange = (newSelection) => {
     setSelected(newSelection);
   };
 
   const onEditTemplate = (template) => {
-    history.push("/settings/contract-templates/" + template.id);
+    navigate("/settings/contract-templates/" + template.id);
   };
 
   return (

@@ -74,7 +74,7 @@ const BookingsTable = props => {
   };
 
   function handleRowClick(event, booking) {
-    // history.push("/bookings/" + id);
+    // navigate("/bookings/" + id);
     onEdit && onEdit(booking);
   }
 

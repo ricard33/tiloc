@@ -3,7 +3,8 @@ import { Pagination, Payment } from "../types";
 
 export const initialState: Partial<RootState> = {
   auth: {
-    isLoggedIn: false,
+    isLoading: false,
+    isAuthenticated: false,
   },
   api: {
     queries: {},

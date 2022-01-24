@@ -10,7 +10,7 @@ import CardContent from "@mui/material/CardContent";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { endOfMonth, startOfMonth } from "date-fns";
 
 const useStyles = makeStyles(theme => ({
@@ -52,7 +52,7 @@ const BookingList = () => {
     guest_name__icontains: search,
     for_dates: dateFilter
   });
-  const history = useHistory();
+  const navigate = useNavigate();
 
 
   const onSelectionChange = (newSelection) => {
@@ -77,7 +77,7 @@ const BookingList = () => {
 
   const onEditContract = (booking) => {
     setEditBooking(null);
-    history.push("/bookings/" + booking.id + "/contract");
+    navigate("/bookings/" + booking.id + "/contract");
   };
 
   const handlePageChange = (event, page) => {

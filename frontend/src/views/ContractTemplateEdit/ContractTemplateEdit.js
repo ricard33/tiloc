@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
@@ -77,7 +77,7 @@ const ContractTemplateEdit = (/*props*/) => {
   const [createContractTemplate] = useCreateContractTemplateMutation();
   const [updateContractTemplate] = useUpdateContractTemplateMutation();
   const [deleteContractTemplate] = useDeleteContractTemplateMutation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [content, setContent] = useState(template ? template.content : undefined);
   const [name, setName] = useState(template ? template.name : "");
   const [lodgingId, setLodgingId] = useState(0);
@@ -107,7 +107,7 @@ const ContractTemplateEdit = (/*props*/) => {
   }
 
   function onClose() {
-    history.goBack();
+    navigate(-1);
   }
 
   function onCancel() {
@@ -150,7 +150,7 @@ const ContractTemplateEdit = (/*props*/) => {
         if (!template || !template.id) {
           console.debug("change url");
           templateId = data.id;
-          history.replace({ pathname: `/settings/contract-templates/${templateId}` });
+          navigate(`/settings/contract-templates/${templateId}`, {replace: true});
         }
         showSuccess(t("Template saved"));
         if (callback) callback(submittedTemplate);

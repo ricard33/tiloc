@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import validate from "validate.js";
 import "react-perfect-scrollbar/dist/css/styles.css";
@@ -15,7 +15,6 @@ import { LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
-import { History } from "history";
 import { RootState } from "./store";
 import { DateProvider } from "@gecko-conception/react-calendar-timeline";
 
@@ -25,7 +24,6 @@ validate.validators = {
 };
 
 type Props = {
-  history: History<unknown>
 };
 
 function App(props: Props) {
@@ -57,10 +55,9 @@ function App(props: Props) {
         <DateProvider locale={frLocale}>
           <ConfirmProvider>
             <Notifier />
-            <Router history={props.history}>
-
+            <BrowserRouter>
               <Routes />
-            </Router>
+            </BrowserRouter>
           </ConfirmProvider>
         </DateProvider>
       </LocalizationProvider>

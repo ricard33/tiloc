@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
@@ -74,7 +74,7 @@ const ContractEdit = () => {
   let { bookingId } = useParams();
   const classes = useStyles();
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   // const [loading, setLoading] = useState(true);
   const [getOrGenerateContract, {data: contract, isLoading}] = useGetOrGenerateContractMutation();
   const [ updateContract ] = useUpdateContractMutation();
@@ -120,7 +120,7 @@ const ContractEdit = () => {
   }
 
   function onClose() {
-    history.goBack();
+    navigate(-1);
   }
 
   function onCancel() {
