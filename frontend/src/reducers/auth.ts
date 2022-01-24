@@ -1,5 +1,5 @@
 import * as actionTypes from "../actions/actionTypes";
-import { LoginInfo, User } from "../types";
+import { User } from "../types";
 import { AuthAction } from "../actions";
 
 export interface AuthState {

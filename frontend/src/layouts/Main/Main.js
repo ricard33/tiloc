@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { makeStyles, useTheme } from "@mui/styles";
 import { Breadcrumbs, Link, Typography, useMediaQuery } from "@mui/material";
 import { Sidebar, Topbar, Footer } from "./components";
-import { Route, Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 
 
 const breadcrumbNameMap = {

@@ -1,23 +1,22 @@
 import React from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
 import {
   BookingList as BookingView,
   ContractEdit,
+  ContractTemplateEdit,
+  ContractTemplateList,
   Dashboard as DashboardView,
+  LoggedOut,
   NotFound as NotFoundView,
   Planning as PlanningView,
-  SignIn,
-  LoggedOut,
-  TestPage,
   Settings,
-  ContractTemplateList,
-  ContractTemplateEdit
+  SignIn,
+  TestPage
 } from "./views";
-import { useSelector } from "react-redux";
-import { RootState } from "./store";
+import { RequireAuth } from "./components/RequireAuth";
 
 const MyRoutes = () => {
   return (
@@ -129,19 +128,5 @@ const MyRoutes = () => {
     </Routes>
   );
 };
-
-function RequireAuth({ children }: { children: JSX.Element }) {
-  const auth = useSelector<RootState>(store => store.auth) as { isLoading: boolean, isAuthenticated: boolean };
-  const location = useLocation();
-  if (auth.isLoading) {
-    return <em>Loading...</em>;
-  } else if (!auth.isAuthenticated) {
-    return <Navigate to={"/login"} state={{ from: location }} replace />;
-  } else {
-    return (
-      children
-    );
-  }
-}
 
 export default MyRoutes;

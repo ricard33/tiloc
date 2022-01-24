@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import PropTypes from 'prop-types';
 import validate from 'validate.js';
 import { makeStyles } from '@mui/styles';
 import {

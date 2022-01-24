@@ -5,7 +5,7 @@ import { NavLink as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
-import { List, ListItem, Button, colors } from '@mui/material';
+import { List, ListItem, colors } from '@mui/material';
 
 const useStyles = makeStyles(theme => ({
   root: {},

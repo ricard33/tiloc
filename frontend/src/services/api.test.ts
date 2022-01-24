@@ -1,5 +1,5 @@
 import { api, serviceURL } from './api';
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { setupApiStore } from "../common/testUtils2";
 import { auth as authReducer } from '../reducers';
 import { newPayment, payment, paymentsList } from "./testData";
