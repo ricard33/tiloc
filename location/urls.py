@@ -81,6 +81,6 @@ if settings.ENV == 'dev':
             relative_path = os.path.relpath(fullpath, public_path)
             # print(relative_path)
             urlpatterns.insert(-1, re_path(relative_path, never_cache(serve_static_file),
-                                       kwargs={'document_path': fullpath}))
+                                           kwargs={'document_path': fullpath}))
 
 urlpatterns.append(re_path(r'^', IndexPage.as_view(template_name="index.html"), name="home"))
