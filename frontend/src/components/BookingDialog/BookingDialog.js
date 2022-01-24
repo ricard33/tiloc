@@ -118,7 +118,7 @@ const BookingDialog = props => {
         //   source: { ...bookingChannels.filter(x => x.id === booking.source_id)[0] }
       };
 
-      const lodging = { ...lodgings.filter(x => x.id === booking.lodging_id)[0] };
+      lodging = { ...lodgings.filter(x => x.id === booking.lodging_id)[0] };
 
       // Provide defaults for new bookings
       // if (initialState.status_id === undefined) {
@@ -204,7 +204,8 @@ const BookingDialog = props => {
           return true;
         else {
           const formValues = getValues();
-          const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
+          const priceObj = computeBookingPrice(formValues.begin_date, formValues.end_date,
+            formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent);
           setMultipleValues(priceObj);
           // setBalance(priceObj.price - priceObj.deposit);
           // setValue('is_flat_rate', false);
@@ -244,7 +245,7 @@ const BookingDialog = props => {
     const duration = Number(newValue);
     const endDate = addDays(formValues.begin_date, duration);
     const priceObj = formValues.is_flat_rate ? { daily_rate: formValues.price / duration }
-      : computeBookingPrice(formValues.begin_date, endDate, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
+      : computeBookingPrice(formValues.begin_date, endDate, formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent);
     setMultipleValues(priceObj);
     setValue("end_date", endDate);
     return duration;
@@ -265,7 +266,7 @@ const BookingDialog = props => {
     };
     const duration = differenceInCalendarDays(newBooking.end_date, newBooking.begin_date);
     const priceObj = newBooking.is_flat_rate ? { daily_rate: newBooking.price / duration }
-      : computeBookingPrice(newBooking.begin_date, newBooking.end_date, lodging ? lodging.daily_rate : 0, 0, 0, [], depositPercent);
+      : computeBookingPrice(newBooking.begin_date, newBooking.end_date, formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent);
     setMultipleValues(priceObj);
     setValue("duration", duration);
     return newBooking[fieldName];
