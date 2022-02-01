@@ -1,38 +1,42 @@
 import React, { useEffect, useState } from "react";
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@mui/styles';
-import { Drawer } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import GroupIcon from '@mui/icons-material/Group';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import SettingsIcon from '@mui/icons-material/Settings';
-import CalendarIcon from '@mui/icons-material/CalendarToday';
-import ListIcon from '@mui/icons-material/List';
-import MoneyIcon from '@mui/icons-material/AttachMoney';
-import LocalLaundryServiceIcon from '@mui/icons-material/LocalLaundryService';
+import clsx from "clsx";
+import PropTypes from "prop-types";
+import { makeStyles } from "@mui/styles";
+import { Drawer } from "@mui/material";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import GroupIcon from "@mui/icons-material/Group";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MovingIcon from "@mui/icons-material/Moving";
+import CalendarIcon from "@mui/icons-material/CalendarToday";
+import ListIcon from "@mui/icons-material/List";
+import MoneyIcon from "@mui/icons-material/AttachMoney";
+import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 import { parseISO } from "date-fns";
 
-import { SidebarNav } from './components';
+import { SidebarNav } from "./components";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { formatDate } from "../../../../common/dateUtils";
+import { useLocation } from "react-router-dom";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 const useStyles = makeStyles(theme => ({
   drawer: {
     width: 160,
     marginTop: 48,
-    height: 'calc(100% - 48px)',
-    [theme.breakpoints.up('md')]: {
+    height: "calc(100% - 48px)",
+    [theme.breakpoints.up("md")]: {
       marginTop: 64,
-      height: 'calc(100% - 64px)'
+      height: "calc(100% - 64px)"
     }
   },
   root: {
     backgroundColor: theme.palette.white,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
     padding: theme.spacing(2)
   },
   divider: {
@@ -54,54 +58,114 @@ const Sidebar = props => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [version, setVersion] = useState({});
+  const location = useLocation();
+  const locationPathname = location.pathname;
 
-  const pages = [
+  const menus = [
     {
-      title: t('Dashboard'),
-      href: '/dashboard',
-      icon: <DashboardIcon />
+      url: "/reports",
+      pages: [
+        {
+          title: t('Back'),
+          href: '/',
+          icon: <ArrowBackIcon />,
+        },
+        {
+          title: t('Reports'),
+          href: '/reports',
+          icon: <BarChartIcon />,
+        },
+        {
+          title: t('Statistics'),
+          href: '/reports/stats',
+          icon: <MovingIcon />,
+        },
+      ]
     },
     {
-      title: t('Planning'),
-      href: '/planning',
-      icon: <CalendarIcon />
+      url: "/settings",
+      pages: [
+        {
+          title: t('Back'),
+          href: '/',
+          icon: <ArrowBackIcon />,
+        },
+        {
+          title: t('General parameters'),
+          href: '/settings/general',
+          icon: <SettingsIcon />,
+          disabled: true,
+        },
+        {
+          title: t('Contract templates'),
+          href: '/settings/contract-templates',
+          icon: <DashboardIcon />
+        },
+      ]
     },
     {
-      title: t('Bookings'),
-      href: '/bookings',
-      icon: <ListIcon />
-    },
-    {
-      title: t('Cleanings'),
-      href: {pathname: "https://docs.google.com/spreadsheets/d/1ucUML5Voeydfnss2udi4XZ-Yrb6p8qRXv7VPgAgGwjw/edit?usp=sharing" },
-      icon: <LocalLaundryServiceIcon />,
-      disabled: false,
-      external: true,
-    },
-    {
-      title: t('Prices'),
-      href: '/prices',
-      icon: <MoneyIcon />,
-      disabled: true,
-    },
-    {
-      title: t('Contacts'),
-      href: '/contacts',
-      icon: <GroupIcon />,
-      disabled: true,
-    },
-    {
-      title: t('My account'),
-      href: '/account',
-      icon: <AccountBoxIcon />,
-      disabled: true,
-    },
-    {
-      title: t('Settings'),
-      href: '/settings/',
-      icon: <SettingsIcon />
+      url: "/",
+      pages: [
+        {
+          title: t("Dashboard"),
+          href: "/",
+          icon: <DashboardIcon />
+        },
+        {
+          title: t("Planning"),
+          href: "/planning",
+          icon: <CalendarIcon />
+        },
+        {
+          title: t("Bookings"),
+          href: "/bookings",
+          icon: <ListIcon />
+        },
+        {
+          title: t("Cleanings"),
+          href: "https://docs.google.com/spreadsheets/d/1ucUML5Voeydfnss2udi4XZ-Yrb6p8qRXv7VPgAgGwjw/edit?usp=sharing",
+          icon: <LocalLaundryServiceIcon />,
+          disabled: false,
+          external: true
+        },
+        {
+          title: t("Reports"),
+          href: "/reports",
+          icon: <MovingIcon />,
+        },
+        {
+          title: t("Prices"),
+          href: "/prices",
+          icon: <MoneyIcon />,
+          disabled: true
+        },
+        {
+          title: t("Contacts"),
+          href: "/contacts",
+          icon: <GroupIcon />,
+          disabled: true
+        },
+        {
+          title: t("My account"),
+          href: "/account",
+          icon: <AccountBoxIcon />,
+          disabled: true
+        },
+        {
+          title: t("Settings"),
+          href: "/settings",
+          icon: <SettingsIcon />
+        }
+      ]
     }
   ];
+
+  const currentMenu = menus.filter((menu) =>
+    locationPathname === menu.url
+    || (locationPathname.startsWith(menu.url) &&
+      locationPathname.charAt(menu.url.length) === "/")
+    || menu.url === "/"
+  )[0];
 
   useEffect(() => {
     axios.get("/api/info/")
@@ -132,7 +196,7 @@ const Sidebar = props => {
         {/*<Divider className={classes.divider} />*/}
         <SidebarNav
           className={classes.nav}
-          pages={pages}
+          pages={currentMenu.pages}
           onClick={onClose}
         />
         {/*<UpgradePlan />*/}

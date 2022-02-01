@@ -21,110 +21,28 @@ import { RequireAuth } from "./components/RequireAuth";
 const MyRoutes = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Navigate to={"/dashboard"} replace />}
-      />
-      <Route
-        path="/login" element={
-          <MinimalLayout>
-            <SignIn />
-          </MinimalLayout>
-        }
-      />
-      <Route
-        path="/logged-out" element={
-          <MinimalLayout>
-            <LoggedOut />
-          </MinimalLayout>
-        }
-      />
-      <Route
-        path="/dashboard" element={
-          <RequireAuth>
-            <MainLayout>
-              <DashboardView />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/planning" element={
-          <RequireAuth>
-            <MainLayout>
-              <PlanningView />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/bookings" element={
-          <RequireAuth>
-            <MainLayout>
-              <BookingView />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/bookings/:bookingId/contract" element={
-          <RequireAuth>
-            <MainLayout>
-              <ContractEdit />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/settings/" element={
-          <RequireAuth>
-            <MainLayout>
-              <Settings />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/settings/contract-templates" element={
-          <RequireAuth>
-            <MainLayout>
-              <ContractTemplateList />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/settings/contract-templates/:templateId" element={
-          <RequireAuth>
-            <MainLayout>
-              <ContractTemplateEdit />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/test-page" element={
-          <RequireAuth>
-            <MainLayout>
-              <TestPage />
-            </MainLayout>
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/not-found" element={
-          <MinimalLayout>
-            <NotFoundView />
-          </MinimalLayout>
-        }
-      />
-      <Route
-        path="*" element={
-          <MinimalLayout>
-            <NotFoundView />
-          </MinimalLayout>
-        }
-      />
+      <Route element={<MinimalLayout />}>
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/logged-out" element={<LoggedOut />} />
+        <Route path="/not-found" element={<NotFoundView />} />
+        {/*<Route path="*" element={<NotFoundView />} />*/}
+      </Route>
+      <Route element={<RequireAuth />}>
+        <Route element={<MainLayout />}>
+          {/*<Route path="/" element={<Navigate to={"/dashboard"} replace />} />*/}
+          {/*<Route path="/dashboard" element={<DashboardView />} />*/}
+          <Route index element={<DashboardView />} />
+          <Route path="/planning" element={<PlanningView />} />
+          <Route path="/bookings" element={<BookingView />} />
+          <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
+          <Route path="/reports" element={<TestPage />} />
+          <Route path="/settings/" element={<Settings />} />
+          <Route path="/settings/contract-templates" element={<ContractTemplateList />} />
+          <Route path="/settings/contract-templates/:templateId" element={<ContractTemplateEdit />} />
+          <Route path="/test-page" element={<TestPage />} />
+          <Route path="*" element={<NotFoundView />} />
+        </Route>
+      </Route>
     </Routes>
   );
 };

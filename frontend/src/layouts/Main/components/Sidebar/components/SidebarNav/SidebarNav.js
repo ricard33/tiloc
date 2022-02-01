@@ -59,7 +59,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CustomNavLink = (props) => {
+const CustomNavLink = React.forwardRef((props, ref) => {
   const { className, disabled, ...rest } = props;
 
   const handleClick = (e) => {
@@ -68,13 +68,14 @@ const CustomNavLink = (props) => {
 
   return (
     <NavLink
+      ref={ref}
       className={className}
       style={{ flexGrow: 1 }}
       onClick={handleClick}
       {...rest}
     />
   );
-};
+});
 
 CustomNavLink.propTypes = {
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
@@ -98,15 +99,26 @@ const SidebarNav = props => {
           disableGutters
           key={page.title}
         >
-          <CustomNavLink
-            className={({ isActive }) => classes.button + (isActive ? (" " + classes.active) : "") + (page.disabled ? (" " + classes.disabled) : "")}
-            target={page.external ? "_blank" : ""}
-            to={page.href}
-            disabled={page.disabled}
-          >
-            <div className={classes.icon}>{page.icon}</div>
-            {page.title}
-          </CustomNavLink>
+          {page.external ?
+            <a
+              className={classes.button + (page.disabled ? (" " + classes.disabled) : "")}
+              target={"_blank"}
+              href={page.href} rel="noreferrer"
+            >
+              <div className={classes.icon}>{page.icon}</div>
+              {page.title}
+            </a>
+            :
+            <CustomNavLink
+              className={({ isActive }) => classes.button + (isActive ? (" " + classes.active) : "") + (page.disabled ? (" " + classes.disabled) : "")}
+              target={page.external ? "_blank" : ""}
+              to={page.href}
+              disabled={page.disabled}
+            >
+              <div className={classes.icon}>{page.icon}</div>
+              {page.title}
+            </CustomNavLink>
+          }
         </ListItem>
       ))}
     </List>

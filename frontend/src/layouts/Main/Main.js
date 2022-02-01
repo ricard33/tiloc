@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { makeStyles, useTheme } from "@mui/styles";
 import { Breadcrumbs, Link, Typography, useMediaQuery } from "@mui/material";
 import { Sidebar, Topbar, Footer } from "./components";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 
 
 const breadcrumbNameMap = {
@@ -95,7 +95,7 @@ const Main = props => {
             );
           })}
         </Breadcrumbs>
-        {children}
+        <Outlet />
         <Footer />
       </main>
     </div>
