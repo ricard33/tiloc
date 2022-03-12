@@ -23,7 +23,7 @@ jinja2==3.0.3
 JSON-log-formatter==0.5.1
 loggly-python-handler==1.0.1
 my-django-tweaks
-Pillow==9.0.0
+Pillow==9.0.1
 pdfkit==1.0.0
 requests==2.27.1
 smartconfigparser==1.0.0
