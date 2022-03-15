@@ -24,10 +24,10 @@ const Footer = props => {
         &copy;{' '}
         <Link
           component="a"
-          href="https://gecko-conception.fr/"
+          href="https://ti-gecko.fr/"
           target="_blank"
         >
-          Gecko Conception
+          Ti'Gecko
         </Link>
         . 2020-{new Date().getFullYear()}
       </Typography>

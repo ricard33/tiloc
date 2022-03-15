@@ -51,7 +51,7 @@ def export_calendar(request, uid):
         sync.save()
     else:
         logger.info("Full calendar requested for lodging [%s]", lodging.name)
-    c = Calendar(creator="-//Gecko Conception//Ti Loc//EN")
+    c = Calendar(creator="-//Ti'Gecko//Ti Loc//EN")
     c.extra.extend([
         ContentLine(name='CALSCALE', value='GREGORIAN')
     ])
@@ -95,7 +95,7 @@ def export_full_planning(request, owner_id=None):
     else:
         logger.info("Full planning requested")
 
-    c = Calendar(creator="-//Gecko Conception//Location")
+    c = Calendar(creator="-//Ti'Gecko//Location")
     for booking in qs.order_by('begin_date', 'lodging__rank'):
         e = Event()
         e.uid = str(booking.uid)
@@ -105,7 +105,7 @@ def export_full_planning(request, owner_id=None):
         e.end = booking.end_date
         e.description = booking.notes
         e.make_all_day()
-        c.events.add(e)
+        c.events.append(e)
     response = HttpResponse(c, content_type="text/calendar")
     response['Content-Disposition'] = 'attachment; filename="{}"'.format("planning.ics")
     return response
@@ -113,6 +113,11 @@ def export_full_planning(request, owner_id=None):
 
 @api_view(['GET', ])
 def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
+    sorted_data = get_filling_rate(begin, end)
+    return Response(sorted_data)
+
+
+def get_filling_rate(begin, end):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')
     data = {}
@@ -121,7 +126,7 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
                                              lodging__isnull=False)
     lodging_count = models.Lodging.objects.filter(active=True).count()
     for booking in bookings:
-        for d1, d2 in arrow.Arrow.interval('month', begin.floor('month'), end.ceil('month')):
+        for d1, d2 in arrow.Arrow.interval('month', begin.floor('month').datetime, end.ceil('month').datetime):
             days_in_month = d2.day
             d2 = d2.floor('day').shift(days=1)
             month = d1.format(fmt='YYYY-MM')
@@ -132,14 +137,13 @@ def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow
                 value['days'] = value['days'] + delta
                 if booking.duration > 0:
                     value['turnover'] = value['turnover'] + delta * booking.price / booking.duration
-
     keys = list(data.keys())
     keys.sort()
     sorted_data = []
     for k in keys:
         data[k]['rate'] = round(data[k]['days'] / data[k]['capacity'] * 100)
         sorted_data.append(data[k])
-    return Response(sorted_data)
+    return sorted_data
 
 
 @api_view(['GET', ])
