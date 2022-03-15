@@ -1,3 +1,6 @@
+[![Django CI](https://github.com/ricard33/tiloc/actions/workflows/django.yml/badge.svg)](https://github.com/ricard33/tiloc/actions/workflows/django.yml)
+[![React CI](https://github.com/ricard33/tiloc/actions/workflows/react.yml/badge.svg)](https://github.com/ricard33/tiloc/actions/workflows/react.yml)
+
 # Development commands
 
 ## Start development servers
