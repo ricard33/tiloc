@@ -225,6 +225,16 @@ const BookingDialog = props => {
           }
         }
         return 0;
+      case "commission_fees":
+        if (!data.target.value) {
+          // setBalance(0);
+        } else {
+          let commission_fees = Number(data.target.value);
+          if (commission_fees && commission_fees >= 0) {
+            return commission_fees;
+          }
+        }
+        return 0;
       case "adults":
       case "children":
       case "babies":
@@ -329,7 +339,12 @@ const BookingDialog = props => {
       ...data,
       begin_date: formatISO(data.begin_date),
       end_date: formatISO(data.end_date),
-      lodging_id: data.lodging_id > 0 ? data.lodging_id : null
+      lodging_id: data.lodging_id > 0 ? data.lodging_id : null,
+      daily_rate: data.daily_rate.toFixed(2),
+      price: data.price.toFixed(2),
+      deposit: data.deposit.toFixed(2),
+      guaranty: data.guaranty.toFixed(2),
+      commission_fees: data.commission_fees.toFixed(2),
     };
     const action = booking.id ? updateBooking : createBooking;
     action(submittedBooking).then((result) => {

@@ -41,7 +41,7 @@ class Owner(models.Model):
     payment = models.TextField(_("payment"), blank=True, null=True, help_text=_("Payment information"))
     billing = models.TextField(_("billing"), blank=True, null=True, help_text=_("Billing conditions"))
     no_vat = models.BooleanField(_("no vat"), )
-    vat_rate = models.DecimalField(_("vat rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    vat_rate = models.DecimalField(_("vat rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     note = models.TextField(_("note"), blank=True)
     invoice_label = models.CharField(_("invoice label"), max_length=30, choices=InvoiceLabel.choices,
                                      default=InvoiceLabel.RECEIPT)
@@ -68,13 +68,13 @@ class Lodging(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     rank = models.IntegerField(_("rank"), )
     address = models.TextField(_("address"), )
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2,
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2,
                                      help_text=_("Default price for one night"))
-    # weekly_rate = models.DecimalField(_("weekly price"), max_digits=10, decimal_places=2, null=True, blank=True)
-    guaranty = models.DecimalField(_("guaranty deposit"), max_digits=10, decimal_places=2, null=True, blank=True)
+    # weekly_rate = models.DecimalField(_("weekly price"), max_digits=20, decimal_places=2, null=True, blank=True)
+    guaranty = models.DecimalField(_("guaranty deposit"), max_digits=20, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
-    tourist_tax = models.DecimalField(_("tourist tax"), max_digits=10, decimal_places=2, null=True, blank=True)
+    tourist_tax = models.DecimalField(_("tourist tax"), max_digits=20, decimal_places=2, null=True, blank=True)
 
     contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
@@ -117,8 +117,8 @@ class Service(models.Model):
     reference = models.CharField(_("reference"), blank=True, null=True, max_length=20)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     designation = models.CharField(_("designation"), max_length=256)
-    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=10, decimal_places=2, blank=True, null=True)
-    vat = models.DecimalField(_("VAT %"), max_digits=10, decimal_places=2, blank=True, null=True)
+    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
+    vat = models.DecimalField(_("VAT %"), max_digits=20, decimal_places=2, blank=True, null=True)
     is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
                                        help_text=_("Use flat rate price instead of daily price computation"))
     included_in_booking = models.BooleanField(
@@ -203,14 +203,14 @@ class Booking(models.Model):
     children = models.PositiveSmallIntegerField(_("children"), default=0)
     babies = models.PositiveSmallIntegerField(_("babies"), default=0)
     catering = models.CharField(_("catering"), choices=Catering.choices, default=Catering.NONE, max_length=20)
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
-    price = models.DecimalField(_("price"), max_digits=10, decimal_places=2,
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(_("price"), max_digits=20, decimal_places=2,
                                 help_text=_("Total price, either computed by daily price or applying flat rate"))
     is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
                                        help_text=_("Use flat rate price instead of daily price computation if true"))
-    deposit = models.DecimalField(_("deposit"), max_digits=10, decimal_places=2, blank=True, null=True)
-    guaranty = models.DecimalField(_("guaranty"), max_digits=10, decimal_places=2, blank=True, null=True)
-    commission_fees = models.DecimalField(_("commission fees"), max_digits=10, decimal_places=2, blank=True, null=True)
+    deposit = models.DecimalField(_("deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
+    guaranty = models.DecimalField(_("guaranty"), max_digits=20, decimal_places=2, blank=True, null=True)
+    commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
 
     notes = models.TextField(_("Notes"), blank=True, null=True)
     options = models.ManyToManyField(Service, through='BookedService')
@@ -336,7 +336,7 @@ class ContractTemplate(models.Model):
 class BookedService(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=10, decimal_places=2, blank=True, null=True)
+    unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
     is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
                                        help_text=_("Use flat rate price instead of daily price computation"))
 
@@ -355,9 +355,9 @@ class Holidays(models.Model):
 
 class Pricing(models.Model):  # or RatePlan
     name = models.CharField(_("name"), max_length=256)
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
-    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=10, decimal_places=2, blank=True, null=True)
-    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
+    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
+    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
     included_guests = models.PositiveSmallIntegerField(_("Number of guests included in the price"))
     supplement_per_additional_guest = models.PositiveSmallIntegerField(
@@ -370,9 +370,9 @@ class SeasonalVariation(models.Model):
     name = models.CharField(_("name"), max_length=256)
     begin_date = models.DateField(_("begin date"), )
     end_date = models.DateField(_("end date"), )
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=10, decimal_places=2, blank=True, null=True)
-    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=10, decimal_places=2, blank=True, null=True)
-    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=10, decimal_places=2, blank=True, null=True)
+    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
+    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
+    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
 
 
@@ -388,7 +388,7 @@ class Payment(models.Model):
 
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     description = models.CharField(_("description"), max_length=255)
-    amount = models.DecimalField(_("amount"), max_digits=10, decimal_places=2)
+    amount = models.DecimalField(_("amount"), max_digits=20, decimal_places=2)
     method = models.CharField(_("Payment method"), max_length=30, choices=PaymentMethod.choices)
     date = models.DateField(_("Payment date"))
 
