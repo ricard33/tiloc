@@ -55,7 +55,7 @@ import './BookingDialog.scss';
 
 
 const BookingDialog = props => {
-  const { booking, lodgings, guests: allGuests, onClose, onOpenContract } = props;
+  const { booking, lodgings, guests: allGuests, onClose, onDelete, onOpenContract } = props;
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
@@ -307,30 +307,6 @@ const BookingDialog = props => {
 
   function onCancel() {
     onClose();
-  }
-
-  function onDelete() {
-    confirm({
-      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
-        guest_name: booking.guest_name,
-        lodging_name: booking.lodging ? booking.lodging.name : "-"
-      }),
-      description: t("Do you really want to permanently delete this booking?")
-    })
-      .then(() => {
-        deleteBooking(booking.id).then((result) => {
-          if (result.error) {
-            const error = result.error;
-            console.error("Error deleting booking", error);
-            showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
-          } else {
-            showSuccess(t("Booking deleted"));
-            onClose();
-          }
-        });
-      })
-      .catch(() => { /* ... */
-      });
   }
 
   function saveBooking(data, callback) {
@@ -695,6 +671,11 @@ const BookingDialog = props => {
                     </Grid>
                     {/* Deposit */}
                     <Grid item xs={12} className="flex-box-align-left">
+                      <Typography>
+                        {includedInPriceOptions ? t("Included options: {{amount}}", { amount: formatCurrency(includedInPriceOptions) }) : ""}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} className="flex-box-align-left">
                       <Controller
                         control={control}
                         name="deposit"
@@ -727,7 +708,7 @@ const BookingDialog = props => {
                       />
                       <div className="spacer" />
                       <Typography>
-                        {price ? t("Balance: {{amount}}", { amount: formatCurrency(price - deposit) }) : ""}
+                        {fullPrice ? t("Balance: {{amount}}", { amount: formatCurrency(fullPrice - deposit) }) : ""}
                       </Typography>
                     </Grid>
                     { /* commission fees */}
@@ -978,6 +959,7 @@ BookingDialog.propTypes = {
   })),
   lodgings: PropTypes.arrayOf(lodgingType),
   onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
   onOpenContract: PropTypes.func
 };
 

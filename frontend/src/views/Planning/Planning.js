@@ -114,6 +114,7 @@ const Planning = () => {
             showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
           } else {
             showSuccess(t("Booking deleted"));
+            handleCloseEdit();
           }
         });
       })
@@ -225,6 +226,7 @@ const Planning = () => {
         booking={editBooking}
         onClose={handleCloseEdit}
         onOpenContract={onEditContract}
+        onDelete={onDeleteBooking}
       />}
 
       <br/>
