@@ -6,13 +6,14 @@ from django.db import transaction
 from ics import Calendar
 
 from core import models
+from location import __date__, __version__
 
 logger = logging.getLogger("sync")
 
 
 def retrieve_ical(url) -> str:
     logger.debug("Requesting ical from %s" % url)
-    r = requests.get(url)
+    r = requests.get(url, headers={'User-agent': f'TiLoc {__version__} (build {__date__.isoformat(timespec="seconds")}'})
     if r.status_code != 200:
         logger.warning("HTTP Error requesting ical @ [%s]: [%d] %s", url, r.status_code, r.text)
         r.raise_for_status()

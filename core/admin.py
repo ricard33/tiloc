@@ -52,6 +52,7 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
                     'last_import_error')
     list_display_links = ('channel', 'lodging')
     list_filter = ('lodging', 'lodging__owner', 'channel', 'active')
+    list_editable = ('active',)
     actions = ['synchronize']
 
     def get_queryset(self, request):
