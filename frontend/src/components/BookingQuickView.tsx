@@ -66,6 +66,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
       </React.Fragment>}
       <span className={classes.label}>{t("Price:")}</span>
       <span className={classes.value}>{formatCurrency(booking.price_with_options)}</span>
+      { booking.deposit! > 0 && <React.Fragment>
+        <span className={classes.label}>{t("Deposit:")}</span>
+        <span className={classes.value}>{formatCurrency(booking.deposit)}</span></React.Fragment>}
       { booking.left_to_pay > 0 && <React.Fragment>
         <span className={classes.label}>{t("Left to pay:")}</span>
         <span className={classes.importantValue}>{formatCurrency(booking.left_to_pay)}</span></React.Fragment>}
