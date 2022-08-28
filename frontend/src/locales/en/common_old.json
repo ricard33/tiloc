@@ -1,7 +1,6 @@
 {
   "Duration": "Duration",
   "Details": "Details",
-  "nights": "nights",
   "{count} night": "{count} night",
   "{count} night_plural": "{count} nights",
   "Daily price": "Daily price",
@@ -24,5 +23,10 @@
   "{{count}} selected": "{{count}} selected",
   "{{count}} selected_plural": "{{count}} selected",
   "{{ duration }} nights - {{ count }} guests": "{{ duration }} nights - {{ count }} guests",
-  "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nights - {{ count }} guests"
+  "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nights - {{ count }} guests",
+  "Guest:": "Guest:",
+  "From:": "From:",
+  "To:": "To:",
+  "Nights:": "Nights:",
+  "Contact:": "Contact:"
 }

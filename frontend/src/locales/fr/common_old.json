@@ -1,7 +1,6 @@
 {
   "Duration": "Durée",
   "Details": "Détails",
-  "nights": "nuits",
   "{count} night": "{count} nuit",
   "{count} night_plural": "{count} nuits",
   "Daily price": "Tarif journalier",
@@ -23,5 +22,10 @@
   "{{count}} selected": "{{count}} sélectionné",
   "{{count}} selected_plural": "{{count}} sélectionnés",
   "{{ duration }} nights - {{ count }} guests": "{{ duration }} nuits - {{ count }} locataire",
-  "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nuits - {{ count }} locataires"
+  "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nuits - {{ count }} locataires",
+  "Guest:": "Client :",
+  "From:": "Du :",
+  "To:": "Au :",
+  "Nights:": "Nuits :",
+  "Contact:": "Contact :"
 }
