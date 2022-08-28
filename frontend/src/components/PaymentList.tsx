@@ -4,7 +4,8 @@ import TableRow from "@mui/material/TableRow";
 import { formatDate } from "../common/dateUtils";
 import { DecimalPrecision } from "../common/priceUtils";
 import IconButton from "@mui/material/IconButton";
-import { DeleteForever as DeleteIcon } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
+import EditIcon from "@mui/icons-material/Edit";
 import { parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Payment, paymentMethods } from "../types";
@@ -12,10 +13,11 @@ import { Payment, paymentMethods } from "../types";
 
 type PaymentListProps = {
   payments: Payment[];
-  onDelete: (payment: Payment) => void;
+  onModify?: (payment: Payment) => void;
+  onDelete?: (payment: Payment) => void;
 };
 
-const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDelete }: PaymentListProps) => {
+const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onModify, onDelete }: PaymentListProps) => {
   const { t } = useTranslation();
 
   function ccyFormat(num: number) {
@@ -39,18 +41,30 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onDe
             <TableCell>{paymentLabels[p.method]}</TableCell>
             <TableCell>{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>
             <TableCell>
-              <IconButton
+              {onModify && <IconButton
+                edge="end"
+                aria-label="edit"
+                sx={{
+                  color: "blue",
+                  margin: 0
+                }}
+                onClick={() => onModify(p)}
+                size="large"
+              >
+                <EditIcon />
+              </IconButton>}
+              {onDelete && <IconButton
                 edge="end"
                 aria-label="delete"
                 sx={{
                   color: "red",
-                  margin: 0,
+                  margin: 0
                 }}
                 onClick={() => onDelete(p)}
                 size="large"
               >
                 <DeleteIcon />
-              </IconButton>
+              </IconButton>}
             </TableCell>
           </TableRow>
         ))}

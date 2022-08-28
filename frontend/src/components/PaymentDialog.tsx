@@ -43,20 +43,20 @@ const useStyles = makeStyles((/*theme: Theme*/) => ({
 }));
 
 type Props = {
-  open: boolean;
+  payment?: Payment;
   bookingId: number;
-  onAdd: (payment: Payment) => void;
+  onValidate: (payment: Payment) => void;
   onClose: () => void;
 };
 
-const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd, onClose }: Props) => {
+const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onValidate, onClose }: Props) => {
   const classes = useStyles();
   const { t } = useTranslation();
   const { register, handleSubmit, control, formState: { errors } } = useForm<Payment>();
   const onSubmit: SubmitHandler<Payment> = data => {
     // noinspection SuspiciousTypeOfGuard
     const date = typeof data.date === "string" ? parseISO(data.date) : data.date;
-    onAdd({
+    onValidate({
       ...data,
       date: formatISO(date),
       amount: Number(data.amount)
@@ -72,21 +72,24 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
   }
 
   return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="md">
-      <DialogTitle id="form-dialog-title">{t("Add payment")}</DialogTitle>
+    <Dialog open={payment !== null} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="md">
+      <DialogTitle id="form-dialog-title">{payment!.id ? t("Modify payment") : t("Add payment")}</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <input
             type="hidden"
             {...register("booking")}
-            defaultValue={bookingId}
+            defaultValue={payment!.booking}
           />
           <Controller
             name="date"
             control={control}
-            defaultValue={new Date().toISOString()}
+            defaultValue={payment!.id ? payment!.date : new Date().toISOString()}
             render={({ field }) =>
               <DatePicker
+                label={t("date")}
+                openTo="month"
+                views={['year', 'month', 'day']}
                 inputFormat="dd/MM/yyyy"
                 renderInput={(props) => <TextField label={t("date")} variant={variant} {...props} />}
                 className={classes.date}
@@ -96,13 +99,14 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
           <Controller
             name="description"
             control={control}
-            defaultValue={""}
+            defaultValue={payment!.id ? payment!.description : ""}
             rules={{ required: true }}
             render={({ field }) =>
               <TextField
                 label={t("description")}
                 variant={variant}
                 className={classes.description}
+                onKeyPress={handleKeyPress}
                 error={!!errors.description}
                 helperText={errors.description?.type === "required" && t("The description is required")}
                 {...field}
@@ -111,7 +115,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
           <Controller
             name="method"
             control={control}
-            defaultValue={""}
+            defaultValue={payment!.id ? payment!.method : ""}
             rules={{ required: true }}
             render={({ field }) =>
               <TextField
@@ -129,7 +133,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
           <Controller
             name="amount"
             control={control}
-            defaultValue={0}
+            defaultValue={payment!.id ? payment!.amount : 0}
             rules={{ required: true }}
             render={({ field }) =>
               <TextField
@@ -154,7 +158,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ open, bookingId, onAdd,
           {t("Cancel")}
         </Button>
         <Button onClick={handleSubmit(onSubmit)} color="primary" type="submit">
-          {t("Add")}
+          {payment!.id ? t("Modify") : t("Add")}
         </Button>
       </DialogActions>
     </Dialog>

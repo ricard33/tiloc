@@ -8,9 +8,15 @@ import IconButton from "@mui/material/IconButton";
 import { AddCircle as AddIcon } from "@mui/icons-material";
 import PaymentDialog from "./PaymentDialog";
 import { Payment } from "../types";
-import { useCreatePaymentMutation, useDeletePaymentMutation, useGetPaymentsForBookingQuery } from "../services/api";
+import {
+  useCreatePaymentMutation,
+  useDeletePaymentMutation,
+  useGetPaymentsForBookingQuery,
+  useUpdatePaymentMutation
+} from "../services/api";
 import { useAlert } from "../common/alertUtils";
 import { fetchErrorDecode } from "../common/apiUtils";
+import { shiftUTCDateToLocalDate } from "../common/tzUtils";
 
 type PaymentListProps = {
   bookingId: number;
@@ -19,13 +25,14 @@ type PaymentListProps = {
 
 const Payments: React.FunctionComponent<PaymentListProps> = ({
   bookingId,
-  onPaymentsUpdate,
+  onPaymentsUpdate
 }: PaymentListProps) => {
-  const [open, setOpen] = useState(false);
+  const [edited, setEdited] = useState<Payment | null>(null);
   const confirm = useConfirm();
   const { t } = useTranslation();
   const { data } = useGetPaymentsForBookingQuery(bookingId);
   const [createPayment] = useCreatePaymentMutation();
+  const [updatePayment] = useUpdatePaymentMutation();
   const [deletePayment] = useDeletePaymentMutation();
   const { showError, showSuccess } = useAlert();
 
@@ -36,19 +43,48 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
     });
   }
 
-  function onCreatePayment(payment: Payment) {
-    createPayment(payment).then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        console.error("Error during payment creation", error);
-        showError(t("Impossible to create payment: ") + fetchErrorDecode(error));
-      } else {
-        totalPaid += payment.amount;
-        if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
-        setOpen(false);
-        showSuccess(t("Payment added"));
-      }
+  function onAddPayment() {
+    setEdited({
+      booking: bookingId,
+      date: shiftUTCDateToLocalDate(new Date()).toISOString(),
+      description: "",
+      method: "",
+      amount: 0,
     });
+  }
+
+  function onCreateorModifyPayment(payment: Payment) {
+    if(!edited) {
+      createPayment(payment).then((result) => {
+        if ((result as any).error) {
+          const error = (result as any).error;
+          console.error("Error during payment creation", error);
+          showError(t("Impossible to create payment: ") + fetchErrorDecode(error));
+        } else {
+          totalPaid += payment.amount;
+          if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
+          setEdited(null);
+          showSuccess(t("Payment added"));
+        }
+      });
+    } else {
+      updatePayment({...edited, ...payment}).then((result) => {
+        if ((result as any).error) {
+          const error = (result as any).error;
+          console.error("Error during payment change", error);
+          showError(t("Impossible to modify payment: ") + fetchErrorDecode(error));
+        } else {
+          totalPaid += payment.amount - edited.amount;
+          if (onPaymentsUpdate) onPaymentsUpdate(totalPaid);
+          setEdited(null);
+          showSuccess(t("Payment changed"));
+        }
+      });
+    }
+  }
+
+  function onEditPayment(payment: Payment) {
+    setEdited(payment);
   }
 
   function onDeletePayment(payment: Payment) {
@@ -76,22 +112,23 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   }
 
   function onClose() {
-    setOpen(false);
+    setEdited(null);
   }
 
   return (
     <div>
-      <PaymentList payments={data ? data.results : []} onDelete={onDeletePayment} />
+      <PaymentList payments={data ? data.results : []} onModify={onEditPayment} onDelete={onDeletePayment} />
       <IconButton
         edge="end"
         aria-label="delete"
         color="primary"
-        onClick={() => setOpen(true)}
+        onClick={onAddPayment}
         size="large"
       >
         <AddIcon />{t("Add payment")}
       </IconButton>
-      {open && <PaymentDialog open={open} bookingId={bookingId} onAdd={onCreatePayment} onClose={onClose} />}
+      {edited !== null &&
+        <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateorModifyPayment} onClose={onClose} />}
     </div>
   );
 };
