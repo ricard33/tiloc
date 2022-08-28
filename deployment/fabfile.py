@@ -176,11 +176,17 @@ def prepare_frontend_env(c):
         c.local('yarn install --pure-lockfile')
         c.local('npm rebuild node-sass')
 
+@task
+def update_browserlist(c):
+    with c.cd(os.path.join(WORKSPACE, 'frontend')):
+        c.local('npx browserslist@latest --update-db')
+
 
 @task
 def build_frontend(c, only_sources=False):
     if not only_sources:
         prepare_frontend_env(c)
+        update_browserlist(c)
     with c.cd(os.path.join(WORKSPACE, 'frontend')):
         # print(os.environ)
         # c.local('env', replace_env=False)
