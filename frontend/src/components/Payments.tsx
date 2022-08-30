@@ -54,7 +54,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   }
 
   function onCreateorModifyPayment(payment: Payment) {
-    if(!edited) {
+    if(!edited || !edited.id) {
       createPayment(payment).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
