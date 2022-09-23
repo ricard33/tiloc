@@ -172,6 +172,7 @@ class BookingNoPriceSerializer(BookingSerializer):
     total_payments = None
     left_to_pay = None
     price_with_options = None
+
     class Meta:
         model = models.Booking
         exclude = ['price',

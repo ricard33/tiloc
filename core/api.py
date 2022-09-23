@@ -26,11 +26,11 @@ from . import models
 from .filters import BookingFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
-from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingSerializer,
-                          BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
-                          GuestSerializer, HolidaysSerializer, LodgingSerializer, LoginUserSerializer,
-                          NextEventSerializer, OwnerSerializer, PaymentSerializer, PricingSerializer,
-                          SeasonalVariationSerializer, ServiceSerializer, UserSerializer, BookingNoPriceSerializer)
+from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingNoPriceSerializer,
+                          BookingSerializer, BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer,
+                          CreateUserSerializer, GuestSerializer, HolidaysSerializer, LodgingSerializer,
+                          LoginUserSerializer, NextEventSerializer, OwnerSerializer, PaymentSerializer,
+                          PricingSerializer, SeasonalVariationSerializer, ServiceSerializer, UserSerializer)
 
 logger = logging.getLogger('api')
 
@@ -120,7 +120,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     filterset_class = BookingFilter
 
     def get_serializer_class(self):
-        if not self.request.user.has_perm('core.view_prices') :
+        if not self.request.user.has_perm('core.view_prices'):
             return BookingNoPriceSerializer
         return BookingSerializer
 
