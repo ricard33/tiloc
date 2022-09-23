@@ -12,6 +12,7 @@ import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import { useNavigate } from "react-router-dom";
 import { endOfMonth, startOfMonth } from "date-fns";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -52,6 +53,9 @@ const BookingList = () => {
     guest_name__icontains: search,
     for_dates: dateFilter
   });
+  const user = useSelector(store => store.auth.user);
+  const canAdd = user.permissions.includes("core.add_booking");
+  const showPayments = user.permissions.includes("core.view_payment");
   const navigate = useNavigate();
 
 
@@ -110,7 +114,7 @@ const BookingList = () => {
   return (
     <div className={classes.root}>
       <BookingsToolbar
-        numSelected={numSelected} onCreateBooking={onCreateBooking} onSearch={onSearch}
+        numSelected={numSelected} onCreateBooking={canAdd ? onCreateBooking : undefined} onSearch={onSearch}
         dateRange={dateRange} onDateRangeChange={onDateRangeChange}
       />
       <div className={classes.content}>

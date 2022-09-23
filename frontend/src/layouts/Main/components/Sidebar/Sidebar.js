@@ -121,13 +121,13 @@ const Sidebar = props => {
           href: "/bookings",
           icon: <ListIcon />
         },
-        {
-          title: t("Cleanings"),
-          href: "https://docs.google.com/spreadsheets/d/1ucUML5Voeydfnss2udi4XZ-Yrb6p8qRXv7VPgAgGwjw/edit?usp=sharing",
-          icon: <LocalLaundryServiceIcon />,
-          disabled: false,
-          external: true
-        },
+        // {
+        //   title: t("Cleanings"),
+        //   href: "https://docs.google.com/spreadsheets/d/1ucUML5Voeydfnss2udi4XZ-Yrb6p8qRXv7VPgAgGwjw/edit?usp=sharing",
+        //   icon: <LocalLaundryServiceIcon />,
+        //   disabled: false,
+        //   external: true
+        // },
         {
           title: t("Reports"),
           href: "/reports",

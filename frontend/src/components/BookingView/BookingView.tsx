@@ -1,10 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Booking } from "../../types";
+import { Booking, User } from "../../types";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Grid, Button, Typography } from "@mui/material";
 import { DeleteForever as DeleteIcon, PictureAsPdf as PdfIcon, Edit as EditIcon } from "@mui/icons-material";
 import useWindowDimensions from "../../common/windowDimensions";
 import BookingQuickView from "../BookingQuickView";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 
 type BookingViewProps = {
@@ -19,6 +21,10 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
   ...props
 }: BookingViewProps) => {
   const { booking, onClose, onEdit, onDelete, onOpenContract } = props;
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canEdit = user.permissions.includes("core.change_booking");
+  const canDelete = user.permissions.includes("core.delete_booking");
+  const canViewContract = user.permissions.includes("core.view_contract");
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
 
@@ -42,7 +48,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       <DialogActions>
         <Grid container justifyContent="space-between">
           <Grid item>
-            {booking && booking.id &&
+            {booking && booking.id && canDelete &&
             <Button
               type="button"
               className="delete-button"
@@ -52,7 +58,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
             >{t("Delete")}</Button>}
           </Grid>
           <Grid item>
-            {onOpenContract &&
+            {onOpenContract &&  canViewContract &&
             <Button
               type="button"
               disabled={!booking || !booking.id}
@@ -63,13 +69,14 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
           </Grid>
           <Grid item>
             <Button type="button" onClick={onClose}>{t("Close")}</Button>
-            <Button
-              type="submit"
-              color="primary"
-              className="button"
-              startIcon={<EditIcon />}
-              onClick={onEdit}
-            >{t("Edit")}</Button>
+            {canEdit &&
+              <Button
+                type="submit"
+                color="primary"
+                className="button"
+                startIcon={<EditIcon />}
+                onClick={onEdit}
+              >{t("Edit")}</Button>}
           </Grid>
         </Grid>
       </DialogActions>

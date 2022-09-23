@@ -34,13 +34,18 @@ class LoginUserSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
+        # fields = ('id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
+        fields = '__all__'
 
     def get_full_name(self, user):
         return user.get_full_name()
+
+    def get_permissions(self, user):
+        return user.get_all_permissions()
 
 
 class OwnerSerializer(serializers.ModelSerializer):
@@ -161,6 +166,16 @@ class BookingSerializer(serializers.ModelSerializer):
         to_remove_service_ids = instance.options.exclude(id__in=all_service_ids).values_list('id', flat=True)
         instance.options.remove(*to_remove_service_ids)
         return instance
+
+
+class BookingNoPriceSerializer(BookingSerializer):
+    total_payments = None
+    left_to_pay = None
+    price_with_options = None
+    class Meta:
+        model = models.Booking
+        exclude = ['price',
+                   'daily_rate', 'is_flat_rate', 'deposit', 'guaranty', 'commission_fees']
 
 
 class HolidaysSerializer(serializers.ModelSerializer):

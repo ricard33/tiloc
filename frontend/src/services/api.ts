@@ -365,8 +365,11 @@ export const {
   useNextEventsQuery,
 
   useGetPaymentsForBookingQuery,
+  useLazyGetPaymentsForBookingQuery,
   useGetPaymentQuery,
+  useLazyGetPaymentQuery,
   useListPaymentsQuery,
+  useLazyListPaymentsQuery,
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
   useDeletePaymentMutation,

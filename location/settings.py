@@ -240,7 +240,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.SessionAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES':     [
-        'rest_framework.permissions.IsAuthenticated',
+        'core.permissions.TiLocPermissions',
     ],
     'DEFAULT_PAGINATION_CLASS':       'core.pagination.StandardResultsSetPagination',
     'PAGE_SIZE':                      100,

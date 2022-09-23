@@ -7,7 +7,7 @@ import { parseISO } from "date-fns";
 import IconButton from "@mui/material/IconButton";
 import { AddCircle as AddIcon } from "@mui/icons-material";
 import PaymentDialog from "./PaymentDialog";
-import { Payment } from "../types";
+import { Payment, User } from "../types";
 import {
   useCreatePaymentMutation,
   useDeletePaymentMutation,
@@ -17,6 +17,8 @@ import {
 import { useAlert } from "../common/alertUtils";
 import { fetchErrorDecode } from "../common/apiUtils";
 import { shiftUTCDateToLocalDate } from "../common/tzUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 type PaymentListProps = {
   bookingId: number;
@@ -35,6 +37,8 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   const [updatePayment] = useUpdatePaymentMutation();
   const [deletePayment] = useDeletePaymentMutation();
   const { showError, showSuccess } = useAlert();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const showPayments = user.permissions.includes('core.view_payment')
 
   let totalPaid = 0;
   if (data) {
@@ -117,19 +121,20 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
 
   return (
     <div>
-      <PaymentList payments={data ? data.results : []} onModify={onEditPayment} onDelete={onDeletePayment} />
-      <IconButton
-        edge="end"
-        aria-label="delete"
-        color="primary"
-        onClick={onAddPayment}
-        size="large"
-      >
-        <AddIcon />{t("Add payment")}
-      </IconButton>
-      {edited !== null &&
+      {showPayments && <>
+        <PaymentList payments={data ? data.results : []} onModify={onEditPayment} onDelete={onDeletePayment} />
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          color="primary"
+          onClick={onAddPayment}
+          size="large"
+        >
+          <AddIcon />{t("Add payment")}
+        </IconButton>
+        {edited !== null &&
         <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateorModifyPayment} onClose={onClose} />}
-    </div>
+      </>}</div>
   );
 };
 

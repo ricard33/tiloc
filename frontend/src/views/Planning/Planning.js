@@ -26,6 +26,7 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import "./Planning.scss";
+import { useSelector } from "react-redux";
 
 
 const Planning = () => {
@@ -53,6 +54,10 @@ const Planning = () => {
     showPaymentStatus: true,
     monthsToDisplay: 12,
   });
+  const user = useSelector(store => store.auth.user);
+  const canAdd = user.permissions.includes("core.add_booking");
+  const canDelete = user.permissions.includes("core.delete_booking");
+  const canViewContract = user.permissions.includes("core.view_contract");
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -98,6 +103,7 @@ const Planning = () => {
   };
 
   const onDeleteBooking = (booking) => {
+    if(!canDelete) return;
     confirm({
       title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
         guest_name: booking.guest_name,
@@ -150,7 +156,7 @@ const Planning = () => {
           className="delete-button"
           color="secondary"
           onClick={() => onDeleteBooking(selected)}
-          disabled={!selected}
+          disabled={!canDelete || !selected}
           size="large"
         ><DeleteIcon/></IconButton>
         <IconButton
@@ -158,7 +164,7 @@ const Planning = () => {
           color="default"
           onClick={() => onEditContract(selected)}
           title={t("Contract")}
-          disabled={!selected}
+          disabled={!canViewContract && !selected}
           size="large"
         ><DescriptionIcon/></IconButton>
         <IconButton
@@ -184,7 +190,7 @@ const Planning = () => {
         bookings={bookings ?? []}
         lodgings={[...(lodgings ?? [])]}
         beginDate={beginDate}
-        onCreateBooking={onCreateBooking}
+        onCreateBooking={canAdd ? onCreateBooking : undefined}
         onOpenBooking={onEditBooking}
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}

@@ -15,6 +15,7 @@ import { EnhancedTableHead } from "../../../components";
 import Button from "@mui/material/Button";
 import { formatDate } from "../../../common/dateUtils";
 import { parseISO } from "date-fns";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -36,6 +37,8 @@ const BookingsTable = props => {
   const { t } = useTranslation();
   const classes = useStyles();
   const [selectedBookings, setSelectedUsers] = useState([]);
+  const user = useSelector(store => store.auth.user);
+  const showPayments = user.permissions.includes("core.view_payment");
 
   const handleSelectAll = event => {
     const { bookings } = props;
@@ -118,7 +121,7 @@ const BookingsTable = props => {
           { id: "guest_name", numeric: false, disablePadding: false, label: t("Guest") },
           { id: "lodging", numeric: false, disablePadding: false, label: t("Lodging") },
           { id: "status", numeric: false, disablePadding: false, label: t("Status") },
-          { id: "price", numeric: false, disablePadding: false, label: t("Price") },
+          ...(showPayments ? [{ id: "price", numeric: false, disablePadding: false, label: t("Price") }] : []),
           { id: "action", numeric: false, disablePadding: false, label: t("Actions") }
         ]}
         numSelected={selectedBookings.length}
@@ -165,7 +168,7 @@ const BookingsTable = props => {
                 {booking.lodging ? booking.lodging.name : ""}
               </TableCell>
               <TableCell>{booking.status.name}</TableCell>
-              <TableCell>{booking.price}</TableCell>
+              {showPayments && <TableCell>{booking.price}</TableCell>}
               <TableCell>
                 {onEdit && (<Button onClick={event => handleRowClick(event, booking)}>
                   <EditIcon />

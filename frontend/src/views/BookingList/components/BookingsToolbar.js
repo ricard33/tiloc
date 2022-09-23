@@ -108,6 +108,7 @@ const BookingsToolbar = props => {
         <Button
           // color="primary"
           // variant="contained"
+          disabled={!onCreateBooking}
           onClick={onCreateBooking}
         >
           {t("Add booking")}

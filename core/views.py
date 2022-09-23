@@ -13,7 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core import models
@@ -112,12 +113,13 @@ def export_full_planning(request, owner_id=None):
 
 
 @api_view(['GET', ])
+@permission_classes([IsAuthenticated])
 def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
-    sorted_data = get_filling_rate(begin, end)
+    sorted_data = get_filling_rate(begin, end, with_turnover=request.user.has_perm('core.view_prices'))
     return Response(sorted_data)
 
 
-def get_filling_rate(begin, end):
+def get_filling_rate(begin, end, with_turnover=True):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')
     data = {}
@@ -135,18 +137,21 @@ def get_filling_rate(begin, end):
                                             'capacity': days_in_month * lodging_count})
             if delta > 0:
                 value['days'] = value['days'] + delta
-                if booking.duration > 0:
+                if with_turnover and booking.duration > 0:
                     value['turnover'] = value['turnover'] + delta * booking.price / booking.duration
     keys = list(data.keys())
     keys.sort()
     sorted_data = []
     for k in keys:
         data[k]['rate'] = round(data[k]['days'] / data[k]['capacity'] * 100)
+        if not with_turnover:
+            del data[k]['turnover']
         sorted_data.append(data[k])
     return sorted_data
 
 
 @api_view(['GET', ])
+@permission_classes([IsAuthenticated])
 def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arrow.utcnow().shift(years=5)):
     begin = arrow.get(begin).floor('month')
     end = arrow.get(end).ceil('month')

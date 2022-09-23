@@ -12,6 +12,7 @@ export interface User {
   last_name: string;
   full_name: string;
   email: string;
+  permissions: string[];
 }
 
 export interface Owner {

@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
 import { parseISO } from "date-fns";
-import { FieldArrayWithId } from "react-hook-form";
-import { Booking, Lodging, Service } from "../types";
+import { Booking, Service, User } from "../types";
 import { Grid } from "@mui/material";
 import "./BookingQuickView.scss";
 import PaymentList from "./PaymentList";
-import { useGetPaymentsForBookingQuery } from "../services/api";
+import {  useLazyGetPaymentsForBookingQuery } from "../services/api";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 type BookingQuickViewProps = {
   booking: Booking;
@@ -17,12 +18,20 @@ type BookingQuickViewProps = {
 const BookingQuickView = (props: BookingQuickViewProps) => {
   const { booking } = props;
   const { t } = useTranslation();
-  const { data } = useGetPaymentsForBookingQuery(booking.id!);
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const showPayments = user.permissions.includes("core.view_payment");
+  const [triggerPayments, { data }] = useLazyGetPaymentsForBookingQuery();
 
   const detectPhoneAndMail = (str: string) => {
     const s1 = str.replace(/([\w._-]+@[\w.-]+\.[\w-]+)/g, "<a href=\"mailto:$1\">$1</a>");
     return s1.replace(/(([+][\s./0-9]*)?[(]?[0-9]{1,4}[)]?[0-9][-\s./0-9]{6,12}[0-9])/g, "<a href=\"tel:$1\">$1</a>");
   };
+
+  useEffect(() => {
+    if (showPayments && booking.id)
+      triggerPayments(booking.id);
+  }, [booking.id, showPayments, triggerPayments]);
+
 
   return (
     <Grid container className="booking-quick-view">
@@ -47,8 +56,8 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
         <div className="value">{booking.status.name}</div>
         <div className="label">{t("Lodging:")}</div>
         <div className="important-value">{booking.lodging ? booking.lodging.name : t("Cancellation / Waiting")}</div>
-        <div className="label">{t("Price:")}</div>
-        <div className="important-value">{formatCurrency(booking.price_with_options)}</div>
+        { showPayments && <React.Fragment><div className="label">{t("Price:")}</div>
+          <div className="important-value">{formatCurrency(booking.price_with_options)}</div></React.Fragment>}
       </Grid>
       <Grid item xs={8}>
         <div className="label">{t("Guest name:")}</div>
@@ -61,44 +70,46 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
           : ""}
         {booking.guest_contact ?
           <React.Fragment>
-            <div className="value">{booking.guest_contact.match(/[^\r\n]+/g)!.map(s => <div
-              dangerouslySetInnerHTML={{ __html: detectPhoneAndMail(s) }}
-            />)}</div>
+            <div className="value">{booking.guest_contact.match(/[^\r\n]+/g)!.map((s, index) =>
+              // eslint-disable-next-line react/no-danger
+              <div key={index} dangerouslySetInnerHTML={{ __html: detectPhoneAndMail(s) }} />)}</div>
           </React.Fragment>
           : ""}
         {booking.notes ?
           <React.Fragment>
             <div className="label">{t("Remarks:")}</div>
-            <div className="value">{booking.notes.match(/[^\r\n]+/g)!.map(s =>
-              <React.Fragment>{s}<br /></React.Fragment>)}</div>
+            <div className="value">{booking.notes.match(/[^\r\n]+/g)!.map((s, index) =>
+              <React.Fragment key={index}>{s}<br /></React.Fragment>)}</div>
           </React.Fragment>
           : ""}
 
         <div className="label">{t("Options:")}</div>
         {booking.options && <React.Fragment>
           <div className="value">{booking.options.map((option: Service, index: number) => (
-            <li>{option.designation}</li>
+            <li key={option.id}>{option.designation}</li>
           ))
           }</div>
         </React.Fragment>}
 
         <Grid container>
           <Grid item xs={6}>
-            <div className="label">{t("Price:")}</div>
-            <div className="value">{formatCurrency(booking.price_with_options)}</div>
+            { showPayments && <React.Fragment>
+              <div className="label">{t("Price:")}</div>
+              <div className="value">{formatCurrency(booking.price_with_options)}</div>
+            </React.Fragment>}
           </Grid>
           <Grid item xs={6}>
-            {booking.deposit! > 0 && <React.Fragment>
+            {showPayments && booking.deposit! > 0 && <React.Fragment>
               <div className="label">{t("Deposit:")}</div>
               <div className="value">{formatCurrency(booking.deposit)}</div>
             </React.Fragment>}
           </Grid>
           <Grid item xs={6}>
-            {booking.left_to_pay > 0 && <React.Fragment>
+            {showPayments && booking.left_to_pay > 0 && <React.Fragment>
               <div className="label">{t("Left to pay:")}</div>
               <div className="important-value">{formatCurrency(booking.left_to_pay)}</div>
             </React.Fragment>}
-            {booking.left_to_pay < 0 && <React.Fragment>
+            {showPayments && booking.left_to_pay < 0 && <React.Fragment>
               <div className="label">{t("Too perceived:")}</div>
               <div className="value">{formatCurrency(-booking.left_to_pay)}</div>
             </React.Fragment>}
@@ -109,11 +120,13 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
           </Grid>
         </Grid>
 
-        <div className="label">{t("Payments:")}</div>
-        <div className="value">
-          <PaymentList payments={data ? data.results : []} />
-        </div>
-
+        {showPayments && <>
+          <div className="label">{t("Payments:")}</div>
+          <div className="value">
+            <PaymentList payments={data && data.results ? data.results : []} />
+          </div>
+        </>
+        }
 
       </Grid>
     </Grid>

@@ -30,7 +30,7 @@ from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer
                           BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer, CreateUserSerializer,
                           GuestSerializer, HolidaysSerializer, LodgingSerializer, LoginUserSerializer,
                           NextEventSerializer, OwnerSerializer, PaymentSerializer, PricingSerializer,
-                          SeasonalVariationSerializer, ServiceSerializer, UserSerializer)
+                          SeasonalVariationSerializer, ServiceSerializer, UserSerializer, BookingNoPriceSerializer)
 
 logger = logging.getLogger('api')
 
@@ -118,6 +118,11 @@ class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
     filterset_class = BookingFilter
+
+    def get_serializer_class(self):
+        if not self.request.user.has_perm('core.view_prices') :
+            return BookingNoPriceSerializer
+        return BookingSerializer
 
     @action(detail=False, methods=['get'])
     def all_guests(self, request, pk=None):

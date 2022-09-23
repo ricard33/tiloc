@@ -222,6 +222,9 @@ class Booking(models.Model):
     class Meta:
         verbose_name = _("Booking")
         ordering = ('-begin_date',)
+        permissions = [
+            ("view_prices", "Can view prices informations"),
+        ]
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
