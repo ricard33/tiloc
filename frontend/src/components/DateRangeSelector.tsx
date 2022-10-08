@@ -29,9 +29,17 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
   const today = new Date();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [range, setRange] = useState<DateRange>({startDate, endDate});
+  const maxDate = new Date(2100,12,31);
+  const minDate = new Date(2000,1,1);
+
 
 
   const defaultRanges = [
+    {
+      label: t('All'),
+      startDate: minDate,
+      endDate: maxDate,
+    },
     {
       label: t('Today'),
       startDate: today,
@@ -117,6 +125,8 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
           onChange={handleChange}
           definedRanges={defaultRanges}
           initialDateRange={range}
+          minDate={minDate}
+          maxDate={maxDate}
           locale={frLocale}
         />
       </Popover>
