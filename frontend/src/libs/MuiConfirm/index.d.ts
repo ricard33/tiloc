@@ -14,6 +14,7 @@ export interface ConfirmOptions {
 }
 
 export interface ConfirmProviderProps {
+  children: React.ReactNode;
   defaultOptions?: ConfirmOptions;
 }
 

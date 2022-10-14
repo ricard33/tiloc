@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 
 export interface Props extends RouterProps {
-  layout: React.FunctionComponent,
+  layout: React.FunctionComponent<React.PropsWithChildren>,
   needAuthentication?: boolean,
 }
 
