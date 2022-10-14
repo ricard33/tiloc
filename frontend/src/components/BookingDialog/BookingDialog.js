@@ -44,7 +44,7 @@ import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
 import {
-  useCreateBookingMutation, useDeleteBookingMutation,
+  useCreateBookingMutation,
   useListBookingChannelsQuery,
   useListBookingStatusesQuery,
   useUpdateBookingMutation
@@ -63,7 +63,6 @@ const BookingDialog = props => {
   const { data: bookingChannels } = useListBookingChannelsQuery();
   const [ createBooking ] = useCreateBookingMutation();
   const [ updateBooking ] = useUpdateBookingMutation();
-  const [ deleteBooking ] = useDeleteBookingMutation();
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const confirm = useConfirm();
   const variant = "filled";

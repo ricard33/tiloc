@@ -55,7 +55,6 @@ const BookingList = () => {
   });
   const user = useSelector(store => store.auth.user);
   const canAdd = user.permissions.includes("core.add_booking");
-  const showPayments = user.permissions.includes("core.view_payment");
   const navigate = useNavigate();
 
 

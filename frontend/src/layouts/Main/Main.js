@@ -39,9 +39,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Main = props => {
-  const { children } = props;
-
+const Main = () => {
   const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();

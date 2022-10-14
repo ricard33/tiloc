@@ -41,30 +41,32 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onMo
             <TableCell>{paymentLabels[p.method]}</TableCell>
             <TableCell>{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>
             <TableCell>
-              {onModify && <IconButton
-                edge="end"
-                aria-label="edit"
-                sx={{
-                  color: "blue",
-                  margin: 0
-                }}
-                onClick={() => onModify(p)}
-                size="large"
-              >
-                <EditIcon />
-              </IconButton>}
-              {onDelete && <IconButton
-                edge="end"
-                aria-label="delete"
-                sx={{
-                  color: "red",
-                  margin: 0
-                }}
-                onClick={() => onDelete(p)}
-                size="large"
-              >
-                <DeleteIcon />
-              </IconButton>}
+              {onModify &&
+                <IconButton
+                  edge="end"
+                  aria-label="edit"
+                  sx={{
+                    color: "blue",
+                    margin: 0
+                  }}
+                  onClick={() => onModify(p)}
+                  size="large"
+                >
+                  <EditIcon />
+                </IconButton>}
+              {onDelete &&
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  sx={{
+                    color: "red",
+                    margin: 0
+                  }}
+                  onClick={() => onDelete(p)}
+                  size="large"
+                >
+                  <DeleteIcon />
+                </IconButton>}
             </TableCell>
           </TableRow>
         ))}
