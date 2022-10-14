@@ -8,10 +8,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle, InputAdornment, MenuItem,
-  TextField
+  TextField,
+  TextFieldProps
 } from "@mui/material";
-import DatePicker from '@mui/lab/DatePicker';
-import makeStyles from '@mui/styles/makeStyles';
+import DatePicker from "@mui/lab/DatePicker";
+import makeStyles from "@mui/styles/makeStyles";
 import { Payment, paymentMethods } from "../types";
 import { parseISO } from "date-fns";
 
@@ -19,7 +20,7 @@ import { parseISO } from "date-fns";
 const useStyles = makeStyles((/*theme: Theme*/) => ({
   input: {
     marginLeft: "4px",
-    marginRight: "4px",
+    marginRight: "4px"
   },
   date: {
     marginLeft: "4px",
@@ -28,7 +29,7 @@ const useStyles = makeStyles((/*theme: Theme*/) => ({
   },
   description: {
     marginLeft: "4px",
-    marginRight: "4px",
+    marginRight: "4px"
   },
   method: {
     marginLeft: "4px",
@@ -39,7 +40,7 @@ const useStyles = makeStyles((/*theme: Theme*/) => ({
     marginLeft: "4px",
     marginRight: "4px",
     width: "5em"
-  },
+  }
 }));
 
 type Props = {
@@ -65,11 +66,11 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
   const variant = "standard";
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
-    if(event.key === 'Enter'){
+    if (event.key === "Enter") {
       handleSubmit(onSubmit)(event);
       event.preventDefault();
     }
-  }
+  };
 
   return (
     <Dialog open={payment !== null} onClose={onClose} aria-labelledby="form-dialog-title" maxWidth="md">
@@ -89,9 +90,9 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
               <DatePicker
                 label={t("date")}
                 openTo="month"
-                views={['year', 'month', 'day']}
+                views={["year", "month", "day"]}
                 inputFormat="dd/MM/yyyy"
-                renderInput={(props) => <TextField label={t("date")} variant={variant} {...props} />}
+                renderInput={(props: JSX.IntrinsicAttributes & TextFieldProps) => <TextField label={t("date")} variant={variant} {...props} />}
                 className={classes.date}
                 {...field}
               />}
