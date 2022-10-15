@@ -3289,10 +3289,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.10.tgz#616f16e9d3a2a3d618136b1be244315d95bd7cab"
   integrity sha512-S/3xB4KzyFxYGCppyDt68yzBU9ysL88lSdIah4D6cptdcltc4NCPCAMc0+PCpg/lLIyC7IPvj2Z52OJWeIUkog==
 
-"@types/node@^18.8.5":
-  version "18.8.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.5.tgz#6a31f820c1077c3f8ce44f9e203e68a176e8f59e"
-  integrity sha512-Bq7G3AErwe5A/Zki5fdD3O6+0zDChhg671NfPjtIcbtzDNZTv4NPKMRFr7gtYPG7y+B8uTiNK4Ngd9T0FTar6Q==
+"@types/node@^18.11.0":
+  version "18.11.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.0.tgz#f38c7139247a1d619f6cc6f27b072606af7c289d"
+  integrity sha512-IOXCvVRToe7e0ny7HpT/X9Rb2RYtElG1a+VshjwT00HxrM2dWBApHQoqsI6WiY7Q03vdf2bCrIGzVrkF/5t10w==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -12328,10 +12328,10 @@ webpack-bundle-analyzer@^4.6.1:
     sirv "^1.0.7"
     ws "^7.3.1"
 
-webpack-bundle-tracker@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/webpack-bundle-tracker/-/webpack-bundle-tracker-1.4.0.tgz#66d8c801c6eebe090385bfb03e1071b95fd5a659"
-  integrity sha512-5dbAdtS+DbvJfXIXfCytRv5D4I2EWBdBBVOzDMpSa52goTroryWcH4lm3h2qwVqSQEgTTWCkgLGGlZYZmYRM9g==
+webpack-bundle-tracker@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/webpack-bundle-tracker/-/webpack-bundle-tracker-1.6.0.tgz#738e450f13ab2ab5de0c81a2cd671f78537cf861"
+  integrity sha512-aDb5WpHyo/U23UsAFHadUJavOAcpcEDrdSOb2ExlSrsoYBnJlECC37wekDRQ9UwRKvNjVdjZWJ/NI8/dVaVp8w==
   dependencies:
     lodash.assign "^4.2.0"
     lodash.defaults "^4.2.0"

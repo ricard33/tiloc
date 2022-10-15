@@ -262,20 +262,21 @@ class Booking(models.Model):
             signature_img = '<img style="max-width: 200px; max-height: 100px" ' \
                             'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
 
-            content = render_template(self.lodging.contract_template.content,
-                                      {
-                                          'booking':    self,
-                                          'lodging':    self.lodging,
-                                          'owner':      self.lodging.owner,
-                                          'options':    list(self.bookedservice_set.all()),
-                                          'included_options':   self.bookedservice_set.filter(
-                                              service__not_included_in_price=False),
-                                          'third_party_options': self.bookedservice_set.filter(
-                                              service__not_included_in_price=True),
-                                          'url_server': url_server,
-                                          'date':       date.today(),
-                                          'signature':  signature_img
-                                      })
+            content = render_template(
+                self.lodging.contract_template.content,
+                {
+                    'booking':             self,
+                    'lodging':             self.lodging,
+                    'owner':               self.lodging.owner,
+                    'options':             self.id and list(self.bookedservice_set.all()) or [],
+                    'included_options':    self.id and self.bookedservice_set.filter(
+                        service__not_included_in_price=False) or [],
+                    'third_party_options': self.id and self.bookedservice_set.filter(
+                        service__not_included_in_price=True) or [],
+                    'url_server':          url_server,
+                    'date':                date.today(),
+                    'signature':           signature_img
+                })
             page_break = '<div style="display: block; page-break-before: always;"></div>'
             if self.lodging.description:
                 content += page_break + self.lodging.description
