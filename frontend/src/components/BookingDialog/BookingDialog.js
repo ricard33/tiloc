@@ -36,7 +36,7 @@ import {
   Checkbox,
   Hidden
 } from "@mui/material";
-import DatePicker from '@mui/lab/DatePicker';
+import { DatePicker } from '@mui/x-date-pickers';
 import useWindowDimensions from "../../common/windowDimensions";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { formatISO } from "../../common/tzUtils";

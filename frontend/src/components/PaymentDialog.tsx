@@ -11,7 +11,7 @@ import {
   TextField,
   TextFieldProps
 } from "@mui/material";
-import DatePicker from "@mui/lab/DatePicker";
+import { DatePicker } from '@mui/x-date-pickers';
 import makeStyles from "@mui/styles/makeStyles";
 import { Payment, paymentMethods } from "../types";
 import { parseISO } from "date-fns";
@@ -89,7 +89,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
             render={({ field }) =>
               <DatePicker
                 label={t("date")}
-                openTo="month"
+                openTo="day"
                 views={["year", "month", "day"]}
                 inputFormat="dd/MM/yyyy"
                 renderInput={(props: JSX.IntrinsicAttributes & TextFieldProps) => <TextField label={t("date")} variant={variant} {...props} />}
