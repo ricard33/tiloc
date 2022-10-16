@@ -144,6 +144,9 @@ class BookingStatus(models.Model):
     name = models.CharField(_("name"), max_length=100)
     color = models.CharField(_("color"), max_length=10)
     rank = models.PositiveSmallIntegerField(_("rank"))
+    no_stats = models.BooleanField(default=False, help_text=_("Check to ignore from statistics bookings with "
+                                                              "this status"))
+    finalized = models.BooleanField(default=True, help_text=_("If true, the booking is finalized and considered as real"))
 
     class Meta:
         verbose_name = _("Booking status")

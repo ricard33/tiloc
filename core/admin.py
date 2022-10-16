@@ -39,8 +39,8 @@ class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
 
 
 class BookingStatusAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'name', 'color', 'rank')
-    list_editable = ('name', 'color', 'rank')
+    list_display = ('id', 'name', 'color', 'rank', 'no_stats', 'finalized')
+    list_editable = ('name', 'color', 'rank', 'no_stats', 'finalized')
 
 
 class BookingChannelAdmin(ImportExportModelAdmin):

@@ -125,7 +125,9 @@ def get_filling_rate(begin, end, with_turnover=True):
     data = {}
     dates_range = [begin.date(), end.date()]
     bookings = models.Booking.objects.filter(Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
-                                             lodging__isnull=False)
+                                             lodging__isnull=False,
+                                             status__no_stats=False,
+                                             status__finalized=True)
     lodging_count = models.Lodging.objects.filter(active=True).count()
     for booking in bookings:
         for d1, d2 in arrow.Arrow.interval('month', begin.floor('month').datetime, end.ceil('month').datetime):
