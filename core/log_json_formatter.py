@@ -1,6 +1,5 @@
 import logging
 
-import django
 import json_log_formatter
 
 

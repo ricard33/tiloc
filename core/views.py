@@ -1,7 +1,6 @@
 import logging
 
 import arrow
-from django.contrib.auth import authenticate
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse

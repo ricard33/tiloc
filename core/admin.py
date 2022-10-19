@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from django.contrib.admin import ModelAdmin, TabularInline
+from django.contrib.admin import TabularInline
 from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext

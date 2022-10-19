@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Sum
 from rest_framework import serializers
-from rest_framework.fields import empty
 
 from core import models
 

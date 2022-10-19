@@ -1,7 +1,7 @@
 __all__ = ["BookingResource"]
 
 from import_export import fields, resources
-from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
+from import_export.widgets import ForeignKeyWidget
 
 from core import models
 
