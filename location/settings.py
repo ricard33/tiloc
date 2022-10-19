@@ -14,7 +14,6 @@ import os
 import sys
 from datetime import timedelta
 
-# import django_heroku
 from django.utils.translation import gettext_lazy as _
 from my_django_tweaks.logging_config import configure_logging
 from smartconfigparser import Config
