@@ -405,7 +405,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "fabric"
-version = "2.6.0"
+version = "2.7.1"
 description = "High level SSH command execution"
 category = "dev"
 optional = false
@@ -1148,7 +1148,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "bc672baf047dae602342cca7e9655f2f4850e80b1acc87a38408078b8254dfb2"
+content-hash = "179489ec199b323d5dd6e7a399ab190d81baddb8ae48e29d3d1094c5adbed664"
 
 [metadata.files]
 arrow = [
@@ -1522,8 +1522,8 @@ et-xmlfile = [
     {file = "et_xmlfile-1.1.0.tar.gz", hash = "sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c"},
 ]
 fabric = [
-    {file = "fabric-2.6.0-py2.py3-none-any.whl", hash = "sha256:7a71714b8b8f28cf828eceb155196f43ebac1bd4c849b7161ed5993d1cbcaa40"},
-    {file = "fabric-2.6.0.tar.gz", hash = "sha256:47f184b070272796fd2f9f0436799e18f2ccba4ee8ee587796fca192acd46cd2"},
+    {file = "fabric-2.7.1-py2.py3-none-any.whl", hash = "sha256:7610362318ef2d391cc65d4befb684393975d889ed5720f23499394ec0e136fa"},
+    {file = "fabric-2.7.1.tar.gz", hash = "sha256:76f8fef59cf2061dbd849bbce4fe49bdd820884385004b0ca59136ac3db129e4"},
 ]
 factory-boy = [
     {file = "factory_boy-3.2.1-py2.py3-none-any.whl", hash = "sha256:eb02a7dd1b577ef606b75a253b9818e6f9eaf996d94449c9d5ebb124f90dc795"},
