@@ -145,3 +145,4 @@ frontend0/
 !/backups/
 /TODO.md
 /test-reports/
+/requirements-prod.txt

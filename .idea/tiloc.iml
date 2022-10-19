@@ -27,12 +27,12 @@
       <excludeFolder url="file://$MODULE_DIR$/frontend/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/test-reports" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (loc)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (tiloc)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="@types/jest" level="application" />
   </component>
   <component name="PackageRequirementsSettings">
-    <option name="requirementsPath" value="$MODULE_DIR$/deployment/requirements/dev.txt" />
+    <option name="requirementsPath" value="" />
     <option name="versionSpecifier" value="Strong equality (==x.y.z)" />
     <option name="modifyBaseFiles" value="true" />
   </component>

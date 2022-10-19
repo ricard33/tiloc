@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import subprocess
 
 from fabric import task
 from invoke import Exit, Failure
@@ -228,7 +229,7 @@ def run_frontend_tests(c):
 #                                # '--exclude=frontend/static_src',
 #                                'assets', 'config/logging-location.default.py', 'core',
 #                                'legacy', 'locale', 'location', 'templates', 'static', 'manage.py',
-#                                'requirements.txt', 'deployment',
+#                                'requirements-prod.txt', 'deployment',
 #                                ],
 #                               cwd=WORKSPACE)
 #         puts("Archive '%s' created" % archive_name)
@@ -291,6 +292,7 @@ def empty_folder(c):
 @task
 def deploy_location(c):
     c.run("mkdir -p %s" % c.TARGET_PATH)
+    subprocess.check_call(['poetry', 'export', '-o', os.path.join(WORKSPACE, 'requirements-prod.txt'), '--without-hashes'])
     sync_sources(c)
     clean_compiled_files(c)
     # compile_python_files(c)
@@ -306,7 +308,7 @@ def deploy_location(c):
         c.run('rm -rf www/static')
         with c.prefix('. .env/bin/activate'):
             c.run('pip install pip --upgrade')
-            c.run('pip install -r requirements.txt --upgrade')
+            c.run('pip install -r requirements-prod.txt --upgrade')
 
             c.run('python manage.py dbbackup --clean --noinput')
             c.run('python manage.py mediabackup --clean --noinput')
