@@ -11,8 +11,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
 
-    username = factory.Faker('email')
-    email = factory.Faker('email')
+    username = factory.Faker("email")
+    email = factory.Faker("email")
 
 
 class AdminFactory(UserFactory):
@@ -23,8 +23,8 @@ class OwnerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Owner
 
-    name = factory.Faker('name')
-    email = factory.Faker('email')
+    name = factory.Faker("name")
+    email = factory.Faker("email")
     no_vat = False
     signature = factory.django.ImageField()
 
@@ -33,7 +33,7 @@ class LodgingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Lodging
 
-    name = factory.Faker('name')
+    name = factory.Faker("name")
     owner = factory.SubFactory(OwnerFactory)
     rank = factory.Sequence(lambda n: n)
     address = factory.Faker("address")
@@ -48,7 +48,7 @@ class BookingChannelFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingChannel
 
-    name = factory.Faker('name')
+    name = factory.Faker("name")
 
 
 class BookingChannelSyncFactory(factory.django.DjangoModelFactory):
@@ -57,15 +57,15 @@ class BookingChannelSyncFactory(factory.django.DjangoModelFactory):
 
     channel = factory.SubFactory(BookingChannelFactory)
     lodging = factory.SubFactory(LodgingFactory)
-    source_url = factory.Faker('uri')
+    source_url = factory.Faker("uri")
 
 
 class BookingStatusFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingStatus
 
-    name = factory.Iterator(['option', 'contract sent', 'deposit paid', 'paid'])
-    color = factory.Faker('color')
+    name = factory.Iterator(["option", "contract sent", "deposit paid", "paid"])
+    color = factory.Faker("color")
     rank = factory.Sequence(lambda n: n)
 
 
@@ -78,7 +78,7 @@ class BookingFactory(factory.django.DjangoModelFactory):
     guest_contact = factory.Faker("email")
     guest_address = factory.Faker("address")
     status = factory.LazyFunction(lambda: models.BookingStatus.objects.first())
-    begin_date = factory.Faker('date_between', start_date='-5d', end_date='+1y')
+    begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
     duration = factory.LazyAttribute(lambda b: random.randint(7, 21))
     end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=b.duration).date())
     daily_rate = factory.LazyAttribute(lambda b: b.lodging and b.lodging.daily_rate or 50)
@@ -104,7 +104,7 @@ class ContractFactory(factory.django.DjangoModelFactory):
 class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Category
-        django_get_or_create = ['name']
+        django_get_or_create = ["name"]
 
     name = factory.Sequence(lambda n: "Cat %d" % (n % 3))
 
@@ -112,7 +112,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 class ServiceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Service
-        django_get_or_create = ['reference']
+        django_get_or_create = ["reference"]
 
     category = factory.SubFactory(CategoryFactory)
     reference = factory.Sequence(lambda n: "REF%d" % n)
@@ -130,10 +130,7 @@ class BookedServiceFactory(factory.django.DjangoModelFactory):
 
 
 class BookingWithServiceFactory(BookingFactory):
-    service0 = factory.RelatedFactory(
-        BookedServiceFactory,
-        factory_related_name='booking'
-    )
+    service0 = factory.RelatedFactory(BookedServiceFactory, factory_related_name="booking")
 
 
 class PaymentFactory(factory.django.DjangoModelFactory):
@@ -144,4 +141,4 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     description = "Solde"
     amount = 150.0
     method = models.Payment.PaymentMethod.TRANSFER
-    date = factory.Faker('date')
+    date = factory.Faker("date")

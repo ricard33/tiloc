@@ -13,7 +13,9 @@ logger = logging.getLogger("sync")
 
 def retrieve_ical(url) -> str:
     logger.debug("Requesting ical from %s" % url)
-    r = requests.get(url, headers={'User-agent': f'TiLoc {__version__} (build {__date__.isoformat(timespec="seconds")}'})
+    r = requests.get(
+        url, headers={"User-agent": f'TiLoc {__version__} (build {__date__.isoformat(timespec="seconds")}'}
+    )
     if r.status_code != 200:
         logger.warning("HTTP Error requesting ical @ [%s]: [%d] %s", url, r.status_code, r.text)
         r.raise_for_status()
@@ -28,15 +30,16 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
     for event in c.events:
 
         # HACK Ignoring fake event created by Airbnb. Until we find other cases like this, we can keep this simple hack
-        if event.summary in ['Airbnb (Not available)']:
+        if event.summary in ["Airbnb (Not available)"]:
             continue
 
         if event.uid and models.Booking.objects.filter(lodging=lodging, source_uid=event.uid).exists():
             logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.summary)
             continue
 
-        same_bookings = models.Booking.objects.filter(lodging=lodging, source_uid__isnull=True,
-                                                      begin_date=event.begin.date(), end_date=event.end.date())
+        same_bookings = models.Booking.objects.filter(
+            lodging=lodging, source_uid__isnull=True, begin_date=event.begin.date(), end_date=event.end.date()
+        )
 
         if same_bookings.exists():
             booking = same_bookings.first()
@@ -46,18 +49,19 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             continue
 
         logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.summary)
-        models.Booking.objects.create(lodging=lodging,
-                                      source=channel,
-                                      source_uid=event.uid,
-                                      guest_name=event.summary,
-                                      status=channel.default_booking_status or models.BookingStatus.objects.first(),
-                                      begin_date=event.begin.date(),
-                                      end_date=event.end.date(),
-                                      duration=(event.end.date() - event.begin.date()).days,
-                                      notes=event.description,
-                                      price=0,
-                                      deposit=0
-                                      )
+        models.Booking.objects.create(
+            lodging=lodging,
+            source=channel,
+            source_uid=event.uid,
+            guest_name=event.summary,
+            status=channel.default_booking_status or models.BookingStatus.objects.first(),
+            begin_date=event.begin.date(),
+            end_date=event.end.date(),
+            duration=(event.end.date() - event.begin.date()).days,
+            notes=event.description,
+            price=0,
+            deposit=0,
+        )
     sync.last_import = arrow.utcnow().datetime
     sync.last_import_error = ""
     sync.save()

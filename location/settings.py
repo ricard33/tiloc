@@ -22,127 +22,127 @@ from . import __version__
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONFIG_DIR = os.path.join(BASE_DIR, 'config')
+CONFIG_DIR = os.path.join(BASE_DIR, "config")
 os.makedirs(CONFIG_DIR, exist_ok=True)
-CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.ini')
+CONFIG_FILE = os.path.join(CONFIG_DIR, "config.ini")
 
 config = Config()
 config.read(CONFIG_FILE)
 
-LOG_DIR = os.path.join(BASE_DIR, 'log')
+LOG_DIR = os.path.join(BASE_DIR, "log")
 os.makedirs(LOG_DIR, exist_ok=True)
 
-BACKUP_DIR = os.path.join(BASE_DIR, 'backup')
+BACKUP_DIR = os.path.join(BASE_DIR, "backup")
 os.makedirs(BACKUP_DIR, exist_ok=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
-ENV = os.environ.get('APP_ENV', DEBUG and 'dev' or 'prod')
-UNITTEST = 'test' in sys.argv
+ENV = os.environ.get("APP_ENV", DEBUG and "dev" or "prod")
+UNITTEST = "test" in sys.argv
 
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
-    SECRET_KEY = config.get('APP', 'SECRET_KEY')  # '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
+    SECRET_KEY = config.get("APP", "SECRET_KEY")  # '7rf!%(5w-db9ln+0dcdvv))!_d!e1c33-8v7^1gqe$t@7!=b4!'
 except Exception:
-    print('SECRET_KEY not found! Generating a new one...', file=sys.stderr)
+    print("SECRET_KEY not found! Generating a new one...", file=sys.stderr)
     import random
 
     SECRET_KEY = "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$^&*(-_=+)") for i in range(50)])
-    config.set('APP', 'SECRET_KEY', SECRET_KEY)
-    f = open(CONFIG_FILE, 'wt')
+    config.set("APP", "SECRET_KEY", SECRET_KEY)
+    f = open(CONFIG_FILE, "wt")
     config.write(f)
     f.close()
 
 LOGGING_CONFIG = None  # disable log configuration by Django
-DEFAULT_LOG_FORMAT = '%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s'
+DEFAULT_LOG_FORMAT = "%(name)-12s: %(asctime)s %(levelname)-8s [%(threadName)s] %(message)s"
 
 LOGGING = configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT, UNITTEST)
 
-if ENV not in ['dev', 'prod']:
-    logging.critical('Bad value for APP_ENV environment settings: %s', ENV)
+if ENV not in ["dev", "prod"]:
+    logging.critical("Bad value for APP_ENV environment settings: %s", ENV)
 
 logging.info("Starting django application (%s) %s", ENV, DEBUG and "**DEBUG MODE ACTIVATED**" or "")
 
 ALLOWED_HOSTS = []
-ALLOWED_HOSTS.extend(config.getlist('SECURITY', 'ALLOWED_HOSTS', []))
+ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
 
 # Application definition
 
 INSTALLED_APPS = [
-    'constance',
-    'constance.backends.database',
-    'grappelli',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.forms',
-    'django_filters',
-    'rest_framework',
-    'dbbackup',
-    'corsheaders',
-    'import_export',
-    'knox',
-    'simple_history',
-    'django_cron',
-    'core',
+    "constance",
+    "constance.backends.database",
+    "grappelli",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.forms",
+    "django_filters",
+    "rest_framework",
+    "dbbackup",
+    "corsheaders",
+    "import_export",
+    "knox",
+    "simple_history",
+    "django_cron",
+    "core",
     # 'frontend',
-    'webpack_loader',
+    "webpack_loader",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-ROOT_URLCONF = 'location.urls'
+ROOT_URLCONF = "location.urls"
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")  # ROOT dir for templates
 
 TEMPLATES = [
     {
-        'BACKEND':  'django.template.backends.django.DjangoTemplates',
-        'DIRS':     [TEMPLATE_DIR],
-        'APP_DIRS': True,
-        'OPTIONS':  {
-            'context_processors': [
-                'constance.context_processors.config',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.template.context_processors.media',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'core.context_processors.settings'
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [TEMPLATE_DIR],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "constance.context_processors.config",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.template.context_processors.media",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "core.context_processors.settings",
             ],
         },
     },
 ]
 
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-WSGI_APPLICATION = 'location.wsgi.application'
+WSGI_APPLICATION = "location.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE':   config.get('DATABASE', 'engine', 'django.db.backends.sqlite3'),
-        'HOST':     config.get('DATABASE', 'host', ''),
-        'PORT':     config.getint('DATABASE', 'port', 5432),
-        'NAME':     config.get('DATABASE', 'name', os.path.join(BASE_DIR, 'db.sqlite3')),
-        'USER':     config.get('DATABASE', 'user', 'location'),
-        'PASSWORD': config.get('DATABASE', 'password', ''),
+    "default": {
+        "ENGINE": config.get("DATABASE", "engine", "django.db.backends.sqlite3"),
+        "HOST": config.get("DATABASE", "host", ""),
+        "PORT": config.getint("DATABASE", "port", 5432),
+        "NAME": config.get("DATABASE", "name", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": config.get("DATABASE", "user", "location"),
+        "PASSWORD": config.get("DATABASE", "password", ""),
     },
     # 'legacy': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -157,32 +157,32 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
-AUTHENTICATION_BACKENDS = ['core.auth_backend.EmailBackend']
+AUTHENTICATION_BACKENDS = ["core.auth_backend.EmailBackend"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('fr', _('French')),
+    ("en", _("English")),
+    ("fr", _("French")),
 ]
 
-LANGUAGE_CODE = 'fr'
+LANGUAGE_CODE = "fr"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -190,93 +190,90 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale')
-]
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
 # Media files (uploaded, generated PDF, etc...)
-MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
-MEDIA_URL = '/files/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "files")
+MEDIA_URL = "/files/"
 os.makedirs(MEDIA_ROOT, exist_ok=True)
-os.makedirs(os.path.join(MEDIA_ROOT, 'contracts'), exist_ok=True)
+os.makedirs(os.path.join(MEDIA_ROOT, "contracts"), exist_ok=True)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = config.get('APP', 'STATIC_URL', '/static/')
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = config.get("APP", "STATIC_URL", "/static/")
 
 # Extra lookup directories for collectstatic to find static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, "static"),
 ]
 PROD_ASSETS_DIR = os.path.join(BASE_DIR, "frontend", "build")
 if os.path.exists(PROD_ASSETS_DIR):
     STATICFILES_DIRS.append(PROD_ASSETS_DIR)
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # admin user
-ADMINS = (
-    ('Support', config.get('APP', 'EMAIL_ADMIN', 'support@tiloc.fr')),
-)
+ADMINS = (("Support", config.get("APP", "EMAIL_ADMIN", "support@tiloc.fr")),)
 
 # Email configuration
-DEFAULT_FROM_EMAIL = config.get('EMAIL', 'DEFAULT_FROM_EMAIL', 'app@tiloc.fr')
+DEFAULT_FROM_EMAIL = config.get("EMAIL", "DEFAULT_FROM_EMAIL", "app@tiloc.fr")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-EMAIL_HOST = config.get('EMAIL', 'SMTP_HOST', 'smtp-crd.alwaysdata.net')
+EMAIL_HOST = config.get("EMAIL", "SMTP_HOST", "smtp-crd.alwaysdata.net")
 EMAIL_PORT = 587
-EMAIL_HOST_USER = config.get('EMAIL', 'SMTP_USER', '')
-EMAIL_HOST_PASSWORD = config.get('EMAIL', 'SMTP_PASSWORD', '')
+EMAIL_HOST_USER = config.get("EMAIL", "SMTP_USER", "")
+EMAIL_HOST_PASSWORD = config.get("EMAIL", "SMTP_PASSWORD", "")
 EMAIL_USE_TLS = True
-EMAIL_SUBJECT_PREFIX = config.get('EMAIL', 'SUBJECT_PREFIX', '[TiLoc]') + ' '
+EMAIL_SUBJECT_PREFIX = config.get("EMAIL", "SUBJECT_PREFIX", "[TiLoc]") + " "
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'knox.auth.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "knox.auth.TokenAuthentication",
         # 'rest_framework.authentication.SessionAuthentication'
     ],
-    'DEFAULT_PERMISSION_CLASSES':     [
-        'core.permissions.TiLocPermissions',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "core.permissions.TiLocPermissions",
     ],
-    'DEFAULT_PAGINATION_CLASS':       'core.pagination.StandardResultsSetPagination',
-    'PAGE_SIZE':                      100,
-    'DEFAULT_FILTER_BACKENDS':        [
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.OrderingFilter',
+    "DEFAULT_PAGINATION_CLASS": "core.pagination.StandardResultsSetPagination",
+    "PAGE_SIZE": 100,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.OrderingFilter",
     ],
 }
 
-if ENV == 'dev':
+if ENV == "dev":
     # needed to allow access to /api/ pages
-    REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].append('rest_framework.authentication.SessionAuthentication')
+    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
 
 REST_KNOX = {
-    'SECURE_HASH_ALGORITHM': UNITTEST and 'cryptography.hazmat.primitives.hashes.MD5'
-                             or 'cryptography.hazmat.primitives.hashes.SHA512',  # noqa: E131
+    "SECURE_HASH_ALGORITHM": UNITTEST
+    and "cryptography.hazmat.primitives.hashes.MD5"
+    or "cryptography.hazmat.primitives.hashes.SHA512",  # noqa: E131
     # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-    'TOKEN_TTL':             timedelta(days=30),
+    "TOKEN_TTL": timedelta(days=30),
     # 'TOKEN_LIMIT_PER_USER': None,
-    'AUTO_REFRESH':          True,
-    'USER_SERIALIZER':       'core.serializers.UserSerializer',
+    "AUTO_REFRESH": True,
+    "USER_SERIALIZER": "core.serializers.UserSerializer",
 }
 
 APP_NAME = _("Ti Loc")
 
-CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
-    'DEBUG': (False, 'Turn on DEBUG information on Django'),
+    "DEBUG": (False, "Turn on DEBUG information on Django"),
 }
 
 GRAPPELLI_ADMIN_TITLE = _("Ti Loc")
 
 WEBPACK_LOADER = {
-    'DEFAULT': {
-        'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE':      os.path.join(BASE_DIR, 'frontend', 'webpack-stats.%s.json' % ENV),
+    "DEFAULT": {
+        "CACHE": not DEBUG,
+        "BUNDLE_DIR_NAME": "bundles/",
+        "STATS_FILE": os.path.join(BASE_DIR, "frontend", "webpack-stats.%s.json" % ENV),
     }
 }
 
@@ -287,13 +284,13 @@ CRON_CLASSES = [
     # ...
 ]
 
-WKHTMLTOPDF_PATH = config.get('PDF', 'WKHTMLTOPDF_PATH', 'wkhtmltopdf')
+WKHTMLTOPDF_PATH = config.get("PDF", "WKHTMLTOPDF_PATH", "wkhtmltopdf")
 
 
 def get_backup_filename(**kwargs):
-    return 'tiloc-{servername}-{datetime}-v{version}.{extension}'.format(**dict(kwargs, **{'version': __version__}))
+    return "tiloc-{servername}-{datetime}-v{version}.{extension}".format(**dict(kwargs, **{"version": __version__}))
 
 
-DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
+DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+DBBACKUP_STORAGE_OPTIONS = {"location": os.path.join(BASE_DIR, "backups")}
 DBBACKUP_FILENAME_TEMPLATE = get_backup_filename

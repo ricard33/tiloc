@@ -4,9 +4,15 @@ import re
 import sys
 from os.path import join
 
-base_dirs = map(lambda x: join(".", x), ('core', 'django_auth_ldap', ))
-verbose = '-v' in sys.argv
-delete_py = '--delete-py' in sys.argv
+base_dirs = map(
+    lambda x: join(".", x),
+    (
+        "core",
+        "django_auth_ldap",
+    ),
+)
+verbose = "-v" in sys.argv
+delete_py = "--delete-py" in sys.argv
 excludes = []  # don't visit .svn directories
 exclude = re.compile("(/[.]svn)|(/nolimit)|(/commands)|(settings.py)")
 
@@ -19,7 +25,7 @@ def clean_pyc_files(base_dir):
                 print("Deleting '%s'... " % fullpath),
                 os.remove(fullpath)
                 print("Ok")
-        for name in ('.svn', '.git', '.hg'):
+        for name in (".svn", ".git", ".hg"):
             if name in dirs:
                 dirs.remove(name)  # don't visit .svn, .git and .hg directories
 
@@ -29,7 +35,7 @@ def compile_python(base_dir):
     for root, dirs, files in os.walk(base_dir):
         for name in files:
             if name.endswith(".py"):
-                fullpath = join(root, name).replace('\\', '/')
+                fullpath = join(root, name).replace("\\", "/")
                 if exclude.search(fullpath):
                     continue
                 if verbose:
@@ -52,7 +58,7 @@ def compile_python(base_dir):
 
 
 if __name__ == "__main__":
-    if '-c' in sys.argv:
+    if "-c" in sys.argv:
         print("Removing all .pyc files...")
         for dir in base_dirs:
             clean_pyc_files(dir)

@@ -5,11 +5,11 @@ from django.db.models import OuterRef, Subquery
 
 
 def copy_price_values(apps, schema_editor):
-    BookedService = apps.get_model('core', 'BookedService')
-    Service = apps.get_model('core', 'Service')
+    BookedService = apps.get_model("core", "BookedService")
+    Service = apps.get_model("core", "Service")
 
-    unit_price = Service.objects.filter(id=OuterRef('service_id')).values('unit_price')[:1]
-    is_flat_rate = Service.objects.filter(id=OuterRef('service_id')).values('is_flat_rate')[:1]
+    unit_price = Service.objects.filter(id=OuterRef("service_id")).values("unit_price")[:1]
+    is_flat_rate = Service.objects.filter(id=OuterRef("service_id")).values("is_flat_rate")[:1]
 
     BookedService.objects.all().update(unit_price=Subquery(unit_price), is_flat_rate=Subquery(is_flat_rate))
 
@@ -17,31 +17,37 @@ def copy_price_values(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0001_squashed_0049_remove cleaning_fee field'),
+        ("core", "0001_squashed_0049_remove cleaning_fee field"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='bookedservice',
-            name='quantity',
+            model_name="bookedservice",
+            name="quantity",
         ),
         migrations.AddField(
-            model_name='bookedservice',
-            name='is_flat_rate',
-            field=models.BooleanField(default=False, help_text='Use flat rate price instead of daily price computation', verbose_name='flat rate?'),
+            model_name="bookedservice",
+            name="is_flat_rate",
+            field=models.BooleanField(
+                default=False,
+                help_text="Use flat rate price instead of daily price computation",
+                verbose_name="flat rate?",
+            ),
         ),
         migrations.AddField(
-            model_name='bookedservice',
-            name='unit_price',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='unit price VAT incl.'),
+            model_name="bookedservice",
+            name="unit_price",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="unit price VAT incl."
+            ),
         ),
         migrations.RunPython(copy_price_values),
         migrations.RemoveField(
-            model_name='historicalservice',
-            name='quantity',
+            model_name="historicalservice",
+            name="quantity",
         ),
         migrations.RemoveField(
-            model_name='service',
-            name='quantity',
+            model_name="service",
+            name="quantity",
         ),
     ]

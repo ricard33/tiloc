@@ -19,11 +19,11 @@ import core.models
 
 
 def gen_uuid(apps, schema_editor):
-    Lodging = apps.get_model('core', 'Lodging')
+    Lodging = apps.get_model("core", "Lodging")
     for row in Lodging.objects.all():
         row.uid = uuid.uuid4()
         row.save()
-    Booking = apps.get_model('core', 'Booking')
+    Booking = apps.get_model("core", "Booking")
     for row in Booking.objects.all():
         row.uid = uuid.uuid4()
         row.save()
@@ -31,7 +31,57 @@ def gen_uuid(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('core', '0001_initial'), ('core', '0002_add_verbose_names'), ('core', '0003_Alter field deposit_label on owner'), ('core', '0004_auto_20200221_1949'), ('core', '0005_auto_20200221_2136'), ('core', '0006_auto_20200222_0046'), ('core', '0007_auto_20200222_0052'), ('core', '0008_auto_20200222_0057'), ('core', '0009_lodging_owner'), ('core', '0010_auto_20200429_2343'), ('core', '0011_auto_20200430_0239'), ('core', '0012_auto_20200509_2256'), ('core', '0013_auto_20200630_1003'), ('core', '0014_bookingchannelsync_holidays_pricing_seasonalvariation'), ('core', '0015_auto_20200702_1014'), ('core', '0016_auto_20200703_0940'), ('core', '0017_bookingchannelsync_active'), ('core', '0018_lodging_uid'), ('core', '0019_populate_uuid_values'), ('core', '0020_remove_uuid_null'), ('core', '0021_booking_uid'), ('core', '0022_populate_uuid_values'), ('core', '0023_remove_uuid_null'), ('core', '0024_auto_20200704_0212'), ('core', '0025_bookingchannelsync_last_export'), ('core', '0026_auto_20200704_0220'), ('core', '0027_auto_20200720_1124'), ('core', '0028_add_contract_models'), ('core', '0029_lodging_description'), ('core', '0030_pdf_nullable_on_contract'), ('core', '0031_payment'), ('core', '0032_booking_commission_fees'), ('core', '0033_add_creation_date_to_booking'), ('core', '0034_fix_contracts_path'), ('core', '0035_Alter field pdf on contract'), ('core', '0036_Alter fields logo and signature on owner'), ('core', '0037_lodging_shown'), ('core', '0038_add_history'), ('core', '0039_add_included_in_booking_field'), ('core', '0040_Add field is_flat_rate to service'), ('core', '0041_alter_option_quantity_field'), ('core', '0042_payment_description'), ('core', '0043_bookingchannelsync_last_import_error'), ('core', '0044_add field not_included_in_price'), ('core', '0045_add tourist_tax field'), ('core', '0046_increase_contract_filename_size'), ('core', '0047_alter_payment_options'), ('core', '0048_rename Service field unit_price_ht to unit_price'), ('core', '0049_remove cleaning_fee field')]
+    replaces = [
+        ("core", "0001_initial"),
+        ("core", "0002_add_verbose_names"),
+        ("core", "0003_Alter field deposit_label on owner"),
+        ("core", "0004_auto_20200221_1949"),
+        ("core", "0005_auto_20200221_2136"),
+        ("core", "0006_auto_20200222_0046"),
+        ("core", "0007_auto_20200222_0052"),
+        ("core", "0008_auto_20200222_0057"),
+        ("core", "0009_lodging_owner"),
+        ("core", "0010_auto_20200429_2343"),
+        ("core", "0011_auto_20200430_0239"),
+        ("core", "0012_auto_20200509_2256"),
+        ("core", "0013_auto_20200630_1003"),
+        ("core", "0014_bookingchannelsync_holidays_pricing_seasonalvariation"),
+        ("core", "0015_auto_20200702_1014"),
+        ("core", "0016_auto_20200703_0940"),
+        ("core", "0017_bookingchannelsync_active"),
+        ("core", "0018_lodging_uid"),
+        ("core", "0019_populate_uuid_values"),
+        ("core", "0020_remove_uuid_null"),
+        ("core", "0021_booking_uid"),
+        ("core", "0022_populate_uuid_values"),
+        ("core", "0023_remove_uuid_null"),
+        ("core", "0024_auto_20200704_0212"),
+        ("core", "0025_bookingchannelsync_last_export"),
+        ("core", "0026_auto_20200704_0220"),
+        ("core", "0027_auto_20200720_1124"),
+        ("core", "0028_add_contract_models"),
+        ("core", "0029_lodging_description"),
+        ("core", "0030_pdf_nullable_on_contract"),
+        ("core", "0031_payment"),
+        ("core", "0032_booking_commission_fees"),
+        ("core", "0033_add_creation_date_to_booking"),
+        ("core", "0034_fix_contracts_path"),
+        ("core", "0035_Alter field pdf on contract"),
+        ("core", "0036_Alter fields logo and signature on owner"),
+        ("core", "0037_lodging_shown"),
+        ("core", "0038_add_history"),
+        ("core", "0039_add_included_in_booking_field"),
+        ("core", "0040_Add field is_flat_rate to service"),
+        ("core", "0041_alter_option_quantity_field"),
+        ("core", "0042_payment_description"),
+        ("core", "0043_bookingchannelsync_last_import_error"),
+        ("core", "0044_add field not_included_in_price"),
+        ("core", "0045_add tourist_tax field"),
+        ("core", "0046_increase_contract_filename_size"),
+        ("core", "0047_alter_payment_options"),
+        ("core", "0048_rename Service field unit_price_ht to unit_price"),
+        ("core", "0049_remove cleaning_fee field"),
+    ]
 
     initial = True
 
@@ -41,438 +91,930 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='BookedService',
+            name="BookedService",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.SmallIntegerField(default=1, verbose_name='quantity')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("quantity", models.SmallIntegerField(default=1, verbose_name="quantity")),
             ],
             options={
-                'verbose_name': 'Booking service',
+                "verbose_name": "Booking service",
             },
         ),
         migrations.CreateModel(
-            name='Booking',
+            name="Booking",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uid', models.UUIDField(default=uuid.uuid4, unique=True)),
-                ('guest_name', models.CharField(max_length=256, verbose_name='guest name')),
-                ('guest_contact', models.TextField(blank=True, null=True, verbose_name='guest contact')),
-                ('guest_address', models.TextField(blank=True, null=True, verbose_name='guest address')),
-                ('source_uid', models.CharField(blank=True, help_text='UID on source channel', max_length=256, null=True, verbose_name='channel UID')),
-                ('begin_date', models.DateField(verbose_name='begin date')),
-                ('end_date', models.DateField(verbose_name='end date')),
-                ('duration', models.PositiveSmallIntegerField(verbose_name='duration')),
-                ('adults', models.PositiveSmallIntegerField(default=1, verbose_name='adults')),
-                ('children', models.PositiveSmallIntegerField(default=0, verbose_name='children')),
-                ('babies', models.PositiveSmallIntegerField(default=0, verbose_name='babies')),
-                ('catering', models.CharField(choices=[('none', 'None'), ('breakfast', 'Breakfast'), ('half', 'Half board'), ('full', 'Full board')], default='none', max_length=20, verbose_name='catering')),
-                ('daily_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='daily rate')),
-                ('price', models.DecimalField(decimal_places=2, help_text='Total price, either computed by daily price or applying flat rate', max_digits=10, verbose_name='price')),
-                ('is_flat_rate', models.BooleanField(default=False, help_text='Use flat rate price instead of daily price computation if true', verbose_name='flat rate?')),
-                ('deposit', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='deposit')),
-                ('guaranty', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='guaranty')),
-                ('commission_fees', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='commission fees')),
-                ('info', models.TextField(blank=True, null=True, verbose_name='info')),
-                ('special_conditions', models.TextField(blank=True, null=True, verbose_name='Special conditions')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("uid", models.UUIDField(default=uuid.uuid4, unique=True)),
+                ("guest_name", models.CharField(max_length=256, verbose_name="guest name")),
+                ("guest_contact", models.TextField(blank=True, null=True, verbose_name="guest contact")),
+                ("guest_address", models.TextField(blank=True, null=True, verbose_name="guest address")),
+                (
+                    "source_uid",
+                    models.CharField(
+                        blank=True,
+                        help_text="UID on source channel",
+                        max_length=256,
+                        null=True,
+                        verbose_name="channel UID",
+                    ),
+                ),
+                ("begin_date", models.DateField(verbose_name="begin date")),
+                ("end_date", models.DateField(verbose_name="end date")),
+                ("duration", models.PositiveSmallIntegerField(verbose_name="duration")),
+                ("adults", models.PositiveSmallIntegerField(default=1, verbose_name="adults")),
+                ("children", models.PositiveSmallIntegerField(default=0, verbose_name="children")),
+                ("babies", models.PositiveSmallIntegerField(default=0, verbose_name="babies")),
+                (
+                    "catering",
+                    models.CharField(
+                        choices=[
+                            ("none", "None"),
+                            ("breakfast", "Breakfast"),
+                            ("half", "Half board"),
+                            ("full", "Full board"),
+                        ],
+                        default="none",
+                        max_length=20,
+                        verbose_name="catering",
+                    ),
+                ),
+                (
+                    "daily_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="daily rate"
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2,
+                        help_text="Total price, either computed by daily price or applying flat rate",
+                        max_digits=10,
+                        verbose_name="price",
+                    ),
+                ),
+                (
+                    "is_flat_rate",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Use flat rate price instead of daily price computation if true",
+                        verbose_name="flat rate?",
+                    ),
+                ),
+                (
+                    "deposit",
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="deposit"),
+                ),
+                (
+                    "guaranty",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="guaranty"
+                    ),
+                ),
+                (
+                    "commission_fees",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="commission fees"
+                    ),
+                ),
+                ("info", models.TextField(blank=True, null=True, verbose_name="info")),
+                ("special_conditions", models.TextField(blank=True, null=True, verbose_name="Special conditions")),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name': 'Booking',
+                "verbose_name": "Booking",
             },
         ),
         migrations.CreateModel(
-            name='BookingChannel',
+            name="BookingChannel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
             ],
             options={
-                'verbose_name': 'Booking channel',
-                'ordering': ['name'],
+                "verbose_name": "Booking channel",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='BookingStatus',
+            name="BookingStatus",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('color', models.CharField(max_length=10, verbose_name='color')),
-                ('rank', models.PositiveSmallIntegerField(verbose_name='rank')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
+                ("color", models.CharField(max_length=10, verbose_name="color")),
+                ("rank", models.PositiveSmallIntegerField(verbose_name="rank")),
             ],
             options={
-                'verbose_name': 'Booking status',
-                'verbose_name_plural': 'Booking statuses',
-                'ordering': ['rank'],
+                "verbose_name": "Booking status",
+                "verbose_name_plural": "Booking statuses",
+                "ordering": ["rank"],
             },
         ),
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
             ],
             options={
-                'verbose_name': 'Category',
-                'verbose_name_plural': 'Categories',
+                "verbose_name": "Category",
+                "verbose_name_plural": "Categories",
             },
         ),
         migrations.CreateModel(
-            name='ContractTemplate',
+            name="ContractTemplate",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('content', models.TextField(verbose_name='Contract')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100)),
+                ("content", models.TextField(verbose_name="Contract")),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name': 'Contract template',
+                "verbose_name": "Contract template",
             },
         ),
         migrations.CreateModel(
-            name='Holidays',
+            name="Holidays",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='name')),
-                ('begin_date', models.DateField(verbose_name='begin date')),
-                ('end_date', models.DateField(verbose_name='end date')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=256, verbose_name="name")),
+                ("begin_date", models.DateField(verbose_name="begin date")),
+                ("end_date", models.DateField(verbose_name="end date")),
             ],
             options={
-                'verbose_name_plural': 'holidays',
+                "verbose_name_plural": "holidays",
             },
         ),
         migrations.CreateModel(
-            name='Owner',
+            name="Owner",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('name', models.CharField(max_length=200, unique=True, verbose_name='name')),
-                ('email', models.EmailField(max_length=254, verbose_name='email')),
-                ('phone', models.CharField(blank=True, max_length=30, null=True, verbose_name='phone')),
-                ('contact', models.TextField(blank=True, help_text='Phone number and email as displayed in contracts, invoices, etc...', null=True, verbose_name='contact')),
-                ('address', models.TextField(blank=True, null=True, verbose_name='address')),
-                ('legal', models.TextField(blank=True, help_text='Legal mention on bills', null=True, verbose_name='legal mention')),
-                ('payment', models.TextField(blank=True, help_text='Payment information', null=True, verbose_name='payment')),
-                ('billing', models.TextField(blank=True, help_text='Billing conditions', null=True, verbose_name='billing')),
-                ('no_vat', models.BooleanField(verbose_name='no vat')),
-                ('vat_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='vat rate')),
-                ('note', models.TextField(blank=True, verbose_name='note')),
-                ('invoice_label', models.CharField(choices=[('invoice', 'Invoice'), ('note', 'Note'), ('receipt', 'Receipt'), ('quittance', 'Quittance')], default='receipt', max_length=30, verbose_name='invoice label')),
-                ('deposit_label', models.CharField(choices=[('deposit', 'Deposit'), ('down_payment', 'Down payment')], default='deposit', max_length=30, verbose_name='deposit or down payment')),
-                ('logo', models.ImageField(blank=True, upload_to=core.models.user_directory_path, verbose_name='logo')),
-                ('signature', models.ImageField(blank=True, upload_to=core.models.user_directory_path, verbose_name='signature')),
-                ('display_week', models.BooleanField(default=False, verbose_name='display week number')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("active", models.BooleanField(default=True, verbose_name="active")),
+                ("name", models.CharField(max_length=200, unique=True, verbose_name="name")),
+                ("email", models.EmailField(max_length=254, verbose_name="email")),
+                ("phone", models.CharField(blank=True, max_length=30, null=True, verbose_name="phone")),
+                (
+                    "contact",
+                    models.TextField(
+                        blank=True,
+                        help_text="Phone number and email as displayed in contracts, invoices, etc...",
+                        null=True,
+                        verbose_name="contact",
+                    ),
+                ),
+                ("address", models.TextField(blank=True, null=True, verbose_name="address")),
+                (
+                    "legal",
+                    models.TextField(
+                        blank=True, help_text="Legal mention on bills", null=True, verbose_name="legal mention"
+                    ),
+                ),
+                (
+                    "payment",
+                    models.TextField(blank=True, help_text="Payment information", null=True, verbose_name="payment"),
+                ),
+                (
+                    "billing",
+                    models.TextField(blank=True, help_text="Billing conditions", null=True, verbose_name="billing"),
+                ),
+                ("no_vat", models.BooleanField(verbose_name="no vat")),
+                (
+                    "vat_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="vat rate"
+                    ),
+                ),
+                ("note", models.TextField(blank=True, verbose_name="note")),
+                (
+                    "invoice_label",
+                    models.CharField(
+                        choices=[
+                            ("invoice", "Invoice"),
+                            ("note", "Note"),
+                            ("receipt", "Receipt"),
+                            ("quittance", "Quittance"),
+                        ],
+                        default="receipt",
+                        max_length=30,
+                        verbose_name="invoice label",
+                    ),
+                ),
+                (
+                    "deposit_label",
+                    models.CharField(
+                        choices=[("deposit", "Deposit"), ("down_payment", "Down payment")],
+                        default="deposit",
+                        max_length=30,
+                        verbose_name="deposit or down payment",
+                    ),
+                ),
+                ("logo", models.ImageField(blank=True, upload_to=core.models.user_directory_path, verbose_name="logo")),
+                (
+                    "signature",
+                    models.ImageField(blank=True, upload_to=core.models.user_directory_path, verbose_name="signature"),
+                ),
+                ("display_week", models.BooleanField(default=False, verbose_name="display week number")),
             ],
             options={
-                'verbose_name': 'Owner',
+                "verbose_name": "Owner",
             },
         ),
         migrations.CreateModel(
-            name='Pricing',
+            name="Pricing",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='name')),
-                ('daily_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='daily rate')),
-                ('weekend_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='weekend rate')),
-                ('weekly_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='weekly rate')),
-                ('minimum_stay', models.PositiveSmallIntegerField(verbose_name='Minimum stay')),
-                ('included_guests', models.PositiveSmallIntegerField(verbose_name='Number of guests included in the price')),
-                ('supplement_per_additional_guest', models.PositiveSmallIntegerField(verbose_name='Supplement per night and per additional guest')),
-                ('info', models.TextField(blank=True, null=True, verbose_name='info')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=256, verbose_name="name")),
+                (
+                    "daily_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="daily rate"
+                    ),
+                ),
+                (
+                    "weekend_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="weekend rate"
+                    ),
+                ),
+                (
+                    "weekly_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="weekly rate"
+                    ),
+                ),
+                ("minimum_stay", models.PositiveSmallIntegerField(verbose_name="Minimum stay")),
+                (
+                    "included_guests",
+                    models.PositiveSmallIntegerField(verbose_name="Number of guests included in the price"),
+                ),
+                (
+                    "supplement_per_additional_guest",
+                    models.PositiveSmallIntegerField(verbose_name="Supplement per night and per additional guest"),
+                ),
+                ("info", models.TextField(blank=True, null=True, verbose_name="info")),
             ],
         ),
         migrations.CreateModel(
-            name='Service',
+            name="Service",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('reference', models.CharField(blank=True, max_length=20, null=True, verbose_name='reference')),
-                ('designation', models.CharField(max_length=256, verbose_name='designation')),
-                ('quantity', models.SmallIntegerField(default=1, verbose_name='quantity')),
-                ('unit_price', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='unit price VAT incl.')),
-                ('vat', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='VAT %')),
-                ('is_flat_rate', models.BooleanField(default=False, help_text='Use flat rate price instead of daily price computation', verbose_name='flat rate?')),
-                ('included_in_booking', models.BooleanField(default=False, help_text='If true, the price of this option is included in booking price and not displayed separately', verbose_name='included in booking')),
-                ('not_included_in_price', models.BooleanField(default=False, help_text='Service not included in current booking price. Maybe provided by external partner...', verbose_name='not included in price')),
-                ('auto_add_booking', models.BooleanField(default=False, verbose_name='auto add booking')),
-                ('auto_add_invoice', models.BooleanField(default=False, verbose_name='auto add invoice')),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.category')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("reference", models.CharField(blank=True, max_length=20, null=True, verbose_name="reference")),
+                ("designation", models.CharField(max_length=256, verbose_name="designation")),
+                ("quantity", models.SmallIntegerField(default=1, verbose_name="quantity")),
+                (
+                    "unit_price",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="unit price VAT incl."
+                    ),
+                ),
+                (
+                    "vat",
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="VAT %"),
+                ),
+                (
+                    "is_flat_rate",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Use flat rate price instead of daily price computation",
+                        verbose_name="flat rate?",
+                    ),
+                ),
+                (
+                    "included_in_booking",
+                    models.BooleanField(
+                        default=False,
+                        help_text="If true, the price of this option is included in booking price and not displayed separately",
+                        verbose_name="included in booking",
+                    ),
+                ),
+                (
+                    "not_included_in_price",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Service not included in current booking price. Maybe provided by external partner...",
+                        verbose_name="not included in price",
+                    ),
+                ),
+                ("auto_add_booking", models.BooleanField(default=False, verbose_name="auto add booking")),
+                ("auto_add_invoice", models.BooleanField(default=False, verbose_name="auto add invoice")),
+                ("category", models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to="core.category")),
             ],
             options={
-                'verbose_name': 'Service',
-                'ordering': ('reference',),
+                "verbose_name": "Service",
+                "ordering": ("reference",),
             },
         ),
         migrations.CreateModel(
-            name='SeasonalVariation',
+            name="SeasonalVariation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='name')),
-                ('begin_date', models.DateField(verbose_name='begin date')),
-                ('end_date', models.DateField(verbose_name='end date')),
-                ('daily_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='daily rate')),
-                ('weekend_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='weekend rate')),
-                ('weekly_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='weekly rate')),
-                ('minimum_stay', models.PositiveSmallIntegerField(verbose_name='Minimum stay')),
-                ('pricing', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.pricing')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=256, verbose_name="name")),
+                ("begin_date", models.DateField(verbose_name="begin date")),
+                ("end_date", models.DateField(verbose_name="end date")),
+                (
+                    "daily_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="daily rate"
+                    ),
+                ),
+                (
+                    "weekend_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="weekend rate"
+                    ),
+                ),
+                (
+                    "weekly_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="weekly rate"
+                    ),
+                ),
+                ("minimum_stay", models.PositiveSmallIntegerField(verbose_name="Minimum stay")),
+                ("pricing", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.pricing")),
             ],
         ),
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.CharField(max_length=255, verbose_name='description')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='amount')),
-                ('method', models.CharField(choices=[('cash', 'Cash'), ('bank_card', 'Bank card'), ('check', 'Check'), ('transfer', 'Transfer'), ('paypal', 'PayPal'), ('vouchers', 'Holiday vouchers'), ('other', 'Other')], max_length=30, verbose_name='Payment method')),
-                ('date', models.DateField(verbose_name='Payment date')),
-                ('booking', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.booking')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("description", models.CharField(max_length=255, verbose_name="description")),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10, verbose_name="amount")),
+                (
+                    "method",
+                    models.CharField(
+                        choices=[
+                            ("cash", "Cash"),
+                            ("bank_card", "Bank card"),
+                            ("check", "Check"),
+                            ("transfer", "Transfer"),
+                            ("paypal", "PayPal"),
+                            ("vouchers", "Holiday vouchers"),
+                            ("other", "Other"),
+                        ],
+                        max_length=30,
+                        verbose_name="Payment method",
+                    ),
+                ),
+                ("date", models.DateField(verbose_name="Payment date")),
+                ("booking", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.booking")),
             ],
             options={
-                'ordering': ['date'],
+                "ordering": ["date"],
             },
         ),
         migrations.CreateModel(
-            name='Lodging',
+            name="Lodging",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uid', models.UUIDField(default=uuid.uuid4, unique=True)),
-                ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('shown', models.BooleanField(default=True, verbose_name='shown')),
-                ('name', models.CharField(max_length=200, unique=True, verbose_name='name')),
-                ('rank', models.IntegerField(verbose_name='rank')),
-                ('address', models.TextField(verbose_name='address')),
-                ('daily_rate', models.DecimalField(decimal_places=2, help_text='Default price for one night', max_digits=10, verbose_name='daily rate')),
-                ('guaranty', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='guaranty deposit')),
-                ('capacity', models.IntegerField(blank=True, null=True, verbose_name='capacity')),
-                ('information', models.TextField(blank=True, verbose_name='information')),
-                ('tourist_tax', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='tourist tax')),
-                ('description', models.TextField(blank=True, help_text='Used by contracts generation', verbose_name='description')),
-                ('contract_template', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.contracttemplate')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.owner')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("uid", models.UUIDField(default=uuid.uuid4, unique=True)),
+                ("active", models.BooleanField(default=True, verbose_name="active")),
+                ("shown", models.BooleanField(default=True, verbose_name="shown")),
+                ("name", models.CharField(max_length=200, unique=True, verbose_name="name")),
+                ("rank", models.IntegerField(verbose_name="rank")),
+                ("address", models.TextField(verbose_name="address")),
+                (
+                    "daily_rate",
+                    models.DecimalField(
+                        decimal_places=2,
+                        help_text="Default price for one night",
+                        max_digits=10,
+                        verbose_name="daily rate",
+                    ),
+                ),
+                (
+                    "guaranty",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="guaranty deposit"
+                    ),
+                ),
+                ("capacity", models.IntegerField(blank=True, null=True, verbose_name="capacity")),
+                ("information", models.TextField(blank=True, verbose_name="information")),
+                (
+                    "tourist_tax",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="tourist tax"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(blank=True, help_text="Used by contracts generation", verbose_name="description"),
+                ),
+                (
+                    "contract_template",
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="core.contracttemplate"
+                    ),
+                ),
+                ("owner", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.owner")),
             ],
             options={
-                'verbose_name': 'Lodging',
-                'ordering': ['owner', 'rank'],
+                "verbose_name": "Lodging",
+                "ordering": ["owner", "rank"],
             },
         ),
         migrations.CreateModel(
-            name='HistoricalService',
+            name="HistoricalService",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('reference', models.CharField(blank=True, max_length=20, null=True, verbose_name='reference')),
-                ('designation', models.CharField(max_length=256, verbose_name='designation')),
-                ('quantity', models.SmallIntegerField(default=1, verbose_name='quantity')),
-                ('unit_price', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='unit price VAT incl.')),
-                ('vat', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='VAT %')),
-                ('is_flat_rate', models.BooleanField(default=False, help_text='Use flat rate price instead of daily price computation', verbose_name='flat rate?')),
-                ('included_in_booking', models.BooleanField(default=False, help_text='If true, the price of this option is included in booking price and not displayed separately', verbose_name='included in booking')),
-                ('not_included_in_price', models.BooleanField(default=False, help_text='Service not included in current booking price. Maybe provided by external partner...', verbose_name='not included in price')),
-                ('auto_add_booking', models.BooleanField(default=False, verbose_name='auto add booking')),
-                ('auto_add_invoice', models.BooleanField(default=False, verbose_name='auto add invoice')),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('category', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='core.category')),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ("id", models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name="ID")),
+                ("reference", models.CharField(blank=True, max_length=20, null=True, verbose_name="reference")),
+                ("designation", models.CharField(max_length=256, verbose_name="designation")),
+                ("quantity", models.SmallIntegerField(default=1, verbose_name="quantity")),
+                (
+                    "unit_price",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="unit price VAT incl."
+                    ),
+                ),
+                (
+                    "vat",
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="VAT %"),
+                ),
+                (
+                    "is_flat_rate",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Use flat rate price instead of daily price computation",
+                        verbose_name="flat rate?",
+                    ),
+                ),
+                (
+                    "included_in_booking",
+                    models.BooleanField(
+                        default=False,
+                        help_text="If true, the price of this option is included in booking price and not displayed separately",
+                        verbose_name="included in booking",
+                    ),
+                ),
+                (
+                    "not_included_in_price",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Service not included in current booking price. Maybe provided by external partner...",
+                        verbose_name="not included in price",
+                    ),
+                ),
+                ("auto_add_booking", models.BooleanField(default=False, verbose_name="auto add booking")),
+                ("auto_add_invoice", models.BooleanField(default=False, verbose_name="auto add invoice")),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")], max_length=1),
+                ),
+                (
+                    "category",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="core.category",
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Service',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical Service",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalOwner',
+            name="HistoricalOwner",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('name', models.CharField(db_index=True, max_length=200, verbose_name='name')),
-                ('email', models.EmailField(max_length=254, verbose_name='email')),
-                ('phone', models.CharField(blank=True, max_length=30, null=True, verbose_name='phone')),
-                ('contact', models.TextField(blank=True, help_text='Phone number and email as displayed in contracts, invoices, etc...', null=True, verbose_name='contact')),
-                ('address', models.TextField(blank=True, null=True, verbose_name='address')),
-                ('legal', models.TextField(blank=True, help_text='Legal mention on bills', null=True, verbose_name='legal mention')),
-                ('payment', models.TextField(blank=True, help_text='Payment information', null=True, verbose_name='payment')),
-                ('billing', models.TextField(blank=True, help_text='Billing conditions', null=True, verbose_name='billing')),
-                ('no_vat', models.BooleanField(verbose_name='no vat')),
-                ('vat_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='vat rate')),
-                ('note', models.TextField(blank=True, verbose_name='note')),
-                ('invoice_label', models.CharField(choices=[('invoice', 'Invoice'), ('note', 'Note'), ('receipt', 'Receipt'), ('quittance', 'Quittance')], default='receipt', max_length=30, verbose_name='invoice label')),
-                ('deposit_label', models.CharField(choices=[('deposit', 'Deposit'), ('down_payment', 'Down payment')], default='deposit', max_length=30, verbose_name='deposit or down payment')),
-                ('logo', models.TextField(blank=True, max_length=100, verbose_name='logo')),
-                ('signature', models.TextField(blank=True, max_length=100, verbose_name='signature')),
-                ('display_week', models.BooleanField(default=False, verbose_name='display week number')),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ("id", models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name="ID")),
+                ("active", models.BooleanField(default=True, verbose_name="active")),
+                ("name", models.CharField(db_index=True, max_length=200, verbose_name="name")),
+                ("email", models.EmailField(max_length=254, verbose_name="email")),
+                ("phone", models.CharField(blank=True, max_length=30, null=True, verbose_name="phone")),
+                (
+                    "contact",
+                    models.TextField(
+                        blank=True,
+                        help_text="Phone number and email as displayed in contracts, invoices, etc...",
+                        null=True,
+                        verbose_name="contact",
+                    ),
+                ),
+                ("address", models.TextField(blank=True, null=True, verbose_name="address")),
+                (
+                    "legal",
+                    models.TextField(
+                        blank=True, help_text="Legal mention on bills", null=True, verbose_name="legal mention"
+                    ),
+                ),
+                (
+                    "payment",
+                    models.TextField(blank=True, help_text="Payment information", null=True, verbose_name="payment"),
+                ),
+                (
+                    "billing",
+                    models.TextField(blank=True, help_text="Billing conditions", null=True, verbose_name="billing"),
+                ),
+                ("no_vat", models.BooleanField(verbose_name="no vat")),
+                (
+                    "vat_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="vat rate"
+                    ),
+                ),
+                ("note", models.TextField(blank=True, verbose_name="note")),
+                (
+                    "invoice_label",
+                    models.CharField(
+                        choices=[
+                            ("invoice", "Invoice"),
+                            ("note", "Note"),
+                            ("receipt", "Receipt"),
+                            ("quittance", "Quittance"),
+                        ],
+                        default="receipt",
+                        max_length=30,
+                        verbose_name="invoice label",
+                    ),
+                ),
+                (
+                    "deposit_label",
+                    models.CharField(
+                        choices=[("deposit", "Deposit"), ("down_payment", "Down payment")],
+                        default="deposit",
+                        max_length=30,
+                        verbose_name="deposit or down payment",
+                    ),
+                ),
+                ("logo", models.TextField(blank=True, max_length=100, verbose_name="logo")),
+                ("signature", models.TextField(blank=True, max_length=100, verbose_name="signature")),
+                ("display_week", models.BooleanField(default=False, verbose_name="display week number")),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")], max_length=1),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Owner',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical Owner",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalLodging',
+            name="HistoricalLodging",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('uid', models.UUIDField(db_index=True, default=uuid.uuid4)),
-                ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('shown', models.BooleanField(default=True, verbose_name='shown')),
-                ('name', models.CharField(db_index=True, max_length=200, verbose_name='name')),
-                ('rank', models.IntegerField(verbose_name='rank')),
-                ('address', models.TextField(verbose_name='address')),
-                ('daily_rate', models.DecimalField(decimal_places=2, help_text='Default price for one night', max_digits=10, verbose_name='daily rate')),
-                ('guaranty', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='guaranty deposit')),
-                ('capacity', models.IntegerField(blank=True, null=True, verbose_name='capacity')),
-                ('information', models.TextField(blank=True, verbose_name='information')),
-                ('tourist_tax', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='tourist tax')),
-                ('description', models.TextField(blank=True, help_text='Used by contracts generation', verbose_name='description')),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('contract_template', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='core.contracttemplate')),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='core.owner')),
+                ("id", models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name="ID")),
+                ("uid", models.UUIDField(db_index=True, default=uuid.uuid4)),
+                ("active", models.BooleanField(default=True, verbose_name="active")),
+                ("shown", models.BooleanField(default=True, verbose_name="shown")),
+                ("name", models.CharField(db_index=True, max_length=200, verbose_name="name")),
+                ("rank", models.IntegerField(verbose_name="rank")),
+                ("address", models.TextField(verbose_name="address")),
+                (
+                    "daily_rate",
+                    models.DecimalField(
+                        decimal_places=2,
+                        help_text="Default price for one night",
+                        max_digits=10,
+                        verbose_name="daily rate",
+                    ),
+                ),
+                (
+                    "guaranty",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="guaranty deposit"
+                    ),
+                ),
+                ("capacity", models.IntegerField(blank=True, null=True, verbose_name="capacity")),
+                ("information", models.TextField(blank=True, verbose_name="information")),
+                (
+                    "tourist_tax",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="tourist tax"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(blank=True, help_text="Used by contracts generation", verbose_name="description"),
+                ),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")], max_length=1),
+                ),
+                (
+                    "contract_template",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="core.contracttemplate",
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="core.owner",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Lodging',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical Lodging",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalContractTemplate',
+            name="HistoricalContractTemplate",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('content', models.TextField(verbose_name='Contract')),
-                ('created', models.DateTimeField(blank=True, editable=False)),
-                ('modified', models.DateTimeField(blank=True, editable=False)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ("id", models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name="ID")),
+                ("name", models.CharField(max_length=100)),
+                ("content", models.TextField(verbose_name="Contract")),
+                ("created", models.DateTimeField(blank=True, editable=False)),
+                ("modified", models.DateTimeField(blank=True, editable=False)),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")], max_length=1),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Contract template',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical Contract template",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalBooking',
+            name="HistoricalBooking",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('uid', models.UUIDField(db_index=True, default=uuid.uuid4)),
-                ('guest_name', models.CharField(max_length=256, verbose_name='guest name')),
-                ('guest_contact', models.TextField(blank=True, null=True, verbose_name='guest contact')),
-                ('guest_address', models.TextField(blank=True, null=True, verbose_name='guest address')),
-                ('source_uid', models.CharField(blank=True, help_text='UID on source channel', max_length=256, null=True, verbose_name='channel UID')),
-                ('begin_date', models.DateField(verbose_name='begin date')),
-                ('end_date', models.DateField(verbose_name='end date')),
-                ('duration', models.PositiveSmallIntegerField(verbose_name='duration')),
-                ('adults', models.PositiveSmallIntegerField(default=1, verbose_name='adults')),
-                ('children', models.PositiveSmallIntegerField(default=0, verbose_name='children')),
-                ('babies', models.PositiveSmallIntegerField(default=0, verbose_name='babies')),
-                ('catering', models.CharField(choices=[('none', 'None'), ('breakfast', 'Breakfast'), ('half', 'Half board'), ('full', 'Full board')], default='none', max_length=20, verbose_name='catering')),
-                ('daily_rate', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='daily rate')),
-                ('price', models.DecimalField(decimal_places=2, help_text='Total price, either computed by daily price or applying flat rate', max_digits=10, verbose_name='price')),
-                ('is_flat_rate', models.BooleanField(default=False, help_text='Use flat rate price instead of daily price computation if true', verbose_name='flat rate?')),
-                ('deposit', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='deposit')),
-                ('guaranty', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='guaranty')),
-                ('commission_fees', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name='commission fees')),
-                ('info', models.TextField(blank=True, null=True, verbose_name='info')),
-                ('special_conditions', models.TextField(blank=True, null=True, verbose_name='Special conditions')),
-                ('created', models.DateTimeField(blank=True, editable=False)),
-                ('modified', models.DateTimeField(blank=True, editable=False)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('lodging', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='core.lodging')),
-                ('source', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='core.bookingchannel')),
-                ('status', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='core.bookingstatus')),
+                ("id", models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name="ID")),
+                ("uid", models.UUIDField(db_index=True, default=uuid.uuid4)),
+                ("guest_name", models.CharField(max_length=256, verbose_name="guest name")),
+                ("guest_contact", models.TextField(blank=True, null=True, verbose_name="guest contact")),
+                ("guest_address", models.TextField(blank=True, null=True, verbose_name="guest address")),
+                (
+                    "source_uid",
+                    models.CharField(
+                        blank=True,
+                        help_text="UID on source channel",
+                        max_length=256,
+                        null=True,
+                        verbose_name="channel UID",
+                    ),
+                ),
+                ("begin_date", models.DateField(verbose_name="begin date")),
+                ("end_date", models.DateField(verbose_name="end date")),
+                ("duration", models.PositiveSmallIntegerField(verbose_name="duration")),
+                ("adults", models.PositiveSmallIntegerField(default=1, verbose_name="adults")),
+                ("children", models.PositiveSmallIntegerField(default=0, verbose_name="children")),
+                ("babies", models.PositiveSmallIntegerField(default=0, verbose_name="babies")),
+                (
+                    "catering",
+                    models.CharField(
+                        choices=[
+                            ("none", "None"),
+                            ("breakfast", "Breakfast"),
+                            ("half", "Half board"),
+                            ("full", "Full board"),
+                        ],
+                        default="none",
+                        max_length=20,
+                        verbose_name="catering",
+                    ),
+                ),
+                (
+                    "daily_rate",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="daily rate"
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2,
+                        help_text="Total price, either computed by daily price or applying flat rate",
+                        max_digits=10,
+                        verbose_name="price",
+                    ),
+                ),
+                (
+                    "is_flat_rate",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Use flat rate price instead of daily price computation if true",
+                        verbose_name="flat rate?",
+                    ),
+                ),
+                (
+                    "deposit",
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="deposit"),
+                ),
+                (
+                    "guaranty",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="guaranty"
+                    ),
+                ),
+                (
+                    "commission_fees",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=10, null=True, verbose_name="commission fees"
+                    ),
+                ),
+                ("info", models.TextField(blank=True, null=True, verbose_name="info")),
+                ("special_conditions", models.TextField(blank=True, null=True, verbose_name="Special conditions")),
+                ("created", models.DateTimeField(blank=True, editable=False)),
+                ("modified", models.DateTimeField(blank=True, editable=False)),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")], max_length=1),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "lodging",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="core.lodging",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="core.bookingchannel",
+                    ),
+                ),
+                (
+                    "status",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="core.bookingstatus",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical Booking',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical Booking",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='Contract',
+            name="Contract",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField(verbose_name='Contract')),
-                ('pdf', models.CharField(blank=True, max_length=255, null=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('modified', models.DateTimeField(auto_now=True)),
-                ('pdf_created', models.DateTimeField(blank=True, null=True)),
-                ('signed', models.DateTimeField(blank=True, null=True, verbose_name='signed')),
-                ('booking', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='core.booking')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("content", models.TextField(verbose_name="Contract")),
+                ("pdf", models.CharField(blank=True, max_length=255, null=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("modified", models.DateTimeField(auto_now=True)),
+                ("pdf_created", models.DateTimeField(blank=True, null=True)),
+                ("signed", models.DateTimeField(blank=True, null=True, verbose_name="signed")),
+                ("booking", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="core.booking")),
             ],
             options={
-                'verbose_name': 'Contract',
+                "verbose_name": "Contract",
             },
         ),
         migrations.CreateModel(
-            name='BookingChannelSync',
+            name="BookingChannelSync",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('source_url', models.URLField(verbose_name='Source URL')),
-                ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('last_import', models.DateTimeField(blank=True, help_text='Last time we imported remote calendar from channel.', null=True)),
-                ('last_export', models.DateTimeField(blank=True, help_text='Last time the calendar has been successfully requested by remote channel.', null=True)),
-                ('last_import_error', models.TextField(blank=True, null=True)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.bookingchannel')),
-                ('lodging', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.lodging')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("source_url", models.URLField(verbose_name="Source URL")),
+                ("active", models.BooleanField(default=True, verbose_name="active")),
+                (
+                    "last_import",
+                    models.DateTimeField(
+                        blank=True, help_text="Last time we imported remote calendar from channel.", null=True
+                    ),
+                ),
+                (
+                    "last_export",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="Last time the calendar has been successfully requested by remote channel.",
+                        null=True,
+                    ),
+                ),
+                ("last_import_error", models.TextField(blank=True, null=True)),
+                ("channel", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.bookingchannel")),
+                ("lodging", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.lodging")),
             ],
         ),
         migrations.AddField(
-            model_name='bookingchannel',
-            name='default_booking_status',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.bookingstatus'),
+            model_name="bookingchannel",
+            name="default_booking_status",
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="core.bookingstatus"
+            ),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='lodging',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.lodging'),
+            model_name="booking",
+            name="lodging",
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to="core.lodging"
+            ),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='options',
-            field=models.ManyToManyField(through='core.BookedService', to='core.Service'),
+            model_name="booking",
+            name="options",
+            field=models.ManyToManyField(through="core.BookedService", to="core.Service"),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='source',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='core.bookingchannel'),
+            model_name="booking",
+            name="source",
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="core.bookingchannel"
+            ),
         ),
         migrations.AddField(
-            model_name='booking',
-            name='status',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='core.bookingstatus'),
+            model_name="booking",
+            name="status",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to="core.bookingstatus"),
         ),
         migrations.AddField(
-            model_name='bookedservice',
-            name='booking',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.booking'),
+            model_name="bookedservice",
+            name="booking",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.booking"),
         ),
         migrations.AddField(
-            model_name='bookedservice',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.service'),
+            model_name="bookedservice",
+            name="service",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.service"),
         ),
     ]

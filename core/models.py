@@ -11,42 +11,53 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-logger = logging.getLogger('api')
+logger = logging.getLogger("api")
 
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
-    return 'owner_{0}/{1}'.format(instance.id, filename)
+    return "owner_{0}/{1}".format(instance.id, filename)
 
 
 class Owner(models.Model):
     class DepositOrDownPayment(models.TextChoices):
-        DEPOSIT = 'deposit', _('Deposit')
-        DOWN_PAYMENT = 'down_payment', _('Down payment')
+        DEPOSIT = "deposit", _("Deposit")
+        DOWN_PAYMENT = "down_payment", _("Down payment")
 
     class InvoiceLabel(models.TextChoices):
-        INVOICE = 'invoice', _('Invoice')
-        NOTE = 'note', _('Note')
-        RECEIPT = 'receipt', _('Receipt')
-        QUITTANCE = 'quittance', _('Quittance')
+        INVOICE = "invoice", _("Invoice")
+        NOTE = "note", _("Note")
+        RECEIPT = "receipt", _("Receipt")
+        QUITTANCE = "quittance", _("Quittance")
 
     active = models.BooleanField(_("active"), default=True)
     name = models.CharField(_("name"), max_length=200, unique=True)
     email = models.EmailField(_("email"))
     phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
-    contact = models.TextField(_("contact"), blank=True, null=True,
-                               help_text=_("Phone number and email as displayed in contracts, invoices, etc..."))
+    contact = models.TextField(
+        _("contact"),
+        blank=True,
+        null=True,
+        help_text=_("Phone number and email as displayed in contracts, invoices, etc..."),
+    )
     address = models.TextField(_("address"), blank=True, null=True)
     legal = models.TextField(_("legal mention"), blank=True, null=True, help_text=_("Legal mention on bills"))
     payment = models.TextField(_("payment"), blank=True, null=True, help_text=_("Payment information"))
     billing = models.TextField(_("billing"), blank=True, null=True, help_text=_("Billing conditions"))
-    no_vat = models.BooleanField(_("no vat"), )
+    no_vat = models.BooleanField(
+        _("no vat"),
+    )
     vat_rate = models.DecimalField(_("vat rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     note = models.TextField(_("note"), blank=True)
-    invoice_label = models.CharField(_("invoice label"), max_length=30, choices=InvoiceLabel.choices,
-                                     default=InvoiceLabel.RECEIPT)
-    deposit_label = models.CharField(_("deposit or down payment"), max_length=30, choices=DepositOrDownPayment.choices,
-                                     default=DepositOrDownPayment.DEPOSIT)
+    invoice_label = models.CharField(
+        _("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT
+    )
+    deposit_label = models.CharField(
+        _("deposit or down payment"),
+        max_length=30,
+        choices=DepositOrDownPayment.choices,
+        default=DepositOrDownPayment.DEPOSIT,
+    )
     logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True)
     signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True)
     display_week = models.BooleanField(_("display week number"), default=False)
@@ -66,10 +77,15 @@ class Lodging(models.Model):
     shown = models.BooleanField(_("shown"), default=True)
     name = models.CharField(_("name"), max_length=200, unique=True)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
-    rank = models.IntegerField(_("rank"), )
-    address = models.TextField(_("address"), )
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2,
-                                     help_text=_("Default price for one night"))
+    rank = models.IntegerField(
+        _("rank"),
+    )
+    address = models.TextField(
+        _("address"),
+    )
+    daily_rate = models.DecimalField(
+        _("daily rate"), max_digits=20, decimal_places=2, help_text=_("Default price for one night")
+    )
     # weekly_rate = models.DecimalField(_("weekly price"), max_digits=20, decimal_places=2, null=True, blank=True)
     guaranty = models.DecimalField(_("guaranty deposit"), max_digits=20, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
@@ -83,12 +99,12 @@ class Lodging(models.Model):
 
     class Meta:
         verbose_name = _("Lodging")
-        ordering = ['owner', 'rank']
+        ordering = ["owner", "rank"]
 
     def __str__(self):
         return self.name
 
-    def generate_empty_contract(self, url_server='http://127.0.0.1:8000'):
+    def generate_empty_contract(self, url_server="http://127.0.0.1:8000"):
         booking = Booking(
             lodging=self,
             guest_name="........................................",
@@ -103,6 +119,7 @@ class Lodging(models.Model):
 
 class Category(models.Model):
     """Category of receipts, mainly for reports"""
+
     name = models.CharField(_("name"), max_length=100)
 
     class Meta:
@@ -119,14 +136,19 @@ class Service(models.Model):
     designation = models.CharField(_("designation"), max_length=256)
     unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=20, decimal_places=2, blank=True, null=True)
-    is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
-                                       help_text=_("Use flat rate price instead of daily price computation"))
+    is_flat_rate = models.BooleanField(
+        _("flat rate?"), default=False, help_text=_("Use flat rate price instead of daily price computation")
+    )
     included_in_booking = models.BooleanField(
-        _("included in booking"), default=False,
-        help_text=_("If true, the price of this option is included in booking price and not displayed separately"))
+        _("included in booking"),
+        default=False,
+        help_text=_("If true, the price of this option is included in booking price and not displayed separately"),
+    )
     not_included_in_price = models.BooleanField(
-        _("not included in price"), default=False,
-        help_text=_("Service not included in current booking price. Maybe provided by external partner..."))
+        _("not included in price"),
+        default=False,
+        help_text=_("Service not included in current booking price. Maybe provided by external partner..."),
+    )
     auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
     auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
 
@@ -144,14 +166,17 @@ class BookingStatus(models.Model):
     name = models.CharField(_("name"), max_length=100)
     color = models.CharField(_("color"), max_length=10)
     rank = models.PositiveSmallIntegerField(_("rank"))
-    no_stats = models.BooleanField(default=False, help_text=_("Check to ignore from statistics bookings with "
-                                                              "this status"))
-    finalized = models.BooleanField(default=True, help_text=_("If true, the booking is finalized and considered as real"))
+    no_stats = models.BooleanField(
+        default=False, help_text=_("Check to ignore from statistics bookings with " "this status")
+    )
+    finalized = models.BooleanField(
+        default=True, help_text=_("If true, the booking is finalized and considered as real")
+    )
 
     class Meta:
         verbose_name = _("Booking status")
         verbose_name_plural = _("Booking statuses")
-        ordering = ['rank']
+        ordering = ["rank"]
 
     def __str__(self):
         return self.name
@@ -159,12 +184,13 @@ class BookingStatus(models.Model):
 
 class BookingChannel(models.Model):
     """Where does the booking come from, for reports"""
+
     name = models.CharField(_("name"), max_length=100)
     default_booking_status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Booking channel")
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -172,23 +198,26 @@ class BookingChannel(models.Model):
 
 class BookingChannelSync(models.Model):
     """Take care about calendar synchronisation with external booking platforms"""
+
     channel = models.ForeignKey(BookingChannel, on_delete=models.CASCADE)
     lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
     source_url = models.URLField(_("Source URL"))
     active = models.BooleanField(_("active"), default=True)
-    last_import = models.DateTimeField(blank=True, null=True,
-                                       help_text=_("Last time we imported remote calendar from channel."))
-    last_export = models.DateTimeField(blank=True, null=True, help_text=_(
-        "Last time the calendar has been successfully requested by remote channel."))
+    last_import = models.DateTimeField(
+        blank=True, null=True, help_text=_("Last time we imported remote calendar from channel.")
+    )
+    last_export = models.DateTimeField(
+        blank=True, null=True, help_text=_("Last time the calendar has been successfully requested by remote channel.")
+    )
     last_import_error = models.TextField(null=True, blank=True)
 
 
 class Booking(models.Model):
     class Catering(models.TextChoices):
-        NONE = 'none', _('None')
-        BREAKFAST = 'breakfast', _('Breakfast')
-        HALF = 'half', _('Half board')
-        FULL = 'full', _('Full board')
+        NONE = "none", _("None")
+        BREAKFAST = "breakfast", _("Breakfast")
+        HALF = "half", _("Half board")
+        FULL = "full", _("Full board")
 
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
     lodging = models.ForeignKey(Lodging, blank=True, null=True, on_delete=models.SET_NULL)
@@ -197,26 +226,38 @@ class Booking(models.Model):
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
     status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT)
     source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT, blank=True, null=True)
-    source_uid = models.CharField(_("channel UID"), max_length=256, null=True, blank=True,
-                                  help_text=_('UID on source channel'))
-    begin_date = models.DateField(_("begin date"), )
-    end_date = models.DateField(_("end date"), )
-    duration = models.PositiveSmallIntegerField(_("duration"), )
+    source_uid = models.CharField(
+        _("channel UID"), max_length=256, null=True, blank=True, help_text=_("UID on source channel")
+    )
+    begin_date = models.DateField(
+        _("begin date"),
+    )
+    end_date = models.DateField(
+        _("end date"),
+    )
+    duration = models.PositiveSmallIntegerField(
+        _("duration"),
+    )
     adults = models.PositiveSmallIntegerField(_("adults"), default=1)
     children = models.PositiveSmallIntegerField(_("children"), default=0)
     babies = models.PositiveSmallIntegerField(_("babies"), default=0)
     catering = models.CharField(_("catering"), choices=Catering.choices, default=Catering.NONE, max_length=20)
     daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    price = models.DecimalField(_("price"), max_digits=20, decimal_places=2,
-                                help_text=_("Total price, either computed by daily price or applying flat rate"))
-    is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
-                                       help_text=_("Use flat rate price instead of daily price computation if true"))
+    price = models.DecimalField(
+        _("price"),
+        max_digits=20,
+        decimal_places=2,
+        help_text=_("Total price, either computed by daily price or applying flat rate"),
+    )
+    is_flat_rate = models.BooleanField(
+        _("flat rate?"), default=False, help_text=_("Use flat rate price instead of daily price computation if true")
+    )
     deposit = models.DecimalField(_("deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("guaranty"), max_digits=20, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
 
     notes = models.TextField(_("Notes"), blank=True, null=True)
-    options = models.ManyToManyField(Service, through='BookedService')
+    options = models.ManyToManyField(Service, through="BookedService")
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -224,14 +265,18 @@ class Booking(models.Model):
 
     class Meta:
         verbose_name = _("Booking")
-        ordering = ('-begin_date',)
+        ordering = ("-begin_date",)
         permissions = [
             ("view_prices", "Can view prices informations"),
         ]
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
-            self.guest_name, self.lodging and self.lodging.name or '--', self.begin_date, self.end_date)
+            self.guest_name,
+            self.lodging and self.lodging.name or "--",
+            self.begin_date,
+            self.end_date,
+        )
 
     @property
     def price_with_options(self):
@@ -244,7 +289,7 @@ class Booking(models.Model):
     @property
     def total_payments(self):
         """Returns the sum of the payments already made."""
-        return self.payment_set.aggregate(total_payments=Sum('amount'))['total_payments'] or 0
+        return self.payment_set.aggregate(total_payments=Sum("amount"))["total_payments"] or 0
 
     @property
     def left_to_pay(self):
@@ -252,9 +297,9 @@ class Booking(models.Model):
         return self.price_with_options - self.total_payments - (self.commission_fees or 0)
 
     def get_absolute_url(self):
-        return reverse('booking-detail', kwargs={'pk': self.pk})
+        return reverse("booking-detail", kwargs={"pk": self.pk})
 
-    def generate_contract(self, url_server='http://127.0.0.1:8000', save=True):
+    def generate_contract(self, url_server="http://127.0.0.1:8000", save=True):
         if not self.lodging:
             logger.warning("Lodging not set, can't generate a contract")
             return None
@@ -262,24 +307,29 @@ class Booking(models.Model):
             self.contract = Contract(booking=self)
         if self.lodging.contract_template:
             from core.jinja2_tools import render_template
-            signature_img = '<img style="max-width: 200px; max-height: 100px" ' \
-                            'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
+
+            signature_img = '<img style="max-width: 200px; max-height: 100px" ' 'src="%s" alt="Signature"' % (
+                url_server + self.lodging.owner.signature.url
+            )
 
             content = render_template(
                 self.lodging.contract_template.content,
                 {
-                    'booking':             self,
-                    'lodging':             self.lodging,
-                    'owner':               self.lodging.owner,
-                    'options':             self.id and list(self.bookedservice_set.all()) or [],
-                    'included_options':    self.id and self.bookedservice_set.filter(
-                        service__not_included_in_price=False) or [],
-                    'third_party_options': self.id and self.bookedservice_set.filter(
-                        service__not_included_in_price=True) or [],
-                    'url_server':          url_server,
-                    'date':                date.today(),
-                    'signature':           signature_img
-                })
+                    "booking": self,
+                    "lodging": self.lodging,
+                    "owner": self.lodging.owner,
+                    "options": self.id and list(self.bookedservice_set.all()) or [],
+                    "included_options": self.id
+                    and self.bookedservice_set.filter(service__not_included_in_price=False)
+                    or [],
+                    "third_party_options": self.id
+                    and self.bookedservice_set.filter(service__not_included_in_price=True)
+                    or [],
+                    "url_server": url_server,
+                    "date": date.today(),
+                    "signature": signature_img,
+                },
+            )
             page_break = '<div style="display: block; page-break-before: always;"></div>'
             if self.lodging.description:
                 content += page_break + self.lodging.description
@@ -293,7 +343,7 @@ class Booking(models.Model):
 
 
 def contracts_path():
-    return os.path.join(settings.MEDIA_ROOT, 'contracts')
+    return os.path.join(settings.MEDIA_ROOT, "contracts")
 
 
 class Contract(models.Model):
@@ -313,17 +363,27 @@ class Contract(models.Model):
 
     def make_pdf_path(self):
         def multiple_replace(string, rep_dict):
-            pattern = re.compile("|".join([re.escape(k) for k in sorted(rep_dict, key=len, reverse=True)]),
-                                 flags=re.DOTALL)
+            pattern = re.compile(
+                "|".join([re.escape(k) for k in sorted(rep_dict, key=len, reverse=True)]), flags=re.DOTALL
+            )
             return pattern.sub(lambda x: rep_dict[x.group(0)], string)
 
-        return os.path.join('contracts', str(self.booking.lodging.uid),
-                            "%s_%s.pdf" % (self.booking.begin_date.isoformat(),
-                                           multiple_replace(self.booking.guest_name, {
-                                               " ": "_",
-                                               ",": "_",
-                                               ";": "_",
-                                           })))
+        return os.path.join(
+            "contracts",
+            str(self.booking.lodging.uid),
+            "%s_%s.pdf"
+            % (
+                self.booking.begin_date.isoformat(),
+                multiple_replace(
+                    self.booking.guest_name,
+                    {
+                        " ": "_",
+                        ",": "_",
+                        ";": "_",
+                    },
+                ),
+            ),
+        )
 
 
 class ContractTemplate(models.Model):
@@ -344,8 +404,9 @@ class BookedService(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
-    is_flat_rate = models.BooleanField(_("flat rate?"), default=False,
-                                       help_text=_("Use flat rate price instead of daily price computation"))
+    is_flat_rate = models.BooleanField(
+        _("flat rate?"), default=False, help_text=_("Use flat rate price instead of daily price computation")
+    )
 
     class Meta:
         verbose_name = _("Booking service")
@@ -353,8 +414,12 @@ class BookedService(models.Model):
 
 class Holidays(models.Model):
     name = models.CharField(_("name"), max_length=256)
-    begin_date = models.DateField(_("begin date"), )
-    end_date = models.DateField(_("end date"), )
+    begin_date = models.DateField(
+        _("begin date"),
+    )
+    end_date = models.DateField(
+        _("end date"),
+    )
 
     class Meta:
         verbose_name_plural = _("holidays")
@@ -368,15 +433,20 @@ class Pricing(models.Model):  # or RatePlan
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
     included_guests = models.PositiveSmallIntegerField(_("Number of guests included in the price"))
     supplement_per_additional_guest = models.PositiveSmallIntegerField(
-        _('Supplement per night and per additional guest'))
+        _("Supplement per night and per additional guest")
+    )
     info = models.TextField(_("info"), blank=True, null=True)
 
 
 class SeasonalVariation(models.Model):
     pricing = models.ForeignKey(Pricing, on_delete=models.CASCADE)
     name = models.CharField(_("name"), max_length=256)
-    begin_date = models.DateField(_("begin date"), )
-    end_date = models.DateField(_("end date"), )
+    begin_date = models.DateField(
+        _("begin date"),
+    )
+    end_date = models.DateField(
+        _("end date"),
+    )
     daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     weekly_rate = models.DecimalField(_("weekly rate"), max_digits=20, decimal_places=2, blank=True, null=True)
@@ -385,13 +455,13 @@ class SeasonalVariation(models.Model):
 
 class Payment(models.Model):
     class PaymentMethod(models.TextChoices):
-        CASH = 'cash', _('Cash')
-        BANK_CARD = 'bank_card', _('Bank card')
-        CHECK = 'check', _('Check')
-        TRANSFER = 'transfer', _('Transfer')
-        PAYPAL = 'paypal', _('PayPal')
-        HOLIDAY_VOUCHERS = 'vouchers', _('Holiday vouchers')
-        OTHER = 'other', _('Other')
+        CASH = "cash", _("Cash")
+        BANK_CARD = "bank_card", _("Bank card")
+        CHECK = "check", _("Check")
+        TRANSFER = "transfer", _("Transfer")
+        PAYPAL = "paypal", _("PayPal")
+        HOLIDAY_VOUCHERS = "vouchers", _("Holiday vouchers")
+        OTHER = "other", _("Other")
 
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     description = models.CharField(_("description"), max_length=255)
@@ -400,4 +470,4 @@ class Payment(models.Model):
     date = models.DateField(_("Payment date"))
 
     class Meta:
-        ordering = ['date']
+        ordering = ["date"]

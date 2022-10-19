@@ -26,22 +26,40 @@ from . import models
 from .filters import BookingFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
-from .serializers import (BookingChannelSerializer, BookingChannelSyncSerializer, BookingNoPriceSerializer,
-                          BookingSerializer, BookingStatusSerializer, ContractSerializer, ContractTemplateSerializer,
-                          CreateUserSerializer, GuestSerializer, HolidaysSerializer, LodgingSerializer,
-                          LoginUserSerializer, NextEventSerializer, OwnerSerializer, PaymentSerializer,
-                          PricingSerializer, SeasonalVariationSerializer, ServiceSerializer, UserSerializer)
+from .serializers import (
+    BookingChannelSerializer,
+    BookingChannelSyncSerializer,
+    BookingNoPriceSerializer,
+    BookingSerializer,
+    BookingStatusSerializer,
+    ContractSerializer,
+    ContractTemplateSerializer,
+    CreateUserSerializer,
+    GuestSerializer,
+    HolidaysSerializer,
+    LodgingSerializer,
+    LoginUserSerializer,
+    NextEventSerializer,
+    OwnerSerializer,
+    PaymentSerializer,
+    PricingSerializer,
+    SeasonalVariationSerializer,
+    ServiceSerializer,
+    UserSerializer,
+)
 
-logger = logging.getLogger('api')
+logger = logging.getLogger("api")
 
 
 @api_view()
 @permission_classes([AllowAny])
 def version_view(request, *args, **kwargs):
-    return Response({
-        'version':    __version__,
-        'build_date': __date__.isoformat(timespec='seconds'),
-    })
+    return Response(
+        {
+            "version": __version__,
+            "build_date": __date__.isoformat(timespec="seconds"),
+        }
+    )
 
 
 class RegistrationAPI(generics.GenericAPIView):
@@ -54,10 +72,7 @@ class RegistrationAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         auth_token, token = AuthToken.objects.create(user)
-        return Response({
-            "user":  UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": token
-        })
+        return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token})
 
 
 class LoginAPI_(generics.GenericAPIView):
@@ -71,10 +86,7 @@ class LoginAPI_(generics.GenericAPIView):
         if not user or not user.is_active:
             raise AuthenticationFailed()
         auth_token, token = AuthToken.objects.create(user)
-        return Response({
-            "user":  UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": token
-        })
+        return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token})
 
 
 class LoginAPI(KnoxLoginView):
@@ -86,7 +98,7 @@ class LoginAPI(KnoxLoginView):
         user = authenticate(**serializer.validated_data)
         if not user or not user.is_active:
             raise AuthenticationFailed()
-        logging.getLogger('auth').info("User %s successfully logged." % user.email)
+        logging.getLogger("auth").info("User %s successfully logged." % user.email)
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
@@ -102,7 +114,9 @@ class LogoutAPI(KnoxLogoutView):
 
 class UserAPI(generics.RetrieveAPIView):
     # authentication_classes = (TokenAuthentication,)
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
     serializer_class = UserSerializer
 
     def get_object(self):
@@ -113,45 +127,67 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows bookings to be viewed or edited.
     """
-    queryset = models.Booking.objects.all().order_by('-begin_date').prefetch_related('status', 'lodging', 'source',
-                                                                                     'options')
+
+    queryset = (
+        models.Booking.objects.all().order_by("-begin_date").prefetch_related("status", "lodging", "source", "options")
+    )
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
     filterset_class = BookingFilter
 
     def get_serializer_class(self):
-        if not self.request.user.has_perm('core.view_prices'):
+        if not self.request.user.has_perm("core.view_prices"):
             return BookingNoPriceSerializer
         return BookingSerializer
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def all_guests(self, request, pk=None):
-        serializer = GuestSerializer(models.Booking.objects.all().order_by('guest_name')
-                                     .values('guest_name')
-                                     .annotate(name=Min('guest_name'), contact=Max('guest_contact'),
-                                               address=Max('guest_address')),
-                                     many=True)
+        serializer = GuestSerializer(
+            models.Booking.objects.all()
+            .order_by("guest_name")
+            .values("guest_name")
+            .annotate(name=Min("guest_name"), contact=Max("guest_contact"), address=Max("guest_address")),
+            many=True,
+        )
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def next_events(self, request, pk=None):
-        qs1 = models.Booking.objects.filter(begin_date__gte=timezone.now(), lodging__isnull=False).order_by().annotate(
-            date=F('begin_date'),
-            event_type=Value('CHECKIN')) \
-            .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
-                    lodging_name=F('lodging__name'), booking_channel=F('source__name'))
-        qs2 = models.Booking.objects.filter(end_date__gte=timezone.now(), lodging__isnull=False).order_by().annotate(
-            date=F('end_date'),
-            event_type=Value('CHECKOUT')) \
-            .values('id', 'date', 'guest_name', 'event_type', 'guest_name',
-                    lodging_name=F('lodging__name'), booking_channel=F('source__name'))
-        qs = qs1.union(qs2).order_by('date')
-        count = int(self.request.query_params.get('count', 10))
+        qs1 = (
+            models.Booking.objects.filter(begin_date__gte=timezone.now(), lodging__isnull=False)
+            .order_by()
+            .annotate(date=F("begin_date"), event_type=Value("CHECKIN"))
+            .values(
+                "id",
+                "date",
+                "guest_name",
+                "event_type",
+                "guest_name",
+                lodging_name=F("lodging__name"),
+                booking_channel=F("source__name"),
+            )
+        )
+        qs2 = (
+            models.Booking.objects.filter(end_date__gte=timezone.now(), lodging__isnull=False)
+            .order_by()
+            .annotate(date=F("end_date"), event_type=Value("CHECKOUT"))
+            .values(
+                "id",
+                "date",
+                "guest_name",
+                "event_type",
+                "guest_name",
+                lodging_name=F("lodging__name"),
+                booking_channel=F("source__name"),
+            )
+        )
+        qs = qs1.union(qs2).order_by("date")
+        count = int(self.request.query_params.get("count", 10))
         serializer = NextEventSerializer(qs[:count], many=True)
         return Response(serializer.data)
 
     @transaction.atomic
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def get_or_create_contract(self, request, pk=None):
         booking = self.get_object()
         if models.Contract.objects.filter(booking=booking).exists():
@@ -159,7 +195,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         else:
             try:
                 contract = booking.generate_contract(
-                    request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+                    request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
+                )
             except jinja2.exceptions.TemplateError as ex:
                 logger.exception("Template generation error")
                 raise APIException(detail="Template error: " + ex.message)
@@ -170,11 +207,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @transaction.atomic
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def generate_contract(self, request, pk=None):
         booking = self.get_object()
         try:
-            contract = booking.generate_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost'))
+            contract = booking.generate_contract(request.scheme + "://" + request.META.get("HTTP_HOST", "localhost"))
         except jinja2.exceptions.TemplateError as ex:
             logger.exception("Template generation error")
             raise APIException(detail="Template error: " + ex.message)
@@ -202,11 +239,11 @@ class BookingChannelSyncViewSet(viewsets.ModelViewSet):
 
 class LodgingViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
-    queryset = models.Lodging.objects.all().order_by('name')
+    queryset = models.Lodging.objects.all().order_by("name")
     serializer_class = LodgingSerializer
-    filterset_fields = ['shown']
+    filterset_fields = ["shown"]
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     @transaction.atomic
     def empty_contract_pdf(self, request, pk=None):
         lodging = self.get_object()
@@ -214,52 +251,53 @@ class LodgingViewSet(viewsets.ModelViewSet):
         os.makedirs(os.path.split(full_path)[0], exist_ok=True)
 
         sid = transaction.savepoint()
-        if request.GET.get('template_id'):
-            lodging.contract_template_id = request.GET.get('template_id')
+        if request.GET.get("template_id"):
+            lodging.contract_template_id = request.GET.get("template_id")
         generate_pdf(
-            lodging.generate_empty_contract(request.scheme + "://" + request.META.get('HTTP_HOST', 'localhost')),
-            full_path)
+            lodging.generate_empty_contract(request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
+            full_path,
+        )
         transaction.savepoint_rollback(sid)
 
         if os.path.exists(full_path):
-            with open(full_path, 'rb') as fh:
+            with open(full_path, "rb") as fh:
                 response = HttpResponse(fh.read(), content_type="application/pdf")
-                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(full_path)
+                response["Content-Disposition"] = "inline; filename=" + os.path.basename(full_path)
                 return response
         raise Http404
 
 
 class OwnerViewSet(viewsets.ModelViewSet):
-    queryset = models.Owner.objects.all().order_by('name')
+    queryset = models.Owner.objects.all().order_by("name")
     serializer_class = OwnerSerializer
 
 
 class HolidaysViewSet(viewsets.ModelViewSet):
-    queryset = models.Holidays.objects.all().order_by('begin_date')
+    queryset = models.Holidays.objects.all().order_by("begin_date")
     serializer_class = HolidaysSerializer
 
 
 class PricingViewSet(viewsets.ModelViewSet):
-    queryset = models.Pricing.objects.all().order_by('name')
+    queryset = models.Pricing.objects.all().order_by("name")
     serializer_class = PricingSerializer
 
 
 class SeasonalVariationViewSet(viewsets.ModelViewSet):
-    queryset = models.SeasonalVariation.objects.all().order_by('begin_date')
+    queryset = models.SeasonalVariation.objects.all().order_by("begin_date")
     serializer_class = SeasonalVariationSerializer
 
 
 class ContractTemplateViewSet(viewsets.ModelViewSet):
-    queryset = models.ContractTemplate.objects.all().order_by('name')
+    queryset = models.ContractTemplate.objects.all().order_by("name")
     serializer_class = ContractTemplateSerializer
 
 
 class ContractViewSet(viewsets.ModelViewSet):
-    queryset = models.Contract.objects.all().order_by('created')
+    queryset = models.Contract.objects.all().order_by("created")
     serializer_class = ContractSerializer
-    filterset_fields = ['booking_id']
+    filterset_fields = ["booking_id"]
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def pdf(self, request, pk=None):
         contract = self.get_object()
         rel_path = contract.make_pdf_path()
@@ -269,19 +307,19 @@ class ContractViewSet(viewsets.ModelViewSet):
             models.Contract.objects.filter(id=pk).update(pdf=rel_path, pdf_created=arrow.utcnow().isoformat(sep=" "))
 
         if os.path.exists(full_path):
-            with open(full_path, 'rb') as fh:
+            with open(full_path, "rb") as fh:
                 response = HttpResponse(fh.read(), content_type="application/pdf")
-                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(full_path)
+                response["Content-Disposition"] = "inline; filename=" + os.path.basename(full_path)
                 return response
         raise Http404
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = models.Payment.objects.all().order_by('date')
+    queryset = models.Payment.objects.all().order_by("date")
     serializer_class = PaymentSerializer
-    filterset_fields = ['booking_id']
+    filterset_fields = ["booking_id"]
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = models.Service.objects.all().order_by('reference')
+    queryset = models.Service.objects.all().order_by("reference")
     serializer_class = ServiceSerializer

@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0005_alter_bookedservice_unit_price_and_more'),
+        ("core", "0005_alter_bookedservice_unit_price_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='booking',
-            options={'ordering': ('-begin_date',), 'permissions': [('view_prices', 'Can view prices informations')], 'verbose_name': 'Booking'},
+            name="booking",
+            options={
+                "ordering": ("-begin_date",),
+                "permissions": [("view_prices", "Can view prices informations")],
+                "verbose_name": "Booking",
+            },
         ),
     ]

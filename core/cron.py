@@ -22,7 +22,7 @@ class SyncBookingsJob(CronJobBase):
     RUN_EVERY_MINS = 5
 
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
-    code = 'core.sync_bookings'  # a unique code
+    code = "core.sync_bookings"  # a unique code
 
     def do(self):
         t0 = time()
@@ -32,24 +32,32 @@ class SyncBookingsJob(CronJobBase):
             try:
                 retrieve_and_synchronize_bookings(sync)
             except (HTTPError, SSLError, urllib3.exceptions.HTTPError, ConnectionError) as ex:
-                logging.warning("[%s] Request error [%s] during bookings synchronization from [%s]",
-                                sync.lodging.name, ex, sync.channel.name)
+                logging.warning(
+                    "[%s] Request error [%s] during bookings synchronization from [%s]",
+                    sync.lodging.name,
+                    ex,
+                    sync.channel.name,
+                )
                 with transaction.atomic():
                     sync.last_import_error = str(ex)
-                    sync.save(update_fields=['last_import_error'])
+                    sync.save(update_fields=["last_import_error"])
             except Exception:
-                logging.exception("[%s] exception during bookings synchronization from [%s]",
-                                  sync.lodging.name, sync.channel.name)
+                logging.exception(
+                    "[%s] exception during bookings synchronization from [%s]", sync.lodging.name, sync.channel.name
+                )
             if (arrow.utcnow().datetime - sync.last_import) > timedelta(hours=6):
-                logging.error("[%s] bookings synchronization from [%s] in error since %d hours",
-                              sync.lodging.name, sync.channel.name,
-                              (arrow.utcnow().datetime - sync.last_import).total_seconds() / 3600)
+                logging.error(
+                    "[%s] bookings synchronization from [%s] in error since %d hours",
+                    sync.lodging.name,
+                    sync.channel.name,
+                    (arrow.utcnow().datetime - sync.last_import).total_seconds() / 3600,
+                )
         logger.info("Booking synchronizer finished in %.2f seconds", time() - t0)
 
 
 class ExportBookingsJob(CronJobBase):
     schedule = Schedule(run_at_times="02:00")
-    code = 'core.export_bookings'  # a unique code
+    code = "core.export_bookings"  # a unique code
     PURGE_OLDER_THAN_DAYS = 30
 
     @staticmethod
@@ -59,7 +67,7 @@ class ExportBookingsJob(CronJobBase):
     def do(self):
         dataset = BookingResource().export()
         filename = os.path.join(settings.BACKUP_DIR, self.make_filename(arrow.utcnow()))
-        with open(filename, 'wb') as f:
+        with open(filename, "wb") as f:
             f.write(dataset.xlsx)
 
         purge_date = arrow.utcnow().shift(days=-self.PURGE_OLDER_THAN_DAYS)

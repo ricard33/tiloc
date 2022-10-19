@@ -6,158 +6,206 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0004_alter_booking_options'),
+        ("core", "0004_alter_booking_options"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='bookedservice',
-            name='unit_price',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='unit price VAT incl.'),
+            model_name="bookedservice",
+            name="unit_price",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="unit price VAT incl."
+            ),
         ),
         migrations.AlterField(
-            model_name='booking',
-            name='commission_fees',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='commission fees'),
+            model_name="booking",
+            name="commission_fees",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="commission fees"
+            ),
         ),
         migrations.AlterField(
-            model_name='booking',
-            name='daily_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='daily rate'),
+            model_name="booking",
+            name="daily_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="daily rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='booking',
-            name='deposit',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='deposit'),
+            model_name="booking",
+            name="deposit",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="deposit"),
         ),
         migrations.AlterField(
-            model_name='booking',
-            name='guaranty',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='guaranty'),
+            model_name="booking",
+            name="guaranty",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="guaranty"),
         ),
         migrations.AlterField(
-            model_name='booking',
-            name='price',
-            field=models.DecimalField(decimal_places=2, help_text='Total price, either computed by daily price or applying flat rate', max_digits=20, verbose_name='price'),
+            model_name="booking",
+            name="price",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Total price, either computed by daily price or applying flat rate",
+                max_digits=20,
+                verbose_name="price",
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalbooking',
-            name='commission_fees',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='commission fees'),
+            model_name="historicalbooking",
+            name="commission_fees",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="commission fees"
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalbooking',
-            name='daily_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='daily rate'),
+            model_name="historicalbooking",
+            name="daily_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="daily rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalbooking',
-            name='deposit',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='deposit'),
+            model_name="historicalbooking",
+            name="deposit",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="deposit"),
         ),
         migrations.AlterField(
-            model_name='historicalbooking',
-            name='guaranty',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='guaranty'),
+            model_name="historicalbooking",
+            name="guaranty",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="guaranty"),
         ),
         migrations.AlterField(
-            model_name='historicalbooking',
-            name='price',
-            field=models.DecimalField(decimal_places=2, help_text='Total price, either computed by daily price or applying flat rate', max_digits=20, verbose_name='price'),
+            model_name="historicalbooking",
+            name="price",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Total price, either computed by daily price or applying flat rate",
+                max_digits=20,
+                verbose_name="price",
+            ),
         ),
         migrations.AlterField(
-            model_name='historicallodging',
-            name='daily_rate',
-            field=models.DecimalField(decimal_places=2, help_text='Default price for one night', max_digits=20, verbose_name='daily rate'),
+            model_name="historicallodging",
+            name="daily_rate",
+            field=models.DecimalField(
+                decimal_places=2, help_text="Default price for one night", max_digits=20, verbose_name="daily rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='historicallodging',
-            name='guaranty',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='guaranty deposit'),
+            model_name="historicallodging",
+            name="guaranty",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="guaranty deposit"
+            ),
         ),
         migrations.AlterField(
-            model_name='historicallodging',
-            name='tourist_tax',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='tourist tax'),
+            model_name="historicallodging",
+            name="tourist_tax",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="tourist tax"
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalowner',
-            name='vat_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='vat rate'),
+            model_name="historicalowner",
+            name="vat_rate",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="vat rate"),
         ),
         migrations.AlterField(
-            model_name='historicalservice',
-            name='unit_price',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='unit price VAT incl.'),
+            model_name="historicalservice",
+            name="unit_price",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="unit price VAT incl."
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalservice',
-            name='vat',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='VAT %'),
+            model_name="historicalservice",
+            name="vat",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="VAT %"),
         ),
         migrations.AlterField(
-            model_name='lodging',
-            name='daily_rate',
-            field=models.DecimalField(decimal_places=2, help_text='Default price for one night', max_digits=20, verbose_name='daily rate'),
+            model_name="lodging",
+            name="daily_rate",
+            field=models.DecimalField(
+                decimal_places=2, help_text="Default price for one night", max_digits=20, verbose_name="daily rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='lodging',
-            name='guaranty',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='guaranty deposit'),
+            model_name="lodging",
+            name="guaranty",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="guaranty deposit"
+            ),
         ),
         migrations.AlterField(
-            model_name='lodging',
-            name='tourist_tax',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='tourist tax'),
+            model_name="lodging",
+            name="tourist_tax",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="tourist tax"
+            ),
         ),
         migrations.AlterField(
-            model_name='owner',
-            name='vat_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='vat rate'),
+            model_name="owner",
+            name="vat_rate",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="vat rate"),
         ),
         migrations.AlterField(
-            model_name='payment',
-            name='amount',
-            field=models.DecimalField(decimal_places=2, max_digits=20, verbose_name='amount'),
+            model_name="payment",
+            name="amount",
+            field=models.DecimalField(decimal_places=2, max_digits=20, verbose_name="amount"),
         ),
         migrations.AlterField(
-            model_name='pricing',
-            name='daily_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='daily rate'),
+            model_name="pricing",
+            name="daily_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="daily rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='pricing',
-            name='weekend_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='weekend rate'),
+            model_name="pricing",
+            name="weekend_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="weekend rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='pricing',
-            name='weekly_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='weekly rate'),
+            model_name="pricing",
+            name="weekly_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="weekly rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='seasonalvariation',
-            name='daily_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='daily rate'),
+            model_name="seasonalvariation",
+            name="daily_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="daily rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='seasonalvariation',
-            name='weekend_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='weekend rate'),
+            model_name="seasonalvariation",
+            name="weekend_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="weekend rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='seasonalvariation',
-            name='weekly_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='weekly rate'),
+            model_name="seasonalvariation",
+            name="weekly_rate",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="weekly rate"
+            ),
         ),
         migrations.AlterField(
-            model_name='service',
-            name='unit_price',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='unit price VAT incl.'),
+            model_name="service",
+            name="unit_price",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="unit price VAT incl."
+            ),
         ),
         migrations.AlterField(
-            model_name='service',
-            name='vat',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name='VAT %'),
+            model_name="service",
+            name="vat",
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True, verbose_name="VAT %"),
         ),
     ]

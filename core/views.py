@@ -19,22 +19,22 @@ from rest_framework.response import Response
 
 from core import models
 
-logger = logging.getLogger('view')
+logger = logging.getLogger("view")
 
 
 class IndexPage(TemplateView):
     def get(self, request, *args, **kwargs):
-        accept = request.META.get('HTTP_ACCEPT')
+        accept = request.META.get("HTTP_ACCEPT")
 
-        if not accept or 'text/html' not in accept:
-            raise Http404(_('"%(path)s" does not exist') % {'path': request.path})
+        if not accept or "text/html" not in accept:
+            raise Http404(_('"%(path)s" does not exist') % {"path": request.path})
         return super().get(request, *args, **kwargs)
 
 
 @csrf_exempt
 def loggly_proxy(request, path):
     extra_requests_args = {}
-    remote_url = 'http://logs-01.loggly.com/' + path
+    remote_url = "http://logs-01.loggly.com/" + path
     return proxy_view(request, remote_url, extra_requests_args)
 
 
@@ -42,7 +42,7 @@ def loggly_proxy(request, path):
 @transaction.atomic
 def export_calendar(request, uid):
     lodging = get_object_or_404(models.Lodging, uid=uid)
-    source = request.GET.get('s')
+    source = request.GET.get("s")
     qs = lodging.booking_set.filter(end_date__gte=timezone.now())
     if source:
         sync = get_object_or_404(models.BookingChannelSync, id=source)
@@ -53,11 +53,9 @@ def export_calendar(request, uid):
     else:
         logger.info("Full calendar requested for lodging [%s]", lodging.name)
     c = Calendar(creator="-//Ti'Gecko//Ti Loc//EN")
-    c.extra.extend([
-        ContentLine(name='CALSCALE', value='GREGORIAN')
-    ])
-    c.extra_params['PRODID'] = {'X-RICAL-TZSOURCE': ['TZINFO']}
-    for booking in qs.order_by('begin_date'):
+    c.extra.extend([ContentLine(name="CALSCALE", value="GREGORIAN")])
+    c.extra_params["PRODID"] = {"X-RICAL-TZSOURCE": ["TZINFO"]}
+    for booking in qs.order_by("begin_date"):
         e = Event()
         e.uid = str(booking.uid)
         e.summary = booking.guest_name.split()[0]  # only first word (= first name)
@@ -65,8 +63,8 @@ def export_calendar(request, uid):
         e.end = arrow.get(booking.end_date).date()
         e.make_all_day()
         c.events.append(e)
-    response = HttpResponse(c.serialize() + '\n', content_type="text/calendar")
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format("%s.ics" % uid)
+    response = HttpResponse(c.serialize() + "\n", content_type="text/calendar")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format("%s.ics" % uid)
     return response
 
 
@@ -87,7 +85,7 @@ def export_full_planning(request, owner_id=None):
     #         return r
     owner = owner_id and get_object_or_404(models.Owner, id=owner_id) or None
     if owner and owner_id != request.user.id and not request.user.is_superuser:
-        raise Http404('No owner matches the given query.')
+        raise Http404("No owner matches the given query.")
 
     qs = models.Booking.objects.filter(lodging__isnull=False)
     if owner:
@@ -97,7 +95,7 @@ def export_full_planning(request, owner_id=None):
         logger.info("Full planning requested")
 
     c = Calendar(creator="-//Ti'Gecko//Location")
-    for booking in qs.order_by('begin_date', 'lodging__rank'):
+    for booking in qs.order_by("begin_date", "lodging__rank"):
         e = Event()
         e.uid = str(booking.uid)
         e.name = booking.guest_name
@@ -108,61 +106,74 @@ def export_full_planning(request, owner_id=None):
         e.make_all_day()
         c.events.append(e)
     response = HttpResponse(c, content_type="text/calendar")
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format("planning.ics")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format("planning.ics")
     return response
 
 
-@api_view(['GET', ])
+@api_view(
+    [
+        "GET",
+    ]
+)
 @permission_classes([IsAuthenticated])
 def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
-    sorted_data = get_filling_rate(begin, end, with_turnover=request.user.has_perm('core.view_prices'))
+    sorted_data = get_filling_rate(begin, end, with_turnover=request.user.has_perm("core.view_prices"))
     return Response(sorted_data)
 
 
 def get_filling_rate(begin, end, with_turnover=True):
-    begin = arrow.get(begin).floor('month')
-    end = arrow.get(end).ceil('month')
+    begin = arrow.get(begin).floor("month")
+    end = arrow.get(end).ceil("month")
     data = {}
     dates_range = [begin.date(), end.date()]
-    bookings = models.Booking.objects.filter(Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
-                                             lodging__isnull=False,
-                                             status__no_stats=False,
-                                             status__finalized=True)
+    bookings = models.Booking.objects.filter(
+        Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
+        lodging__isnull=False,
+        status__no_stats=False,
+        status__finalized=True,
+    )
     lodging_count = models.Lodging.objects.filter(active=True).count()
     for booking in bookings:
-        for d1, d2 in arrow.Arrow.interval('month', begin.floor('month').datetime, end.ceil('month').datetime):
+        for d1, d2 in arrow.Arrow.interval("month", begin.floor("month").datetime, end.ceil("month").datetime):
             days_in_month = d2.day
-            d2 = d2.floor('day').shift(days=1)
-            month = d1.format(fmt='YYYY-MM')
+            d2 = d2.floor("day").shift(days=1)
+            month = d1.format(fmt="YYYY-MM")
             delta = (min(d2, arrow.get(booking.end_date)) - max(d1, arrow.get(booking.begin_date))).days
-            value = data.setdefault(month, {'date':     month, 'days': 0, 'turnover': 0,
-                                            'capacity': days_in_month * lodging_count})
+            value = data.setdefault(
+                month, {"date": month, "days": 0, "turnover": 0, "capacity": days_in_month * lodging_count}
+            )
             if delta > 0:
-                value['days'] = value['days'] + delta
+                value["days"] = value["days"] + delta
                 if with_turnover and booking.duration > 0:
-                    value['turnover'] = value['turnover'] + delta * booking.price / booking.duration
+                    value["turnover"] = value["turnover"] + delta * booking.price / booking.duration
     keys = list(data.keys())
     keys.sort()
     sorted_data = []
     for k in keys:
-        data[k]['rate'] = round(data[k]['days'] / data[k]['capacity'] * 100)
+        data[k]["rate"] = round(data[k]["days"] / data[k]["capacity"] * 100)
         if not with_turnover:
-            del data[k]['turnover']
+            del data[k]["turnover"]
         sorted_data.append(data[k])
     return sorted_data
 
 
-@api_view(['GET', ])
+@api_view(
+    [
+        "GET",
+    ]
+)
 @permission_classes([IsAuthenticated])
 def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arrow.utcnow().shift(years=5)):
-    begin = arrow.get(begin).floor('month')
-    end = arrow.get(end).ceil('month')
+    begin = arrow.get(begin).floor("month")
+    end = arrow.get(end).ceil("month")
     data = []
     dates_range = [begin.date(), end.date()]
-    booking_count = Count('booking',
-                          filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
-                                 & Q(booking__lodging__isnull=False))  # noqa: E127
+    booking_count = Count(
+        "booking",
+        filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
+        & Q(booking__lodging__isnull=False),
+    )  # noqa: E127
     channels = models.BookingChannel.objects.annotate(booking_count=booking_count)
     for row in channels:
-        data.append({'channel': row.name, 'count': row.booking_count})
+        data.append({"channel": row.name, "count": row.booking_count})
     return Response(data)

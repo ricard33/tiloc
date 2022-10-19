@@ -2,14 +2,17 @@ class Router:
     """
     A router to control all database operations on models.
     """
-    route_app_labels = {'legacy', }
+
+    route_app_labels = {
+        "legacy",
+    }
 
     def db_for_read(self, model, **hints):
         """
         Attempts to read legacy models go to legacy.
         """
         if model._meta.app_label in self.route_app_labels:
-            return 'legacy'
+            return "legacy"
         return None
 
     def db_for_write(self, model, **hints):
@@ -17,7 +20,7 @@ class Router:
         Attempts to write legacy models go to legacy.
         """
         if model._meta.app_label in self.route_app_labels:
-            return 'legacy'
+            return "legacy"
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
@@ -35,5 +38,5 @@ class Router:
         'legacy' database.
         """
         if app_label in self.route_app_labels:
-            return db == 'legacy'
+            return db == "legacy"
         return None

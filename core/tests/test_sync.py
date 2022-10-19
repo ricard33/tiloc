@@ -3,6 +3,7 @@ from datetime import date
 
 import arrow
 from django.test import TestCase
+
 # Create your tests here.
 from ics import Calendar
 
@@ -90,7 +91,7 @@ END:VCALENDAR
 
 class SyncBookingsTestCase(TestCase):
     def setUp(self) -> None:
-        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+        for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory(name=name)
         self.lodging = factories.LodgingFactory()
         self.sync = factories.BookingChannelSyncFactory(lodging=self.lodging)
@@ -117,41 +118,42 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.first().status.id, status.id)
 
     def test_update_existing_booking_with_same_dates(self):
-        factories.BookingFactory(lodging=self.lodging, begin_date=arrow.get("2020-08-02").date(),
-                                 end_date=arrow.get("2020-08-12").date())
+        factories.BookingFactory(
+            lodging=self.lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-12").date()
+        )
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
 
 class ExportCalendarTestCase(TestCase):
     def setUp(self) -> None:
-        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+        for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory(name=name)
         self.lodging = factories.LodgingFactory()
 
     def test_simple_export(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
-        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        r = self.client.get("/calendar/%s/" % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r['content-type'], "text/calendar")
+        self.assertEqual(r["content-type"], "text/calendar")
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
-        self.assertEqual('GREGORIAN', c.extra['CALSCALE'][0].value)
+        self.assertEqual("GREGORIAN", c.extra["CALSCALE"][0].value)
         e = c.events.pop()
         self.assertEqual(e.summary, "Cédric")
 
     def test_secondary_export_url(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
-        r = self.client.get('/calendar/%s.ics' % self.lodging.uid)
+        r = self.client.get("/calendar/%s.ics" % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r['content-type'], "text/calendar")
+        self.assertEqual(r["content-type"], "text/calendar")
 
     def test_event_uid_are_reliable(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
-        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        r = self.client.get("/calendar/%s/" % self.lodging.uid)
         c = Calendar(r.content.decode())
         e1 = c.events.pop()
-        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        r = self.client.get("/calendar/%s/" % self.lodging.uid)
         c = Calendar(r.content.decode())
         e2 = c.events.pop()
         self.assertEqual(e1.uid, e2.uid)
@@ -161,19 +163,22 @@ class ExportCalendarTestCase(TestCase):
         sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
         factories.BookingFactory(lodging=self.lodging, source=channel)
         factories.BookingFactory(lodging=self.lodging)
-        r = self.client.get('/calendar/%s/?s=%d' % (self.lodging.uid, sync.id))
+        r = self.client.get("/calendar/%s/?s=%d" % (self.lodging.uid, sync.id))
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
 
     def test_booking_dates(self):
         now = arrow.now()
         year_ = now.date().year + 1
-        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric",
-                                 begin_date=arrow.get("%d-08-02" % year_).date(),
-                                 end_date=arrow.get("%d-08-12" % year_).date())
+        factories.BookingFactory(
+            lodging=self.lodging,
+            guest_name="Cédric",
+            begin_date=arrow.get("%d-08-02" % year_).date(),
+            end_date=arrow.get("%d-08-12" % year_).date(),
+        )
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
-        r = self.client.get('/calendar/%s/' % self.lodging.uid)
+        r = self.client.get("/calendar/%s/" % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
@@ -185,7 +190,7 @@ class ExportCalendarTestCase(TestCase):
 @unittest.skip("Security hole: Endpoint removed because not used")
 class ExportFullPlanningTestCase(TestCase):
     def setUp(self) -> None:
-        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+        for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory(name=name)
         self.lodging1 = factories.LodgingFactory()
         self.lodging2 = factories.LodgingFactory()
@@ -195,18 +200,18 @@ class ExportFullPlanningTestCase(TestCase):
     def test_full_export_by_admin(self):
         admin = factories.AdminFactory()
         self.client.force_login(admin)
-        r = self.client.get('/full_planning/')
+        r = self.client.get("/full_planning/")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r['content-type'], "text/calendar")
+        self.assertEqual(r["content-type"], "text/calendar")
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 2)
 
     def test_owner_export(self):
         admin = factories.AdminFactory()
         self.client.force_login(admin)
-        r = self.client.get('/full_planning/%d/' % self.lodging1.owner_id)
+        r = self.client.get("/full_planning/%d/" % self.lodging1.owner_id)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r['content-type'], "text/calendar")
+        self.assertEqual(r["content-type"], "text/calendar")
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
         e = c.events.pop()

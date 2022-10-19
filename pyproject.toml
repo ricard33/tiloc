@@ -7,21 +7,25 @@ extend-exclude = '''
 # A regex preceded with ^/ will apply only to files and directories
 # in the root of the project.
 (
-node_modules//*
+node_modules
 | .DS_Store
-| .idea//*
-| __pycache__//*
-| .pytest_cache//*
-| backup//*
-| backups//*
-| files//*
-| frontend//*
-| log//*
-| static//*
-| staticfiles//*
-| tmp//*
+| .idea
+| __pycache__
+| .pytest_cache
+| backup
+| backups
+| files
+| frontend
+| log
+| static
+| staticfiles
+| tmp
 )
 '''
+
+[tool.isort]
+profile = "black"
+line_length = 120
 
 [tool.poetry]
 name = "tiloc"
@@ -73,6 +77,7 @@ patchwork = "1.0.1"
 pep8 = ">=1.7.1"
 pytest = "6.2.5"
 pytest-django = "*"
+black = "^22.10.0"
 
 [build-system]
 requires = ["poetry-core"]

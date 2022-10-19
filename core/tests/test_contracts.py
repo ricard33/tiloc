@@ -7,12 +7,13 @@ from core.tests import factories
 
 class ContractTestCase(APITestCase):
     def setUp(self) -> None:
-        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+        for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory.create(name=name)
 
     def test_generate_contract(self):
         contract_template = factories.ContractTemplateFactory.create(
-            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}...")
+            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
+        )
         booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
         booking.generate_contract()
         self.assertIsNotNone(booking.contract)
@@ -29,16 +30,17 @@ class ContractTestCase(APITestCase):
     def test_generate_contract_with_api(self):
         user = factories.AdminFactory.create()
         contract_template = factories.ContractTemplateFactory.create(
-            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}...")
+            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
+        )
         booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
         self.client.force_login(user)
         instance, token = AuthToken.objects.create(user)
-        header = {'HTTP_AUTHORIZATION': "Token " + token}
-        response = self.client.post('/api/booking/%d/generate_contract/' % booking.id, **header)
+        header = {"HTTP_AUTHORIZATION": "Token " + token}
+        response = self.client.post("/api/booking/%d/generate_contract/" % booking.id, **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
-        self.assertEqual(booking.contract.id, response.data['id'])
+        self.assertEqual(booking.contract.id, response.data["id"])
         self.assertIn(booking.lodging.name, booking.contract.content)
 
     # @override_settings(MEDIA_ROOT="/www/", MEDIA_URL="http://mediaserv.com/myapp/")
@@ -47,12 +49,13 @@ class ContractTestCase(APITestCase):
 
 class ContractTemplateTestCase(APITestCase):
     def setUp(self) -> None:
-        for name in ['option', 'contract sent', 'deposit paid', 'paid']:
+        for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory.create(name=name)
 
     def test_generate_contract(self):
         contract_template = factories.ContractTemplateFactory.create(
-            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date|format_date('full') }} to {{ booking.end_date|format_date('full') }}...")
+            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date|format_date('full') }} to {{ booking.end_date|format_date('full') }}..."
+        )
         lodging = factories.LodgingFactory.create(contract_template=contract_template)
         content = lodging.generate_empty_contract()
         self.assertIn(lodging.name, content)

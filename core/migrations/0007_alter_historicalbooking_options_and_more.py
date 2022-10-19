@@ -6,53 +6,78 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0006_alter_booking_options'),
+        ("core", "0006_alter_booking_options"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='historicalbooking',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Booking', 'verbose_name_plural': 'historical Bookings'},
+            name="historicalbooking",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Booking",
+                "verbose_name_plural": "historical Bookings",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalcontracttemplate',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Contract template', 'verbose_name_plural': 'historical Contract templates'},
+            name="historicalcontracttemplate",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Contract template",
+                "verbose_name_plural": "historical Contract templates",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicallodging',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Lodging', 'verbose_name_plural': 'historical Lodgings'},
+            name="historicallodging",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Lodging",
+                "verbose_name_plural": "historical Lodgings",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalowner',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Owner', 'verbose_name_plural': 'historical Owners'},
+            name="historicalowner",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Owner",
+                "verbose_name_plural": "historical Owners",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalservice',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Service', 'verbose_name_plural': 'historical Services'},
+            name="historicalservice",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Service",
+                "verbose_name_plural": "historical Services",
+            },
         ),
         migrations.AlterField(
-            model_name='historicalbooking',
-            name='history_date',
+            model_name="historicalbooking",
+            name="history_date",
             field=models.DateTimeField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='historicalcontracttemplate',
-            name='history_date',
+            model_name="historicalcontracttemplate",
+            name="history_date",
             field=models.DateTimeField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='historicallodging',
-            name='history_date',
+            model_name="historicallodging",
+            name="history_date",
             field=models.DateTimeField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='historicalowner',
-            name='history_date',
+            model_name="historicalowner",
+            name="history_date",
             field=models.DateTimeField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='historicalservice',
-            name='history_date',
+            model_name="historicalservice",
+            name="history_date",
             field=models.DateTimeField(db_index=True),
         ),
     ]

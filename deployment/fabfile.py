@@ -1,6 +1,6 @@
 import os
-from datetime import datetime
 import subprocess
+from datetime import datetime
 
 from fabric import task
 from invoke import Exit, Failure
@@ -14,8 +14,8 @@ WORKSPACE = os.path.normpath(os.path.join(FAB_PATH, ".."))
 
 @task
 def disk_free(c):
-    uname = c.run('uname -s', hide=True)
-    if 'Linux' in uname.stdout:
+    uname = c.run("uname -s", hide=True)
+    if "Linux" in uname.stdout:
         command = "df -h / | tail -n1 | awk '{print $5}'"
         free = c.run(command, hide=True).stdout.strip()
         print(free)
@@ -26,13 +26,13 @@ def disk_free(c):
 
 @task
 def most_recent_modified(c, path):
-    print(get_most_recent_modified(path, ['node_modules']))
+    print(get_most_recent_modified(path, ["node_modules"]))
 
 
 def get_most_recent_modified(path, excludes=None):
     if excludes is None:
         excludes = []
-    excludes.extend(['.DS_Store'])
+    excludes.extend([".DS_Store"])
 
     def not_in_pattern(name):
         return (not name.startswith("webpack-stats")) and not name in excludes
@@ -53,42 +53,43 @@ def get_most_recent_modified(path, excludes=None):
 
 
 def write_version_properties(version):
-    with open(os.path.join(WORKSPACE, 'location', 'version.properties'), "wt") as f:
+    with open(os.path.join(WORKSPACE, "location", "version.properties"), "wt") as f:
         f.write("VERSION=%s\n" % version)
         # f.write("DATE=%s\n" % datetime.utcnow().strftime("%Y-%m-%d"))
         f.write("DATE=%s\n" % datetime.utcnow().isoformat())
         import socket
+
         f.write("BUILDER=%s\n" % socket.gethostname())
 
 
 @task
 def get_version(c):
     # Get the version using "git describe".
-    cmd = 'git describe --tags --match [0-9]*'
+    cmd = "git describe --tags --match [0-9]*"
     try:
         version = c.local(cmd).stdout.strip()
     except Failure:
-        print('Unable to get version number from git tags')
+        print("Unable to get version number from git tags")
         raise
 
     # PEP 386 compatibility
-    if '-' in version:
-        version = '.post'.join(version.split('-')[:2])
+    if "-" in version:
+        version = ".post".join(version.split("-")[:2])
 
     # Don't declare a version "dirty" merely because a time stamp has
     # changed. If it is dirty, append a ".dev1" suffix to indicate a
     # development revision after the release.
-    c.local('git status', hide='both')
+    c.local("git status", hide="both")
 
-    cmd = 'git diff-index --name-only HEAD'
+    cmd = "git diff-index --name-only HEAD"
     try:
         dirty = c.local(cmd, hide=True).stdout.strip()
     except Failure:
-        print('Unable to get git index status')
+        print("Unable to get git index status")
         raise
 
-    if dirty != '':
-        version += '.dev1'
+    if dirty != "":
+        version += ".dev1"
 
     return version
 
@@ -101,20 +102,20 @@ def inc_version(version, pos):
             return 0
 
     # major, minor, release, build, *ignored = map(safe_int, [*version.split('.'), '0', '0', '0'])
-    values = list(map(safe_int, [*version.split('.')[:pos + 1], '0', '0', '0'][:3]))
+    values = list(map(safe_int, [*version.split(".")[: pos + 1], "0", "0", "0"][:3]))
     values[pos] += 1
     # while values[-1] == 0:
     #     values.pop()
-    return '.'.join(map(str, values))
+    return ".".join(map(str, values))
 
 
 @task
 def increment_version(c):
     version = get_version(c)
     print("Last version was %s" % version)
-    result = hasattr(c, 'VERSION_INC') and c.VERSION_INC or ''
+    result = hasattr(c, "VERSION_INC") and c.VERSION_INC or ""
 
-    while result not in ['0', '1', '2', '3']:
+    while result not in ["0", "1", "2", "3"]:
         print()
         print("-------------------------------------")
         print("Please choose the new version number:")
@@ -125,18 +126,18 @@ def increment_version(c):
         print(" 3) New release      : %s" % inc_version(version, 2))
         # print(" 4) New build        : %s" % inc_version(version, 3))
         result = input("Select a value between 0 to 3 (default=3): ")
-        if result == '':
-            result = '3'
+        if result == "":
+            result = "3"
 
-    if result == '0':
+    if result == "0":
         return version
     new_version = inc_version(version, int(result) - 1)
 
-    cmd = 'git tag -a %(version)s -m "Version %(version)s"' % {'version': new_version}
+    cmd = 'git tag -a %(version)s -m "Version %(version)s"' % {"version": new_version}
     try:
         c.local(cmd)
     except Failure:
-        print('Unable to create version git tag')
+        print("Unable to create version git tag")
         raise
 
     return new_version
@@ -145,8 +146,8 @@ def increment_version(c):
 @task
 def prepare_python_env(c):
     with c.cd(WORKSPACE):
-        c.run('pip install pip -U')
-        c.run('pip install -U -r deployment/requirements/dev.txt')
+        c.run("pip install pip -U")
+        c.run("pip install -U -r deployment/requirements/dev.txt")
 
 
 @task
@@ -154,10 +155,10 @@ def build_python(c):
     with c.cd(WORKSPACE):
         # subprocess.check_call('find . -name "*.py[co]" -delete')
         # subprocess.check_call(['python', 'deployment/compile.py', '-c'], cwd=WORKSPACE)
-        c.run('python deployment/compile.py -c')
+        c.run("python deployment/compile.py -c")
 
-        c.run('python manage.py migrate --noinput')
-        c.run('python manage.py compilemessages --no-color')
+        c.run("python manage.py migrate --noinput")
+        c.run("python manage.py compilemessages --no-color")
         # subprocess.check_call(['python', 'manage.py', 'migrate', '--noinput'], cwd=WORKSPACE)
         # subprocess.check_call(['python', 'manage.py', 'compilemessages', '--no-color'], cwd=WORKSPACE)
 
@@ -173,14 +174,15 @@ def build(c):
 
 @task
 def prepare_frontend_env(c):
-    with c.cd(os.path.join(WORKSPACE, 'frontend')):
-        c.local('yarn install --pure-lockfile')
-        c.local('npm rebuild node-sass')
+    with c.cd(os.path.join(WORKSPACE, "frontend")):
+        c.local("yarn install --pure-lockfile")
+        c.local("npm rebuild node-sass")
+
 
 @task
 def update_browserlist(c):
-    with c.cd(os.path.join(WORKSPACE, 'frontend')):
-        c.local('npx browserslist@latest --update-db')
+    with c.cd(os.path.join(WORKSPACE, "frontend")):
+        c.local("npx browserslist@latest --update-db")
 
 
 @task
@@ -188,10 +190,10 @@ def build_frontend(c, only_sources=False):
     if not only_sources:
         prepare_frontend_env(c)
         update_browserlist(c)
-    with c.cd(os.path.join(WORKSPACE, 'frontend')):
+    with c.cd(os.path.join(WORKSPACE, "frontend")):
         # print(os.environ)
         # c.local('env', replace_env=False)
-        c.local('yarn run build', replace_env=False)
+        c.local("yarn run build", replace_env=False)
         # c.local('yarn run test')
 
 
@@ -205,15 +207,15 @@ def test(c):
 def run_python_tests(c):
     # with settings(user=APIDAE_USER):
     with c.cd(WORKSPACE):
-        c.local('coverage run --source=. manage.py test')
-        c.local('coverage report')
+        c.local("coverage run --source=. manage.py test")
+        c.local("coverage report")
 
 
 @task
 def run_frontend_tests(c):
     # with settings(user=APIDAE_USER):
-    with c.cd(os.path.join(WORKSPACE, 'frontend')):
-        c.local('yarn run test')
+    with c.cd(os.path.join(WORKSPACE, "frontend")):
+        c.local("yarn run test")
 
 
 # @task
@@ -242,8 +244,10 @@ def compile_python_files(c):
 
 @task
 def need_to_rebuild(c):
-    newer_files = get_most_recent_modified(os.path.join(WORKSPACE, 'frontend'), ['node_modules', 'build'])[1] > \
-                  get_most_recent_modified(os.path.join(WORKSPACE, 'frontend', 'build'))[1]
+    newer_files = (
+        get_most_recent_modified(os.path.join(WORKSPACE, "frontend"), ["node_modules", "build"])[1]
+        > get_most_recent_modified(os.path.join(WORKSPACE, "frontend", "build"))[1]
+    )
     print(newer_files and "Frontend build is needed" or "Frontend build already up-to-date")
     return newer_files
 
@@ -253,13 +257,13 @@ def sync_sources(c, test_only=False):
     if need_to_rebuild(c):
         build_frontend(c, only_sources=True)
 
-    rsync(c,
-          WORKSPACE + "/",
-          c.TARGET_PATH,
-          delete=True,
-          rsync_opts='-ci --filter=". %s"' % os.path.join(FAB_PATH, "rsync_filter") + (
-                  test_only and " --dry-run" or ""),
-          )
+    rsync(
+        c,
+        WORKSPACE + "/",
+        c.TARGET_PATH,
+        delete=True,
+        rsync_opts='-ci --filter=". %s"' % os.path.join(FAB_PATH, "rsync_filter") + (test_only and " --dry-run" or ""),
+    )
 
 
 def clean_compiled_files(c):
@@ -272,9 +276,10 @@ def clean_compiled_files(c):
 def empty_folder(c):
     # with settings(warn_only=True, user=APIDAE_USER):
     with c.cd(c.TARGET_PATH):
-        c.run('find . -type f -name \'*.tar.gz\' | xargs rm -rf')
+        c.run("find . -type f -name '*.tar.gz' | xargs rm -rf")
         c.run(
-            'rm -rf app assets authentication core deployment frontend legacy locale location static staticfiles templates ')
+            "rm -rf app assets authentication core deployment frontend legacy locale location static staticfiles templates "
+        )
 
 
 # def untar_archive():
@@ -292,29 +297,32 @@ def empty_folder(c):
 @task
 def deploy_location(c):
     c.run("mkdir -p %s" % c.TARGET_PATH)
-    subprocess.check_call(['poetry', 'export', '-o', os.path.join(WORKSPACE, 'requirements-prod.txt'), '--without-hashes'])
+    subprocess.check_call(
+        ["poetry", "export", "-o", os.path.join(WORKSPACE, "requirements-prod.txt"), "--without-hashes"]
+    )
     sync_sources(c)
     clean_compiled_files(c)
     # compile_python_files(c)
 
     with c.cd(c.TARGET_PATH):
-        if files.exists(c, ".env/bin/python") and not c.run('.env/bin/python -V').stdout.strip().startswith(
-                'Python %s' % c.PYTHON_VERSION):
+        if files.exists(c, ".env/bin/python") and not c.run(".env/bin/python -V").stdout.strip().startswith(
+            "Python %s" % c.PYTHON_VERSION
+        ):
             c.run("rm -rf .env")
         if not files.exists(c, ".env/bin/python"):
             print("create virtual env")
             c.run("python%s -m venv .env" % c.PYTHON_VERSION)
 
-        c.run('rm -rf www/static')
-        with c.prefix('. .env/bin/activate'):
-            c.run('pip install pip --upgrade')
-            c.run('pip install -r requirements-prod.txt --upgrade')
+        c.run("rm -rf www/static")
+        with c.prefix(". .env/bin/activate"):
+            c.run("pip install pip --upgrade")
+            c.run("pip install -r requirements-prod.txt --upgrade")
 
-            c.run('python manage.py dbbackup --clean --noinput')
-            c.run('python manage.py mediabackup --clean --noinput')
+            c.run("python manage.py dbbackup --clean --noinput")
+            c.run("python manage.py mediabackup --clean --noinput")
 
-            c.run('python manage.py migrate --noinput')
-            c.run('python manage.py collectstatic --clear --noinput -v 0')
+            c.run("python manage.py migrate --noinput")
+            c.run("python manage.py collectstatic --clear --noinput -v 0")
 
 
 # @task
@@ -329,8 +337,8 @@ def deploy_location(c):
 @task
 def create_superuser(c):
     with c.cd(c.TARGET_PATH):
-        with c.prefix('. .env/bin/activate'):
-            c.run('python manage.py createsuperuser', pty=True)
+        with c.prefix(". .env/bin/activate"):
+            c.run("python manage.py createsuperuser", pty=True)
 
 
 # @task
@@ -346,11 +354,14 @@ def create_superuser(c):
 #
 #
 
+
 @task
 def restart(c):
-    c.local("curl --basic --user \"%(API_KEY)s account=%(ACCOUNT)s:\" --data ''"
-            " --request POST https://api.alwaysdata.com/v1/site/%(SITE_ID)s/restart/"
-            % {'API_KEY': c.API_KEY, 'ACCOUNT': c.ACCOUNT, 'SITE_ID': c.SITE_ID})
+    c.local(
+        "curl --basic --user \"%(API_KEY)s account=%(ACCOUNT)s:\" --data ''"
+        " --request POST https://api.alwaysdata.com/v1/site/%(SITE_ID)s/restart/"
+        % {"API_KEY": c.API_KEY, "ACCOUNT": c.ACCOUNT, "SITE_ID": c.SITE_ID}
+    )
 
 
 @task(default=True)
@@ -364,9 +375,9 @@ def deploy(c):
 @task
 def dump_db(c):
     with c.cd(c.TARGET_PATH):
-        with c.prefix('. .env/bin/activate'):
-            fname = 'dump-%s.json' % datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-            c.run('python manage.py dumpdata --exclude auth.permission --exclude contenttypes --output %s' % fname)
+        with c.prefix(". .env/bin/activate"):
+            fname = "dump-%s.json" % datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+            c.run("python manage.py dumpdata --exclude auth.permission --exclude contenttypes --output %s" % fname)
             c.get(fname)
 
 
@@ -376,12 +387,12 @@ def load_db(c, fname):
     # fname = os.path.abspath(fname)
     print(fname)
     if os.path.exists(fname):
-        with c.cd(c.TARGET_PATH), \
-                c.prefix('. .env/bin/activate'):
+        with c.cd(c.TARGET_PATH), c.prefix(". .env/bin/activate"):
             c.put(fname, os.path.join(c.TARGET_PATH, fname))
-            c.run('python manage.py loaddata %s' % fname)
+            c.run("python manage.py loaddata %s" % fname)
     else:
         print("'%s' not found" % fname)
+
 
 # @task
 # def create_supervisord_config():
@@ -422,7 +433,8 @@ def load_db(c, fname):
 #         with prefix('. .env/bin/activate'):
 #             run("pip freeze")
 
+
 @task
 def debug(c):
-    print(c.run('uname -a'))
+    print(c.run("uname -a"))
     print(c.TARGET_PATH)

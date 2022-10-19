@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_migrate_special_conditions_to_notes'),
+        ("core", "0003_migrate_special_conditions_to_notes"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='booking',
-            options={'ordering': ('-begin_date',), 'verbose_name': 'Booking'},
+            name="booking",
+            options={"ordering": ("-begin_date",), "verbose_name": "Booking"},
         ),
     ]
