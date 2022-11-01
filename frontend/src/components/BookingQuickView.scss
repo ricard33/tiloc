@@ -2,10 +2,16 @@
 
   .label {
     font-size: small;
+    @media (min-width: 500px) {
+      min-width: 200px;
+    }
   }
 
   .value {
     margin-bottom: 1em;
+    @media (min-width: 500px) {
+      min-width: 200px;
+    }
   }
 
   .important-value {

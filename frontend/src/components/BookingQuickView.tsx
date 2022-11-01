@@ -4,7 +4,7 @@ import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
 import { parseISO } from "date-fns";
 import { Booking, Service, User } from "../types";
-import { Grid } from "@mui/material";
+import Grid from '@mui/material/Unstable_Grid2';
 import "./BookingQuickView.scss";
 import PaymentList from "./PaymentList";
 import {  useLazyGetPaymentsForBookingQuery } from "../services/api";
@@ -35,7 +35,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
 
   return (
     <Grid container className="booking-quick-view">
-      <Grid item xs={4}>
+      <Grid xs={4}>
         <div className="label">{t("Check-in:")}</div>
         <div className="value">{formatDate(parseISO(booking.begin_date), "PPPP")}</div>
         <div className="label">{t("Check-out:")}</div>
@@ -59,7 +59,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
         { showPayments && <React.Fragment><div className="label">{t("Price:")}</div>
           <div className="important-value">{formatCurrency(booking.price_with_options)}</div></React.Fragment>}
       </Grid>
-      <Grid item xs={8}>
+      <Grid xs={8}>
         <div className="label">{t("Guest name:")}</div>
         <div className="important-value">{booking.guest_name}</div>
 
@@ -92,19 +92,19 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
         </React.Fragment>}
 
         <Grid container>
-          <Grid item xs={6}>
+          <Grid xs={6}>
             { showPayments && <React.Fragment>
               <div className="label">{t("Price:")}</div>
               <div className="value">{formatCurrency(booking.price_with_options)}</div>
             </React.Fragment>}
           </Grid>
-          <Grid item xs={6}>
+          <Grid xs={6}>
             {showPayments && booking.deposit! > 0 && <React.Fragment>
               <div className="label">{t("Deposit:")}</div>
               <div className="value">{formatCurrency(booking.deposit)}</div>
             </React.Fragment>}
           </Grid>
-          <Grid item xs={6}>
+          <Grid xs={6}>
             {showPayments && booking.left_to_pay > 0 && <React.Fragment>
               <div className="label">{t("Left to pay:")}</div>
               <div className="important-value">{formatCurrency(booking.left_to_pay)}</div>
@@ -114,7 +114,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               <div className="value">{formatCurrency(-booking.left_to_pay)}</div>
             </React.Fragment>}
           </Grid>
-          <Grid item xs={6}>
+          <Grid xs={6}>
             <div className="label">{t("Channel:")}</div>
             <div className="value">{booking.source?.name}</div>
           </Grid>
