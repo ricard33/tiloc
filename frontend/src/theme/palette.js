@@ -53,6 +53,5 @@ export default {
     paper: white
   },
   icon: colors.blueGrey[600],
-  divider: colors.grey[200],
-  hover: 'rgba(63, 81, 181, 0.04)',
+  // divider: 'rgba(0,0,0,12)',
 };

@@ -17,14 +17,14 @@ export default {
   ].join(","),
   h1: {
   //   color: palette.text.primary,
-    fontWeight: 500,
+    fontWeight: 400,
     fontSize: "2.5rem",
     // letterSpacing: "-0.24px",
   //   lineHeight: "40px"
   },
   h2: {
   //   color: palette.text.primary,
-    fontWeight: 500,
+    fontWeight: 400,
     fontSize: "2rem",
   //   letterSpacing: "-0.24px",
   //   lineHeight: "32px"
@@ -39,21 +39,21 @@ export default {
   h4: {
   //   color: palette.text.primary,
     fontWeight: 500,
-    fontSize: "1.2rem",
+    fontSize: "1.35rem",
   //   letterSpacing: "-0.06px",
   //   lineHeight: "24px"
   },
   h5: {
   //   color: palette.text.primary,
     fontWeight: 500,
-    fontSize: "1rem",
+    fontSize: "1.25rem",
   //   letterSpacing: "-0.05px",
   //   lineHeight: "20px"
   },
   h6: {
   //   color: palette.text.primary,
     fontWeight: 500,
-    fontSize: "0.9em",
+    fontSize: "1.15rem",
   //   letterSpacing: "-0.05px",
   //   lineHeight: "20px"
   },
@@ -71,16 +71,16 @@ export default {
   //   lineHeight: "21px"
   // },
   body1: {
-    color: palette.text.primary,
-    fontSize: "0.85em",
-    letterSpacing: "-0.05px",
-    lineHeight: "21px"
+    // color: palette.text.primary,
+    // fontSize: "0.85em",
+    // letterSpacing: "-0.05px",
+    // lineHeight: "21px"
   },
   body2: {
-    color: palette.text.secondary,
-    fontSize: "0.7em",
-    letterSpacing: "-0.04px",
-    lineHeight: "18px"
+    // color: palette.text.secondary,
+    // fontSize: "0.7em",
+    // letterSpacing: "-0.04px",
+    // lineHeight: "18px"
   },
   // button: {
   //   color: palette.text.primary,
