@@ -18,6 +18,11 @@ const Settings = () => {
       disabled: true,
     },
     {
+      title: t('Lodgings'),
+      href: './lodgings',
+      icon: <HolidayVillage />
+    },
+    {
       title: t('Contract templates'),
       href: './contract-templates',
       icon: <DashboardIcon />

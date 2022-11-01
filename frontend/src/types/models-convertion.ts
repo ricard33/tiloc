@@ -1,4 +1,4 @@
-import { Booking, Lodging, Payment, Service } from "./models";
+import { Booking, Lodging, Owner, Payment, Service } from "./models";
 
 
 export function api2Payment(p: Record<string, any>): Payment {
@@ -12,6 +12,15 @@ export function payment2Api(p: Payment): Record<string, any> {
   return {
     ...p,
     amount: p.amount.toFixed(2)
+  };
+}
+
+// ----- OWNER -----
+
+export function api2Owner(owner: Record<string, any>): Owner {
+  return {
+    ...owner as Owner,
+    vat_rate: Number(owner.vat_rate),
   };
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BookingsTable, BookingsToolbar } from "./components";
+import { BookingsTable } from "./components";
 import { makeStyles } from "@mui/styles";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -13,11 +13,12 @@ import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoa
 import { useNavigate } from "react-router-dom";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { useSelector } from "react-redux";
+import Page from "../../layouts/Main/Page";
+import ListToolbar from "../../components/ListToolbar";
+import { useTranslation } from "react-i18next";
+import { BookingsImportDialog } from "../../components";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(3)
-  },
   content: {
     marginTop: theme.spacing(2)
   },
@@ -35,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 
 const BookingList = () => {
   const classes = useStyles();
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const [selected, setSelected] = useState([]);
   const [editBooking, setEditBooking] = useState(null);
   const numSelected = selected.length;
@@ -43,12 +44,13 @@ const BookingList = () => {
   const [page, setPage] = useState(0);
   const [ordering, setOrdering] = useState({ orderBy: "begin_date", order: "asc" });
   const [search, setSearch] = useState("");
+  const [openImport, setOpenImport] = useState(false);
   const today = new Date();
-  const [dateRange, setDateRange] = useState({startDate: startOfMonth(today), endDate: endOfMonth(today)});
-  const dateFilter = formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate)
+  const [dateRange, setDateRange] = useState({ startDate: startOfMonth(today), endDate: endOfMonth(today) });
+  const dateFilter = formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate);
   const { data: bookings, isLoading: isLoadingBookings } = useListBookingsPaginatedQuery({
     page_size: rowsPerPage,
-    page: page+1,
+    page: page + 1,
     ordering: (ordering.order === "desc" ? "-" : "") + ordering.orderBy,
     guest_name__icontains: search,
     for_dates: dateFilter
@@ -110,11 +112,26 @@ const BookingList = () => {
     setDateRange(range);
   };
 
+  const handleClickOpen = () => {
+    setOpenImport(true);
+  };
+
+  const handleCloseImport = (value) => {
+    setOpenImport(false);
+  };
+
+
   return (
-    <div className={classes.root}>
-      <BookingsToolbar
-        numSelected={numSelected} onCreateBooking={canAdd ? onCreateBooking : undefined} onSearch={onSearch}
+    <Page>
+      <ListToolbar
+        title={t("Bookings")}
+        numSelected={numSelected} onSearch={onSearch} onSearchLabel={t("Search booking")}
         dateRange={dateRange} onDateRangeChange={onDateRangeChange}
+        tools={[
+          { label: t("Import"), onClick: handleClickOpen, disabled: !canAdd },
+          { label: t("Export"), onClick: ()=>undefined, disabled: true },
+          { label: t("Add booking"), onClick: onCreateBooking, disabled: !canAdd },
+        ]}
       />
       <div className={classes.content}>
         <Card>
@@ -129,7 +146,7 @@ const BookingList = () => {
                   onChangeOrdering={onChangeOrdering}
                 />
                 <Backdrop className={classes.backdrop} open={isLoadingBookings} timeout={0}>
-                  <CircularProgress color="inherit"/>
+                  <CircularProgress color="inherit" />
                 </Backdrop>
               </div>
             </PerfectScrollbar>
@@ -148,12 +165,13 @@ const BookingList = () => {
         </Card>
       </div>
       {editBooking &&
-      <BookingDialogLoader
-        booking={editBooking}
-        onClose={handleCloseEdit}
-        onOpenContract={onEditContract}
-      />}
-    </div>
+        <BookingDialogLoader
+          booking={editBooking}
+          onClose={handleCloseEdit}
+          onOpenContract={onEditContract}
+        />}
+      <BookingsImportDialog url="something" open={openImport} onClose={handleCloseImport} />
+    </Page>
   );
 };
 

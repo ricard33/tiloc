@@ -9,14 +9,14 @@ import {
   Guest,
   Lodging,
   LoginInfo,
-  NextEvent,
+  NextEvent, Owner,
   Pagination,
   Payment,
   Service,
   User
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { api2Booking, api2Lodging, api2Payment } from "../types/models-convertion";
+import { api2Booking, api2Lodging, api2Owner, api2Payment } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
 export const serviceURL = "/api/";
@@ -204,6 +204,7 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
+const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate");
@@ -255,6 +256,13 @@ export const api = createApi({
     createBookingChannel: bookingChannelApi.create(builder),
     updateBookingChannel: bookingChannelApi.update(builder),
     deleteBookingChannel: bookingChannelApi.delete(builder),
+
+    // owner
+    listOwners: ownerApi.list(builder),
+    getOwner: ownerApi.get(builder),
+    createOwner: ownerApi.create(builder),
+    updateOwner: ownerApi.update(builder),
+    deleteOwner: ownerApi.delete(builder),
 
     // Lodging
     listLodgings: lodgingApi.list(builder),
@@ -348,6 +356,12 @@ export const {
   useCreateBookingChannelMutation,
   useUpdateBookingChannelMutation,
   useDeleteBookingChannelMutation,
+
+  useListOwnersQuery,
+  useGetOwnerQuery,
+  useCreateOwnerMutation,
+  useUpdateOwnerMutation,
+  useDeleteOwnerMutation,
 
   useListLodgingsQuery,
   useGetLodgingQuery,

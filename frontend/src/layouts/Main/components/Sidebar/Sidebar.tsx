@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import clsx from "clsx";
-import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
 import { Drawer, Theme } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -65,7 +63,7 @@ const Sidebar: React.FC<Props> = props => {
 
   const classes = useStyles();
   const { t } = useTranslation();
-  const [version, setVersion] = useState({version: "?", build_date: "-"});
+  const [version, setVersion] = useState({ version: "?", build_date: "-" });
   const location = useLocation();
   const locationPathname = location.pathname;
 
