@@ -27,6 +27,7 @@ import { useAlert } from "../../common/alertUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import "./Planning.scss";
 import { useSelector } from "react-redux";
+import Page from "../../layouts/Main/Page";
 
 
 const Planning = () => {
@@ -149,7 +150,7 @@ const Planning = () => {
   // }));
 
   return (
-    <div className="planning">
+    <Page className="planning">
       <div className="toolbar">
         <IconButton
           type="button"
@@ -251,14 +252,13 @@ const Planning = () => {
           })}
         </CardContent>
       </Card>
-      <div>Legend: TODO</div>
       {settingsOpened &&
       <PlanningSettingsDialog
         open={settingsOpened}
         settings={settings}
         onClose={onCloseSettings}
       />}
-    </div>
+    </Page>
   );
 };
 

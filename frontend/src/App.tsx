@@ -32,13 +32,13 @@ function App(props: Props) {
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
 
   useEffect(() => {
-    console.log("useEffect token", token);
+    // console.log("useEffect token", token);
     dispatch(auth.userLoading());
     refetchUser();
   }, [dispatch, refetchUser, token]);
 
   useEffect(() => {
-    console.log("useEffect user", currentUser);
+    // console.log("useEffect user", currentUser);
     if(currentUser)
       dispatch(auth.userLoaded(currentUser));
   }, [dispatch, currentUser, token]);

@@ -49,6 +49,7 @@ const SearchInput = props => {
 
 SearchInput.propTypes = {
   className: PropTypes.string,
+  placeholder: PropTypes.string,
   onChange: PropTypes.func,
   style: PropTypes.object
 };

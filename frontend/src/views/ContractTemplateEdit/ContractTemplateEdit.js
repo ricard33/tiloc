@@ -25,12 +25,14 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
+import Page from "../../layouts/Main/Page";
 
 const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {
-    padding: theme.spacing(1)
+    display: "flex",
+    flexFlow: "column"
   },
   content: {
     marginTop: theme.spacing(2)
@@ -160,7 +162,7 @@ const ContractTemplateEdit = (/*props*/) => {
 
 
   return (
-    <div className={classes.root}>
+    <Page className={classes.root}>
       <Backdrop className={classes.backdrop} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -173,6 +175,7 @@ const ContractTemplateEdit = (/*props*/) => {
       {/*    "No legal or other liability is accepted by the software publisher.")}*/}
       {/*</Alert>*/}
       <Grid
+        style={{ flex: "1 1 auto" }}
         container
         spacing={1}
       >
@@ -265,7 +268,7 @@ const ContractTemplateEdit = (/*props*/) => {
           </Grid>
         </Grid>
       </Grid>
-    </div>
+    </Page>
   );
 };
 

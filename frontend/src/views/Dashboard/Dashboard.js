@@ -1,29 +1,13 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Grid } from '@mui/material';
+import React from "react";
+import { Grid } from "@mui/material";
 
-import {
-  // Budget,
-  // TotalUsers,
-  // TasksProgress,
-  // TotalProfit,
-  FillingRate,
-  ChannelsDistribution,
-  LatestBookings,
-  NextEvents
-} from './components';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(4)
-  }
-}));
+import { ChannelsDistribution, FillingRate, LatestBookings, NextEvents } from "./components";
+import Page from "../../layouts/Main/Page";
 
 const Dashboard = () => {
-  const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <Page>
       <Grid
         container
         spacing={4}
@@ -103,7 +87,7 @@ const Dashboard = () => {
         {/*  <LatestBookings />*/}
         {/*</Grid>*/}
       </Grid>
-    </div>
+    </Page>
   );
 };
 

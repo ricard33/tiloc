@@ -5,11 +5,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { ContractTemplatesTable, ContractTemplatesToolbar } from "./components";
 import { useNavigate } from "react-router-dom";
 import { useListContractTemplatesQuery } from "../../../services/api";
+import Page from "../../../layouts/Main/Page";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(3)
-  },
   content: {
     marginTop: theme.spacing(2)
   },
@@ -35,8 +33,8 @@ const ContractTemplateList = () => {
   };
 
   return (
-    <div className={classes.root}>
-      <ContractTemplatesToolbar numSelected={numSelected}/>
+    <Page>
+      <ContractTemplatesToolbar numSelected={numSelected} />
       <div className={classes.content}>
         <ContractTemplatesTable
           templates={allTemplates || []}
@@ -44,10 +42,10 @@ const ContractTemplateList = () => {
           onSelectionChange={onSelectionChange}
         />
         <Backdrop className={classes.backdrop} open={isLoading} timeout={0}>
-          <CircularProgress color="inherit"/>
+          <CircularProgress color="inherit" />
         </Backdrop>
       </div>
-    </div>
+    </Page>
   );
 };
 

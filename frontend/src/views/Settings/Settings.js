@@ -1,20 +1,14 @@
 import React from "react";
-import { makeStyles } from "@mui/styles";
 import { Typography } from "@mui/material";
 import { SidebarNav } from "../../layouts/Main/components/Sidebar/components";
 import { useTranslation } from "react-i18next";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
+import HolidayVillage from "@mui/icons-material/HolidayVillage";
+import Page from "../../layouts/Main/Page";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(4)
-  },
-  nav: {}
-}));
 
 const Settings = () => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const pages = [
     {
@@ -32,15 +26,14 @@ const Settings = () => {
 
 
   return (
-    <div className={classes.root}>
-      <Typography variant="h1">
+    <Page>
+      <Typography variant="h4">
         Settings
       </Typography>
       <SidebarNav
-        className={classes.nav}
         pages={pages}
       />
-    </div>
+    </Page>
   );
 };
 

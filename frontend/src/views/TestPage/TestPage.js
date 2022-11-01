@@ -1,29 +1,19 @@
 import React, { } from "react";
-import { makeStyles } from "@mui/styles";
 import { Typography } from "@mui/material";
+import Page from "../../layouts/Main/Page";
 // import { useTranslation } from "react-i18next";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(3)
-  },
-  content: {
-    marginTop: theme.spacing(2)
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  }
-}));
 
 const TestPage = () => {
-  const classes = useStyles();
   // const { t } = useTranslation();
 
   return (
-    <div className={classes.root}>
+    <Page>
       <h1>Test page</h1>
-      <Typography variant="h1" component="h2" gutterBottom>
+      <h2>Test page</h2>
+      <h3>Test page</h3>
+      <h4>Test page</h4>
+      <Typography variant="h1" gutterBottom>
         h1. Heading
       </Typography>
       <Typography variant="h2" gutterBottom>
@@ -66,7 +56,7 @@ const TestPage = () => {
       <Typography variant="overline" display="block" gutterBottom>
         overline text
       </Typography>
-    </div>
+    </Page>
   );
 };
 

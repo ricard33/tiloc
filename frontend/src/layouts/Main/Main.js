@@ -32,7 +32,9 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 160
   },
   content: {
-    height: "100%"
+    height: "100%",
+    display: "flex",
+    flexFlow: "column"
   },
   breadcrumb: {
     padding: `0 ${theme.spacing(1)}`

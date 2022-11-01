@@ -24,13 +24,11 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
+import Page from "../../layouts/Main/Page";
 
 const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(1)
-  },
   content: {
     marginTop: theme.spacing(2)
   },
@@ -168,7 +166,7 @@ const ContractEdit = () => {
 
 
   return (
-    <div className={classes.root}>
+    <Page>
       <Backdrop className={classes.backdrop} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -246,7 +244,7 @@ const ContractEdit = () => {
           </Grid>
         </Grid>
       </Grid>
-    </div>
+    </Page>
   );
 };
 

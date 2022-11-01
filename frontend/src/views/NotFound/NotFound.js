@@ -2,20 +2,18 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Grid, Typography } from '@mui/material';
 import PageNotFound from '../../assets/images/undraw_page_not_found_su7k.svg';
+import Page from "../../layouts/Main/Page";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(4)
-  },
   content: {
-    paddingTop: 150,
+    paddingTop: "10vh",
     textAlign: 'center'
   },
   image: {
-    marginTop: 50,
+    marginTop: "5vh",
     display: 'inline-block',
     maxWidth: '100%',
-    width: 560
+    width: "30vw"
   }
 }));
 
@@ -23,7 +21,7 @@ const NotFound = () => {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <Page>
       <Grid
         container
         justifyContent="center"
@@ -31,11 +29,9 @@ const NotFound = () => {
       >
         <Grid
           item
-          lg={6}
-          xs={12}
         >
           <div className={classes.content}>
-            <Typography variant="h1">
+            <Typography variant="h3">
               404: The page you are looking for isn’t here
             </Typography>
             <Typography variant="subtitle2">
@@ -50,7 +46,7 @@ const NotFound = () => {
           </div>
         </Grid>
       </Grid>
-    </div>
+    </Page>
   );
 };
 
