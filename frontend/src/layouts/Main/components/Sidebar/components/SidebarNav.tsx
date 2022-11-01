@@ -1,13 +1,12 @@
 /* eslint-disable react/no-multi-comp */
 /* eslint-disable react/display-name */
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, NavLinkProps } from "react-router-dom";
 import clsx from "clsx";
-import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
-import { List, ListItem, colors } from "@mui/material";
+import { colors, List, ListItem, ListProps, Theme } from "@mui/material";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {},
   item: {
     display: "flex",
@@ -23,23 +22,23 @@ const useStyles = makeStyles(theme => ({
     width: "100%",
     fontWeight: theme.typography.fontWeightMedium,
 
-    display: 'inline-flex',
-    position: 'relative',
-    boxSizing: 'border-box',
-    backgroundColor: 'transparent',
-    outline: '0px',
-    border: '0px',
-    margin: '0px',
-    cursor: 'pointer',
-    verticalAlign: 'middle',
-    appearance: 'none',
-    textDecoration: 'none',
-    fontSize: '0.8125rem',
+    display: "inline-flex",
+    position: "relative",
+    boxSizing: "border-box",
+    backgroundColor: "transparent",
+    outline: "0px",
+    border: "0px",
+    margin: "0px",
+    cursor: "pointer",
+    verticalAlign: "middle",
+    appearance: "none",
+    textDecoration: "none",
+    fontSize: "0.8125rem",
     lineHeight: 1.75,
-    textTransform: 'uppercase',
-    minWidth: '64px',
+    textTransform: "uppercase",
+    minWidth: "64px",
     "&:hover": {
-      backgroundColor: theme.palette.hover,
+      backgroundColor: theme.palette.action.hover
     }
   },
   icon: {
@@ -51,20 +50,25 @@ const useStyles = makeStyles(theme => ({
   },
   active: {
     color: theme.palette.primary.main,
-    fontWeight: theme.typography.fontWeightMedium,
+    fontWeight: theme.typography.fontWeightMedium
   },
   disabled: {
     color: theme.palette.primary.light,
-    cursor: "default",
+    cursor: "default"
   }
 }));
 
-const CustomNavLink = React.forwardRef((props, ref) => {
+export interface CustomNavLinkProps extends NavLinkProps {
+  className: string | (({ isActive }: { isActive: boolean; }) => string);
+  disabled: boolean;
+}
+
+const CustomNavLink = React.forwardRef<HTMLAnchorElement, CustomNavLinkProps>((props, ref) => {
   const { className, disabled, ...rest } = props;
 
-  const handleClick = (e) => {
-    if(disabled) e.preventDefault()
-  }
+  const handleClick = (e: React.MouseEvent) => {
+    if (disabled) e.preventDefault();
+  };
 
   return (
     <NavLink
@@ -77,16 +81,24 @@ const CustomNavLink = React.forwardRef((props, ref) => {
   );
 });
 
-CustomNavLink.propTypes = {
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  disabled: PropTypes.bool,
-};
 
-const SidebarNav = props => {
+type Page = {
+  title: string;
+  href: string;
+  icon: React.ReactElement;
+  external?: boolean;
+  disabled?: boolean;
+}
+
+export interface SidebarNavProps extends ListProps {
+  className: string;
+  pages: Page[];
+}
+
+const SidebarNav: React.FunctionComponent<SidebarNavProps> = props => {
   const { pages, className, ...rest } = props;
 
   const classes = useStyles();
-
 
   return (
     <List
@@ -113,7 +125,7 @@ const SidebarNav = props => {
               className={({ isActive }) => classes.button + (isActive ? (" " + classes.active) : "") + (page.disabled ? (" " + classes.disabled) : "")}
               target={page.external ? "_blank" : ""}
               to={page.href}
-              disabled={page.disabled}
+              disabled={page.disabled ?? false}
             >
               <div className={classes.icon}>{page.icon}</div>
               {page.title}
@@ -123,11 +135,6 @@ const SidebarNav = props => {
       ))}
     </List>
   );
-};
-
-SidebarNav.propTypes = {
-  className: PropTypes.string,
-  pages: PropTypes.array.isRequired
 };
 
 export default SidebarNav;

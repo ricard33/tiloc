@@ -1,28 +1,29 @@
 import React, { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
-import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
-import { AppBar, Avatar, Badge, Hidden, IconButton, Toolbar } from "@mui/material";
+import { AppBar, AppBarProps, Avatar, Badge, Hidden, IconButton, Theme, Toolbar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import InputIcon from "@mui/icons-material/Input";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import LogoTiLoc from "../../../../assets/images/logos/logo-tiloc.png";
+import LogoTiLoc from "../../../assets/images/logos/logo-tiloc.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getGravatarUrl } from "../../../../components/Gravatar";
+import { getGravatarUrl } from "../../../components/Gravatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useTranslation } from "react-i18next";
-import { auth } from "../../../../actions";
-import { useLogoutMutation } from "../../../../services/api";
-import { fetchErrorDecode } from "../../../../common/apiUtils";
-import { useAlert } from "../../../../common/alertUtils";
-import logger from "../../../../common/logger";
+import { auth } from "../../../actions";
+import { useLogoutMutation } from "../../../services/api";
+import { fetchErrorDecode } from "../../../common/apiUtils";
+import { useAlert } from "../../../common/alertUtils";
+import logger from "../../../common/logger";
+import { RootState } from "../../../store";
+import { User } from "../../../types";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     boxShadow: "none"
   },
@@ -42,28 +43,34 @@ const useStyles = makeStyles(theme => ({
   appName: {
     color: "white",
     fontSize: "2em"
-  }
+  },
+  avatar: {}
 }));
 
-const Topbar = props => {
+export interface TopbarProps extends AppBarProps {
+  className?: string;
+  onSidebarOpen: (event: React.MouseEvent) => void;
+}
+
+const Topbar: React.FC<TopbarProps> = (props) => {
   const { className, onSidebarOpen, ...rest } = props;
 
   const classes = useStyles();
 
   const { t } = useTranslation();
   const [notifications] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const user = useSelector(store => store.auth.user);
+  const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null);
+  const user = useSelector<RootState>(store => store.auth.user) as User;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [doLogout, ] = useLogoutMutation();
+  const [doLogout] = useLogoutMutation();
   const { showError } = useAlert();
 
   const avatar = getGravatarUrl(user.email, {
     default: "mp"
   });
 
-  const handleClickUser = event => {
+  const handleClickUser: React.MouseEventHandler = event => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -71,21 +78,20 @@ const Topbar = props => {
     setAnchorEl(null);
   };
 
-  const handleSignOut = event => {
+  const handleSignOut: React.MouseEventHandler = event => {
     event.preventDefault();
-    doLogout().then((result)=> {
-      const {error} = result;
-      if(error) {
+    doLogout().then((result) => {
+      if ((result as any).error) {
+        const error = (result as any).error;
         showError(t("Logout error: ") + fetchErrorDecode(error));
         console.error(result);
-        logger.error(result)
-      }
-      else {
+        logger.error(result);
+      } else {
         dispatch(auth.logoutSuccessful());
-        console.log("Logged out!")
+        console.log("Logged out!");
         navigate("/logged-out");
       }
-    })
+    });
   };
 
   return (
@@ -133,7 +139,7 @@ const Topbar = props => {
         />
         <Menu
           id="user-menu"
-          anchorEl={anchorEl}
+          anchorEl={anchorEl as Element}
           elevation={0}
           anchorOrigin={{
             vertical: "bottom",
@@ -163,11 +169,6 @@ const Topbar = props => {
       </Toolbar>
     </AppBar>
   );
-};
-
-Topbar.propTypes = {
-  className: PropTypes.string,
-  onSidebarOpen: PropTypes.func
 };
 
 export default Topbar;

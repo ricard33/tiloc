@@ -1,13 +1,14 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import clsx from "clsx";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
-import { Avatar, Typography } from "@mui/material";
-import { getGravatarUrl } from "../../../../../../components/Gravatar";
+import { Avatar, Theme, Typography } from "@mui/material";
+import { getGravatarUrl } from "../../../../../components/Gravatar";
 import { useSelector } from "react-redux";
+import { RootState } from "../../../../../store";
+import { User } from "../../../../../types";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
@@ -23,21 +24,16 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Profile = props => {
-  const { className, ...rest } = props;
-
+const Profile = () => {
   const classes = useStyles();
-  const user = useSelector(store => store.auth.user);
+  const user = useSelector<RootState>(store => store.auth.user) as User;
 
   const avatar = getGravatarUrl(user.email, {
     default: "mp"
   });
 
   return (
-    <div
-      {...rest}
-      className={clsx(classes.root, className)}
-    >
+    <div className={classes.root}>
       <Avatar
         alt="Person"
         className={classes.avatar}
@@ -46,12 +42,12 @@ const Profile = props => {
         to="/settings"
       />
       <Typography
-        className={classes.full_name}
+        className={classes.name}
         variant="h5"
       >
         {user.full_name}
       </Typography>
-      <Typography variant="body2">{user.bio}</Typography>
+      <Typography variant="body2">"Small bio</Typography>
     </div>
   );
 };

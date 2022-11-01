@@ -2,13 +2,10 @@ import { colors, createTheme } from "@mui/material";
 
 import palette from "./palette";
 import typography from "./typography";
-import overrides from "./overrides";
-import MuiTableCell from "./overrides/MuiTableCell";
 
 const theme = createTheme({
   palette,
   typography,
-  overrides,
   zIndex: {
     appBar: 1200,
     drawer: 1100
@@ -75,15 +72,7 @@ const theme = createTheme({
         }
       }
     },
-    MuiTableCell,
     MuiTableHead: {
-      styleOverrides: {
-        root: {
-          backgroundColor: colors.grey[50]
-        }
-      }
-    },
-    MuiDataGridColumnHeaderRow: {
       styleOverrides: {
         root: {
           backgroundColor: colors.grey[50]

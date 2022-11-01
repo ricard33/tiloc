@@ -2,13 +2,14 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import { makeStyles, useTheme } from "@mui/styles";
-import { Breadcrumbs, Link, Typography, useMediaQuery } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import { useTheme } from '@mui/material/styles';
+import { Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/material";
 import { Sidebar, Topbar, Footer } from "./components";
-import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
+import { Link as RouterLink, LinkProps, Outlet, useLocation } from "react-router-dom";
 
 
-const breadcrumbNameMap = {
+const breadcrumbNameMap: {[key: string]: string|undefined,} = {
   "/dashboard": "Dashboard",
   "/planning": "Planning",
   "/bookings": "Bookings",
@@ -18,9 +19,9 @@ const breadcrumbNameMap = {
 };
 
 
-const LinkRouter = (props) => <Link {...props} component={RouterLink} />;
+const LinkRouter = (props: LinkProps) => <Link {...props} component={RouterLink} />;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     paddingTop: 56,
     height: "100%",

@@ -1,21 +1,19 @@
-import React from 'react';
-import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@mui/styles';
-import { Typography, Button, colors } from '@mui/material';
-import ResumeFolderSvg from '../../../../../../assets/images/undraw_resume_folder_2_arse.svg';
+import React from "react";
+import { makeStyles } from "@mui/styles";
+import { Button, colors, Theme, Typography } from "@mui/material";
+import ResumeFolderSvg from "../../../../../assets/images/undraw_resume_folder_2_arse.svg";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     backgroundColor: colors.grey[50]
   },
   media: {
     paddingTop: theme.spacing(2),
     height: 80,
-    textAlign: 'center',
-    '& > img': {
-      height: '100%',
-      width: 'auto'
+    textAlign: "center",
+    "& > img": {
+      height: "100%",
+      width: "auto"
     }
   },
   content: {
@@ -23,20 +21,17 @@ const useStyles = makeStyles(theme => ({
   },
   actions: {
     padding: theme.spacing(1, 2),
-    display: 'flex',
-    justifyContent: 'center'
+    display: "flex",
+    justifyContent: "center"
   }
 }));
 
-const UpgradePlan = props => {
-  const { className, ...rest } = props;
-
+const UpgradePlan = () => {
   const classes = useStyles();
 
   return (
     <div
-      {...rest}
-      className={clsx(classes.root, className)}
+      className={classes.root}
     >
       <div className={classes.media}>
         <img
@@ -71,10 +66,6 @@ const UpgradePlan = props => {
       </div>
     </div>
   );
-};
-
-UpgradePlan.propTypes = {
-  className: PropTypes.string
 };
 
 export default UpgradePlan;
