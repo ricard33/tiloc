@@ -4005,16 +4005,6 @@ ajv@^8.0.0, ajv@^8.6.0, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-ajv@^8.11.0:
-  version "8.11.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.11.0.tgz#977e91dd96ca669f54a11e23e378e33b884a565f"
-  integrity sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==
-  dependencies:
-    fast-deep-equal "^3.1.1"
-    json-schema-traverse "^1.0.0"
-    require-from-string "^2.0.2"
-    uri-js "^4.2.2"
-
 alphanum-sort@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
@@ -7379,13 +7369,6 @@ interpret@^2.2.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
   integrity sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==
 
-invariant@^2.0.0:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"
-  integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
-  dependencies:
-    loose-envify "^1.0.0"
-
 ip@^1.1.0, ip@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
@@ -8688,7 +8671,7 @@ lodash.uniq@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
-lodash@^4.0.0, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.4, lodash@^4.7.0, lodash@~4.17.10:
+lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.4, lodash@^4.7.0, lodash@~4.17.10:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -8698,7 +8681,7 @@ loggly-jslogger@^2.2.4:
   resolved "https://registry.yarnpkg.com/loggly-jslogger/-/loggly-jslogger-2.2.4.tgz#db6f64c43d6ad9d4a1778d9eb2f7ad2559780bce"
   integrity sha512-3VttLHnmz1RdfJHP4x8ALsTwDt0ONqrgfV9B1y6UTijP9TWwNGKqdjK0P7FfoEEEM3Fmg2/pmmOA92U20YKRTw==
 
-loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
+loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
@@ -10429,6 +10412,11 @@ react-error-overlay@^6.0.11:
   version "6.0.11"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.11.tgz#92835de5841c5cf08ba00ddd2d677b6d17ff9adb"
   integrity sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==
+
+react-hook-form-mui@^5.7.2:
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/react-hook-form-mui/-/react-hook-form-mui-5.7.2.tgz#947419b854b2b0241c55079dcf44dc5cc3651660"
+  integrity sha512-AeQ4e2v7odlacSdBhpKy/vQ51MW6IgVpgPPF6gimZTMKWf0y3tk4AKiI0evFzQ2ybElKiJNRj767OtwAPJFxpw==
 
 react-hook-form@^7.38.0:
   version "7.38.0"
@@ -12182,35 +12170,6 @@ unicode-property-aliases-ecmascript@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-2.0.0.tgz#0a36cb9a585c4f6abd51ad1deddb285c165297c8"
   integrity sha512-5Zfuy9q/DFr4tfO7ZPeVXb1aPoeQSdeFMLpYuFebehDAhbuevLs5yxSZmIFN1tP5F9Wl4IpJrYojg85/zgyZHQ==
-
-uniforms-bridge-json-schema@^3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/uniforms-bridge-json-schema/-/uniforms-bridge-json-schema-3.10.1.tgz#7d134a6fc1d3585570ab313bd5df602fa03f8aa6"
-  integrity sha512-AVC+HSTQplF28o7f7Cvc+ezTr07dO+OkRSYaG7Ip8VyGi7BSmORYOKCU8LMkKlLm3Ez3QhHCGnDdLwy9d9Vqgw==
-  dependencies:
-    invariant "^2.0.0"
-    lodash "^4.0.0"
-    tslib "^2.2.0"
-    uniforms "^3.10.1"
-
-uniforms-mui@^3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/uniforms-mui/-/uniforms-mui-3.10.1.tgz#243d1a399193a1beb3625e41d2c903647c90669f"
-  integrity sha512-q/QqShgeA+HYh8k2tOEMAqvMrtnSTHu4VZoFOcCqddRS95miv3sQN0mHCN0g42AYw7ixbeSmYDCKMso2pzvFJg==
-  dependencies:
-    invariant "^2.0.0"
-    lodash "^4.0.0"
-    tslib "^2.2.0"
-    uniforms "^3.10.1"
-
-uniforms@^3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/uniforms/-/uniforms-3.10.1.tgz#ad58afe19174743464a09c3c3fec7e68d59c9211"
-  integrity sha512-R2FBzYVv9KbgsYaVloL13Cw+eoF9q1DeSZOePBf28WWDtHFWNrziUZBPgmd4UVbk+6oQuwkbomX7BnNJ/jdtqw==
-  dependencies:
-    invariant "^2.0.0"
-    lodash "^4.0.0"
-    tslib "^2.2.0"
 
 unique-filename@^1.1.1:
   version "1.1.1"

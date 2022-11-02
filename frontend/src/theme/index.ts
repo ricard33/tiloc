@@ -12,7 +12,7 @@ const theme = createTheme({
   },
   components: {
     MuiButton: {
-      defaultProps: { size: "small" },
+      defaultProps: { size: "small", variant: "text" },
     },
     MuiFilledInput: {
       defaultProps: { margin: "dense" }

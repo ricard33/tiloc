@@ -1,4 +1,3 @@
-import * as React from "react";
 import { styled } from "@mui/system";
 
 const Page = styled("div")(({ theme }) => ({

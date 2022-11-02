@@ -1,7 +1,5 @@
 import React from "react";
-import { AutoField, AutoForm, ErrorsField, HiddenField, NumField, SelectField, SubmitField } from "uniforms-mui";
 
-import { lodgingBridge } from "../../types/lodgingSchema";
 import { useParams } from "react-router-dom";
 import { useGetLodgingQuery, useListOwnersQuery } from "../../services/api";
 import Page from "../../layouts/Main/Page";
@@ -9,8 +7,9 @@ import { Button, Card, CardActions, CardContent, CardHeader } from "@mui/materia
 import { useTranslation } from "react-i18next";
 import InputAdornment from "@mui/material/InputAdornment";
 import Grid2 from "@mui/material/Unstable_Grid2";
+import { FormContainer, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 
-export function LodgingFormBasic() {
+export function LodgingForm() {
   const { t } = useTranslation();
   let { lodgingId } = useParams();
   const {
@@ -19,73 +18,90 @@ export function LodgingFormBasic() {
   } = useGetLodgingQuery(Number(lodgingId), { skip: typeof lodgingId === "undefined" });
   const { data: owners } = useListOwnersQuery();
 
-  const ownersOptions: { label: string, value: number }[] = owners ? owners.map((owner, index) => {
-    return { label: owner.name, value: owner.id };
+  const ownersOptions: { label: string, id: number }[] = owners ? owners.map((owner, index) => {
+    return { label: owner.name, id: owner.id };
   }) : [];
 
   if (isLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <AutoForm schema={lodgingBridge} model={lodging} onSubmit={console.log}>
-        <Card sx={{maxWidth: "800px"}}>
+      <FormContainer
+        defaultValues={lodging}
+        onSuccess={(data) => {
+          console.log(data);
+        }}
+      >
+        <Card sx={{ maxWidth: "800px" }}>
           <CardHeader title={t("Lodging properties")} />
           <CardContent sx={{}}>
-            <HiddenField name={"id"} />
+            <input type="hidden" name={"id"} value={lodging!.id} />
             <Grid2 container spacing={4}>
               <Grid2 xs={12}>
-                <AutoField name={"name"} />
+                <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
               </Grid2>
               <Grid2 sm={6} xs={12}>
-                <AutoField name={"address"} />
+                <TextFieldElement name={"address"} label={t("Address")} multiline fullWidth required />
               </Grid2>
               <Grid2 sm={6} xs={12}>
-                <SelectField
+                <SelectElement
                   name={"owner"}
-                  // @ts-ignore
+                  label={t("Owner")}
                   options={ownersOptions}
+                  fullWidth
                 />
-                <AutoField name={"active"} />
-                <AutoField name={"shown"} />
-                <HiddenField name={"rank"} />
+                <SwitchElement name={"active"} label={t("Active ?")} />
+                <SwitchElement name={"shown"} label={t("Shown ?")} />
+                <input type="hidden" name={"rank"} value={lodging!.rank} />
               </Grid2>
               <Grid2 sm={3} xs={6}>
-                <AutoField name={"capacity"} />
+                <TextFieldElement label={"Capacity"} name={"capacity"} required type={"number"} />
               </Grid2>
               <Grid2 sm={3} xs={6}>
-                <NumField
+                <TextFieldElement
                   name={"daily_rate"}
+                  label={"Daily rate"}
+                  type={"number"}
+                  required
                   InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                 />
               </Grid2>
               <Grid2 sm={3} xs={6}>
-                <NumField
+                <TextFieldElement
                   name={"guaranty"}
+                  label={"Guaranty"}
+                  type={"number"}
+                  required
                   InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                 />
               </Grid2>
               <Grid2 sm={3} xs={6}>
-                <NumField
+                <TextFieldElement
                   name={"tourist_tax"}
+                  label={"Tourist tax"}
+                  type={"number"}
                   InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                 />
               </Grid2>
               <Grid2 xs={12}>
-                <AutoField name={"information"} />
+                <TextFieldElement name={"information"} label={t("Information")} multiline fullWidth />
               </Grid2>
-              <Grid2 xs={12}>
-                <AutoField name={"description"} />
-              </Grid2>
-              <Grid2 xs={12}>
-                <ErrorsField />
-              </Grid2>
+              {/*<Grid2 xs={12}>*/}
+              {/*  <AutoField name={"description"} />*/}
+              {/*</Grid2>*/}
             </Grid2>
           </CardContent>
-          <CardActions>
-            <Button>{t("Cancel")}</Button>
-            <SubmitField />
+          <CardActions
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "flex-end"
+            }}
+          >
+            <Button color={"secondary"}>{t("Cancel")}</Button>
+            <Button type={"submit"} color={"primary"}>{t("Submit")}</Button>
           </CardActions>
         </Card>
-      </AutoForm>
+      </FormContainer>
     </Page>
   )
   ;
