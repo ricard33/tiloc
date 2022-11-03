@@ -18,7 +18,7 @@ import {
 } from "./views";
 import { RequireAuth } from "./components/RequireAuth";
 import LodgingsList from "./views/Lodging/LodgingList";
-import { LodgingForm } from "./views/Lodging/LodgingForm";
+import { LodgingPage } from "./views/Lodging/LodgingPage";
 
 const MyRoutes = () => {
   return (
@@ -40,7 +40,7 @@ const MyRoutes = () => {
           <Route path="/reports" element={<TestPage />} />
           <Route path="/settings/" element={<Settings />} />
           <Route path="/settings/lodgings" element={<LodgingsList />} />
-          <Route path="/settings/lodgings/:lodgingId" element={<LodgingForm />} />
+          <Route path="/settings/lodgings/:lodgingId" element={<LodgingPage />} />
           <Route path="/settings/contract-templates" element={<ContractTemplateList />} />
           <Route path="/settings/contract-templates/:templateId" element={<ContractTemplateEdit />} />
           <Route path="/test-page" element={<TestPage />} />

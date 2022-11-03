@@ -15,7 +15,7 @@ const LodgingsList: React.FunctionComponent<Props> = ({
   ...props
 }: Props) => {
   const { t } = useTranslation();
-  const { data } = useListLodgingsQuery();
+  const { data } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
   const { data: owners } = useListOwnersQuery();
   const navigate = useNavigate();
 
@@ -43,14 +43,6 @@ const LodgingsList: React.FunctionComponent<Props> = ({
       field: "tourist_tax", headerName: t("Tourist tax"), type: "number", width: 90,
       valueFormatter: formatPrice
     }
-    // {
-    //   field: "fullName",
-    //   headerName: "Full name",
-    //   description: "This column has a value getter and is not sortable.",
-    //   sortable: false,
-    //   width: 160,
-    //   valueGetter: (params: GridValueGetterParams) => getOwnerName(params.row.owner) ?? ""
-    // }
   ];
 
   const getOwnerName = (ownerId: number) => {
