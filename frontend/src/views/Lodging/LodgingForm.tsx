@@ -9,6 +9,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { Lodging, Owner } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
+import { Save as SaveIcon } from "@mui/icons-material";
 
 type Props = {
   lodging: Lodging;
@@ -27,25 +28,11 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
   const { dirtyFields } = useFormState({
     control
   });
-  usePageUnloadAlert(() => Object.keys(dirtyFields).length > 0);
+  usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
 
   const ownersOptions: { label: string, id: number }[] = owners ? owners.map((owner) => {
     return { label: owner.name, id: owner.id };
   }) : [];
-
-
-  // useEffect(() => {
-  //   const unloadCallback = (event: { preventDefault: () => void; returnValue: string; }) => {
-  //     if (Object.keys(dirtyFields).length > 0) {
-  //       event.preventDefault();
-  //       event.returnValue = "";
-  //       return "";
-  //     }
-  //   };
-  //
-  //   window.addEventListener("beforeunload", unloadCallback);
-  //   return () => window.removeEventListener("beforeunload", unloadCallback);
-  // }, [dirtyFields]);
 
   const onCancelHandler = () => {
     unsavedChangesConfirm()
@@ -140,7 +127,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
           {Object.keys(dirtyFields).length > 0 ?
             <>
               <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
-              <Button type={"submit"} color={"primary"}>{t("Save")}</Button>
+              <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
             </> :
             <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
           }
