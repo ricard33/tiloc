@@ -3,20 +3,11 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 import { Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/material";
-import { Sidebar, Topbar, Footer } from "./components";
+import { Footer, Sidebar, Topbar } from "./components";
 import { Link as RouterLink, LinkProps, Outlet, useLocation } from "react-router-dom";
-
-
-const breadcrumbNameMap: {[key: string]: string|undefined,} = {
-  "/dashboard": "Dashboard",
-  "/planning": "Planning",
-  "/bookings": "Bookings",
-  "/settings": "Settings",
-  "contract-templates": "Contract templates",
-  "contract": "Contract"
-};
+import { useTranslation } from "react-i18next";
 
 
 const LinkRouter = (props: LinkProps) => <Link {...props} component={RouterLink} />;
@@ -44,13 +35,25 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const Main = () => {
   const classes = useStyles();
+  const { t } = useTranslation();
   const theme = useTheme();
   const location = useLocation();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
     defaultMatches: true
   });
-
   const [openSidebar, setOpenSidebar] = useState(false);
+
+  const breadcrumbNameMap: { [key: string]: string | undefined, } = {
+    "dashboard": t("Dashboard"),
+    "planning": t("Planning"),
+    "bookings": t("Bookings"),
+    "settings": t("Settings"),
+    "contract-templates": t("Contract templates"),
+    "contract": t("Contract"),
+    "lodgings": t("Lodgings"),
+    "reports": t("Reports"),
+  };
+
 
   const handleSidebarOpen = () => {
     setOpenSidebar(!openSidebar);
@@ -79,7 +82,7 @@ const Main = () => {
       <main className={classes.content}>
         <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
           <LinkRouter color="inherit" to="/">
-            Home
+            {t("Home")}
           </LinkRouter>
           {pathnames.map((value, index) => {
             const last = index === pathnames.length - 1;

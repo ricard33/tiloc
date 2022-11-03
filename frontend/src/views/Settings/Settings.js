@@ -33,7 +33,7 @@ const Settings = () => {
   return (
     <Page>
       <Typography variant="h4">
-        Settings
+        {t("Settings")}
       </Typography>
       <SidebarNav
         pages={pages}
