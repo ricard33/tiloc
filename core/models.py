@@ -108,8 +108,10 @@ class Lodging(models.Model):
         booking = Booking(
             lodging=self,
             guest_name="........................................",
-            guest_contact="email: .................................@.................... - tel: ...................................",
-            guest_address="........................................\n........................................\n........................................",
+            guest_contact="email: .................................@.................... - tel: "
+                          "...................................",
+            guest_address="........................................\n........................................\n"
+                          "........................................",
             guaranty=self.guaranty,
             adults=0,
             price=0,
@@ -220,7 +222,7 @@ class Booking(models.Model):
         FULL = "full", _("Full board")
 
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
-    lodging = models.ForeignKey(Lodging, blank=True, null=True, on_delete=models.SET_NULL)
+    lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
