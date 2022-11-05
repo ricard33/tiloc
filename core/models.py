@@ -167,7 +167,7 @@ class BookingStatus(models.Model):
     color = models.CharField(_("color"), max_length=10)
     rank = models.PositiveSmallIntegerField(_("rank"))
     no_stats = models.BooleanField(
-        default=False, help_text=_("Check to ignore from statistics bookings with " "this status")
+        default=False, help_text=_("Check to ignore from statistics bookings with this status")
     )
     finalized = models.BooleanField(
         default=True, help_text=_("If true, the booking is finalized and considered as real")
@@ -258,6 +258,8 @@ class Booking(models.Model):
 
     notes = models.TextField(_("Notes"), blank=True, null=True)
     options = models.ManyToManyField(Service, through="BookedService")
+    cancelled = models.BooleanField(_("cancelled"), default=False, help_text=_("True if this booking was cancelled"))
+    deleted = models.BooleanField(_("deleted"), default=False, help_text=_("True if this booking was deleted"))
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

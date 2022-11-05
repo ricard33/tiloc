@@ -11,12 +11,14 @@ import BookingView from "../BookingView";
 type BookingDialogLoaderProps = {
   booking: Booking;
   onClose: () => void;
+  onCancelBooking: (booking: Booking) => void;
+  onUncancelBooking: (booking: Booking) => void;
   onDelete: (booking: Booking) => void;
   onOpenContract: (submittedBooking: Booking) => void;
 };
 
 const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (props: BookingDialogLoaderProps) => {
-  const { booking, onClose, onDelete, onOpenContract } = props;
+  const { booking, onClose, onCancelBooking, onUncancelBooking, onDelete, onOpenContract } = props;
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: allGuests } = useAllGuestsQuery();
   const [isEditMode, setIsEditMode] = useState(booking === undefined || booking.id === undefined);
@@ -29,6 +31,8 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           lodgings={lodgings}
           guests={allGuests}
           onClose={onClose}
+          onCancelBooking={() => onCancelBooking(booking)}
+          onUncancelBooking={() => onUncancelBooking(booking)}
           onDelete={() => onDelete(booking)}
           onOpenContract={onOpenContract}
         />
@@ -39,6 +43,8 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           booking={booking}
           onEdit={() => setIsEditMode(true)}
           onClose={onClose}
+          onCancelBooking={() => onCancelBooking(booking)}
+          onUncancelBooking={() => onUncancelBooking(booking)}
           onDelete={() => onDelete(booking)}
           onOpenContract={onOpenContract}
         />

@@ -137,6 +137,7 @@ const BookingsTable = props => {
           .map(booking => (
             <TableRow
               className={classes.tableRow}
+              sx={{ ...booking.cancelled && { color: "lightgrey", fontStyle: "italic" }}}
               hover
               key={booking.id}
               selected={isSelected(booking.id)}
@@ -167,7 +168,7 @@ const BookingsTable = props => {
               <TableCell>
                 {booking.lodging ? booking.lodging.name : ""}
               </TableCell>
-              <TableCell>{booking.status.name}</TableCell>
+              <TableCell>{booking.cancelled ? t("Cancelled") :  booking.status.name}</TableCell>
               {showPayments && <TableCell>{booking.price}</TableCell>}
               <TableCell>
                 {onEdit && (<Button onClick={event => handleRowClick(event, booking)}>

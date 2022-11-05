@@ -1,18 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Booking, User } from "../../types";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Grid, Button, Typography } from "@mui/material";
-import { DeleteForever as DeleteIcon, PictureAsPdf as PdfIcon, Edit as EditIcon } from "@mui/icons-material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import useWindowDimensions from "../../common/windowDimensions";
 import BookingQuickView from "../BookingQuickView";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import BookingActions from "../BookingActions";
 
 
 type BookingViewProps = {
   booking: Booking;
   onClose: () => void;
   onEdit: () => void;
+  onCancelBooking: () => void;
+  onUncancelBooking: () => void;
   onDelete: () => void;
   onOpenContract?: (booking: Booking) => void;
 };
@@ -20,7 +22,7 @@ type BookingViewProps = {
 const BookingView: React.FunctionComponent<BookingViewProps> = ({
   ...props
 }: BookingViewProps) => {
-  const { booking, onClose, onEdit, onDelete, onOpenContract } = props;
+  const { booking, onClose, onEdit, onCancelBooking, onUncancelBooking, onDelete, onOpenContract } = props;
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canEdit = user.permissions.includes("core.change_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
@@ -42,43 +44,17 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
           {t("Booking details")}
         </Typography>
       </DialogTitle>
-      <DialogContent dividers >
+      <DialogContent dividers>
         <BookingQuickView booking={booking} />
       </DialogContent>
       <DialogActions>
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            {booking && booking.id && canDelete &&
-            <Button
-              type="button"
-              className="delete-button"
-              color="secondary"
-              startIcon={<DeleteIcon />}
-              onClick={onDelete}
-            >{t("Delete")}</Button>}
-          </Grid>
-          <Grid item>
-            {onOpenContract &&  canViewContract &&
-            <Button
-              type="button"
-              disabled={!booking || !booking.id}
-              className="button"
-              startIcon={<PdfIcon />}
-              onClick={() => onOpenContract(booking)}
-            >{t("Contract")}</Button>}
-          </Grid>
-          <Grid item>
-            <Button type="button" onClick={onClose}>{t("Close")}</Button>
-            {canEdit &&
-              <Button
-                type="submit"
-                color="primary"
-                className="button"
-                startIcon={<EditIcon />}
-                onClick={onEdit}
-              >{t("Edit")}</Button>}
-          </Grid>
-        </Grid>
+        <BookingActions
+          booking={booking} onClose={onClose} onDelete={onDelete}
+          onEdit={onEdit}
+          onOpenContract={onOpenContract}
+          onCancelBooking={onCancelBooking}
+          onUncancelBooking={onUncancelBooking}
+        />
       </DialogActions>
     </Dialog>
   );

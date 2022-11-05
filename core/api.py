@@ -129,7 +129,9 @@ class BookingViewSet(viewsets.ModelViewSet):
     """
 
     queryset = (
-        models.Booking.objects.all().order_by("-begin_date").prefetch_related("status", "lodging", "source", "options")
+        models.Booking.objects.filter(deleted=False)
+        .order_by("-begin_date")
+        .prefetch_related("status", "lodging", "source", "options")
     )
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
@@ -139,6 +141,10 @@ class BookingViewSet(viewsets.ModelViewSet):
         if not self.request.user.has_perm("core.view_prices"):
             return BookingNoPriceSerializer
         return BookingSerializer
+
+    def perform_destroy(self, instance):
+        instance.deleted = True
+        instance.save()
 
     @action(detail=False, methods=["get"])
     def all_guests(self, request, pk=None):

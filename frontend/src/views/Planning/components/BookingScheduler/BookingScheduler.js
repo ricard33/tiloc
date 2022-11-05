@@ -139,7 +139,7 @@ const BookingScheduler = props => {
 
   const items = (bookings ?? []).map(booking => ({
     id: booking.id,
-    group: booking.lodging_id > 0 ? booking.lodging_id : -3,
+    group: booking.lodging_id > 0 && !booking.cancelled ? booking.lodging_id : -3,
     title: booking.guest_name,
     status: booking.status,
     start_time: add(parseISO(booking.begin_date), { hours: 12 }).valueOf(),
@@ -157,7 +157,7 @@ const BookingScheduler = props => {
       style: {
         background: "#" + booking.status.color,
         color: "black",
-        opacity: booking.lodging_id > 0 ? undefined : "50%"
+        opacity: booking.lodging_id > 0 && !booking.cancelled ? undefined : "50%"
       }
     },
     booking

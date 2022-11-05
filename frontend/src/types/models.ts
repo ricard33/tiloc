@@ -111,6 +111,8 @@ export interface Booking {
   total_payments: number;
   left_to_pay: number;
   price_with_options: number;
+  cancelled: boolean;
+  deleted: boolean;
   created: string;
   modified: string;
 }

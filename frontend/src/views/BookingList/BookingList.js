@@ -4,7 +4,7 @@ import { makeStyles } from "@mui/styles";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 // import { useTranslation } from "react-i18next";
-import { useListBookingsPaginatedQuery } from "../../services/api";
+import { useDeleteBookingMutation, useListBookingsPaginatedQuery, useUpdateBookingMutation } from "../../services/api";
 import { Card, CardActions, TablePagination } from "@mui/material";
 import CardContent from "@mui/material/CardContent";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -17,6 +17,9 @@ import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
 import { useTranslation } from "react-i18next";
 import { BookingsImportDialog } from "../../components";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
+import { useConfirm } from "../../libs/MuiConfirm";
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -58,6 +61,12 @@ const BookingList = () => {
   const user = useSelector(store => store.auth.user);
   const canAdd = user.permissions.includes("core.add_booking");
   const navigate = useNavigate();
+  const { showError, showSuccess } = useAlert();
+  const confirm = useConfirm();
+  const [ updateBooking ] = useUpdateBookingMutation();
+  const [ deleteBooking ] = useDeleteBookingMutation();
+  const canEdit = user.permissions.includes("core.change_booking");
+  const canDelete = user.permissions.includes("core.delete_booking");
 
 
   const onSelectionChange = (newSelection) => {
@@ -120,6 +129,60 @@ const BookingList = () => {
     setOpenImport(false);
   };
 
+  const onCancelBooking = (booking) => {
+    if (!canEdit) return;
+    updateBooking({ ...booking, cancelled: true }).then((result) => {
+      if (result.error) {
+        const error = result.error;
+        console.error("Error canceling booking", error);
+        showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Booking cancelled"));
+        setEditBooking({ ...booking, cancelled: true });
+      }
+    });
+  };
+
+  const onUncancelBooking = (booking) => {
+    if (!canEdit) return;
+    updateBooking({ ...booking, cancelled: false }).then((result) => {
+      if (result.error) {
+        const error = result.error;
+        console.error("Error uncancelling booking", error);
+        showError(t("Impossible to uncancel booking: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Booking uncancelled"));
+        setEditBooking({ ...booking, cancelled: false });
+      }
+    });
+  };
+
+  const onDeleteBooking = (booking) => {
+    if(!canDelete) return;
+    confirm({
+      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
+        guest_name: booking.guest_name,
+        lodging_name: booking.lodging.name
+      }),
+      description: t("Do you really want to permanently delete this booking?")
+    })
+      .then(() => {
+        setSelected(null);
+        deleteBooking(booking.id).then((result) => {
+          if (result.error) {
+            const error = result.error;
+            console.error("Error deleting booking", error);
+            showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Booking deleted"));
+            handleCloseEdit();
+          }
+        });
+      })
+      .catch(() => { /* ... */
+      });
+  };
+
 
   return (
     <Page>
@@ -169,6 +232,9 @@ const BookingList = () => {
           booking={editBooking}
           onClose={handleCloseEdit}
           onOpenContract={onEditContract}
+          onCancelBooking={onCancelBooking}
+          onUncancelBooking={onUncancelBooking}
+          onDelete={onDeleteBooking}
         />}
       <BookingsImportDialog url="something" open={openImport} onClose={handleCloseImport} />
     </Page>

@@ -20,7 +20,7 @@ import {
   useDeleteBookingMutation,
   useListBookingsQuery,
   useListBookingStatusesQuery,
-  useListLodgingsQuery
+  useListLodgingsQuery, useUpdateBookingMutation
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
@@ -44,6 +44,7 @@ const Planning = () => {
   const { data: bookings, isLoading: isLoadingBookings, isFetching: IsFetchingBooking } = useListBookingsQuery({for_dates: dateFilter}, {pollingInterval: 60000});
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
+  const [ updateBooking ] = useUpdateBookingMutation();
   const [ deleteBooking ] = useDeleteBookingMutation();
   const [selected, setSelected] = useState(null);
   const [editBooking, setEditBooking] = useState(null);
@@ -57,6 +58,7 @@ const Planning = () => {
   });
   const user = useSelector(store => store.auth.user);
   const canAdd = user.permissions.includes("core.add_booking");
+  const canEdit = user.permissions.includes("core.change_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
   const canViewContract = user.permissions.includes("core.view_contract");
   // const [manualFetching, setManualFetching] = useState(false);
@@ -101,6 +103,34 @@ const Planning = () => {
 
   const onDeselectBooking = () => {
     setSelected(null);
+  };
+
+  const onCancelBooking = (booking) => {
+    if (!canEdit) return;
+    updateBooking({ ...booking, cancelled: true }).then((result) => {
+      if (result.error) {
+        const error = result.error;
+        console.error("Error canceling booking", error);
+        showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Booking cancelled"));
+        setEditBooking({ ...booking, cancelled: true });
+      }
+    });
+  };
+
+  const onUncancelBooking = (booking) => {
+    if (!canEdit) return;
+    updateBooking({ ...booking, cancelled: false }).then((result) => {
+      if (result.error) {
+        const error = result.error;
+        console.error("Error uncancelling booking", error);
+        showError(t("Impossible to uncancel booking: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Booking uncancelled"));
+        setEditBooking({ ...booking, cancelled: false });
+      }
+    });
   };
 
   const onDeleteBooking = (booking) => {
@@ -233,6 +263,8 @@ const Planning = () => {
         booking={editBooking}
         onClose={handleCloseEdit}
         onOpenContract={onEditContract}
+        onCancelBooking={onCancelBooking}
+        onUncancelBooking={onUncancelBooking}
         onDelete={onDeleteBooking}
       />}
 

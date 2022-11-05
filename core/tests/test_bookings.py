@@ -73,7 +73,7 @@ class BookingTestCase(APITestCase):
         booking = factories.BookingFactory.create(lodging=None, daily_rate=50)
         response = self.client.delete("/api/booking/%d/" % booking.id, format="json", **self.header)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
-        self.assertFalse(models.Booking.objects.filter(id=booking.id).exists())
+        self.assertFalse(models.Booking.objects.filter(id=booking.id, deleted=False).exists())
 
     def test_create_booking_with_services(self):
         # factories.ServiceFactory.create_batch(5)

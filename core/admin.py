@@ -37,8 +37,17 @@ class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
         "commission_fees",
         "source",
         "source_uid_",
+        "cancelled",
+        "deleted",
     )
-    list_filter = ("lodging", "status", "begin_date", "source")
+    list_filter = (
+        "lodging",
+        "status",
+        "begin_date",
+        "source",
+        "cancelled",
+        "deleted",
+    )
     ordering = ("-begin_date",)
     resource_class = BookingResource
     inlines = [PaymentInlineAdmin]
