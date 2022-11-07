@@ -106,6 +106,7 @@ export interface Booking {
   deposit?: number;
   guaranty?: number;
   commission_fees?: number;
+  arrival_details?: string;
   notes?: string;
   options: Service[];
   total_payments: number;

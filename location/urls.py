@@ -61,7 +61,6 @@ urlpatterns = [
     path(r"stats/channel_distribution/", views.channel_distribution),
     path(r"stats/channel_distribution/<str:begin>/<str:end>/", views.channel_distribution),
     path("admin/", admin.site.urls),
-    path("grappelli/", include("grappelli.urls")),  # grappelli URLS
     # path('', include('frontend.urls')),
     # re_path(r'^', IndexPage.as_view(template_name="index.html")),
     re_path("loggly/(?P<path>.*)", views.loggly_proxy),

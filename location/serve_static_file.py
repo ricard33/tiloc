@@ -18,7 +18,7 @@ def serve_static_file(request, document_path=None):
         raise Http404(_('"%(path)s" does not exist') % {"path": fullpath})
     # Respect the If-Modified-Since header.
     statobj = os.stat(fullpath)
-    if not was_modified_since(request.META.get("HTTP_IF_MODIFIED_SINCE"), statobj.st_mtime, statobj.st_size):
+    if not was_modified_since(request.META.get("HTTP_IF_MODIFIED_SINCE"), statobj.st_mtime):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(fullpath)
     content_type = content_type or "application/octet-stream"

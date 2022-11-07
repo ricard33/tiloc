@@ -48,6 +48,11 @@ class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
         "cancelled",
         "deleted",
     )
+    history_list_display = (
+        "status",
+        "cancelled",
+        "deleted",
+    )
     ordering = ("-begin_date",)
     resource_class = BookingResource
     inlines = [PaymentInlineAdmin]

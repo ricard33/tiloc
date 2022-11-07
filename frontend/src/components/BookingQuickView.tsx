@@ -75,6 +75,12 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               <div key={index} dangerouslySetInnerHTML={{ __html: detectPhoneAndMail(s) }} />)}</div>
           </React.Fragment>
           : ""}
+        {booking.arrival_details ?
+          <React.Fragment>
+            <div className="label">{t("Arrival:")}</div>
+            <div className="value">{booking.arrival_details}</div>
+          </React.Fragment>
+          : ""}
         {booking.notes ?
           <React.Fragment>
             <div className="label">{t("Remarks:")}</div>

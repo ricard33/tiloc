@@ -108,10 +108,8 @@ class Lodging(models.Model):
         booking = Booking(
             lodging=self,
             guest_name="........................................",
-            guest_contact="email: .................................@.................... - tel: "
-                          "...................................",
-            guest_address="........................................\n........................................\n"
-                          "........................................",
+            guest_contact="email: .................................@.................... - tel: ...................................",
+            guest_address="........................................\n........................................\n........................................",
             guaranty=self.guaranty,
             adults=0,
             price=0,
@@ -258,6 +256,9 @@ class Booking(models.Model):
     guaranty = models.DecimalField(_("guaranty"), max_digits=20, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
 
+    arrival_details = models.CharField(
+        _("arrival details"), max_length=100, blank=True, null=True, help_text=_("Arrival time, flight number, etc...")
+    )
     notes = models.TextField(_("Notes"), blank=True, null=True)
     options = models.ManyToManyField(Service, through="BookedService")
     cancelled = models.BooleanField(_("cancelled"), default=False, help_text=_("True if this booking was cancelled"))

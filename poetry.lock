@@ -295,14 +295,6 @@ python-versions = ">=3.7"
 Django = ">=3.2"
 
 [[package]]
-name = "django-grappelli"
-version = "3.0.3"
-description = "A jazzy skin for the Django Admin-Interface."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "django-import-export"
 version = "2.9.0"
 description = "Django application and library for importing and exporting data with included admin integration."
@@ -1148,7 +1140,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "179489ec199b323d5dd6e7a399ab190d81baddb8ae48e29d3d1094c5adbed664"
+content-hash = "153b8a7c33970743ce44bf89734bf608f5be064cd0af2e59bdaa47500cc050d6"
 
 [metadata.files]
 arrow = [
@@ -1481,10 +1473,6 @@ django-dbbackup = [
 django-filter = [
     {file = "django-filter-22.1.tar.gz", hash = "sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5"},
     {file = "django_filter-22.1-py3-none-any.whl", hash = "sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb"},
-]
-django-grappelli = [
-    {file = "django-grappelli-3.0.3.tar.gz", hash = "sha256:7d60304200f4ea202862fda3b0efaa91c70280841ca22b1b22f49f1017ed2afc"},
-    {file = "django_grappelli-3.0.3-py2.py3-none-any.whl", hash = "sha256:a98883407f995896f4c4d108ef3ef6cfc00e581211738c5a13c536950a95bcc8"},
 ]
 django-import-export = [
     {file = "django-import-export-2.9.0.tar.gz", hash = "sha256:02ce3a8e191992fa7aa1d660877ac6764fa9e32a5ba6394293f2fc761a5bdd19"},

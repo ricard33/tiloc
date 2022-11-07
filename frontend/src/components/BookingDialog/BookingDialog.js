@@ -144,6 +144,7 @@ const BookingDialog = props => {
       initialState.babies = booking.babies || 0;
       initialState.source_id = booking.source_id || "";
       initialState.options = booking.options || [];
+      initialState.arrival_details = booking.arrival_details ?? "";
       initialState.notes = booking.notes ?? "";
 
       // console.debug("initialState", initialState);
@@ -869,6 +870,22 @@ const BookingDialog = props => {
                                 </Select>}
                             />}
                         </FormControl>
+                      </Grid>
+                      {/* arrival_details */}
+                      <Grid item xs={12}>
+                        <Controller
+                          control={control}
+                          name="arrival_details"
+                          render={({ field }) =>
+                            <TextField
+                              fullWidth
+                              inputRef={register("arrival_details")}
+                              label={t("Arrival details")}
+                              margin="dense"
+                              variant={variant}
+                              {...field}
+                            />}
+                        />
                       </Grid>
                       {/* notes */}
                       <Grid item xs={12}>
