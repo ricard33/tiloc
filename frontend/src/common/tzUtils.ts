@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns";
 
-export const shiftPickerDateToUTCDate = (pickerDate) => {
+export const shiftPickerDateToUTCDate = (pickerDate: { getTimezoneOffset: () => any; getTime: () => number; }) => {
   // console.debug("PickerDate", pickerDate);
   let pickerOffset = pickerDate.getTimezoneOffset();
   let utcDate = new Date();
@@ -8,17 +8,17 @@ export const shiftPickerDateToUTCDate = (pickerDate) => {
   return utcDate;
 };
 
-export const shiftUTCDateToLocalDate = (utcDate) => {
+export const shiftUTCDateToLocalDate = (utcDate: Date) => {
   if (utcDate) {
     const localDate = new Date();
     const offset = localDate.getTimezoneOffset();
-    localDate.setTime((typeof date === "string" ? parseISO(utcDate) : utcDate).getTime() + offset * 60000);
+    localDate.setTime(utcDate.getTime() + offset * 60000);
 
     return localDate;
   }
   return utcDate;
 };
 
-export const formatISO = (dateWithTZ) => {
+export const formatISO = (dateWithTZ: number | Date) => {
   return format(dateWithTZ, 'yyyy-MM-dd');
 }

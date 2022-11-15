@@ -1,4 +1,4 @@
-const checked = (value, options) => {
+const checked = (value: boolean, options: { message: any; }) => {
   if (value !== true) {
     return options.message || 'must be checked';
   }

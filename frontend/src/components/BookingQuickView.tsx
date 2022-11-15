@@ -107,7 +107,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
           <Grid xs={6}>
             {showPayments && booking.deposit! > 0 && <React.Fragment>
               <div className="label">{t("Deposit:")}</div>
-              <div className="value">{formatCurrency(booking.deposit)}</div>
+              <div className="value">{formatCurrency(booking.deposit || 0)}</div>
             </React.Fragment>}
           </Grid>
           <Grid xs={6}>

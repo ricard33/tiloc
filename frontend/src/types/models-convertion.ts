@@ -40,7 +40,7 @@ export function api2Lodging(lodging: Record<string, any>): Lodging {
 export function api2Booking(booking: Record<string, any>): Booking {
   return {
     ...booking as Booking,
-    lodging: booking.lodging ? api2Lodging(booking.lodging) : undefined,
+    lodging: api2Lodging(booking.lodging),
     daily_rate: Number(booking.daily_rate),
     price: Number(booking.price),
     deposit: Number(booking.deposit),

@@ -85,7 +85,8 @@ export interface BookingChannel {
 
 export interface Booking {
   id?: number;
-  lodging?: Lodging;
+  lodging_id: number;
+  lodging: Lodging;
   guest_name?: string;
   guest_contact?: string;
   guest_address?: string;

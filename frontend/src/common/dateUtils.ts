@@ -1,21 +1,22 @@
 import { format,
-  formatDistanceToNow as _formatDistanceToNow
+  formatDistanceToNow as _formatDistanceToNow,
+  Locale
 } from 'date-fns'
 import { enGB, fr } from 'date-fns/locale'
 import { getLanguage } from "./intlUtils";
 
-const locales = {enGB, fr}
+const locales: Record<string, Locale> = {enGB, fr}
 
 // by providing a default string of 'PP' or any of its variants for `formatStr`
 // it will format dates in whichever way is appropriate to the locale
-export function formatDate(date, formatStr = 'PP') {
+export function formatDate(date: number | Date, formatStr = 'PP') {
   return format(date, formatStr, {
     locale: locales[getLanguage()]
   })
 }
 
 
-export function formatDistanceToNow(date, options = {}) {
+export function formatDistanceToNow(date: number | Date, options = {}) {
   return _formatDistanceToNow(date, {
     locale: locales[getLanguage()],
     addSuffix: true,

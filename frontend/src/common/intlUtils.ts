@@ -6,7 +6,7 @@ export const getLanguage = () => {
     "en";
 };
 
-export const formatCurrency = (number, precision = 2) => {
+export const formatCurrency = (number: number, precision = 2) => {
   return new Intl.NumberFormat(getLanguage(), {
     style: "currency",
     currency: "EUR",

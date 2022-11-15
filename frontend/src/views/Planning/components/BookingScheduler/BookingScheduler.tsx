@@ -20,6 +20,7 @@ import "./BookingScheduler.scss";
 import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 import clsx from "clsx";
 import useWindowDimensions from "../../../../common/windowDimensions";
+import { Booking, Lodging } from "../../../../types";
 
 const timeSteps = {
   second: 0,
@@ -30,14 +31,12 @@ const timeSteps = {
   year: 1
 };
 
-function debounce(fn, ms) {
-  let timer;
-  return (_) => {
-    clearTimeout(timer);
-    timer = setTimeout((_) => {
-      timer = null;
-      fn.apply(this, arguments);
-    }, ms);
+function debounce(fn: Function, ms: number) {
+  let timeoutId: number;
+  return () => {
+    clearTimeout(timeoutId);
+    // @ts-ignore
+    timeoutId = window.setTimeout(() => fn.apply(this, arguments), ms);
   };
 }
 
@@ -58,9 +57,88 @@ function useWindowSize() {
   return size;
 }
 
-const BookingScheduler = props => {
+type TimelineGroup = {
+    id: number,
+    title: string,
+    rightTitle?: string,
+    stackItems: boolean,
+    tip: string,
+    className: string,
+    height?: number,
+};
+
+type TimelineItem = {
+  id: number,
+  group: number,
+  title: string,
+  start_time: number,
+  end_time: number,
+  canMove: boolean,
+  canResize: boolean,
+  canChangeGroup: boolean,
+  itemProps: React.HTMLAttributes<HTMLDivElement>,
+  booking: Booking,
+};
+
+type ItemContext = {
+  dimensions: { collisionLeft: number, collisionWidth: number, height: number, isDragging: boolean, left: number, order: number, originalLeft: number, stack: number, top: number, width: number },
+  useResizeHandle: boolean,
+  title: string,
+  canMove: boolean,
+  canResizeLeft: boolean,
+  canResizeRight: boolean,
+  selected: boolean,
+  dragging: boolean,
+  dragStart: { x: number, y: number },
+  dragTime: number,
+  dragGroupDelta: number,
+  resizing: boolean,
+  resizeEdge: {left: number, right: number},
+  resizeStart: number,
+  resizeTime: number,
+  width: number,
+};
+
+type RenderItemProps = {
+  item: TimelineItem,
+  timelineContext: object,
+  itemContext: ItemContext,
+  getItemProps: (props: object) => React.HTMLAttributes<HTMLDivElement>,
+  getResizeProps: (props?: object) => ResizeProps,
+}
+
+type ResizeProps = {
+  left: {
+    ref: any,
+    className: string,
+    style: object
+  },
+  right: {
+    ref: any,
+    className: string,
+    style: object
+  }
+}
+
+type Props = {
+  beginDate: Date,
+  bookings: Booking[],
+  disabled: boolean,
+  lodgings: Lodging[],
+  onCreateBooking: (lodging: Lodging, startDate: Date) => void,
+  onItemDeselected: (booking: Booking) => void,
+  onItemSelected: (booking: Booking) => void,
+  onOpenBooking: (booking: Booking) => void,
+  settings: {
+    showPaymentStatus: boolean,
+    monthsToDisplay: number,
+  }
+};
+
+
+const BookingScheduler: React.FC<Props> = props => {
   const {
-    bookings, lodgings, beginDate,
+    bookings, lodgings, beginDate: _beginDate,
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
     settings, disabled
   } = props;
@@ -68,13 +146,15 @@ const BookingScheduler = props => {
   const isDesktop = windowWidth >= 900;
   const [horizontalMonths, setHorizontalMonths] = useState(1);
   const [lineHeight, setLineHeight] = useState(20);
-  const [collapsedState, setCollapsed] = useState(undefined);
+  const [collapsedState, setCollapsed] = useState<boolean|undefined>(undefined);
   const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<number[]>([]);
   const [width, height] = useWindowSize();
   const { t } = useTranslation();
 
-  const updateLayout = (width /*height*/) => {
+  const beginDate = _beginDate ?? startOfMonth(new Date());
+
+  const updateLayout: (width: number, height: number) => void = (width /*height*/) => {
     const nbMonths = width > 1300 ? 2 : width > 700 ? 1 : 0.5;
     if (nbMonths !== horizontalMonths) {
       console.debug("Changing nb months to " + nbMonths);
@@ -87,7 +167,7 @@ const BookingScheduler = props => {
   updateLayout(width, height);
 
   lodgings && lodgings.sort((a, b) => a.rank - b.rank);
-  let groups = lodgings.map(lodging => ({
+  let groups: TimelineGroup[] = lodgings.map(lodging => ({
     id: lodging.id,
     title: lodging.name,
     // rightTitle: "title in the right sidebar",
@@ -139,7 +219,7 @@ const BookingScheduler = props => {
 
   const items = (bookings ?? []).map(booking => ({
     id: booking.id,
-    group: booking.lodging_id > 0 && !booking.cancelled ? booking.lodging_id : -3,
+    group: !booking.cancelled ? booking.lodging_id : -3,
     title: booking.guest_name,
     status: booking.status,
     start_time: add(parseISO(booking.begin_date), { hours: 12 }).valueOf(),
@@ -166,21 +246,21 @@ const BookingScheduler = props => {
   // bookings && console.debug(bookings[0]);
   // items && console.debug(items[0]);
 
-  function eventClicked(bookingId) {
+  function eventClicked(bookingId: number) {
     onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
-  function eventItemSelected(bookingId /*e, time*/) {
+  function eventItemSelected(bookingId: number) {
     setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
-  function eventItemDeselected(bookingId) {
+  function eventItemDeselected(bookingId: number) {
     setSelected(selected.filter((value /*index, arr*/) => value === bookingId));
     onItemDeselected && onItemDeselected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
-  function onCanvasClick(groupId, time) {
+  function onCanvasClick(groupId: number, time:  number) {
     const localDate = shiftUTCDateToLocalDate(new Date(time));
     onCreateBooking && onCreateBooking(lodgings.filter(l => l.id === groupId)[0], localDate);
   }
@@ -190,7 +270,7 @@ const BookingScheduler = props => {
   }, []);
 
   // eslint-disable-next-line react/no-multi-comp
-  function renderTimeline(start, end) {
+  function renderTimeline(start: number, end: number) {
     return (
       <Timeline
         groups={groups}
@@ -220,7 +300,7 @@ const BookingScheduler = props => {
         itemRenderer={renderItem}
       >
         <TimelineHeaders className={"sticky timeline-header"}>
-          <SidebarHeader>
+          <SidebarHeader variant="left">
             {renderSidebarHeader}
           </SidebarHeader>
           <DateHeader unit="month" className="date-header" height={15} />
@@ -228,7 +308,7 @@ const BookingScheduler = props => {
         </TimelineHeaders>
         <TimelineMarkers>
           <TodayMarker>
-            {({ styles/*, date*/ }) =>
+            {({ styles }: {styles: object, date: number}) =>
               <div style={{ ...styles, backgroundColor: "red" }} />
             }
           </TodayMarker>
@@ -274,7 +354,7 @@ const BookingScheduler = props => {
   );
 
   // eslint-disable-next-line react/no-multi-comp,react/prop-types
-  function renderSidebarHeader({ getRootProps }) {
+  function renderSidebarHeader({ getRootProps }: {getRootProps: () => object}) {
     return <div {...getRootProps()}>
       <button
         className="collapse-button"
@@ -289,7 +369,7 @@ const BookingScheduler = props => {
   }
 
   // eslint-disable-next-line react/no-multi-comp
-  function renderItem(props) {
+  function renderItem(props: RenderItemProps) {
     /* eslint-disable react/prop-types */
     const { item, itemContext, getItemProps, getResizeProps } = props;
     const { title, ...itemProps } = getItemProps(item.itemProps); // remove the title props
@@ -305,7 +385,7 @@ const BookingScheduler = props => {
             style={{ maxHeight: `${itemContext.dimensions.height}` }}
           >
             <div className="item-title">{itemContext.title}</div>
-            {settings.showPaymentStatus && item.booking.price > 0 &&
+            {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 &&
             <EuroIcon
               className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
               style={{ height: `${itemContext.dimensions.height - 2}` }}
@@ -318,34 +398,13 @@ const BookingScheduler = props => {
   }
 
   // eslint-disable-next-line react/no-multi-comp
-  function renderGroup({ group }) {
+  function renderGroup({ group }: {group: TimelineGroup}) {
     return (
       <Tooltip title={group.tip}>
         <span className={group.className}>{group.title}</span>
       </Tooltip>
     );
   }
-
-
-};
-
-BookingScheduler.defaultProps = {
-  beginDate: startOfMonth(new Date())
-};
-
-BookingScheduler.propTypes = {
-  beginDate: PropTypes.instanceOf(Date),
-  bookings: PropTypes.array.isRequired,
-  disabled: PropTypes.bool,
-  lodgings: PropTypes.array.isRequired,
-  onCreateBooking: PropTypes.func,
-  onItemDeselected: PropTypes.func,
-  onItemSelected: PropTypes.func,
-  onOpenBooking: PropTypes.func,
-  settings: PropTypes.shape({
-    showPaymentStatus: PropTypes.bool,
-    monthsToDisplay: PropTypes.number,
-  })
 };
 
 export default BookingScheduler;

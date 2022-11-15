@@ -2,14 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import { bookingType, lodgingType } from "../../common/propTypesUtils";
-import {
-  Contacts as ContactsIcon,
-  DeleteForever as DeleteIcon,
-  ExpandMore as ExpandMoreIcon,
-  Forward as ForwardIcon,
-  PictureAsPdf as PdfIcon,
-  Save as SaveIcon
-} from "@mui/icons-material";
+import { Contacts as ContactsIcon, ExpandMore as ExpandMoreIcon, Forward as ForwardIcon } from "@mui/icons-material";
 import { Controller, useForm } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
@@ -18,7 +11,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Button,
   Checkbox,
   Dialog,
   DialogActions,

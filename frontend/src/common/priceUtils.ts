@@ -1,11 +1,14 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
+import { Service } from "../types";
 
 if (Number.EPSILON === undefined) {
+  // @ts-ignore
+  // noinspection JSConstantReassignment
   Number.EPSILON = Math.pow(2, -52);
 }
 
 export const DecimalPrecision = {
-  round: function(n, p = 2) {
+  round: function(n: number, p = 2) {
     let r = 0.5 * Number.EPSILON * n;
     let o = 1;
     while (p-- > 0) o *= 10;
@@ -13,7 +16,7 @@ export const DecimalPrecision = {
       o *= -1;
     return Math.round((n + r) * o) / o;
   },
-  ceil: function(n, p = 2) {
+  ceil: function(n: number, p = 2) {
     let r = 0.5 * Number.EPSILON * n;
     let o = 1;
     while (p-- > 0) o *= 10;
@@ -21,7 +24,7 @@ export const DecimalPrecision = {
       o *= -1;
     return Math.ceil((n + r) * o) / o;
   },
-  floor: function(n, p = 2) {
+  floor: function(n: number, p = 2) {
     let r = 0.5 * Number.EPSILON * n;
     let o = 1;
     while (p-- > 0) o *= 10;
@@ -31,8 +34,8 @@ export const DecimalPrecision = {
   }
 };
 
-export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, weekRate, seasonalRates = [],
-  depositPercent) => {
+export const computeBookingPrice = (beginDate: string | Date, endDate: string | Date, dailyRate: string | Date,
+  weekendRate: number, weekRate: number, seasonalRates = [], depositPercent: number) => {
   // TODO compute price using seasonal rates
   if (typeof beginDate === "string")
     beginDate = parseISO(beginDate);
@@ -58,16 +61,18 @@ export const computeBookingPrice = (beginDate, endDate, dailyRate, weekendRate, 
   };
 };
 
-function parseBool(val) { return val === true || val === "true" }
+function parseBool(val: boolean | string) {
+  return val === true || val === "true";
+}
 
-export const computeOptionsPrice = (options, duration) => {
+export const computeOptionsPrice = (options: Service[], duration: number) => {
   let totalIncluded = 0, totalExclude = 0;
   if (options) {
     for (let i = 0; i < options.length; i++) {
       const option = options[i];
       if (option.unit_price) {
-        const price = option.unit_price * (parseBool(option.is_flat_rate)? 1 : duration);
-        if(parseBool(option.not_included_in_price))
+        const price = option.unit_price * (parseBool(option.is_flat_rate) ? 1 : duration);
+        if (parseBool(option.not_included_in_price))
           totalExclude += price;
         else
           totalIncluded += price;
