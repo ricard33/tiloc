@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import NavBar from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import { useLocalStorage } from "../../common/useLocalStorage";
-import PlanningSettingsDialog from "./components/PlanningSettingsDialog";
+import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningSettingsDialog";
 import {
   useDeleteBookingMutation,
   useListBookingsQuery,
@@ -28,14 +28,17 @@ import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoa
 import "./Planning.scss";
 import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
+import { RootState } from "../../store";
+import { Booking, Lodging, User } from "../../types";
+
 
 
 const Planning = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const query = queryString.parse(location.search);
-  let requestedDate = parse(query.start, "yyyy-MM", new Date());
-  if (isNaN(requestedDate))
+  let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
+  if (isNaN(requestedDate.valueOf()))
     requestedDate = new Date();
 
   const { showError, showSuccess } = useAlert();
@@ -46,17 +49,17 @@ const Planning = () => {
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const [ updateBooking ] = useUpdateBookingMutation();
   const [ deleteBooking ] = useDeleteBookingMutation();
-  const [selected, setSelected] = useState(null);
-  const [editBooking, setEditBooking] = useState(null);
+  const [selected, setSelected] = useState<Booking | null>(null);
+  const [editBooking, setEditBooking] = useState<Partial<Booking> | null>(null);
   const [needFirstTimeEdit, setNeedFirstTimeEdit] = useState(query.edit !== undefined);
   const navigate = useNavigate();
   const confirm = useConfirm();
-  const [settingsOpened, setSettingsOpened] = useState(false);
+  const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [settings, setSettings] = useLocalStorage("planningSettings", {
     showPaymentStatus: true,
     monthsToDisplay: 12,
   });
-  const user = useSelector(store => store.auth.user);
+  const user = useSelector<RootState>(store => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_booking");
   const canEdit = user.permissions.includes("core.change_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
@@ -76,12 +79,12 @@ const Planning = () => {
     setNeedFirstTimeEdit(false);
   }
 
-  const onEditBooking = (booking) => {
+  const onEditBooking = (booking: Booking) => {
     console.debug("EDIT ", booking.id);
     setEditBooking(booking);
   };
 
-  const onCreateBooking = (lodging, begin_date) => {
+  const onCreateBooking = (lodging: Lodging, begin_date: Date) => {
     console.debug("CREATE ", lodging ? lodging.id : null, begin_date);
     if (lodging) {
       setEditBooking({
@@ -96,7 +99,7 @@ const Planning = () => {
     setSelected(null);
   };
 
-  const onSelectBooking = (booking) => {
+  const onSelectBooking = (booking: Booking) => {
     console.debug("onSelectBooking", booking);
     setSelected(booking);
   };
@@ -105,11 +108,11 @@ const Planning = () => {
     setSelected(null);
   };
 
-  const onCancelBooking = (booking) => {
+  const onCancelBooking = (booking: Booking) => {
     if (!canEdit) return;
     updateBooking({ ...booking, cancelled: true }).then((result) => {
-      if (result.error) {
-        const error = result.error;
+      if ((result as any).error) {
+        const error = (result as any).error;
         console.error("Error canceling booking", error);
         showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
       } else {
@@ -119,11 +122,11 @@ const Planning = () => {
     });
   };
 
-  const onUncancelBooking = (booking) => {
+  const onUncancelBooking = (booking: Booking) => {
     if (!canEdit) return;
     updateBooking({ ...booking, cancelled: false }).then((result) => {
-      if (result.error) {
-        const error = result.error;
+      if ((result as any).error) {
+        const error = (result as any).error;
         console.error("Error uncancelling booking", error);
         showError(t("Impossible to uncancel booking: ") + fetchErrorDecode(error));
       } else {
@@ -133,7 +136,7 @@ const Planning = () => {
     });
   };
 
-  const onDeleteBooking = (booking) => {
+  const onDeleteBooking = (booking: Booking) => {
     if(!canDelete) return;
     confirm({
       title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
@@ -144,9 +147,9 @@ const Planning = () => {
     })
       .then(() => {
         setSelected(null);
-        deleteBooking(booking.id).then((result) => {
-          if (result.error) {
-            const error = result.error;
+        deleteBooking(booking.id as number).then((result) => {
+          if ((result as any).error) {
+            const error = (result as any).error;
             console.error("Error deleting booking", error);
             showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
           } else {
@@ -159,13 +162,13 @@ const Planning = () => {
       });
   };
 
-  const onEditContract = (booking) => {
+  const onEditContract = (booking: Booking) => {
     setEditBooking(null);
     // setEditContract(booking);
     navigate("/bookings/" + booking.id + "/contract");
   };
 
-  const onCloseSettings = (newSettings) => {
+  const onCloseSettings = (newSettings?: PlanningSettings) => {
     setSettingsOpened(false);
     if (typeof newSettings !== "undefined") {
       setSettings(newSettings);
@@ -186,14 +189,14 @@ const Planning = () => {
           type="button"
           className="delete-button"
           color="secondary"
-          onClick={() => onDeleteBooking(selected)}
+          onClick={() => onDeleteBooking(selected!)}
           disabled={!canDelete || !selected}
           size="large"
         ><DeleteIcon/></IconButton>
         <IconButton
           type="button"
           color="default"
-          onClick={() => onEditContract(selected)}
+          onClick={() => onEditContract(selected!)}
           title={t("Contract")}
           disabled={!canViewContract && !selected}
           size="large"
@@ -201,7 +204,7 @@ const Planning = () => {
         <IconButton
           type="submit"
           color="primary"
-          onClick={() => onEditBooking(selected)}
+          onClick={() => onEditBooking(selected!)}
           disabled={!selected}
           size="large"
         ><EditIcon/></IconButton>
@@ -235,7 +238,7 @@ const Planning = () => {
             className="delete-button"
             color="secondary"
             startIcon={<DeleteIcon/>}
-            onClick={() => onDeleteBooking(selected)}
+            onClick={() => onDeleteBooking(selected!)}
             disabled={!selected}
           >{t("Delete")}</Button>
         </Grid>
@@ -243,7 +246,7 @@ const Planning = () => {
           <Button
             type="button"
             startIcon={<DescriptionIcon/>}
-            onClick={() => onEditContract(selected)}
+            onClick={() => onEditContract(selected!)}
             title={t("Contract")}
             disabled={!selected}
           >{t("Contract")}</Button>
@@ -253,14 +256,14 @@ const Planning = () => {
             type="submit"
             color="primary"
             startIcon={<EditIcon/>}
-            onClick={() => onEditBooking(selected)}
+            onClick={() => onEditBooking(selected!)}
             disabled={!selected}
           >{t("Edit booking")}</Button>
         </Grid>
       </Grid>
       {editBooking &&
       <BookingDialogLoader
-        booking={editBooking}
+        booking={editBooking as Booking}
         onClose={handleCloseEdit}
         onOpenContract={onEditContract}
         onCancelBooking={onCancelBooking}
@@ -293,7 +296,5 @@ const Planning = () => {
     </Page>
   );
 };
-
-Planning.propTypes = {};
 
 export default Planning;

@@ -2227,21 +2227,6 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.2.tgz#30aa825f11d438671d585bd44e7fd564535fc210"
   integrity sha512-82cpyJyKRoQoRi+14ibCeGPu0CwypgtBAdBhq1WfvagpCZNKqwXbKwXllYSMG91DhmG4jt9gN8eP6lGOtozuaw==
 
-"@gecko-conception/react-calendar-timeline@^0.30.3":
-  version "0.30.3"
-  resolved "https://registry.yarnpkg.com/@gecko-conception/react-calendar-timeline/-/react-calendar-timeline-0.30.3.tgz#b71929d87b6edc080354136ce1954d2047daed81"
-  integrity sha512-BVM4A9LogAiFZzEiDEFiGqK3ZBb1Mfxrz95s/XJA9E32jcdDfRuh56OQ1JSTuVDFbT9+P/S2ApSaAgt4SQ09BQ==
-  dependencies:
-    classnames "^2.2.6"
-    element-resize-detector "^1.1.12"
-    lodash.isequal "^4.5.0"
-    memoize-one "^5.1.1"
-
-"@gecko-conception/tiloc-ckeditor5@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@gecko-conception/tiloc-ckeditor5/-/tiloc-ckeditor5-0.0.1.tgz#44d1eef6f5ae7ae90d43c97b2cf5c109c7bfb39c"
-  integrity sha512-0pUVrG1Yto6z90iwn9Borr9OqeGzgo7ofI2sH0HPpEFbs9jnF96N+OFnTJR6noKNHhu7Hc+AviB7N4CJnwyhGQ==
-
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.9.2.tgz#68be55c737023009dfc5fe245d51181bb6476914"
@@ -3171,6 +3156,21 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.4.3.tgz#af975e367743fa91989cd666666aec31a8f50591"
   integrity sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==
 
+"@ti-gecko/react-calendar-timeline@^0.30.4":
+  version "0.30.4"
+  resolved "https://registry.yarnpkg.com/@ti-gecko/react-calendar-timeline/-/react-calendar-timeline-0.30.4.tgz#9c1f5b4e0bd7cd5446b748ec48a364c2269c26b9"
+  integrity sha512-WrJabWhlsGkkr6LhzO9z9/ZKD9TZPkdcICTcbLhlYFMEHOCUPyPrvtiNxLVcEC8Y8pk+uGaAoWgI7A+oyjs+4g==
+  dependencies:
+    classnames "^2.2.6"
+    element-resize-detector "^1.1.12"
+    lodash.isequal "^4.5.0"
+    memoize-one "^5.1.1"
+
+"@ti-gecko/tiloc-ckeditor5@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@ti-gecko/tiloc-ckeditor5/-/tiloc-ckeditor5-0.0.2.tgz#7de0350c03a90e35f9d66ea297a1b03f3d447705"
+  integrity sha512-j4+qeY01dKBTR01JJylvAVjvGMOtY4Xtw+o2NgwjPD5hlUrdWHewxlVVhZICsxquS6WTlcLmM3mCMDG7wX9nAA==
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -3249,7 +3249,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/draft-js@^0.11.5", "@types/draft-js@^0.11.9":
+"@types/draft-js@^0.11.5":
   version "0.11.9"
   resolved "https://registry.yarnpkg.com/@types/draft-js/-/draft-js-0.11.9.tgz#b7535fb2511e8b8c8e33ffac2199a5f2988f4fd5"
   integrity sha512-cQJBZjjIlGaPA1tOY+wGz2KhlPtAAZOIXpUvGPxPRw5uzZ2tcj8m6Yu1QDV9YgP36+cqE3cUvgkARBzgUiuI/Q==

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@gecko-conception/tiloc-ckeditor5/build/ckeditor";  // import symbol ClassicEditor
+import ClassicEditor from "@ti-gecko/tiloc-ckeditor5/build/ckeditor";  // import symbol ClassicEditor
 // import CustomFigureAttributes from 'tiloc-ckeditor5/plugins/custom-figure-attributes';
 // import AllowImageWidth from 'tiloc-ckeditor5/plugins/image_width_and_height';
 import "./Editor.css";

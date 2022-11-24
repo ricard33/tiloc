@@ -1,15 +1,18 @@
 /* eslint-disable react/no-multi-comp */
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import { Grid } from "@mui/material";
 import { add, startOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
 import Button from "@mui/material/Button";
 import { formatDate } from "../../../../common/dateUtils";
 import useWindowDimensions from "../../../../common/windowDimensions";
+import { ButtonProps } from "@mui/material/Button/Button";
 
+interface NavButtonProps extends ButtonProps {
+  children?: React.ReactNode;
+}
 
-const NavButton = (props) => {
+const NavButton: React.FC<NavButtonProps> = (props) => {
   const {children, ...attr} = props;
   return (
     <Button
@@ -23,12 +26,14 @@ const NavButton = (props) => {
   );
 };
 
-NavButton.propTypes = {
-  children: PropTypes.any,
+
+type NavBarProps = {
+  date: Date,
+  onChange: (newDate: Date) => void,
 };
 
 
-const NavBar = props => {
+const NavBar: React.FC<NavBarProps> = props => {
   const {date, onChange} = props;
   const [currentDate, setCurrentDate] = useState(startOfMonth(date));
   const { t } = useTranslation();
@@ -36,7 +41,7 @@ const NavBar = props => {
   const isPhone = windowWidth < 600;
   const monthFormat = isPhone ? "MMM" : "MMMM Y";
 
-  const onPrevNextClick = (months) => {
+  const onPrevNextClick = (months: number) => {
     console.log(performance.now().toFixed(2), "onPrevNextClick");
     const newDate = add(date, {months: months});
     setCurrentDate(newDate)
@@ -61,11 +66,6 @@ const NavBar = props => {
       </Grid>
     </Grid>
   );
-};
-
-NavBar.propTypes = {
-  date: PropTypes.instanceOf(Date).isRequired,
-  onChange: PropTypes.func
 };
 
 export default NavBar;

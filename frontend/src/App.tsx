@@ -16,7 +16,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
 import { RootState } from "./store";
-import { DateProvider } from "@gecko-conception/react-calendar-timeline";
+import { DateProvider } from "@ti-gecko/react-calendar-timeline";
 
 validate.validators = {
   ...validate.validators,

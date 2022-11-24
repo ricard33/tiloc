@@ -1,5 +1,4 @@
 import React, { useState, useLayoutEffect } from "react";
-import PropTypes from "prop-types";
 import Timeline, {
   CursorMarker,
   DateHeader,
@@ -7,8 +6,8 @@ import Timeline, {
   TimelineHeaders,
   TimelineMarkers,
   TodayMarker
-} from "@gecko-conception/react-calendar-timeline";
-import "@gecko-conception/react-calendar-timeline/lib/Timeline.css";
+} from "@ti-gecko/react-calendar-timeline";
+import "@ti-gecko/react-calendar-timeline/lib/Timeline.css";
 import { add, parseISO } from "date-fns";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -125,7 +124,7 @@ type Props = {
   bookings: Booking[],
   disabled: boolean,
   lodgings: Lodging[],
-  onCreateBooking: (lodging: Lodging, startDate: Date) => void,
+  onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
   onItemDeselected: (booking: Booking) => void,
   onItemSelected: (booking: Booking) => void,
   onOpenBooking: (booking: Booking) => void,
