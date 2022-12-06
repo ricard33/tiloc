@@ -60,7 +60,7 @@ class BookingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
 
     def test_update_cancelled_booking(self):
-        booking = factories.BookingFactory.create(lodging=None, daily_rate=50)
+        booking = factories.BookingFactory.create(cancelled=True, daily_rate=50)
         data = {
             "notes": "something",
         }
@@ -70,7 +70,7 @@ class BookingTestCase(APITestCase):
         self.assertEqual("something", instance.notes)
 
     def test_delete_cancelled_booking(self):
-        booking = factories.BookingFactory.create(lodging=None, daily_rate=50)
+        booking = factories.BookingFactory.create(cancelled=True, daily_rate=50)
         response = self.client.delete("/api/booking/%d/" % booking.id, format="json", **self.header)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
         self.assertFalse(models.Booking.objects.filter(id=booking.id, deleted=False).exists())
