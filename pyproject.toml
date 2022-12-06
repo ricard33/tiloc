@@ -60,7 +60,7 @@ loggly-python-handler = "^1.0.1"
 my-django-tweaks = "^0.0.6"
 newrelic = "^8.2.1"
 pdfkit = "^1.0.0"
-Pillow = "^9.2.0"
+Pillow = "^9.3.0"
 requests = "^2.28.1"
 smartconfigparser = "^1.0.0"
 whitenoise = { version = "^6.2.0", extras = ["brotli"] }
