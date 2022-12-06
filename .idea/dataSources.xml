@@ -9,19 +9,5 @@
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db.sqlite3</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="Django legacy" uuid="20fe3c6c-731c-4952-9870-fa8f7b45d8b3">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <imported>true</imported>
-      <remarks>$PROJECT_DIR$/location/settings.py</remarks>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:/Applications/XAMPP/xamppfiles/htdocs/lsai/location3.db</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="location3.db" uuid="0001d262-b722-47eb-94a9-bbb5e3cf954c">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:/Applications/XAMPP/xamppfiles/htdocs/lsai/location3.db</jdbc-url>
-    </data-source>
   </component>
 </project>
