@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import { parse, parseISO } from 'date-fns';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
 import {
@@ -87,12 +86,12 @@ const LatestBookings = props => {
                   {duration: booking.duration, count: booking.adults + booking.children + booking.babies})}
               />
               <ListItemText
-                secondary={formatDate(parse(booking.begin_date, "yyyy-MM-dd", new Date()), "PPP") + " - "
-                + formatDate(parse(booking.end_date, "yyyy-MM-dd", new Date()), "PPP")}
+                secondary={formatDate(booking.begin_date, "PPP") + " - "
+                + formatDate(booking.end_date, "PPP")}
               />
               <ListItemText
                 primary={Number(booking.price).toLocaleString() + " €"}
-                secondary={formatDistanceToNow(parseISO(booking.created))}
+                secondary={formatDistanceToNow(booking.created)}
               />
             </ListItem>
           ))}

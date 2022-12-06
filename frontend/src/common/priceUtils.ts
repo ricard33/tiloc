@@ -1,5 +1,5 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { Service } from "../types";
+import { Booking, Service } from "../types";
 
 if (Number.EPSILON === undefined) {
   // @ts-ignore
@@ -34,21 +34,27 @@ export const DecimalPrecision = {
   }
 };
 
-export const computeBookingPrice = (beginDate: string | Date, endDate: string | Date, dailyRate: string | Date,
-  weekendRate: number, weekRate: number, seasonalRates = [], depositPercent: number) => {
+export const computeBookingPrice = (beginDate: Date, endDate: Date, dailyRate: number,
+  weekendRate: number, weekRate: number, seasonalRates = [], depositPercent: number)
+  : {
+  price: Pick<Booking, "price" | "deposit" | "daily_rate">,
+  price_details: { begin_date: Date, end_date: Date, day_count: number, rate_name: string | null, is_week_rate: boolean }[]
+} => {
   // TODO compute price using seasonal rates
-  if (typeof beginDate === "string")
-    beginDate = parseISO(beginDate);
-  if (typeof endDate === "string")
-    endDate = parseISO(endDate);
+  // if (typeof beginDate === "string")
+  //   beginDate = parseISO(beginDate);
+  // if (typeof endDate === "string")
+  //   endDate = parseISO(endDate);
   const duration = differenceInCalendarDays(endDate, beginDate);
-  const isWeekRate = weekRate && duration >= 7;
+  const isWeekRate = weekRate > 0 && duration >= 7;
   const rate = isWeekRate ? Number(weekRate) / 7 : Number(dailyRate);
   const price = rate * duration;
   return {
-    price: DecimalPrecision.round(price),
-    deposit: DecimalPrecision.round(price * depositPercent / 100, 0),
-    daily_rate: DecimalPrecision.round(rate),
+    price: {
+      price: DecimalPrecision.round(price),
+      deposit: DecimalPrecision.round(price * depositPercent / 100, 0),
+      daily_rate: DecimalPrecision.round(rate)
+    },
     price_details: [
       {
         begin_date: beginDate,
@@ -78,6 +84,6 @@ export const computeOptionsPrice = (options: Service[], duration: number) => {
           totalIncluded += price;
       }
     }
-    return [totalIncluded, totalExclude];
   }
+  return [totalIncluded, totalExclude];
 };

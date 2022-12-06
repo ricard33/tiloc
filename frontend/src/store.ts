@@ -1,8 +1,9 @@
 import * as reducers from "./reducers";
 import createSagaMiddleware from "redux-saga";
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, isPlain } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { api } from "./services/api";
+import { isDate } from "date-fns";
 // import { rtkQueryErrorLogger } from "./services/middlewares";
 
 export const sagaMiddleware = createSagaMiddleware();
@@ -13,7 +14,14 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([sagaMiddleware, /*rtkQueryErrorLogger, */api.middleware])
+    getDefaultMiddleware(
+      {
+        serializableCheck: {
+          // HACK: Date serialization is working well but is not permitted by RTK because Date is mutable.
+          isSerializable: (value: any) => isDate(value) || isPlain(value)
+        }
+      }
+    ).concat([sagaMiddleware, /*rtkQueryErrorLogger, */api.middleware])
 
 });
 

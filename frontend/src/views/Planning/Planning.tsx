@@ -89,7 +89,8 @@ const Planning = () => {
     if (lodging) {
       setEditBooking({
         lodging_id: lodging.id,
-        begin_date: formatISO(begin_date)
+        lodging: lodging,
+        begin_date: begin_date
       });
     }
   };

@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useListLodgingsQuery, useListOwnersQuery } from "../../services/api";
+import { useListLodgingsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Lodging } from "../../types";
+import { Lodging, Owner } from "../../types";
 import { DataGrid, GridColDef, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
 import { DecimalPrecision } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
@@ -16,7 +16,7 @@ const LodgingsList: React.FunctionComponent<Props> = ({
 }: Props) => {
   const { t } = useTranslation();
   const { data } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
-  const { data: owners } = useListOwnersQuery();
+  // const { data: owners } = useListOwnersQuery();
   const navigate = useNavigate();
 
   const formatPrice = (params: GridValueFormatterParams<number>) => DecimalPrecision.round(params.value) + " €";
@@ -26,7 +26,8 @@ const LodgingsList: React.FunctionComponent<Props> = ({
     { field: "name", headerName: t("Name"), width: 130 },
     {
       field: "owner", headerName: t("Owner"), width: 130,
-      valueFormatter: (params: GridValueFormatterParams<number>) => getOwnerName(params.value) ?? ""
+      valueFormatter: (params: GridValueFormatterParams<Partial<Owner>>) => params.value.name ?? ""
+      // valueFormatter: (params: GridValueFormatterParams<number>) => getOwnerName(params.value) ?? ""
     },
     { field: "active", headerName: t("Active"), type: "boolean", width: 70 },
     { field: "shown", headerName: t("Shown"), type: "boolean", width: 70 },
@@ -45,12 +46,12 @@ const LodgingsList: React.FunctionComponent<Props> = ({
     }
   ];
 
-  const getOwnerName = (ownerId: number) => {
-    if (owners) {
-      const owner = owners.find(o => o.id === ownerId);
-      return owner ? owner.name : "";
-    }
-  };
+  // const getOwnerName = (ownerId: number) => {
+  //   if (owners) {
+  //     const owner = owners.find(o => o.id === ownerId);
+  //     return owner ? owner.name : "";
+  //   }
+  // };
 
   const onClick = (lodging: Lodging) => {
     navigate(lodging.id.toString());

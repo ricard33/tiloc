@@ -37,9 +37,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
     <Grid container className="booking-quick-view">
       <Grid xs={4}>
         <div className="label">{t("Check-in:")}</div>
-        <div className="value">{formatDate(parseISO(booking.begin_date), "PPPP")}</div>
+        <div className="value">{formatDate(booking.begin_date, "PPPP")}</div>
         <div className="label">{t("Check-out:")}</div>
-        <div className="value">{formatDate(parseISO(booking.end_date), "PPPP")}</div>
+        <div className="value">{formatDate(booking.end_date, "PPPP")}</div>
         <div className="label">{t("Length of stay:")}</div>
         <div className="value">{booking.duration} {t("nights")}</div>
         <div className="label">{t("Adults:")}</div>

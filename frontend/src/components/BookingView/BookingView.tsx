@@ -40,9 +40,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       fullScreen={width < 600}
     >
       <DialogTitle id="simple-dialog-title">
-        <Typography variant="h2">
-          {t("Booking details")}
-        </Typography>
+        {t("Booking details")}
       </DialogTitle>
       <DialogContent dividers>
         <BookingQuickView booking={booking} />

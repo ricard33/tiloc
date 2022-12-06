@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Table, TableBody, TableCell, TableFooter, TextField, Theme } from "@mui/material";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
@@ -14,7 +14,6 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
-import { useListServicesQuery } from "../../services/api";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -38,14 +37,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type OptionsListProps = {
-  bookingId: number;
   form: any;
   duration: number;
+  allOptions: Service[],
   variant: "filled" | "standard" | "outlined" | undefined;
 };
 
 const OptionsList: React.FunctionComponent<OptionsListProps> = ({
-  bookingId,
+  allOptions,
   form,
   duration,
   variant
@@ -60,20 +59,6 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
   });
   const { fields, append, remove } = optionsFieldArray;
   const options = watch("options");
-  const { data: allOptions } = useListServicesQuery();
-
-  useEffect(() => {
-    if (!bookingId && allOptions && options.length === 0) {
-      console.log("Scan for automatic options", allOptions, options);
-      allOptions.filter((o: Service) => o.auto_add_booking).forEach((option: Service) => {
-        if (options.filter((o: Service) => o.id === option.id).length === 0) {
-          console.log("  add automatic option:", option);
-          append(option);
-        }
-      });
-    }
-
-  }, [allOptions, append, bookingId, options]);
 
   function getDesignation(option: Service) {
     return option.designation + (
@@ -94,7 +79,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
     }
   }
 
-  console.log(options)
+  // console.log(options)
   return (
     <Table className={classes.table} aria-label="simple table">
       <TableBody>

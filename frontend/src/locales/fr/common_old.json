@@ -28,5 +28,10 @@
   "To:": "Au :",
   "Nights:": "Nuits :",
   "Contact:": "Contact :",
-  "Submit": "Soumettre"
+  "Submit": "Soumettre",
+  "Some modifications aren't saved. Do you want to save them and open contract?": "Des changements n'ont pas été enregistrés. Souhaitez-vous les enregistrer et ouvrir le contrat ?",
+  "default rate": "tarif par défaut",
+  "week": "semaine",
+  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
+  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
 }

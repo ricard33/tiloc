@@ -42,7 +42,7 @@ function debounce(fn: Function, ms: number) {
 function useWindowSize() {
   const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
   useLayoutEffect(() => {
-    console.debug("useLayoutEffect");
+    // console.debug("useLayoutEffect");
 
     const debouncedUpdateSize = debounce(function updateSize() {
       setSize([window.innerWidth, window.innerHeight]);
@@ -221,8 +221,8 @@ const BookingScheduler: React.FC<Props> = props => {
     group: !booking.cancelled ? booking.lodging_id : -3,
     title: booking.guest_name,
     status: booking.status,
-    start_time: add(parseISO(booking.begin_date), { hours: 12 }).valueOf(),
-    end_time: add(parseISO(booking.end_date), { hours: 6 }).valueOf(),
+    start_time: add(booking.begin_date, { hours: 12 }).valueOf(),
+    end_time: add(booking.end_date, { hours: 6 }).valueOf(),
     canMove: false,
     canResize: false,
     canChangeGroup: false,

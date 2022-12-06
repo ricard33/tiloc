@@ -16,7 +16,7 @@ import {
   User
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { api2Booking, api2Lodging, api2Owner, api2Payment } from "../types/models-convertion";
+import { api2Booking, api2Lodging, api2Owner, api2Payment, booking2api } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
 export const serviceURL = "/api/";
@@ -145,13 +145,14 @@ function makeGetApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: str
   });
 }
 
-function makeCreateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
+function makeCreateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string,
+  convertFromApi?: (obj: ApiModel) => T, convertToApi?: (obj: Partial<T>) => ApiModel) {
   return builder.mutation<T, Partial<T>>({
     query(body) {
       return {
         url: url,
         method: "POST",
-        data: body
+        data: convertToApi ? convertToApi(body) : body
       };
     },
     invalidatesTags: [{ type: modelName, id: "LIST" }],
@@ -161,13 +162,14 @@ function makeCreateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
   });
 }
 
-function makeUpdateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
+function makeUpdateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string,
+  convertFromApi?: (obj: ApiModel) => T, convertToApi?: (obj: Partial<T>) => ApiModel) {
   return builder.mutation<T, Partial<T>>({
     query(body) {
       return {
         url: `${url}${body.id}/`,
         method: "PATCH",
-        data: body
+        data: convertToApi ? convertToApi(body) : body
       };
     },
     invalidatesTags: (result, error, obj) => [{ type: modelName, id: obj.id }, { type: modelName, id: "LIST" }],
@@ -189,20 +191,20 @@ function makeDeleteApi(builder: AxiosEndpointBuilder, url: string, modelName: st
   });
 }
 
-function makeApi<T extends BaseModel>(url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
+function makeApi<T extends BaseModel>(url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T, convertToApi?: (obj: Partial<T>) => ApiModel) {
   return {
     list: (builder: AxiosEndpointBuilder) => makeListApi<T>(builder, url, modelName, convertFromApi),
     pages: (builder: AxiosEndpointBuilder) => makePaginatedListApi<T>(builder, url, modelName, convertFromApi),
     get: (builder: AxiosEndpointBuilder) => makeGetApi<T>(builder, url, modelName, convertFromApi),
-    create: (builder: AxiosEndpointBuilder) => makeCreateApi<T>(builder, url, modelName, convertFromApi),
-    update: (builder: AxiosEndpointBuilder) => makeUpdateApi<T>(builder, url, modelName, convertFromApi),
+    create: (builder: AxiosEndpointBuilder) => makeCreateApi<T>(builder, url, modelName, convertFromApi, convertToApi),
+    update: (builder: AxiosEndpointBuilder) => makeUpdateApi<T>(builder, url, modelName, convertFromApi, convertToApi),
     delete: (builder: AxiosEndpointBuilder) => makeDeleteApi(builder, url, modelName)
 
   };
 }
 
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment);
-const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking);
+const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
 const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");

@@ -50,13 +50,27 @@ class OwnerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class OwnerSubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Owner
+        fields = [
+            "id",
+            "name",
+        ]
+
+
 class LodgingSerializer(serializers.ModelSerializer):
+    owner = OwnerSubSerializer(read_only=True)
+    owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.Owner.objects.all())
+
     class Meta:
         model = models.Lodging
         fields = "__all__"
 
 
 class LodgingSubSerializer(serializers.ModelSerializer):
+    owner = OwnerSubSerializer(read_only=True)
+
     class Meta:
         model = models.Lodging
         fields = [
@@ -65,6 +79,7 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "active",
             "shown",
             "name",
+            "owner_id",
             "owner",
             "rank",
             "daily_rate",
@@ -139,9 +154,7 @@ class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(source="status", queryset=models.BookingStatus.objects.all())
     lodging = LodgingSubSerializer(read_only=True)
-    lodging_id = serializers.PrimaryKeyRelatedField(
-        source="lodging", queryset=models.Lodging.objects.all(), allow_null=True
-    )
+    lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
     source = BookingChannelSerializer(read_only=True)
     source_id = serializers.PrimaryKeyRelatedField(
         source="source", queryset=models.BookingChannel.objects.all(), required=False, allow_null=True

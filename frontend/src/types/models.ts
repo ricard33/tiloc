@@ -41,7 +41,8 @@ export interface Lodging {
   active: boolean;
   shown: boolean;
   name: string;
-  owner: number;
+  owner_id: number;
+  owner: Extract<Owner, "id" | "name">;
   rank: number;
   address: string;
   daily_rate: number;
@@ -94,8 +95,8 @@ export interface Booking {
   status: BookingStatus;
   source_id?: number;
   source?: BookingChannel;
-  begin_date: string;
-  end_date: string;
+  begin_date: Date;
+  end_date: Date;
   duration: number;
   adults: number;
   children: number;
@@ -115,8 +116,8 @@ export interface Booking {
   price_with_options: number;
   cancelled: boolean;
   deleted: boolean;
-  created: string;
-  modified: string;
+  created: Date;
+  modified: Date;
 }
 
 export interface ContractTemplate {
