@@ -14,7 +14,6 @@
   "Account": "Account",
   "Deposit can't be negative": "Deposit can't be negative",
   "Deposit can't be higher than price": "Deposit can't be higher than price",
-  "Last year": "Last year",
   "Print": "Print",
   "total = {{ fullPrice }} €": "total = {{ fullPrice }} €",
   "Balance: {{amount}} €": "Balance: {{amount}} €",

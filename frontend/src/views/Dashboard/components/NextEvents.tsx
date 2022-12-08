@@ -19,11 +19,11 @@ import {
 } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
-import { StatusBullet } from '../../../../components';
+import { StatusBullet } from '../../../components';
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
-import { useNextEventsQuery } from "../../../../services/api";
-import { formatDate } from "../../../../common/dateUtils";
+import { useNextEventsQuery } from "../../../services/api";
+import { formatDate } from "../../../common/dateUtils";
 import { parseISO } from "date-fns";
 
 const useStyles = makeStyles((theme: Theme) => ({

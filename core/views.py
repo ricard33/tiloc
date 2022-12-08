@@ -17,6 +17,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core import models
+from core.stats import get_filling_rate_and_turnover
 
 logger = logging.getLogger("view")
 
@@ -116,44 +117,8 @@ def export_full_planning(request, owner_id=None):
 )
 @permission_classes([IsAuthenticated])
 def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
-    sorted_data = get_filling_rate(begin, end, with_turnover=request.user.has_perm("core.view_prices"))
+    sorted_data = get_filling_rate_and_turnover(begin, end, with_turnover=request.user.has_perm("core.view_prices"))
     return Response(sorted_data)
-
-
-def get_filling_rate(begin, end, with_turnover=True):
-    begin = arrow.get(begin).floor("month")
-    end = arrow.get(end).ceil("month")
-    data = {}
-    dates_range = [begin.date(), end.date()]
-    bookings = models.Booking.objects.filter(
-        Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
-        lodging__isnull=False,
-        status__no_stats=False,
-        status__finalized=True,
-    )
-    lodging_count = models.Lodging.objects.filter(active=True).count()
-    for booking in bookings:
-        for d1, d2 in arrow.Arrow.interval("month", begin.floor("month").datetime, end.ceil("month").datetime):
-            days_in_month = d2.day
-            d2 = d2.floor("day").shift(days=1)
-            month = d1.format(fmt="YYYY-MM")
-            delta = (min(d2, arrow.get(booking.end_date)) - max(d1, arrow.get(booking.begin_date))).days
-            value = data.setdefault(
-                month, {"date": month, "days": 0, "turnover": 0, "capacity": days_in_month * lodging_count}
-            )
-            if delta > 0:
-                value["days"] = value["days"] + delta
-                if with_turnover and booking.duration > 0:
-                    value["turnover"] = value["turnover"] + delta * booking.price / booking.duration
-    keys = list(data.keys())
-    keys.sort()
-    sorted_data = []
-    for k in keys:
-        data[k]["rate"] = round(data[k]["days"] / data[k]["capacity"] * 100)
-        if not with_turnover:
-            del data[k]["turnover"]
-        sorted_data.append(data[k])
-    return sorted_data
 
 
 @api_view(

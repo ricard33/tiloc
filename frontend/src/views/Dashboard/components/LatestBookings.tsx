@@ -13,9 +13,9 @@ import {
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 import { useTranslation } from "react-i18next";
-import { formatDate, formatDistanceToNow } from "../../../../common/dateUtils";
+import { formatDate, formatDistanceToNow } from "../../../common/dateUtils";
 import { NavLink } from "react-router-dom";
-import { useListBookingsQuery } from "../../../../services/api";
+import { useListBookingsQuery } from "../../../services/api";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {},

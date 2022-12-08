@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import { EnhancedTableHead } from "../../../components";
 import Button from "@mui/material/Button";
 import { formatDate } from "../../../common/dateUtils";
-import { parseISO } from "date-fns";
 import { useSelector } from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -155,10 +154,10 @@ const BookingsTable = props => {
                 />
               </TableCell>
               <TableCell>
-                {formatDate(parseISO(booking.begin_date), "dd/MM/yyyy")}
+                {formatDate(booking.begin_date, "dd/MM/yyyy")}
               </TableCell>
               <TableCell>
-                {formatDate(parseISO(booking.end_date), "dd/MM/yyyy")}
+                {formatDate(booking.end_date, "dd/MM/yyyy")}
               </TableCell>
               <TableCell>
                 <div className={classes.nameContainer}>
