@@ -1,6 +1,7 @@
 import palette from "../../../../theme/palette";
 import { formatCurrency } from "../../../../common/intlUtils";
 import i18n from "../../../../i18n";
+import { TooltipItem } from "chart.js";
 
 export const get_options = () => {
   return {
@@ -14,8 +15,8 @@ export const get_options = () => {
         enabled: true,
         mode: "index",
         callbacks: {
-          label: function(context) {
-            let label = context.dataset.label || "";
+          label: function(context: TooltipItem<"line">) {
+            let label = context.dataset!.label || "";
             if (label) {
               label += ": ";
             }
@@ -54,7 +55,7 @@ export const get_options = () => {
             fontColor: palette.text.secondary,
             beginAtZero: true,
             min: 0,
-            callback: function(value, index, values) {
+            callback: function(value: number, index: number, values: number[]) {
               return value + "%";
             }
           },
@@ -76,7 +77,7 @@ export const get_options = () => {
             fontColor: palette.text.secondary,
             beginAtZero: true,
             min: 0,
-            callback: function(value, index, values) {
+            callback: function(value: number, index: number, values: number[]) {
               return formatCurrency(value, 0);
             }
           },

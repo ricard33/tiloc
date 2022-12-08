@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
-import { parseISO } from "date-fns";
 import { Booking, Service, User } from "../types";
 import Grid from '@mui/material/Unstable_Grid2';
 import "./BookingQuickView.scss";
@@ -91,7 +90,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
 
         <div className="label">{t("Options:")}</div>
         {booking.options && <React.Fragment>
-          <div className="value">{booking.options.map((option: Service, index: number) => (
+          <div className="value">{booking.options.map((option: Service) => (
             <li key={option.id}>{option.designation}</li>
           ))
           }</div>
