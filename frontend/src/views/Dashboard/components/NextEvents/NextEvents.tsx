@@ -1,7 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
 import {
   Card,
@@ -16,7 +15,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  TableSortLabel
+  TableSortLabel, Theme
 } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
@@ -27,7 +26,7 @@ import { useNextEventsQuery } from "../../../../services/api";
 import { formatDate } from "../../../../common/dateUtils";
 import { parseISO } from "date-fns";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {},
   content: {
     padding: 0
@@ -52,7 +51,11 @@ const statusColors = {
   CHECKIN: 'danger'
 };
 
-const NextEvents = props => {
+type Props = {
+  className?: string
+}
+
+const NextEvents: React.FC<Props> = props => {
   const { className, ...rest } = props;
   const classes = useStyles();
   const { t } = useTranslation();
@@ -156,10 +159,6 @@ const NextEvents = props => {
       </CardActions>
     </Card>
   );
-};
-
-NextEvents.propTypes = {
-  className: PropTypes.string
 };
 
 export default NextEvents;

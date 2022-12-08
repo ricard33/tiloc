@@ -37,7 +37,7 @@ type ChannelsDistributionData = {
 }
 
 type Props = {
-  className: string
+  className?: string
 }
 
 const ChannelsDistribution: React.FC<Props> = props => {
@@ -114,7 +114,7 @@ const ChannelsDistribution: React.FC<Props> = props => {
               responsive: true,
               maintainAspectRatio: false,
               animation: false,
-              cutout: "80%",
+              cutout: "50%",
               layout: { padding: 0 }
             }}
           />

@@ -34,7 +34,7 @@ type FillingRateData = {
 }
 
 type FillingRateProps = {
-  className: string
+  className?: string
 }
 
 const FillingRate: React.FC<FillingRateProps> = props => {

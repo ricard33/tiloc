@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
 import {
   Card,
@@ -9,7 +8,7 @@ import {
   CardContent,
   Button,
   Divider,
-  List, ListItem, ListItemText
+  List, ListItem, ListItemText, Theme
 } from "@mui/material";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
@@ -18,7 +17,7 @@ import { formatDate, formatDistanceToNow } from "../../../../common/dateUtils";
 import { NavLink } from "react-router-dom";
 import { useListBookingsQuery } from "../../../../services/api";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {},
   content: {
     padding: 0
@@ -42,7 +41,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LatestBookings = props => {
+type Props = {
+  className?: string
+}
+
+const LatestBookings: React.FC<Props> = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
@@ -111,10 +114,6 @@ const LatestBookings = props => {
       </CardActions>
     </Card>
   );
-};
-
-LatestBookings.propTypes = {
-  className: PropTypes.string
 };
 
 export default LatestBookings;

@@ -1,11 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
-import { Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
+import { Card, CardContent, Grid, Typography, Avatar, Theme } from "@mui/material";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     height: '100%',
     backgroundColor: theme.palette.primary.main,
@@ -19,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700
   },
   avatar: {
-    backgroundColor: theme.palette.white,
+    backgroundColor: theme.palette.common.white,
     color: theme.palette.primary.main,
     height: 56,
     width: 56
@@ -30,7 +29,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const TotalProfit = props => {
+type Props = {
+  className?: string
+}
+
+const TotalProfit: React.FC<Props> = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
@@ -70,10 +73,6 @@ const TotalProfit = props => {
       </CardContent>
     </Card>
   );
-};
-
-TotalProfit.propTypes = {
-  className: PropTypes.string
 };
 
 export default TotalProfit;

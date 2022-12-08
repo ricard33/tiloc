@@ -169,8 +169,8 @@ export interface Guest {
 export interface NextEvent {
   id: number;
   date: string;
-  Lodging_name: string;
-  event_type: string;
+  lodging_name: string;
+  event_type: "CHECKOUT"|"CHECKIN";
   guest_name: string;
   booking_channel: string;
 }

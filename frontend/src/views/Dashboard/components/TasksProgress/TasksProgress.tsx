@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
 import {
   Card,
@@ -8,11 +7,11 @@ import {
   Grid,
   Typography,
   Avatar,
-  LinearProgress
-} from '@mui/material';
+  LinearProgress, Theme
+} from "@mui/material";
 import InsertChartIcon from '@mui/icons-material/InsertChartOutlined';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     height: '100%'
   },
@@ -38,7 +37,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const TasksProgress = props => {
+type Props = {
+  className?: string
+}
+
+const TasksProgress: React.FC<Props> = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
@@ -78,10 +81,6 @@ const TasksProgress = props => {
       </CardContent>
     </Card>
   );
-};
-
-TasksProgress.propTypes = {
-  className: PropTypes.string
 };
 
 export default TasksProgress;

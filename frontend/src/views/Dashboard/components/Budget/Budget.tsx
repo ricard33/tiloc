@@ -1,12 +1,11 @@
 import React from 'react';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
-import { Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import PeopleIcon from '@mui/icons-material/PeopleOutlined';
+import { Card, CardContent, Grid, Typography, Avatar, Theme } from "@mui/material";
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import MoneyIcon from '@mui/icons-material/Money';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     height: '100%'
   },
@@ -17,8 +16,9 @@ const useStyles = makeStyles(theme => ({
   title: {
     fontWeight: 700
   },
+  caption: {},
   avatar: {
-    backgroundColor: theme.palette.success.main,
+    backgroundColor: theme.palette.error.main,
     height: 56,
     width: 56
   },
@@ -32,15 +32,19 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center'
   },
   differenceIcon: {
-    color: theme.palette.success.dark
+    color: theme.palette.error.dark
   },
   differenceValue: {
-    color: theme.palette.success.dark,
+    color: theme.palette.error.dark,
     marginRight: theme.spacing(1)
   }
 }));
 
-const TotalUsers = props => {
+type Props = {
+  className?: string
+}
+
+const Budget: React.FC<Props> = props => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
@@ -62,23 +66,23 @@ const TotalUsers = props => {
               gutterBottom
               variant="body2"
             >
-              TOTAL USERS
+              BUDGET
             </Typography>
-            <Typography variant="h3">1,600</Typography>
+            <Typography variant="h3">$24,000</Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <PeopleIcon className={classes.icon} />
+              <MoneyIcon className={classes.icon} />
             </Avatar>
           </Grid>
         </Grid>
         <div className={classes.difference}>
-          <ArrowUpwardIcon className={classes.differenceIcon} />
+          <ArrowDownwardIcon className={classes.differenceIcon} />
           <Typography
             className={classes.differenceValue}
             variant="body2"
           >
-            16%
+            12%
           </Typography>
           <Typography
             className={classes.caption}
@@ -92,8 +96,4 @@ const TotalUsers = props => {
   );
 };
 
-TotalUsers.propTypes = {
-  className: PropTypes.string
-};
-
-export default TotalUsers;
+export default Budget;
