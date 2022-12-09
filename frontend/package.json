@@ -122,7 +122,7 @@
     "react-scripts": "^5.0.1",
     "sass": "^1.55.0",
     "webpack-bundle-analyzer": "^4.7.0",
-    "webpack-bundle-tracker": "^1.6.0",
+    "webpack-bundle-tracker": "^1.8.0",
     "webpack-cli": "^4.10.0"
   }
 }
