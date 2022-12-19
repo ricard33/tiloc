@@ -23,7 +23,6 @@
   "{{count}} selected_plural": "{{count}} selected",
   "{{ duration }} nights - {{ count }} guests": "{{ duration }} nights - {{ count }} guests",
   "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nights - {{ count }} guests",
-  "Guest:": "Guest:",
   "From:": "From:",
   "To:": "To:",
   "Nights:": "Nights:",

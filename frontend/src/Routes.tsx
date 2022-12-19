@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
 import {
-  BookingList as BookingView,
+  BookingList,
   ContractEdit,
   ContractTemplateEdit,
   ContractTemplateList,
@@ -20,6 +20,8 @@ import { RequireAuth } from "./components/RequireAuth";
 import LodgingsList from "./views/Lodging/LodgingList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
 
+
+
 const MyRoutes = () => {
   return (
     <Routes>
@@ -34,8 +36,8 @@ const MyRoutes = () => {
           {/*<Route path="/" element={<Navigate to={"/dashboard"} replace />} />*/}
           {/*<Route path="/dashboard" element={<DashboardView />} />*/}
           <Route index element={<DashboardView />} />
-          <Route path="/planning" element={<PlanningView />} />
-          <Route path="/bookings" element={<BookingView />} />
+          <Route path="/planning/*" element={<PlanningView />} />
+          <Route path="/bookings/*" element={<BookingList />} />
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/reports" element={<TestPage />} />
           <Route path="/settings/" element={<Settings />} />

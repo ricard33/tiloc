@@ -10,7 +10,7 @@ import CardContent from "@mui/material/CardContent";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
-import { useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
@@ -41,7 +41,6 @@ const BookingList = () => {
   const classes = useStyles();
   const { t } = useTranslation();
   const [selected, setSelected] = useState([]);
-  const [editBooking, setEditBooking] = useState(null);
   const numSelected = selected.length;
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
@@ -74,23 +73,19 @@ const BookingList = () => {
   };
 
   const onCreateBooking = () => {
-    setEditBooking({
-      lodging_id: undefined,
-      begin_date: formatISO(new Date())
-    });
+    navigate(`new?begin_date=${formatISO(new Date())}`);
   };
 
   const onEditBooking = (booking) => {
     console.log(booking);
-    setEditBooking(booking);
+    navigate(`${booking.id}`);
   };
 
   const handleCloseEdit = () => {
-    setEditBooking(null);
+    navigate(-1);
   };
 
   const onEditContract = (booking) => {
-    setEditBooking(null);
     navigate("/bookings/" + booking.id + "/contract");
   };
 
@@ -138,7 +133,6 @@ const BookingList = () => {
         showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
       } else {
         showSuccess(t("Booking cancelled"));
-        setEditBooking({ ...booking, cancelled: true });
       }
     });
   };
@@ -152,7 +146,6 @@ const BookingList = () => {
         showError(t("Impossible to uncancel booking: ") + fetchErrorDecode(error));
       } else {
         showSuccess(t("Booking uncancelled"));
-        setEditBooking({ ...booking, cancelled: false });
       }
     });
   };
@@ -186,6 +179,19 @@ const BookingList = () => {
 
   return (
     <Page>
+      <Routes>
+        <Route
+          path=":bookingId"
+          element={
+            <BookingDialogLoader
+              onClose={handleCloseEdit}
+              onOpenContract={onEditContract}
+              onCancelBooking={onCancelBooking}
+              onUncancelBooking={onUncancelBooking}
+              onDelete={onDeleteBooking}
+            />}
+        />
+      </Routes>
       <ListToolbar
         title={t("Bookings")}
         numSelected={numSelected} onSearch={onSearch} onSearchLabel={t("Search booking")}
@@ -227,15 +233,15 @@ const BookingList = () => {
           </CardActions>
         </Card>
       </div>
-      {editBooking &&
-        <BookingDialogLoader
-          booking={editBooking}
-          onClose={handleCloseEdit}
-          onOpenContract={onEditContract}
-          onCancelBooking={onCancelBooking}
-          onUncancelBooking={onUncancelBooking}
-          onDelete={onDeleteBooking}
-        />}
+      {/*{editBooking &&*/}
+      {/*  <BookingDialogLoader*/}
+      {/*    booking={editBooking}*/}
+      {/*    onClose={handleCloseEdit}*/}
+      {/*    onOpenContract={onEditContract}*/}
+      {/*    onCancelBooking={onCancelBooking}*/}
+      {/*    onUncancelBooking={onUncancelBooking}*/}
+      {/*    onDelete={onDeleteBooking}*/}
+      {/*  />}*/}
       <BookingsImportDialog url="something" open={openImport} onClose={handleCloseImport} />
     </Page>
   );

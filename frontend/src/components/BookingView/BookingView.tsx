@@ -73,8 +73,8 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
             {t("Booking details")}
           </Grid>
           <Grid item xs={6} sx={{ textAlign: "right" }}>
-            <IconButton aria-label="copy" title={t("Copy booking to clipboard")}>
-              <ContentCopyIcon onClick={() => copyToClipboard()} />
+            <IconButton aria-label="copy" title={t("Copy booking to clipboard")} onClick={() => copyToClipboard()}>
+              <ContentCopyIcon />
             </IconButton>
           </Grid>
         </Grid>

@@ -3,13 +3,18 @@ import { Booking } from "../../types";
 import { BookingDialog } from "../index";
 import { Backdrop, CircularProgress } from "@mui/material";
 import {
-  useAllGuestsQuery, useGetOwnerQuery,
-  useListLodgingsQuery, useListServicesQuery
+  useAllGuestsQuery,
+  useGetBookingQuery,
+  useGetOwnerQuery,
+  useListLodgingsQuery,
+  useListServicesQuery
 } from "../../services/api";
 import BookingView from "../BookingView";
+import { useLocation, useParams } from "react-router-dom";
+import queryString from "query-string";
+import { parseISO } from "date-fns";
 
 type BookingDialogLoaderProps = {
-  booking: Booking;
   onClose: () => void;
   onCancelBooking: (booking: Booking) => void;
   onUncancelBooking: (booking: Booking) => void;
@@ -18,18 +23,28 @@ type BookingDialogLoaderProps = {
 };
 
 const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (props: BookingDialogLoaderProps) => {
-  const { booking, onClose, onCancelBooking, onUncancelBooking, onDelete, onOpenContract } = props;
+  const { onClose, onCancelBooking, onUncancelBooking, onDelete, onOpenContract } = props;
+  const { bookingId } = useParams<"bookingId">();
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  const lodging_id = query.lodging_id ? Number(query.lodging_id) : undefined;
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
+  const newBooking = bookingId === "new" ? {
+    lodging_id : lodging_id,
+    lodging: lodging_id && lodgings ? lodgings.filter(l => l.id === lodging_id)[0] : undefined,
+    begin_date: parseISO(query.begin_date as string)
+  } : undefined;
+  const { data: loadedBooking } = useGetBookingQuery(Number(bookingId), { skip: bookingId === "new" });
+  const booking = (loadedBooking ?? newBooking) as Booking;
   const { data: allOptions, isSuccess: optionsLoaded } = useListServicesQuery();
   const {
     data: owner
-  } = useGetOwnerQuery(booking.lodging.owner_id, { skip: typeof booking.lodging.owner_id === "undefined" });
-
+  } = useGetOwnerQuery(booking && booking.lodging ? booking!.lodging.owner_id : -1, { skip: typeof booking === "undefined" || typeof booking.lodging === "undefined" || typeof booking.lodging.owner_id === "undefined" });
   const { data: allGuests } = useAllGuestsQuery();
-  const [isEditMode, setIsEditMode] = useState(booking.id === undefined);
+  const [isEditMode, setIsEditMode] = useState(bookingId === "new");
 
   if (booking && lodgings && owner && allGuests && optionsLoaded) {
-    if(isEditMode)
+    if (isEditMode)
       return (
         <BookingDialog
           booking={booking}

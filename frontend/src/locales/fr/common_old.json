@@ -22,7 +22,6 @@
   "{{count}} selected_plural": "{{count}} sélectionnés",
   "{{ duration }} nights - {{ count }} guests": "{{ duration }} nuits - {{ count }} locataire",
   "{{ duration }} nights - {{ count }} guests_plural": "{{ duration }} nuits - {{ count }} locataires",
-  "Guest:": "Client :",
   "From:": "Du :",
   "To:": "Au :",
   "Nights:": "Nuits :",
