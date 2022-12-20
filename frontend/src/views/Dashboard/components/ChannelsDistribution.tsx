@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, Divider, IconButton, Theme } from "@mui/
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { TooltipItem } from "chart.js";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -80,7 +81,7 @@ const ChannelsDistribution: React.FC<Props> = props => {
         <div className={classes.chartContainer}>
           <Doughnut
             data={{
-              labels: data.map(e => e.channel),
+              labels: data.map(e => e.channel ?? t("Not set")),
               datasets: [
                 {
                   label: t("Origin of bookings"),
@@ -108,7 +109,12 @@ const ChannelsDistribution: React.FC<Props> = props => {
                   backgroundColor: theme.palette.common.white,
                   titleColor: theme.palette.text.primary,
                   bodyColor: theme.palette.text.secondary,
-                  footerColor: theme.palette.text.secondary
+                  footerColor: theme.palette.text.secondary,
+                  callbacks: {
+                    label: function(context: TooltipItem<"doughnut">) {
+                      return `${context.parsed} (${(context.parsed / context.dataset?.data.reduce((prev, cur) => prev + cur, 0) * 100).toFixed()}%)`;
+                    }
+                  }
                 }
               },
               responsive: true,

@@ -135,9 +135,19 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     booking_count = Count(
         "booking",
         filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
-        & Q(booking__lodging__isnull=False),
+        & Q(booking__cancelled=False)
+        & Q(booking__deleted=False)
+        & Q(booking__status__no_stats=False),
     )  # noqa: E127
     channels = models.BookingChannel.objects.annotate(booking_count=booking_count)
     for row in channels:
         data.append({"channel": row.name, "count": row.booking_count})
+    data.append(
+        {
+            "channel": None,
+            "count": models.Booking.objects.filter(
+                cancelled=False, deleted=False, status__no_stats=False, status__finalized=True, source_id__isnull=True
+            ).aggregate(count=Count("id"))["count"],
+        }
+    )
     return Response(data)
