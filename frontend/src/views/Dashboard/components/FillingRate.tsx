@@ -112,6 +112,12 @@ const FillingRate: React.FC<FillingRateProps> = props => {
     }
   ];
 
+  const globalTurnover = data ?
+    data.reduce((previousValue, currentValue) => previousValue + (currentValue.turnover ?? 0), 0)
+    : 0;
+  const globalRate = data ?
+    data.reduce((previousValue, currentValue) => previousValue + (currentValue.rate ?? 0), 0) / data.length
+    : 0;
   const computeTurnover = (lodging: Lodging) => {
     if (data) {
       return data.reduce((previousValue, currentValue) =>
@@ -159,7 +165,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
                 datasets: mode === "global" ? [
                   {
                     type: "bar",
-                    label: t("Filling rate"),
+                    label: t("Filling rate") + ` (${globalRate.toFixed()}%)`,
                     yAxisID: "yAxisFillingRate",
                     backgroundColor: palette.primary.main,
                     barThickness: 12,
@@ -172,7 +178,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
                   },
                   {
                     type: "line",
-                    label: t("Turnover"),
+                    label: t("Turnover") + ` (${formatCurrency(globalTurnover)})`,
                     yAxisID: "yAxisTurnover",
                     backgroundColor: palette.warning.main,
                     borderColor: palette.warning.main,
