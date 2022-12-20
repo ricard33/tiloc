@@ -34,6 +34,7 @@ import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
 import { RootState } from "../../store";
 import { Booking, Lodging, User } from "../../types";
+import { useBookingActions } from "../../common/bookingActions";
 
 
 const Planning = () => {
@@ -69,6 +70,7 @@ const Planning = () => {
   const canEdit = user.permissions.includes("core.change_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
   const canViewContract = user.permissions.includes("core.view_contract");
+  const { onDeleteBooking } = useBookingActions();
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -102,58 +104,6 @@ const Planning = () => {
     setSelected(null);
   };
 
-  const onCancelBooking = (booking: Booking) => {
-    if (!canEdit) return;
-    updateBooking({ ...booking, cancelled: true }).then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        console.error("Error canceling booking", error);
-        showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
-      } else {
-        showSuccess(t("Booking cancelled"));
-      }
-    });
-  };
-
-  const onUncancelBooking = (booking: Booking) => {
-    if (!canEdit) return;
-    updateBooking({ ...booking, cancelled: false }).then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        console.error("Error uncancelling booking", error);
-        showError(t("Impossible to uncancel booking: ") + fetchErrorDecode(error));
-      } else {
-        showSuccess(t("Booking uncancelled"));
-      }
-    });
-  };
-
-  const onDeleteBooking = (booking: Booking) => {
-    if (!canDelete) return;
-    confirm({
-      title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
-        guest_name: booking.guest_name,
-        lodging_name: booking.lodging.name
-      }),
-      description: t("Do you really want to permanently delete this booking?")
-    })
-      .then(() => {
-        setSelected(null);
-        deleteBooking(booking.id as number).then((result) => {
-          if ((result as any).error) {
-            const error = (result as any).error;
-            console.error("Error deleting booking", error);
-            showError(t("Impossible to delete the booking: ") + fetchErrorDecode(error));
-          } else {
-            showSuccess(t("Booking deleted"));
-            handleCloseEdit();
-          }
-        });
-      })
-      .catch(() => { /* ... */
-      });
-  };
-
   const onEditContract = (booking: Booking) => {
     navigate("/bookings/" + booking.id + "/contract");
   };
@@ -181,9 +131,6 @@ const Planning = () => {
             <BookingDialogLoader
               onClose={handleCloseEdit}
               onOpenContract={onEditContract}
-              onCancelBooking={onCancelBooking}
-              onUncancelBooking={onUncancelBooking}
-              onDelete={onDeleteBooking}
             />}
         />
       </Routes>

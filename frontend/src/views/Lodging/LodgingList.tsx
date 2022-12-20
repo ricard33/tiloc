@@ -4,22 +4,18 @@ import { useListLodgingsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Lodging, Owner } from "../../types";
 import { DataGrid, GridColDef, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
-import { DecimalPrecision } from "../../common/priceUtils";
+import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";
 
 type Props = {};
 
-const LodgingsList: React.FunctionComponent<Props> = ({
-  ...props
-}: Props) => {
+const LodgingsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
   // const { data: owners } = useListOwnersQuery();
   const navigate = useNavigate();
-
-  const formatPrice = (params: GridValueFormatterParams<number>) => DecimalPrecision.round(params.value) + " €";
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },

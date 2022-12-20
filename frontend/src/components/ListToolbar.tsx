@@ -7,9 +7,8 @@ import { useTranslation } from "react-i18next";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import Typography from "@mui/material/Typography";
-import DateRangeSelector from "./DateRangeSelector";
+import DateRangeSelector, { DateRange } from "./DateRangeSelector";
 import SearchInput from "./SearchInput";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -57,16 +56,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type ListToolbarProps = {
   title: string,
-  dateRange?: {
-    startDate: Date;
-    endDate: Date;
-  };
+  dateRange?: DateRange;
   numSelected?: number;
-  onDateRangeChange?: (range: { startDate: Date; endDate: Date; }) => void;
+  onDateRangeChange?: (range: DateRange) => void;
   onSearch?: (text: string) => void;
   onSearchLabel?: string;
   onDeleteSelected?: () => void;
-  tools?: [{ label: string; onClick: () => void; icon?: React.ReactNode, disabled: boolean }]
+  tools?: { label: string; onClick: () => void; icon?: React.ReactNode, disabled: boolean }[]
 };
 
 const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
@@ -96,7 +92,7 @@ const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
         <SearchInput
           className={classes.searchInput}
           placeholder={onSearchLabel}
-          onChange={event => onSearch(event.target.value)}
+          onChange={value => onSearch(value)}
         />
       </div>}
       {dateRange && onDateRangeChange && <div>
@@ -104,35 +100,35 @@ const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
       </div>}
       <span className={classes.spacer} />
       <div className={classes.actions}>
-        {tools && tools.map((tool, index) => (
+        {tools && tools.map((tool) => (
           <Button
             key={tool.label}
             className={classes.importButton}
             onClick={tool.onClick}
             disabled={tool.disabled}
+            startIcon={tool.icon}
           >
-            {tool.icon && (
-              <IconButton aria-label={tool.label} size="large">
-                {tool.icon}
-              </IconButton>
-            )}
+            {/*{tool.icon && (*/}
+            {/*  // <IconButton aria-label={tool.label} size="large">*/}
+            {/*  {tool.icon}*/}
+            {/*  // </IconButton>*/}
+            {/*)}*/}
             {tool.label}
           </Button>
         ))}
-        {numSelected && numSelected > 0 ? (
-          <Button onClick={onDeleteSelected} disabled={!onDeleteSelected}>
-            <Tooltip title="Delete">
-              <IconButton aria-label="Delete" size="large">
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Button>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton aria-label="Filter list" size="large">
-              <FilterListIcon />
+        {numSelected && numSelected > 0 && onDeleteSelected ? (
+          <Tooltip title="Delete">
+            <IconButton aria-label="Delete" size="large" onClick={onDeleteSelected}>
+              <DeleteIcon />
             </IconButton>
           </Tooltip>
+        ) : (
+          ""
+          // <Tooltip title="Filter list">
+          //   <IconButton aria-label="Filter list" size="large">
+          //     <FilterListIcon />
+          //   </IconButton>
+          // </Tooltip>
         )}
       </div>
     </Toolbar>

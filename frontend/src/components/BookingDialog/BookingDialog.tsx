@@ -32,7 +32,7 @@ import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
 import {
-  useCreateBookingMutation,
+  useCreateBookingMutation, useGetOwnerQuery,
   useListBookingChannelsQuery,
   useListBookingStatusesQuery,
   useUpdateBookingMutation
@@ -41,7 +41,7 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import "./BookingDialog.scss";
 import BookingActions from "../BookingActions";
-import { Booking, Lodging, Owner, Service } from "../../types";
+import { Booking, Lodging, Service } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 
@@ -55,7 +55,6 @@ type BookingDialogProps = {
   }[],
   lodgings: Lodging[],
   allOptions: Service[],
-  owner: Owner,
   onClose: () => void,
   onDelete: () => void,
   onOpenContract?: (booking: Booking) => void,
@@ -64,10 +63,13 @@ type BookingDialogProps = {
 };
 
 const BookingDialog: React.FC<BookingDialogProps> = props => {
-  const { booking, lodgings, allOptions, owner, guests: allGuests, onClose, onDelete, onOpenContract } = props;
+  const { booking, lodgings, allOptions, guests: allGuests, onClose, onDelete, onOpenContract } = props;
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
+  const {
+    data: owner
+  } = useGetOwnerQuery(booking?.lodging ? booking!.lodging.owner_id : -1, { skip: typeof booking === "undefined" || typeof booking.lodging === "undefined" });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const { data: bookingChannels } = useListBookingChannelsQuery();
   const [createBooking] = useCreateBookingMutation();
@@ -83,7 +85,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue(key as any, (object as any)[key]);
   });
 
-  let lodging = booking.lodging;
+  let lodging: Lodging | undefined = booking.lodging;
 
   const initialState = initializeDefaults(booking);
 
@@ -115,7 +117,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const leftToPay = fullPrice - totalPayment - (commissionFees ?? 0);
   // console.log("options", options, fullPrice);
 
-  const depositLabel = getDepositLabel(t, owner && owner.deposit_label) || t("Deposit");
+  const depositLabel = owner ? getDepositLabel(t, owner.deposit_label) : t("Deposit");
 
   useEffect(() => {
     if (formValues.status_id === undefined && bookingStatuses) {
@@ -130,25 +132,27 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       //   source: { ...bookingChannels.filter(x => x.id === booking.source_id)[0] }
     };
 
-    lodging = { ...lodgings.filter(x => x.id === booking.lodging_id)[0] };
+    lodging = booking.lodging_id ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
     // Provide defaults for new bookings
     // if (initialState.status_id === undefined) {
     //   initialState.status_id = bookingStatuses[0].id;
     //   initialState.status = bookingStatuses[0];
     // }
+    // @ts-ignore
+    initialState.lodging_id = booking.lodging_id || '';
     initialState.guest_name = booking.guest_name || "";
     initialState.guest_contact = booking.guest_contact || "";
     initialState.guest_address = booking.guest_address || "";
     initialState.begin_date = booking.begin_date || new Date();
     initialState.end_date = booking.end_date || addDays(initialState.begin_date, initialState.duration || 7);
     initialState.duration = booking.duration || differenceInCalendarDays(initialState.end_date, initialState.begin_date);
-    initialState.daily_rate = booking.daily_rate || lodging?.daily_rate;
+    initialState.daily_rate = booking.daily_rate || (lodging ? lodging.daily_rate : 0);
     initialState.is_flat_rate = booking.is_flat_rate || false;
     if (initialState.price === undefined)
       Object.assign(initialState, computeBookingPrice(initialState.begin_date, initialState.end_date,
         initialState.daily_rate, 0, 0, [], depositPercent).price);
-    initialState.guaranty = booking.guaranty || lodging?.guaranty;
+    initialState.guaranty = booking.guaranty || (lodging ? lodging.guaranty : 0);
     initialState.commission_fees = booking.commission_fees || 0;
     initialState.adults = booking.adults || 2;
     initialState.children = booking.children || 0;
@@ -397,7 +401,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               <Grid item sm={4} xs={12}>
                 <FormControl className="full-width" variant={variant}>
                   <InputLabel id="status-label">{t("Booking status")}</InputLabel>
-                  {bookingStatuses &&
+                  {bookingStatuses && formValues.status_id &&
                     <Controller
                       name="status_id"
                       control={control}

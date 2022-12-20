@@ -1,5 +1,6 @@
 import { differenceInCalendarDays } from "date-fns";
 import { Booking, Service } from "../types";
+import { GridValueFormatterParams } from "@mui/x-data-grid";
 
 if (Number.EPSILON === undefined) {
   // @ts-ignore
@@ -87,3 +88,5 @@ export const computeOptionsPrice = (options: Service[], duration: number) => {
   }
   return [totalIncluded, totalExclude];
 };
+
+export const formatPrice = (params: GridValueFormatterParams<number>) => DecimalPrecision.round(params.value) + " €";

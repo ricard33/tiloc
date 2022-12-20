@@ -51,7 +51,7 @@ function App(props: Props) {
   return (
     // <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>
-      <LocalizationProvider dateAdapter={AdapterDateFns} locale={frLocale}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
         <DateProvider locale={frLocale}>
           <ConfirmProvider>
             <Notifier />
