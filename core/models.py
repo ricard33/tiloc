@@ -286,9 +286,11 @@ class Booking(models.Model):
     @property
     def price_with_options(self):
         total = self.price
-        for option in self.bookedservice_set.filter(service__not_included_in_price=False):
-            if option.unit_price:
-                total += option.unit_price * (option.is_flat_rate and 1 or self.duration)
+        if self.id:
+            # this is a real db instance, we can follow relations
+            for option in self.bookedservice_set.filter(service__not_included_in_price=False):
+                if option.unit_price:
+                    total += option.unit_price * (option.is_flat_rate and 1 or self.duration)
         return total
 
     @property
