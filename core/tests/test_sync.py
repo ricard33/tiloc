@@ -167,6 +167,24 @@ class ExportCalendarTestCase(TestCase):
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
 
+    def test_exclude_deleted_bookings(self):
+        channel = factories.BookingChannelFactory(name="airbnb")
+        sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
+        factories.BookingFactory(lodging=self.lodging, deleted=True)
+        factories.BookingFactory(lodging=self.lodging)
+        r = self.client.get("/calendar/%s/?s=%d" % (self.lodging.uid, sync.id))
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)
+
+    def test_exclude_cancelled_bookings(self):
+        channel = factories.BookingChannelFactory(name="airbnb")
+        sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
+        factories.BookingFactory(lodging=self.lodging, cancelled=True)
+        factories.BookingFactory(lodging=self.lodging)
+        r = self.client.get("/calendar/%s/?s=%d" % (self.lodging.uid, sync.id))
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)
+
     def test_booking_dates(self):
         now = arrow.now()
         year_ = now.date().year + 1

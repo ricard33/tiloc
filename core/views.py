@@ -43,7 +43,7 @@ def loggly_proxy(request, path):
 def export_calendar(request, uid):
     lodging = get_object_or_404(models.Lodging, uid=uid)
     source = request.GET.get("s")
-    qs = lodging.booking_set.filter(end_date__gte=timezone.now())
+    qs = lodging.booking_set.filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
     if source:
         sync = get_object_or_404(models.BookingChannelSync, id=source)
         qs = qs.exclude(source=sync.channel)
@@ -87,7 +87,7 @@ def export_full_planning(request, owner_id=None):
     if owner and owner_id != request.user.id and not request.user.is_superuser:
         raise Http404("No owner matches the given query.")
 
-    qs = models.Booking.objects.filter(lodging__isnull=False)
+    qs = models.Booking.objects.filter(cancelled=False, deleted=False)
     if owner:
         qs = qs.filter(lodging__owner=owner)
         logger.info("Full planning requested for owner [%s]", owner.name)
