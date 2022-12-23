@@ -22,7 +22,7 @@ def aggregate_month_for_range(
         cancelled=False,
         deleted=False,
         status__no_stats=False,
-        status__finalized=True,
+        # status__finalized=True,
     )
     for booking in bookings:
         for d1, d2 in arrow.Arrow.interval("month", begin.floor("month").datetime, end.ceil("month").datetime):
