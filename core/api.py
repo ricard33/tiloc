@@ -247,7 +247,7 @@ class LodgingViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     queryset = models.Lodging.objects.all().order_by("name")
     serializer_class = LodgingSerializer
-    filterset_fields = ["shown"]
+    filterset_fields = ["shown", "active"]
 
     @action(detail=True, methods=["get"])
     @transaction.atomic

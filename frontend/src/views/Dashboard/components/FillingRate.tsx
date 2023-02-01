@@ -4,7 +4,6 @@ import axios from "axios";
 import "chart.js/auto";
 import { Chart } from "react-chartjs-2";
 // @ts-ignore
-import autocolors from 'chartjs-plugin-autocolors';
 import { makeStyles } from "@mui/styles";
 import {
   Button,
@@ -69,7 +68,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { data: lodgings } = useListLodgingsQuery();
+  const { data: lodgings } = useListLodgingsQuery({ shown: true, active: true });
   const [mode, setMode] = useState<"global" | "per-lodging">("global");
   const [data, setData] = useState<FillingRateData[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -206,12 +205,8 @@ const FillingRate: React.FC<FillingRateProps> = props => {
                   };
                 })
               }}
-              plugins={[autocolors]}
               options={{
                 plugins: {
-                  autocolors: {
-                    offset: 1,
-                  },
                   tooltip: {
                     enabled: true,
                     mode: "index",
