@@ -31,5 +31,7 @@
   "Some modifications aren't saved. Do you want to save them and open contract?": "Some modifications aren't saved. Do you want to save them and open contract?",
   "default rate": "default rate",
   "week": "week",
-  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})"
+  "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
+  "Cancelled": "Cancelled",
+  "Modify description": "Modify description"
 }

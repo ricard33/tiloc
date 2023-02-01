@@ -1,4 +1,4 @@
-import React  from "react";
+import React from "react";
 
 import { Button, Card, CardActions, CardContent, CardHeader } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,8 @@ import { Lodging, Owner } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
+import RichTextEditorElement from "../../components/Fields/RichTextEditorElement";
+
 
 type Props = {
   lodging: Lodging;
@@ -21,18 +23,17 @@ type Props = {
 export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCancel }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-  const formContext = useForm<Lodging>({
-    defaultValues: lodging
-  });
+  const formContext = useForm<Lodging>({ defaultValues: lodging });
   const { control } = formContext;
-  const { dirtyFields } = useFormState({
-    control
-  });
-  usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
+  const {isDirty} = useFormState({ control });
+  // const [description, setDescription] = useState<string | undefined>(undefined);
+  // usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
+  usePageUnloadAlert(isDirty);
 
   const ownersOptions: { label: string, id: number }[] = owners ? owners.map((owner) => {
     return { label: owner.name, id: owner.id };
   }) : [];
+
 
   const onCancelHandler = () => {
     unsavedChangesConfirm()
@@ -41,10 +42,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
       });
   };
 
-  const onModifyDescription = () => {
-
-  };
-
+  // console.log("redraw", dirtyFields, touchedFields);
   return (
     <FormContainer
       defaultValues={lodging}
@@ -106,14 +104,10 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
               <TextFieldElement name={"information"} label={t("Information")} multiline fullWidth />
             </Grid2>
             <Grid2 xs={12}>
-              <Button
-                variant="contained" color={"secondary"}
-                onClick={() => onModifyDescription()}
-              >{t("Modify description")}</Button>
-              {/*  <MUIRichTextEditor*/}
-              {/*    defaultValue={description}*/}
-              {/*    label="Start typing..."*/}
-              {/*  />*/}
+              <RichTextEditorElement
+                placeholder="Start typing..."
+                name="description"
+              />
             </Grid2>
           </Grid2>
         </CardContent>
@@ -124,7 +118,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
             alignItems: "flex-end"
           }}
         >
-          {Object.keys(dirtyFields).length > 0 ?
+          {isDirty ?
             <>
               <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
               <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>

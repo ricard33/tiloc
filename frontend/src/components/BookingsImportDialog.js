@@ -40,7 +40,7 @@ export default function BookingsImportDialog(props) {
 }
 
 BookingsImportDialog.propTypes = {
-  url: PropTypes.string,
   onClose: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired
+  open: PropTypes.bool.isRequired,
+  url: PropTypes.string,
 };

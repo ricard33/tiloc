@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { add, parse, startOfMonth } from "date-fns";
 import { BookingScheduler } from "./components";
 import { useTranslation } from "react-i18next";
-import { useConfirm } from "../../libs/MuiConfirm";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Grid } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -20,14 +19,10 @@ import { formatISO } from "../../common/tzUtils";
 import { useLocalStorage } from "../../common/useLocalStorage";
 import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningSettingsDialog";
 import {
-  useDeleteBookingMutation,
   useListBookingsQuery,
   useListBookingStatusesQuery,
   useListLodgingsQuery,
-  useUpdateBookingMutation
 } from "../../services/api";
-import { fetchErrorDecode } from "../../common/apiUtils";
-import { useAlert } from "../../common/alertUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import "./Planning.scss";
 import { useSelector } from "react-redux";
@@ -45,7 +40,6 @@ const Planning = () => {
   if (isNaN(requestedDate.valueOf()))
     requestedDate = new Date();
 
-  const { showError, showSuccess } = useAlert();
   const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   const dateFilter = formatISO(beginDate) + ":" + formatISO(add(beginDate, { years: 1 }));
   const {
@@ -55,11 +49,8 @@ const Planning = () => {
   } = useListBookingsQuery({ for_dates: dateFilter }, { pollingInterval: 60000 });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
-  const [updateBooking] = useUpdateBookingMutation();
-  const [deleteBooking] = useDeleteBookingMutation();
   const [selected, setSelected] = useState<Booking | null>(null);
   const navigate = useNavigate();
-  const confirm = useConfirm();
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [settings, setSettings] = useLocalStorage("planningSettings", {
     showPaymentStatus: true,
@@ -67,7 +58,6 @@ const Planning = () => {
   });
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_booking");
-  const canEdit = user.permissions.includes("core.change_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
   const canViewContract = user.permissions.includes("core.view_contract");
   const { onDeleteBooking } = useBookingActions();
