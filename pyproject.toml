@@ -38,7 +38,7 @@ readme = "README.md"
 python = "^3.10"
 arrow = "^1.2.3"
 babel = "^2.10.3"
-django = "^4.1.2"
+django = "^4.1.6"
 django-constance = { version = "^2.9.1", extras = ["database"] }
 django-cors-headers = "^3.13.0"
 django-cron = "^0.6.0"
