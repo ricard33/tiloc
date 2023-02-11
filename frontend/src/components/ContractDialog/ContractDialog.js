@@ -30,8 +30,7 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
-
-const Editor = React.lazy(() => import("../Editor"));
+import RichTextEditor from "../RichTextEditor/RichTextEditor";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -189,7 +188,7 @@ const ContractDialog = props => {
           <Grid item xs={12}>
             <Suspense fallback={<div>{t("Loading...")}</div>}>
               {content &&
-              <Editor
+              <RichTextEditor
                 content={content}
                 onChange={onChange}
               />}

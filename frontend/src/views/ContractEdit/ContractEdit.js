@@ -25,8 +25,8 @@ import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
+import RichTextEditor from "../../components/RichTextEditor/RichTextEditor";
 
-const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
   content: {
@@ -193,7 +193,7 @@ const ContractEdit = () => {
         <Grid item xs={12}>
           <Suspense fallback={<div>{t("Loading...")}</div>}>
             {content &&
-            <Editor
+            <RichTextEditor
               content={content}
               onChange={onChange}
             />}

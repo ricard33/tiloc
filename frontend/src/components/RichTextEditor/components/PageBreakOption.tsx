@@ -17,7 +17,7 @@ const PageBreakOption: React.FunctionComponent<PageBreakOptionProps> = ({
 
   const addPageBreak = (): void => {
     const contentState = editorState!.getCurrentContent();
-    const contentStateWithEntity = contentState.createEntity("PAGE_BREAK", "IMMUTABLE", ' ');
+    const contentStateWithEntity = contentState.createEntity("PAGE_BREAK", "IMMUTABLE", { });
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
     const contentStateWithPageBreak = Modifier.applyEntity(
       contentStateWithEntity,

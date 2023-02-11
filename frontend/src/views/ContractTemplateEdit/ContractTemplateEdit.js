@@ -26,8 +26,8 @@ import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
+import RichTextEditor from "../../components/RichTextEditor/RichTextEditor";
 
-const Editor = React.lazy(() => import("../../components/Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -87,6 +87,7 @@ const ContractTemplateEdit = (/*props*/) => {
 
   // console.assert(!!templateId, "Template id not initialized");
 
+  console.log(isLoading, content);
   useEffect(() => {
     if (template) {
       setName(template.name);
@@ -163,7 +164,7 @@ const ContractTemplateEdit = (/*props*/) => {
 
   return (
     <Page className={classes.root}>
-      <Backdrop className={classes.backdrop} open={isLoading}>
+      <Backdrop className={classes.backdrop} open={typeof content === "undefined"}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
@@ -197,8 +198,8 @@ const ContractTemplateEdit = (/*props*/) => {
         </Grid>
         <Grid item xs={12}>
           <Suspense fallback={<div>{t("Loading...")}</div>}>
-            {!isLoading &&
-            <Editor
+            {typeof content !== "undefined" &&
+            <RichTextEditor
               content={content}
               onChange={onChange}
             />}
