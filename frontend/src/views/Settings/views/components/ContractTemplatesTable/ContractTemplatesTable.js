@@ -13,12 +13,12 @@ import {
   TableCell,
   TableRow,
   Typography,
-  TablePagination
+  TablePagination,
+  Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTranslation } from "react-i18next";
 import { EnhancedTableHead } from "../../../../../components";
-import Button from "@mui/material/Button";
 import { parseISO } from 'date-fns';
 import { formatDate, formatDistanceToNow } from "../../../../../common/dateUtils";
 

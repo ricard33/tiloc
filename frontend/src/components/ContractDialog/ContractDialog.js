@@ -2,13 +2,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import { bookingType } from "../../common/propTypesUtils";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
   PictureAsPdf as PdfIcon,
@@ -16,11 +10,19 @@ import {
   Save as SaveIcon
 } from "@mui/icons-material";
 import axios from "axios";
-import { Grid } from "@mui/material";
-import Typography from "@mui/material/Typography";
+import {
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  Typography,
+  Backdrop,
+  CircularProgress,
+} from "@mui/material";
 import useWindowDimensions from "../../common/windowDimensions";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   useGetOrGenerateContractMutation,
   useUpdateContractMutation,

@@ -6,9 +6,11 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle, FormControlLabel, TextField
+  DialogTitle,
+  FormControlLabel,
+  TextField,
+  Checkbox,
 } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
 
 export type PlanningSettings = {
   showPaymentStatus: boolean;

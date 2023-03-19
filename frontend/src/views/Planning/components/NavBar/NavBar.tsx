@@ -1,12 +1,10 @@
 /* eslint-disable react/no-multi-comp */
 import React, { useState } from "react";
-import { Grid } from "@mui/material";
+import { Grid, Button, ButtonProps } from "@mui/material";
 import { add, startOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
-import Button from "@mui/material/Button";
 import { formatDate } from "../../../../common/dateUtils";
 import useWindowDimensions from "../../../../common/windowDimensions";
-import { ButtonProps } from "@mui/material/Button/Button";
 
 interface NavButtonProps extends ButtonProps {
   children?: React.ReactNode;

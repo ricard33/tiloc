@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useListBookingsPaginatedQuery } from "../../services/api";
-import { Card, LinearProgress } from "@mui/material";
-import CardContent from "@mui/material/CardContent";
+import { Card, LinearProgress, CardContent } from "@mui/material";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import { Route, Routes, useNavigate } from "react-router-dom";

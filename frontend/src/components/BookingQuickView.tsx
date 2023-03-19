@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
 import { Booking, Service, User } from "../types";
-import Grid from '@mui/material/Unstable_Grid2';
 import "./BookingQuickView.scss";
 import PaymentList from "./PaymentList";
 import {  useLazyGetPaymentsForBookingQuery } from "../services/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { Unstable_Grid2 as Grid } from '@mui/material';
 
 type BookingQuickViewProps = {
   booking: Booking;

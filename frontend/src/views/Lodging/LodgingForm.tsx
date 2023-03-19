@@ -1,9 +1,15 @@
 import React from "react";
 
-import { Button, Card, CardActions, CardContent, CardHeader } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  InputAdornment,
+  Unstable_Grid2 as Grid2,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
-import InputAdornment from "@mui/material/InputAdornment";
-import Grid2 from "@mui/material/Unstable_Grid2";
 import { FormContainer, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
 import { Lodging, Owner } from "../../types";

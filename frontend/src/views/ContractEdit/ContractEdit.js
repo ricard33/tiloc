@@ -2,7 +2,6 @@ import React, { useEffect, useState, Suspense } from "react";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "@mui/material/Button";
 import {
   DeleteForever as DeleteIcon,
   PictureAsPdf as PdfIcon,
@@ -10,11 +9,7 @@ import {
   Save as SaveIcon
 } from "@mui/icons-material";
 import axios from "axios";
-import { Grid } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import Alert from '@mui/material/Alert';
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Grid, Button, Typography, Alert, Backdrop, CircularProgress } from "@mui/material";
 import {
   useDeleteContractMutation,
   useGetOrGenerateContractMutation,

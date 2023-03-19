@@ -1,12 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import Checkbox from "@mui/material/Checkbox";
-import Tooltip from "@mui/material/Tooltip";
-import TableSortLabel from "@mui/material/TableSortLabel";
 import { useTranslation } from "react-i18next";
+
+import { TableHead, TableRow, TableCell, Checkbox, Tooltip, TableSortLabel } from '@mui/material';
 
 const EnhancedTableHead = props => {
   const {

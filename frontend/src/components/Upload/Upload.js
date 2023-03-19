@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import Dropzone from "../Dropzone";
 import "./Upload.css";
-import LinearProgress from "@mui/material/LinearProgress";
 import CheckIcon from '@mui/icons-material/Check';
 import { withTranslation } from 'react-i18next';
 import PropTypes from "prop-types";
+import { LinearProgress } from '@mui/material';
 
 class UploadClass extends Component {
   constructor(props) {

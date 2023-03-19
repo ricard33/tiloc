@@ -1,13 +1,10 @@
 import React from "react";
 import classNames from "classnames";
 import { makeStyles } from "@mui/styles";
-import { Button, Theme, Toolbar } from "@mui/material";
+import { Button, Theme, Toolbar, Tooltip, IconButton, Typography } from "@mui/material";
 import { lighten } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Typography from "@mui/material/Typography";
 import DateRangeSelector, { DateRange } from "./DateRangeSelector";
 import SearchInput from "./SearchInput";
 

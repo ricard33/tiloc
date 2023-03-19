@@ -2,14 +2,11 @@ import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
-import { Button, Toolbar } from "@mui/material";
-import { lighten } from '@mui/material/styles';
+import { Button, Toolbar, Tooltip, IconButton, Typography } from "@mui/material";
+import { lighten } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import Typography from "@mui/material/Typography";
 import { NavLink } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({

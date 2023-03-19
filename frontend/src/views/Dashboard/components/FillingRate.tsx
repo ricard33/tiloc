@@ -14,7 +14,8 @@ import {
   Divider,
   FormControlLabel,
   Radio,
-  RadioGroup
+  RadioGroup,
+  FormControl,
 } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useDispatch } from "react-redux";
@@ -22,7 +23,6 @@ import palette from "../../../theme/palette";
 import { useTranslation } from "react-i18next";
 import { TooltipItem } from "chart.js";
 import { formatCurrency } from "../../../common/intlUtils";
-import FormControl from "@mui/material/FormControl";
 import { useListLodgingsQuery } from "../../../services/api";
 import DateRangeSelector from "../../../components/DateRangeSelector";
 import { addMonths, addYears, endOfMonth, endOfYear, startOfMonth, startOfYear, subYears } from "date-fns";

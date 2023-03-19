@@ -1,13 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Button from "@mui/material/Button";
-import DialogTitle from "@mui/material/DialogTitle";
-import Dialog from "@mui/material/Dialog";
 import { useTranslation } from "react-i18next";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
 import Upload from "./Upload";
+
+import {
+  Button,
+  DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material';
 
 export default function BookingsImportDialog(props) {
   const { onClose, open } = props;

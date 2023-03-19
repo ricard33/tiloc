@@ -4,7 +4,6 @@ import { useConfirm } from "../libs/MuiConfirm";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../common/dateUtils";
 import { parseISO } from "date-fns";
-import IconButton from "@mui/material/IconButton";
 import { AddCircle as AddIcon } from "@mui/icons-material";
 import PaymentDialog from "./PaymentDialog";
 import { Payment, User } from "../types";
@@ -19,6 +18,7 @@ import { fetchErrorDecode } from "../common/apiUtils";
 import { shiftUTCDateToLocalDate } from "../common/tzUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { IconButton } from '@mui/material';
 
 type PaymentListProps = {
   bookingId: number;

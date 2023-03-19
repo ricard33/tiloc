@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import { ContractTemplatesTable, ContractTemplatesToolbar } from "./components";
 import { useNavigate } from "react-router-dom";
 import { useListContractTemplatesQuery } from "../../../services/api";
 import Page from "../../../layouts/Main/Page";
+
+import { Backdrop, CircularProgress } from '@mui/material';
 
 const useStyles = makeStyles(theme => ({
   content: {

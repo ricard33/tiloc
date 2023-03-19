@@ -1,19 +1,26 @@
 import React from "react";
-import { Table, TableBody, TableCell, TableFooter, TextField, Theme } from "@mui/material";
-import TableRow from "@mui/material/TableRow";
-import IconButton from "@mui/material/IconButton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TextField,
+  Theme,
+  TableRow,
+  IconButton,
+  InputAdornment,
+  FormControlLabel,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { Controller, FieldArrayWithId, useFieldArray } from "react-hook-form";
-import InputAdornment from "@mui/material/InputAdornment";
 import { formatCurrency } from "../../common/intlUtils";
 import { Service } from "../../types";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
 
 
 const useStyles = makeStyles((theme: Theme) => ({

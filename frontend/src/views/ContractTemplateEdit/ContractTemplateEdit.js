@@ -1,25 +1,27 @@
-import React, { useEffect, useState, Suspense } from "react";
-import { makeStyles } from "@mui/styles";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "@mui/material/Button";
+import { DeleteForever as DeleteIcon, PictureAsPdf as PdfIcon, Save as SaveIcon } from "@mui/icons-material";
 import {
-  DeleteForever as DeleteIcon,
-  PictureAsPdf as PdfIcon,
-  Save as SaveIcon
-} from "@mui/icons-material";
-import { Grid, TextField } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
+} from "@mui/material";
 import {
-  useCreateContractTemplateMutation, useDeleteContractTemplateMutation,
+  useCreateContractTemplateMutation,
+  useDeleteContractTemplateMutation,
   useGetContractTemplateQuery,
-  useListLodgingsQuery, useUpdateContractTemplateMutation
+  useListLodgingsQuery,
+  useUpdateContractTemplateMutation
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
@@ -29,47 +31,9 @@ import Page from "../../layouts/Main/Page";
 import RichTextEditor from "../../components/RichTextEditor/RichTextEditor";
 
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex",
-    flexFlow: "column"
-  },
-  content: {
-    marginTop: theme.spacing(2)
-  },
-  formControl: {
-    width: "100%"
-  },
-  flexBoxAlignLeft: {
-    display: "flex",
-    alignItems: "baseline"
-    // justifyContent: "stretch"
-  },
-  flexBoxStretched: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between"
-  },
-  spacer: {
-    flexBasis: "2em"
-  },
-  button: {
-    margin: theme.spacing(1)
-  },
-  deleteButton: {
-    color: "red",
-    margin: theme.spacing(1)
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  }
-}));
-
 const ContractTemplateEdit = (/*props*/) => {
   let { templateId } = useParams();
   templateId = Number(templateId);
-  const classes = useStyles();
   const { t } = useTranslation();
   const {
     data: template,
@@ -153,7 +117,7 @@ const ContractTemplateEdit = (/*props*/) => {
         if (!template || !template.id) {
           console.debug("change url");
           templateId = data.id;
-          navigate(`/settings/contract-templates/${templateId}`, {replace: true});
+          navigate(`/settings/contract-templates/${templateId}`, { replace: true });
         }
         showSuccess(t("Template saved"));
         if (callback) callback(submittedTemplate);
@@ -163,8 +127,8 @@ const ContractTemplateEdit = (/*props*/) => {
 
 
   return (
-    <Page className={classes.root}>
-      <Backdrop className={classes.backdrop} open={typeof content === "undefined"}>
+    <Page sx={{ display: "flex", flexFlow: "column" }}>
+      <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, color: "#fff" }} open={typeof content === "undefined"}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
@@ -175,49 +139,46 @@ const ContractTemplateEdit = (/*props*/) => {
       {/*  {t("The model contract is provided as an example only and does not replace legal advice or professional assistance. " +*/}
       {/*    "No legal or other liability is accepted by the software publisher.")}*/}
       {/*</Alert>*/}
-      <Grid
+      <Stack
         style={{ flex: "1 1 auto" }}
-        container
         spacing={1}
       >
-        <Grid item xs={12}>
+        <Box>
           <TextField
             id="template-name" name="templateName" label={t("Template name")}
             value={name}
             onChange={(event) => setName(event.target.value)}
             fullWidth
           />
-        </Grid>
-        <Grid item xs={12}>
+        </Box>
+        <Box>
           {template &&
-          <Typography variant="caption" display="block" gutterBottom>
-            {t("Template saved {{modified_date}}.",
-              { modified_date: formatDistanceToNow(parseISO(template.modified)) })}
-          </Typography>
+            <Typography variant="caption" display="block" gutterBottom>
+              {t("Template saved {{modified_date}}.",
+                { modified_date: formatDistanceToNow(parseISO(template.modified)) })}
+            </Typography>
           }
-        </Grid>
-        <Grid item xs={12}>
-          <Suspense fallback={<div>{t("Loading...")}</div>}>
-            {typeof content !== "undefined" &&
+        </Box>
+        <Box sx={{flex: 1, background: "white", maxHeight: "400px"}}>
+          {typeof content !== "undefined" &&
             <RichTextEditor
               content={content}
               onChange={onChange}
             />}
-          </Suspense>
-        </Grid>
-        <Grid item container xs={12} justifyContent="space-between" alignItems="flex-start">
+        </Box>
+        <Grid container justifyContent="space-between" alignItems="flex-start" style={{flex: 0}}>
           <Grid item>
             {template && template.id &&
-            <Button
-              type="button"
-              className={classes.deleteButton}
-              color="secondary"
-              startIcon={<DeleteIcon />}
-              onClick={onDelete}
-            >{t("Delete")}</Button>}
+              <Button
+                type="button"
+                sx={{ color: "red", margin: (theme) => theme.spacing(1) }}
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={onDelete}
+              >{t("Delete")}</Button>}
           </Grid>
           <Grid item>
-            <FormControl className={classes.formControl} variant="outlined">
+            <FormControl sx={{ width: "100%" }} variant="outlined">
               <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
               <Select
                 name="lodging_id"
@@ -235,7 +196,7 @@ const ContractTemplateEdit = (/*props*/) => {
             </FormControl>
             <Button
               type="button"
-              className={classes.button}
+              sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<PdfIcon />}
               onClick={makePDF}
               disabled={!lodgingId}
@@ -243,7 +204,7 @@ const ContractTemplateEdit = (/*props*/) => {
             >{t("PDF")}</Button>
             <Button
               type="button"
-              className={classes.button}
+              sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
               disabled={!lodgingId}
@@ -255,20 +216,20 @@ const ContractTemplateEdit = (/*props*/) => {
             <Button
               type="submit"
               color="primary"
-              className={classes.button}
+              sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<SaveIcon />}
               onClick={onSave}
             >{t("Save")}</Button>
             <Button
               type="submit"
               color="primary"
-              className={classes.button}
+              sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<SaveIcon />}
               onClick={onSaveAndClose}
             >{t("Save and Close")}</Button>
           </Grid>
         </Grid>
-      </Grid>
+      </Stack>
     </Page>
   );
 };

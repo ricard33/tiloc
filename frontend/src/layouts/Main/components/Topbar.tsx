@@ -2,7 +2,20 @@ import React, { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
-import { AppBar, AppBarProps, Avatar, Badge, Hidden, IconButton, Theme, Toolbar } from "@mui/material";
+import {
+  AppBar,
+  AppBarProps,
+  Avatar,
+  Badge,
+  Hidden,
+  IconButton,
+  Theme,
+  Toolbar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import InputIcon from "@mui/icons-material/Input";
@@ -10,10 +23,6 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoTiLoc from "../../../assets/images/logos/logo-tiloc.png";
 import { useDispatch, useSelector } from "react-redux";
 import { getGravatarUrl } from "../../../components/Gravatar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import { useTranslation } from "react-i18next";
 import { auth } from "../../../actions";
 import { useLogoutMutation } from "../../../services/api";
