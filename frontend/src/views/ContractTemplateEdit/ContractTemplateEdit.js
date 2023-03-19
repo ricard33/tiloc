@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { DeleteForever as DeleteIcon, PictureAsPdf as PdfIcon, Save as SaveIcon } from "@mui/icons-material";
@@ -28,8 +28,8 @@ import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
-import RichTextEditor from "../../components/RichTextEditor/RichTextEditor";
 
+const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 const ContractTemplateEdit = (/*props*/) => {
   let { templateId } = useParams();
@@ -51,7 +51,7 @@ const ContractTemplateEdit = (/*props*/) => {
 
   // console.assert(!!templateId, "Template id not initialized");
 
-  console.log(isLoading, content);
+  // console.log(isLoading, content);
   useEffect(() => {
     if (template) {
       setName(template.name);
@@ -159,14 +159,16 @@ const ContractTemplateEdit = (/*props*/) => {
             </Typography>
           }
         </Box>
-        <Box sx={{flex: 1, background: "white", maxHeight: "400px"}}>
-          {typeof content !== "undefined" &&
-            <RichTextEditor
-              content={content}
-              onChange={onChange}
-            />}
+        <Box sx={{ flex: 1, background: "white", maxHeight: "400px" }}>
+          <Suspense fallback={<div>{t("Loading...")}</div>}>
+            {typeof content !== "undefined" &&
+              <RichTextEditor
+                content={content}
+                onChange={onChange}
+              />}
+          </Suspense>
         </Box>
-        <Grid container justifyContent="space-between" alignItems="flex-start" style={{flex: 0}}>
+        <Grid container justifyContent="space-between" alignItems="flex-start" style={{ flex: 0 }}>
           <Grid item>
             {template && template.id &&
               <Button

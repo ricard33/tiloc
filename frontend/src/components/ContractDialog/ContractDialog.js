@@ -32,7 +32,8 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
-import RichTextEditor from "../RichTextEditor/RichTextEditor";
+
+const RichTextEditor = React.lazy(() => import("../Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {

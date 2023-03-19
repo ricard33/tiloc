@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ti-gecko/tiloc-ckeditor5/build/ckeditor";  // import symbol ClassicEditor
+import CustomEditor from "@ti-gecko/tiloc-ckeditor5/build/ckeditor";  // import symbol ClassicEditor
+// import DocumentEditor from "@ckeditor/ckeditor5-build-decoupled-document";
 // import CustomFigureAttributes from 'tiloc-ckeditor5/plugins/custom-figure-attributes';
 // import AllowImageWidth from 'tiloc-ckeditor5/plugins/image_width_and_height';
 import "./Editor.css";
 
 const Editor = props => {
-  const { content, onChange } = props;
+  const { content, onChange, readOnly } = props;
   let editorInstance = null;
 
   useEffect(() => {
@@ -33,14 +34,15 @@ const Editor = props => {
             toolbarContainer.appendChild(
               editor.ui.view.toolbar.element);
           }}
+          readOnly={readOnly}
           onChange={_onChange}
           // eslint-disable-next-line no-undef
-          editor={ClassicEditor}
+          editor={CustomEditor}
           data={content}
           config={{
             // extraPlugins: [CustomFigureAttributes,],
             // extraPlugins: [AllowImageWidth],
-            removePlugins: ["ImageResize"],
+            // removePlugins: ["ImageResize"],
             toolbar: {
               items: [
                 "heading",
@@ -55,13 +57,13 @@ const Editor = props => {
                 "fontFamily",
                 "fontSize",
                 "fontColor",
-                "removeFormat",
+                // "removeFormat",
                 "|",
                 "indent",
                 "outdent",
                 "|",
                 // "imageUpload",
-                "blockQuote",
+                // "blockQuote",
                 "insertTable",
                 "undo",
                 "redo",
@@ -153,7 +155,8 @@ const Editor = props => {
 
 Editor.propTypes = {
   content: PropTypes.string,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  readOnly: PropTypes.bool,
 };
 
 export default Editor;

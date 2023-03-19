@@ -1,8 +1,9 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Path, useFormContext } from "react-hook-form";
 import { FieldValues } from "react-hook-form/dist/types/fields";
-import RichTextEditor from "../RichTextEditor/RichTextEditor";
+import { useTranslation } from "react-i18next";
 
+const RichTextEditor = React.lazy(() => import("../Editor"));
 
 type RichTextEditorElementProps<T extends FieldValues = FieldValues> = {
   name: Path<T>,
@@ -14,29 +15,31 @@ type RichTextEditorElementProps<T extends FieldValues = FieldValues> = {
 const RichTextEditorElement: React.FC<RichTextEditorElementProps> = <TFieldValues extends FieldValues = FieldValues>({
   name, readOnly = false, placeholder, onChange, ...props
 }: RichTextEditorElementProps<TFieldValues>) => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const { setValue, getValues } = useFormContext();
   const initialValue = getValues(name);
 
 
   return (
-    <RichTextEditor
-      {...props}
-      content={initialValue}
-      onChange={(content) => {
-        if (initialValue !== content) {
-          setValue(name as string, content, {
-            shouldDirty: true
-            // shouldTouch: true
-          });
-          if (typeof onChange === "function") {
-            onChange(content);
+    <Suspense fallback={<div>{t("Loading...")}</div>}>
+      <RichTextEditor
+        {...props}
+        content={initialValue}
+        onChange={(content: string) => {
+          if (initialValue !== content) {
+            setValue(name as string, content, {
+              shouldDirty: true
+              // shouldTouch: true
+            });
+            if (typeof onChange === "function") {
+              onChange(content);
+            }
           }
-        }
-      }}
-      readOnly={readOnly}
-      placeholder={placeholder}
-    />
+        }}
+        readOnly={readOnly}
+        // placeholder={placeholder}
+      />
+    </Suspense>
     // <Editor
     //   {...props}
     //   toolbarCustomButtons={[

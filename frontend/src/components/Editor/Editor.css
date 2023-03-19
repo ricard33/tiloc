@@ -4,6 +4,7 @@
 
     /* Set vertical boundaries for the document editor. */
     max-height: 400px;
+    height: 100%;
 
     /* This element is a flex container for easier rendering. */
     display: flex;
@@ -31,6 +32,8 @@
 .document-editor__editable-container {
     padding: calc( 2 * var(--ck-spacing-large) );
     background: var(--ck-color-base-foreground);
+    height: 100%;
+
 
     /* Make it possible to scroll the "page" of the edited content. */
     overflow-y: scroll;
@@ -38,6 +41,7 @@
 
 .document-editor__editable-container .ck-editor__editable {
     /* Set the dimensions of the "page". */
+    /*height: 100%;*/
     /*width: 21cm;*/
     /*min-height: 29cm;*/
 

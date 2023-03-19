@@ -320,6 +320,7 @@ class Booking(models.Model):
                 url_server + self.lodging.owner.signature.url
             )
 
+            page_break = '<div style="display: block; page-break-before: always;"></div>'
             content = render_template(
                 self.lodging.contract_template.content,
                 {
@@ -336,6 +337,7 @@ class Booking(models.Model):
                     "url_server": url_server,
                     "date": date.today(),
                     "signature": signature_img,
+                    "page_break": page_break,
                 },
             )
             page_break = '<div style="display: block; page-break-before: always;"></div>'
