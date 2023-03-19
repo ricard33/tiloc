@@ -1,0 +1,57 @@
+.quill {
+    height: 100%;
+}
+.ql-container {
+    height: calc(100% - 42px);
+    //max-height: calc(100% - 42px);
+}
+
+.ql-formats {
+
+    button.ql-page-break {
+        position: relative;
+        top: -6px;
+        margin-left: 0px;
+        margin-top: 2px;
+        width: 15px;
+        height: 6px;
+        border-right: solid 1px #333333;
+        border-bottom: solid 1px #333333;
+        border-left: solid 1px #333333;
+        border-radius: 0 0 1px 1px;
+    }
+
+    .ql-page-break:before, .ql-page-break:after {
+        content: '';
+        position: relative;
+        display: block;
+    }
+
+    .ql-page-break:before {
+        left: -6px;
+        top: 9px;
+        width: 13px;
+        height: 6px;
+        border-top: solid 1px #333333;
+        border-left: solid 1px #333333;
+        border-right: solid 1px #333333;
+        border-radius: 1px 1px 0 0;
+    }
+
+    .ql-page-break:after {
+        width: 17px;
+        height: 0;
+        left: -7px;
+        top: -1px;
+        border-top: dotted 1px #333333;
+    }
+
+    .ql-page-break.filled {
+        background-color: #333333;
+    }
+
+    .ql-page-break.filled:before {
+        background-color: #333333;
+    }
+
+}

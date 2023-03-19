@@ -1,68 +1,16 @@
-import React from "react";
-import { ContentBlock, Editor, RawDraftContentState } from "react-draft-wysiwyg";
-import { ContentState, convertToRaw, RawDraftEntity } from "draft-js";
-import "../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import draftToHtml from "draftjs-to-html";
-import htmlToDraft from "./html-to-draftjs";
-import AtomicBlock from "./components/AtomicBlock";
-import PageBreakOption from "./components/PageBreakOption";
+import React, { useCallback, useEffect, useRef } from "react";
+import ReactQuill from "react-quill-v2.0";
+import "react-quill-v2.0/dist/quill.snow.css";
+import "quill-better-table/dist/quill-better-table.css";
+import Quill from "quill";
+import PageBreak from "./modules/PageBreak";
+// @ts-ignore
+import QuillBetterTable from "quill-better-table";
+import "./RichTextEditor.scss";
 
+Quill.register(PageBreak);
+Quill.register("modules/better-table", QuillBetterTable);
 
-function myBlockRenderer(contentBlock: ContentBlock) {
-  const type = contentBlock.getType();
-  // console.log("type=", type);
-  if (type === "atomic") {
-    return {
-      component: AtomicBlock,
-      editable: false,
-      props: {
-        // foo: "bar"
-      }
-    };
-  }
-}
-
-function uploadImageCallBack(file: string) {
-  return new Promise(
-    (resolve, reject) => {
-      const xhr = new XMLHttpRequest(); // eslint-disable-line no-undef
-      xhr.open("POST", "https://api.imgur.com/3/image");
-      xhr.setRequestHeader("Authorization", "Client-ID 8d26ccd12712fca");
-      const data = new FormData(); // eslint-disable-line no-undef
-      data.append("image", file);
-      xhr.send(data);
-      xhr.addEventListener("load", () => {
-        const response = JSON.parse(xhr.responseText);
-        resolve(response);
-      });
-      xhr.addEventListener("error", () => {
-        const error = JSON.parse(xhr.responseText);
-        reject(error);
-      });
-    }
-  );
-}
-
-export function customChunkRenderer(nodeName: string, node: HTMLElement): RawDraftEntity | undefined {
-  console.log(nodeName, node.className);
-  if (nodeName === "div" && node.className === "page-break") {
-    return {
-      "type": "PAGE_BREAK",
-      "mutability": "IMMUTABLE",
-      "data": {}
-    };
-  }
-  return undefined;
-}
-
-export function customEntityTransform(entity: RawDraftEntity, text: string): string | undefined {
-  if (entity.type === "PAGE_BREAK") {
-    return "<div\n" +
-      "    class=\"page-break\"\n" +
-      "    style={{ pageBreakAfter:\"always\" }}\n" +
-      "  > </div>";
-  }
-}
 
 type RichTextEditorProps = {
   content: string,
@@ -75,40 +23,88 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   content, readOnly = false, placeholder, onChange, ...props
 }: RichTextEditorProps) => {
   // const { t } = useTranslation();
-  let initialContentState: RawDraftContentState;
-  try {
-    // const contentBlock = htmlToDraft(content);
-    const { contentBlocks, entityMap } = htmlToDraft(content, customChunkRenderer);
-    initialContentState = convertToRaw(ContentState.createFromBlockArray(contentBlocks, entityMap));
-    console.log("Converted to", initialContentState);
-  } catch (ex) {
-    console.error(ex);
-    initialContentState = convertToRaw(ContentState.createFromText("Loading content error..."));
-  }
+  // const [value, setValue] = useState(content);
+  let quill: Quill | null = null; // Quill instance
+  const reactQuillRef = useRef<ReactQuill>(null); // ReactQuill component
+
+  useEffect(() => {
+    if (reactQuillRef.current === null || typeof reactQuillRef.current.getEditor !== "function") return;
+    quill = reactQuillRef.current.getEditor();
+  }, [reactQuillRef.current]);
+
+  const insertPageBreak = () => {
+    if (reactQuillRef.current === null || typeof reactQuillRef.current.getEditor !== "function") return;
+    const quill = reactQuillRef.current.getEditor();
+    if (quill === null) return;
+    let range = quill.getSelection(true);
+    quill.insertText(range.index, "\n", "user");
+    quill.insertEmbed(range.index + 1, "page-break", true, "user");
+    quill.setSelection(range.index + 2, range.length, "silent");
+  };
+
+  const insertTable = () => {
+    if (reactQuillRef.current === null || typeof reactQuillRef.current.getEditor !== "function") return;
+    const quill = reactQuillRef.current.getEditor();
+    if (quill === null) return;
+    let tableModule = quill.getModule("better-table");
+    tableModule.insertTable(3, 3);
+  };
+
+  const toolbarOptions = {
+    container: [
+      ["bold", "italic", "underline", "strike"],        // toggled buttons
+      ["blockquote", "code-block"
+      ],
+
+      [{ "header": 1 }, { "header": 2 }],               // custom button values
+      [{ "list": "ordered" }, { "list": "bullet" }],
+      [{ "script": "sub" }, { "script": "super" }],      // superscript/subscript
+      [{ "indent": "-1" }, { "indent": "+1" }],          // outdent/indent
+      [{ "direction": "rtl" }],                         // text direction
+
+      [{ "size": ["small", false, "large", "huge"] }],  // custom dropdown
+      [{ "header": [1, 2, 3, 4, 5, 6, false] }],
+
+      [{ "color": [] }, { "background": [] }],          // dropdown with defaults from theme
+      [{ "font": [] }],
+      [{ "align": [] }],
+      [{
+        "better-table": []
+      }],
+      ["page-break"],
+
+      ["clean"]                                         // remove formatting button
+    ],
+    handlers: {
+      "table": useCallback(insertTable, []),
+      "page-break": useCallback(insertPageBreak, [])
+      // pagebreak(value: any) {
+      //   alert("click" + value);
+      // }
+    }
+  };
 
   return (
-    <Editor
-      {...props}
-      toolbarCustomButtons={[
-        <PageBreakOption />
-      ]}
-      toolbar={{
-        image: {
-          uploadCallback: uploadImageCallBack,
-          alt: { present: true, mandatory: false }
-        }
-      }}
-      defaultContentState={initialContentState}
-      onContentStateChange={(contentState) => {
-        // console.log(contentState);
-        const newContent = draftToHtml(contentState, undefined, undefined, customEntityTransform);
-        if (newContent !== content) {
-          if (typeof onChange === "function") {
-            onChange(newContent);
+    <ReactQuill
+      ref={reactQuillRef}
+      theme="better-table-snow" value={content} onChange={onChange}
+      modules={{
+        toolbar: toolbarOptions,
+        table: false, // disable table module
+        "better-table": {
+          operationMenu: {
+            //   items: {
+            //     unmergeCells: {
+            //       text: "Another unmerge cells name"
+            //     }
+            //   }
           }
+        },
+        keyboard: {
+          bindings: QuillBetterTable.keyboardBindings
         }
       }}
-      customBlockRenderFunc={myBlockRenderer}
+      {...props}
     />
   );
 };

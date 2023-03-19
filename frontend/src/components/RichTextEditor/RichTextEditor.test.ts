@@ -2,7 +2,7 @@ import draftToHtml from "draftjs-to-html";
 import htmlToDraft0 from "html-to-draftjs";
 import htmlToDraft from "./html-to-draftjs";
 import { ContentState, convertToRaw, RawDraftContentState } from "draft-js";
-import { customChunkRenderer, customEntityTransform } from "./RichTextEditor";
+import { customChunkRenderer, customEntityTransform } from "./RichTextEditorDraftJS";
 
 describe("HTML conversions", () => {
   it("should load page break", () => {
