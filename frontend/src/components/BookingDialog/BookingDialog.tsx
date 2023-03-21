@@ -32,7 +32,8 @@ import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
 import {
-  useCreateBookingMutation, useGetOwnerQuery,
+  useCreateBookingMutation,
+  useGetOwnerQuery,
   useListBookingChannelsQuery,
   useListBookingStatusesQuery,
   useUpdateBookingMutation
@@ -44,6 +45,7 @@ import BookingActions from "../BookingActions";
 import { Booking, Lodging, Service } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 
 
 type BookingDialogProps = {
@@ -89,15 +91,16 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   const initialState = initializeDefaults(booking);
 
-  const form = useForm<Booking>({
+  const formContext = useForm<Booking>({
     defaultValues: initialState
   });
-  const { register, control, setValue, getValues, watch, formState } = form;
+  const { register, control, setValue, getValues, watch, formState } = formContext;
   const { errors, isDirty /*isValid*/ } = formState;
   const { dirtyFields } = useFormState({
     control
   });
 
+  console.log("ERRORS", errors);
   usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
 
@@ -140,7 +143,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     //   initialState.status = bookingStatuses[0];
     // }
     // @ts-ignore
-    initialState.lodging_id = booking.lodging_id || '';
+    initialState.lodging_id = booking.lodging_id || "";
     initialState.guest_name = booking.guest_name || "";
     initialState.guest_contact = booking.guest_contact || "";
     initialState.guest_address = booking.guest_address || "";
@@ -166,7 +169,16 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     return initialState;
   }
 
+  /**
+   * Handle values AFTER validation. This fonction can't change the type or the value, except using setValue().
+   * NOTE: this is true when using rhf-mui fields only.
+   * TODO: upgrade all input to rhf-mui.
+   * @param fieldName
+   * @param value
+   */
   function handleChange(fieldName: string, value: string | number | boolean) {
+    // here, value is always a string or a boolean. Why ?
+    // console.log("VALUE", fieldName, value, typeof value, parseFloat(value as string), Number(value));
     switch (fieldName) {
       case "status_id": {
         return value;
@@ -194,21 +206,21 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         onDurationChange(duration);
         return duration;
       }
-      case "daily_rate": {
-        value = Number(value);
-        // const formValues = getValues();
-        const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], depositPercent);
-        setMultipleValues(priceObj);
-        // setBalance(priceObj.price - priceObj.deposit);
-        return value;
-      }
+      case "daily_rate":
+        value = parseFloat(value as string);
+        if (!isNaN(value)) {
+          const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], depositPercent);
+          setMultipleValues(priceObj);
+        }
+        break;
       case "price":
-        value = Number(value);
-        setValue("daily_rate", DecimalPrecision.round(value / getValues().duration));
-        setValue("price", value);
-        setValue("is_flat_rate", true);
-        // setBalance(value - getValues().deposit);
-        return value;
+        value = parseFloat(value as string);
+        if (!isNaN(value)) {
+          setValue("daily_rate", DecimalPrecision.round(value / getValues().duration));
+          setValue("price", value);
+          setValue("is_flat_rate", true);
+        }
+        break;
       case "is_flat_rate":
         if (value)
           return true;
@@ -217,34 +229,27 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date,
             formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent);
           setMultipleValues(priceObj);
-          // setBalance(priceObj.price - priceObj.deposit);
-          // setValue('is_flat_rate', false);
           return false;
         }
-      case "deposit":
-        if (!value) {
-          // setBalance(0);
-        } else {
-          let deposit = Number(value);
-          const price = getValues().price ?? 0;
-          if (deposit && deposit >= 0) {
-            if (deposit > price)
-              deposit = price;
-            // setBalance(price - deposit);
-            return deposit;
-          }
-        }
-        return 0;
-      case "commission_fees":
-        if (!value) {
-          // setBalance(0);
-        } else {
-          let commission_fees = Number(value);
-          if (commission_fees && commission_fees >= 0) {
-            return commission_fees;
-          }
-        }
-        return 0;
+      // case "deposit":
+      //   if (value) {
+      //     let deposit = Number(value);
+      //     const price = getValues().price ?? 0;
+      //     if (deposit && deposit >= 0) {
+      //       if (deposit > price)
+      //         deposit = price;
+      //       return deposit;
+      //     }
+      //   }
+      //   return 0;
+      // case "commission_fees":
+      //   if (value) {
+      //     let commission_fees = Number(value);
+      //     if (commission_fees && commission_fees >= 0) {
+      //       return commission_fees;
+      //     }
+      //   }
+      //   return 0;
       case "adults":
       case "children":
       case "babies":
@@ -307,7 +312,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       if (isDirty) {
         unsavedChangesConfirm()
           .then(() => {
-            form.handleSubmit((data: Booking) => saveBooking(data, submittedBooking => onOpenContract(submittedBooking)));
+            formContext.handleSubmit((data: Booking) => saveBooking(data, submittedBooking => onOpenContract(submittedBooking)));
           });
       } else
         onOpenContract(booking);
@@ -385,7 +390,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       </DialogTitle>
       <DialogContent dividers>
         {booking &&
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <FormContainer
+            formContext={formContext}
+            onSuccess={onSubmit}
+          >
             <input
               type="hidden"
               {...register("id")}
@@ -617,48 +625,42 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         {!isFlatRate &&
                           <Grid item sm={7} xs={12} className="flex-box-stretched">
                             <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
-                            <Controller
-                              name="daily_rate"
+                            <TextFieldElement
                               control={control}
-                              rules={{ min: 1, required: true }}
-                              render={({ field }) =>
-                                <TextField
-                                  className="price-input"
-                                  label={t("Daily rate")}
-                                  error={!!errors.daily_rate}
-                                  margin="dense"
-                                  variant={variant}
-                                  InputProps={{
-                                    endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                                    type: "number"
-                                  }}
-                                  {...field}
-                                  onChange={event => field.onChange(handleChange(event.target.name, event.target.value))}
-                                />}
+                              name={"daily_rate"}
+                              label={t("Daily rate")}
+                              className="price-input"
+                              type={"number"}
+                              required
+                              validation={{
+                                min: { value: 0, message: t("Rate can't be negative") },
+                                validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                              }}
+                              InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                              margin="dense"
+                              variant={variant}
+                              onChange={event => handleChange(event.target.name, event.target.value)}
                             />
                             <div className="spacer" />
                             =
                             <div className="spacer" />
                           </Grid>}
                         <Grid item sm={5} xs={12} className="flex-box-align-left">
-                          <Controller
+                          <TextFieldElement
                             control={control}
-                            name="price"
-                            rules={{ required: true }}
-                            render={({ field }) =>
-                              <TextField
-                                className="price-input"
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                                  type: "number"
-                                }}
-                                label={t("Total")}
-                                margin="dense"
-                                required
-                                variant={variant}
-                                {...field}
-                                onChange={event => field.onChange(handleChange(event.target.name, event.target.value))}
-                              />}
+                            name={"price"}
+                            label={t("Total")}
+                            className="price-input"
+                            type={"number"}
+                            required
+                            validation={{
+                              min: { value: 0, message: t("Price can't be negative") },
+                              validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                            }}
+                            InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                            margin="dense"
+                            variant={variant}
+                            onChange={event => handleChange(event.target.name, event.target.value)}
                           />
                           <div className="spacer" />
                           <FormControlLabel
@@ -688,10 +690,14 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         </Typography>
                       </Grid>
                       <Grid item xs={12} className="flex-box-align-left">
-                        <Controller
+                        <TextFieldElement
                           control={control}
-                          name="deposit"
-                          rules={{
+                          name={"deposit"}
+                          label={depositLabel}
+                          className="price-input"
+                          type={"number"}
+                          // required
+                          validation={{
                             min: {
                               value: 0,
                               message: t("{{depositLabel}} can't be negative", { depositLabel: depositLabel })
@@ -699,23 +705,15 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             max: {
                               value: price ?? 0,
                               message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
+                            },
+                            validate: {
+                              validateNumber: (v) => !isNaN(parseFloat(v))
                             }
                           }}
-                          render={({ field }) =>
-                            <TextField
-                              error={!!errors.deposit}
-                              helperText={errors.deposit && errors.deposit.message}
-                              className="price-input"
-                              InputProps={{
-                                endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                                type: "number"
-                              }}
-                              label={depositLabel}
-                              margin="dense"
-                              variant={variant}
-                              {...field}
-                              onChange={event => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                            />}
+                          InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                          margin="dense"
+                          variant={variant}
+                          onChange={event => handleChange(event.target.name, event.target.value)}
                         />
                         <div className="spacer" />
                         <Typography>
@@ -724,27 +722,23 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       </Grid>
                       { /* commission fees */}
                       <Grid item xs={12} className="flex-box-align-left">
-                        <Controller
+                        <TextFieldElement
                           control={control}
-                          name="commission_fees"
-                          rules={{
-                            min: { value: 0, message: t("Commission fees can't be negative") }
+                          name={"commission_fees"}
+                          label={t("Commission fees")}
+                          className="price-input"
+                          type={"number"}
+                          // required
+                          validation={{
+                            min: { value: 0, message: t("Commission fees can't be negative") },
+                            validate: {
+                              validateNumber: (v) => !isNaN(parseFloat(v))
+                            }
                           }}
-                          render={({ field }) =>
-                            <TextField
-                              error={!!errors.commission_fees}
-                              helperText={errors.commission_fees && errors.commission_fees.message}
-                              className="price-input"
-                              InputProps={{
-                                endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                                type: "number"
-                              }}
-                              label={t("Commission fees")}
-                              margin="dense"
-                              variant={variant}
-                              {...field}
-                              onChange={event => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                            />}
+                          InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                          margin="dense"
+                          variant={variant}
+                          onChange={event => handleChange(event.target.name, event.target.value)}
                         />
                       </Grid>
                       {/* number of persons */}
@@ -824,7 +818,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     <Grid container spacing={1}>
                       <Grid item xs={12}>
                         {allOptions &&
-                          <OptionsList form={form} duration={duration} allOptions={allOptions} variant={variant} />}
+                          <OptionsList form={formContext} duration={duration} allOptions={allOptions} variant={variant} />}
                       </Grid>
                     </Grid>
                   </AccordionDetails>
@@ -934,13 +928,13 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                   </Accordion>
                 </Grid>}
             </Grid>
-          </form>
+          </FormContainer>
         }
       </DialogContent>
       <DialogActions>
         <BookingActions
           booking={booking} onClose={onCloseHandler} onDelete={onDelete}
-          onSave={form.handleSubmit(onSubmit)}
+          onSave={formContext.handleSubmit(onSubmit)}
           onOpenContract={() => openContract()}
           onCancelBooking={onCancelBooking}
           onUncancelBooking={onUncancelBooking}

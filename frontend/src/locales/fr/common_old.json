@@ -33,5 +33,6 @@
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "Cancelled": "Annulée",
-  "Modify description": "Modifier la description"
+  "Modify description": "Modifier la description",
+  "Page break": "Séparation de page"
 }

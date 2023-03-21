@@ -1,26 +1,24 @@
 import React from "react";
 import {
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableFooter,
-  TextField,
-  Theme,
   TableRow,
-  IconButton,
-  InputAdornment,
-  FormControlLabel,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  Select,
+  Theme
 } from "@mui/material";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
-import { Controller, FieldArrayWithId, useFieldArray } from "react-hook-form";
+import { FieldArrayWithId, useFieldArray } from "react-hook-form";
 import { formatCurrency } from "../../common/intlUtils";
 import { Service } from "../../types";
+import { CheckboxElement, TextFieldElement } from "react-hook-form-mui";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -77,7 +75,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
 
 
   function onAddOption(data: any) {
-    if(allOptions) {
+    if (allOptions) {
       console.debug("ADD OPTION", data.target.value);
       const value = Number(data.target.value);
       const option = allOptions.filter((o: Service) => o.id === value)[0];
@@ -112,50 +110,38 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 />
                 {option.designation}</TableCell>
               <TableCell>{option.unit_price && !options[index].is_flat_rate &&
-              <span>{duration}&nbsp;x</span>}</TableCell>
+                <span>{duration}&nbsp;x</span>}</TableCell>
               <TableCell>
                 {option.unit_price &&
-                <Controller
-                  control={control}
-                  name={`options.${index}.unit_price`}
-                  // rules={{ valueAsNumber: true }}
-                  render={({ field }) =>
-                    <TextField
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">€</InputAdornment>,
-                        type: "number"
-                      }}
-                      className={classes.optionPriceInput}
-                      margin="dense"
-                      required
-                      // variant={variant}
-                      {...field}
-                    />}
-                />}
+                  <TextFieldElement
+                    control={control}
+                    name={`options.${index}.unit_price`}
+                    className={classes.optionPriceInput}
+                    type={"number"}
+                    required
+                    validation={{
+                      min: { value: 0, message: t("Can't be negative") },
+                      validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                    }}
+                    InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                    margin="dense"
+                    // variant={variant}
+                  />}
               </TableCell>
               <TableCell>
                 {option.unit_price &&
-                <FormControlLabel
-                  control={
-                    <Controller
-                      control={control}
-                      name={`options.${index}.is_flat_rate`}
-                      defaultValue={option.is_flat_rate}
-                      render={({ field }) =>
-                        <Checkbox
-                          color="primary"
-                          {...field}
-                          checked={field.value}
-                        />}
-                    />
-                  }
-                  label={t<string>("Flat rate")}
-                  labelPlacement="start"
-                />}
+                  <CheckboxElement
+                    control={control}
+                    name={`options.${index}.is_flat_rate`}
+                    label={t<string>("Flat rate")}
+                    defaultValue={option.is_flat_rate}
+                    color="primary"
+                    labelProps={{ labelPlacement: "start" }}
+                  />}
               </TableCell>
               <TableCell>
                 {option.unit_price &&
-                <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
+                  <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
               </TableCell>
               <TableCell>
                 <IconButton

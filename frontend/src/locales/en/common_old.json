@@ -33,5 +33,6 @@
   "week": "week",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "Cancelled": "Cancelled",
-  "Modify description": "Modify description"
+  "Modify description": "Modify description",
+  "Page break": "Page break"
 }

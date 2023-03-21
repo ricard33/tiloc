@@ -37,7 +37,6 @@ const ContractTemplateEdit = (/*props*/) => {
   const { t } = useTranslation();
   const {
     data: template,
-    isLoading
   } = useGetContractTemplateQuery(templateId, { skip: typeof templateId === "undefined" });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const [createContractTemplate] = useCreateContractTemplateMutation();
