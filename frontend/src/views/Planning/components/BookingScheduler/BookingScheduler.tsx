@@ -20,6 +20,7 @@ import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 import clsx from "clsx";
 import useWindowDimensions from "../../../../common/windowDimensions";
 import { Booking, Lodging } from "../../../../types";
+import { PlanningSettings } from "../PlanningSettingsDialog";
 
 const timeSteps = {
   second: 0,
@@ -128,10 +129,7 @@ type Props = {
   onItemDeselected: (booking: Booking) => void,
   onItemSelected: (booking: Booking) => void,
   onOpenBooking: (booking: Booking) => void,
-  settings: {
-    showPaymentStatus: boolean,
-    monthsToDisplay: number,
-  }
+  settings: PlanningSettings,
 };
 
 
@@ -284,6 +282,7 @@ const BookingScheduler: React.FC<Props> = props => {
         onCanvasClick={onCanvasClick}
         minZoom={14 * 86400 * 1000}
         canMove={false}
+        // canSelect={false}
         canChangeGroup={false}
         canResize={false}
         dragSnap={24 * 60 * 60 * 1000}
@@ -374,26 +373,32 @@ const BookingScheduler: React.FC<Props> = props => {
     const { title, ...itemProps } = getItemProps(item.itemProps); // remove the title props
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
 
-    return (
-      <HtmlTooltip title={<BookingQuickView booking={item.booking} />} enterDelay={1000} arrow>
-        <div {...itemProps}>
-          {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
+    function getItem() {
+      return <div {...itemProps}>
+        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
-          <div
-            className="rct-item-content item-content"
-            style={{ maxHeight: `${itemContext.dimensions.height}` }}
-          >
-            <div className="item-title">{itemContext.title}</div>
-            {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 &&
+        <div
+          className="rct-item-content item-content"
+          style={{ maxHeight: `${itemContext.dimensions.height}` }}
+        >
+          <div className="item-title">{itemContext.title}</div>
+          {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 &&
             <EuroIcon
               className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
               style={{ height: `${itemContext.dimensions.height - 2}` }}
             />}
-          </div>
-          {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
         </div>
-      </HtmlTooltip>
-    );
+        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
+      </div>;
+    }
+
+    if(settings.showTooltips)
+      return (
+        <HtmlTooltip title={<BookingQuickView booking={item.booking} />} enterDelay={1000} arrow disableInteractive>
+          {getItem()}
+        </HtmlTooltip>
+      );
+    else return getItem();
   }
 
   // eslint-disable-next-line react/no-multi-comp

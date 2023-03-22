@@ -25,11 +25,13 @@ import Page from "../../layouts/Main/Page";
 import { RootState } from "../../store";
 import { Booking, Lodging, User } from "../../types";
 import { useBookingActions } from "../../common/bookingActions";
+import { useDeviceDetector } from "../../common/useDeviceDetector";
 
 
 const Planning = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const { hasTouchScreen } = useDeviceDetector();
   const query = queryString.parse(location.search);
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
   if (isNaN(requestedDate.valueOf()))
@@ -49,8 +51,10 @@ const Planning = () => {
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [settings, setSettings] = useLocalStorage("planningSettings", {
     showPaymentStatus: true,
-    monthsToDisplay: 12
+    monthsToDisplay: 12,
   });
+  const [showTooltips, setShowTooltips] = useLocalStorage("planning.showTooltips", !hasTouchScreen);
+
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
@@ -97,6 +101,7 @@ const Planning = () => {
     setSettingsOpened(false);
     if (typeof newSettings !== "undefined") {
       setSettings(newSettings);
+      setShowTooltips(newSettings.showTooltips)
     }
   };
 
@@ -216,7 +221,10 @@ const Planning = () => {
       {settingsOpened &&
         <PlanningSettingsDialog
           open={settingsOpened}
-          settings={settings}
+          settings={{
+            ...settings,
+            showTooltips: showTooltips
+          }}
           onClose={onCloseSettings}
         />}
     </Page>

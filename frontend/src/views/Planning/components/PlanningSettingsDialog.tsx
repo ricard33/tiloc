@@ -1,20 +1,13 @@
 import React from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  TextField,
-  Checkbox,
-} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from "@mui/material";
+import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
 
 export type PlanningSettings = {
   showPaymentStatus: boolean;
   monthsToDisplay: number;
+  showTooltips: boolean;
 }
 
 
@@ -27,19 +20,21 @@ type Props = {
 const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings, onClose }: Props) => {
   // const classes = useStyles();
   const { t } = useTranslation();
-  const { handleSubmit, control, formState } = useForm<PlanningSettings>({
+  const formContext = useForm<PlanningSettings>({
     defaultValues: {
       showPaymentStatus: settings.showPaymentStatus,
       monthsToDisplay: settings.monthsToDisplay,
+      showTooltips: settings.showTooltips
     }
   });
+  const { handleSubmit, control, formState } = formContext;
   const { errors } = formState;
 
   const onSubmit: SubmitHandler<PlanningSettings> = data => {
     console.log(data);
     onClose({
       ...data,
-      monthsToDisplay: Number(data.monthsToDisplay),
+      monthsToDisplay: Number(data.monthsToDisplay)
     });
   };
 
@@ -47,50 +42,39 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
     <Dialog open={open} onClose={() => onClose()} aria-labelledby="form-dialog-title" maxWidth="sm">
       <DialogTitle id="form-dialog-title">{t("Planning settings")}</DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControlLabel
-            control={
-              <Controller
-                control={control}
-                name="showPaymentStatus"
-                render={({ field }) =>
-                  <Checkbox
-                    defaultChecked={settings.showPaymentStatus}
-                    {...field}
-                  />}
-              />
-            }
-            label={t<string>("Show payment status on bookings")}
-          />
-          <FormControlLabel
-            control={
-              <Controller
-                control={control}
-                name="monthsToDisplay"
-                defaultValue={settings.monthsToDisplay}
-                rules={{
-                  min: {
-                    value: 1,
-                    message: t("Minimum 1 month")
-                  },
-                  max: {
-                    value: 12,
-                    message: t("Maximum 12 month")
-                  },
-                  // valueAsNumber: true
-                }}
-                render={({ field }) =>
-                  <TextField
-                    error={!!errors.monthsToDisplay}
-                    helperText={errors.monthsToDisplay && errors.monthsToDisplay.message}
-                    InputProps={{ type: "number" }}
-                    {...field}
-                  />}
-              />
-            }
-            label={t<string>("Number of months to display")}
-          />
-        </form>
+        <FormContainer
+          formContext={formContext}
+          // defaultValues={lodging}
+          onSuccess={onSubmit}
+        >
+          <Stack>
+            <CheckboxElement
+              control={control}
+              name="showPaymentStatus"
+              label={t<string>("Show payment status on bookings")}
+              // defaultChecked={settings.showPaymentStatus}
+            />
+            <TextFieldElement
+              control={control}
+              name="monthsToDisplay"
+              label={t<string>("Number of months to display")}
+              // defaultValue={settings.monthsToDisplay}
+              type={"number"}
+              required
+              validation={{
+                min: { value: 1, message: t("Minimum 1 month") },
+                max: { value: 12, message: t("Maximum 12 month") }
+              }}
+            />
+
+            <CheckboxElement
+              control={control}
+              name="showTooltips"
+              label={t<string>("Show booking details on tooltip")}
+            />
+          </Stack>
+
+        </FormContainer>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => onClose()}>
