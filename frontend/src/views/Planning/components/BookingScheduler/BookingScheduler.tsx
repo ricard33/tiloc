@@ -20,7 +20,6 @@ import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
 import clsx from "clsx";
 import useWindowDimensions from "../../../../common/windowDimensions";
 import { Booking, Lodging } from "../../../../types";
-import { PlanningSettings } from "../PlanningSettingsDialog";
 
 const timeSteps = {
   second: 0,
@@ -129,7 +128,9 @@ type Props = {
   onItemDeselected: (booking: Booking) => void,
   onItemSelected: (booking: Booking) => void,
   onOpenBooking: (booking: Booking) => void,
-  settings: PlanningSettings,
+  showPaymentStatus: boolean,
+  showTooltips: boolean,
+  monthsToDisplay: number,
 };
 
 
@@ -137,7 +138,7 @@ const BookingScheduler: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate: _beginDate,
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
-    settings, disabled
+    showPaymentStatus, showTooltips, monthsToDisplay, disabled
   } = props;
   const { width: windowWidth } = useWindowDimensions();
   const isDesktop = windowWidth >= 900;
@@ -318,7 +319,7 @@ const BookingScheduler: React.FC<Props> = props => {
 
   var timelines = [];
 
-  for (var i = 0; i < (settings.monthsToDisplay ?? 12); i += horizontalMonths) {
+  for (var i = 0; i < (monthsToDisplay ?? 12); i += horizontalMonths) {
     var start = add(beginDate, { months: Math.trunc(i), days: 30 * (i % 1) });
     timelines.push(
       <div key={i} className="timeline">
@@ -382,7 +383,7 @@ const BookingScheduler: React.FC<Props> = props => {
           style={{ maxHeight: `${itemContext.dimensions.height}` }}
         >
           <div className="item-title">{itemContext.title}</div>
-          {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 &&
+          {showPaymentStatus && item.booking.price && item.booking.price > 0 &&
             <EuroIcon
               className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
               style={{ height: `${itemContext.dimensions.height - 2}` }}
@@ -392,7 +393,7 @@ const BookingScheduler: React.FC<Props> = props => {
       </div>;
     }
 
-    if(settings.showTooltips)
+    if(showTooltips)
       return (
         <HtmlTooltip title={<BookingQuickView booking={item.booking} />} enterDelay={1000} arrow disableInteractive>
           {getItem()}

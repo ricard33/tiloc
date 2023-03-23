@@ -49,10 +49,8 @@ const Planning = () => {
   const [selected, setSelected] = useState<Booking | null>(null);
   const navigate = useNavigate();
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
-  const [settings, setSettings] = useLocalStorage("planningSettings", {
-    showPaymentStatus: true,
-    monthsToDisplay: 12,
-  });
+  const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
+  const [monthsToDisplay, setMonthsToDisplay] = useLocalStorage("planning.monthsToDisplay", 12);
   const [showTooltips, setShowTooltips] = useLocalStorage("planning.showTooltips", !hasTouchScreen);
 
   const user = useSelector<RootState>(store => store.auth.user) as User;
@@ -100,7 +98,8 @@ const Planning = () => {
   const onCloseSettings = (newSettings?: PlanningSettings) => {
     setSettingsOpened(false);
     if (typeof newSettings !== "undefined") {
-      setSettings(newSettings);
+      setShowPaymentStatus(newSettings.showPaymentStatus);
+      setMonthsToDisplay(newSettings.monthsToDisplay);
       setShowTooltips(newSettings.showTooltips)
     }
   };
@@ -168,7 +167,9 @@ const Planning = () => {
         onOpenBooking={onEditBooking}
         onItemSelected={onSelectBooking}
         onItemDeselected={onDeselectBooking}
-        settings={settings}
+        showPaymentStatus={showPaymentStatus}
+        monthsToDisplay={monthsToDisplay}
+        showTooltips={showTooltips}
         disabled={isLoadingBookings}
       />
       <Grid container justifyContent="space-between" alignItems="flex-start">
@@ -222,8 +223,9 @@ const Planning = () => {
         <PlanningSettingsDialog
           open={settingsOpened}
           settings={{
-            ...settings,
-            showTooltips: showTooltips
+            showPaymentStatus,
+            monthsToDisplay,
+            showTooltips
           }}
           onClose={onCloseSettings}
         />}
