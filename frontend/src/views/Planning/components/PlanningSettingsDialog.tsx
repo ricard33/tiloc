@@ -27,8 +27,7 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
       showTooltips: settings.showTooltips
     }
   });
-  const { handleSubmit, control, formState } = formContext;
-  const { errors } = formState;
+  const { handleSubmit, control } = formContext;
 
   const onSubmit: SubmitHandler<PlanningSettings> = data => {
     console.log(data);

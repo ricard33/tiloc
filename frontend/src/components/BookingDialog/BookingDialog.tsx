@@ -530,30 +530,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={1}>
-                      {/* Dates and nights */}
-                      <Grid item xs={12}>
-                        <FormControl className="full-width" variant={variant}>
-                          <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
-                          <Controller
-                            name="duration"
-                            control={control}
-                            render={({ field }) =>
-                              <Select
-                                label={t("Nights")}
-                                margin="dense"
-                                {...field}
-                                onChange={(event) => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                              >
-                                {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
-                                  <MenuItem key={n} value={n}>{n}</MenuItem>
-                                ))}
-                                {(duration > 31) &&
-                                  <MenuItem key={duration} value={duration}>{duration}</MenuItem>
-                                }
-                              </Select>}
-                          />
-                        </FormControl>
-                      </Grid>
+                      {/* Dates */}
                       <Grid item xs={12}>
                         <Grid container justifyContent="space-around" alignItems="center">
                           <Grid item sm={5} xs={12}>
@@ -603,7 +580,28 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       >
                         {!isFlatRate &&
                           <Grid item sm={7} xs={12} className="flex-box-stretched">
-                            <span>{t("{{count}} night", { count: duration })}&nbsp;x&nbsp;</span>
+                            <FormControl variant={variant}>
+                              <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
+                              <Controller
+                                name="duration"
+                                control={control}
+                                render={({ field }) =>
+                                  <Select
+                                    label={t("Nights")}
+                                    margin="dense"
+                                    {...field}
+                                    onChange={(event) => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
+                                  >
+                                    {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
+                                      <MenuItem key={n} value={n}>{n}</MenuItem>
+                                    ))}
+                                    {(duration > 31) &&
+                                      <MenuItem key={duration} value={duration}>{duration}</MenuItem>
+                                    }
+                                  </Select>}
+                              />
+                            </FormControl>
+                            <span>&nbsp;x&nbsp;</span>
                             <TextFieldElement
                               control={control}
                               name={"daily_rate"}
