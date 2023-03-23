@@ -16,7 +16,6 @@ import {
   DialogTitle,
   FormControl,
   FormControlLabel,
-  FormHelperText,
   Grid,
   Hidden,
   InputAdornment,
@@ -45,7 +44,8 @@ import BookingActions from "../BookingActions";
 import { Booking, Lodging, Service } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
-import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { AutocompleteElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
+
 
 
 type BookingDialogProps = {
@@ -100,7 +100,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     control
   });
 
-  console.log("ERRORS", errors);
+  // console.log("ERRORS", errors);
   usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
 
@@ -108,7 +108,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   // console.debug("formValues: ", formValues);
 
   const deposit = watch("deposit", initialState.deposit);
-  const existingGuest = watch("guest_name", initialState.guest_name);
   const isFlatRate = watch("is_flat_rate", initialState.is_flat_rate);
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
@@ -195,7 +194,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       }
       case "existing-guest":
         const guest = allGuests.filter(guest => guest.name === value);
-        if (guest) {
+        console.log(guest, typeof guest);
+        if (guest && guest.length > 0) {
           setValue("guest_name", guest[0].name);
           setValue("guest_contact", guest[0].contact);
           setValue("guest_address", guest[0].address);
@@ -333,7 +333,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     console.log("Submit: ", data);
     const submittedBooking = {
       ...data,
-      source_id: data.source_id ? data.source_id : undefined,
+      source_id: data.source_id ? data.source_id : undefined
     };
     const action = booking.id ? updateBooking : createBooking;
     action(submittedBooking).then((result) => {
@@ -463,48 +463,27 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={1}>
-                      <Grid item xs={1}>
-                        <ContactsIcon />
-                      </Grid>
-                      <Grid item xs={11}>
-                        <FormControl className="full-width" variant={variant}>
-                          <InputLabel htmlFor="booking-existing-guest">{t("Existing guest")}</InputLabel>
-                          {allGuests &&
-                            <Select
-                              inputProps={{
-                                name: "existing-guest",
-                                id: "booking-existing-guest"
-                              }}
-                              label={t("Existing guest")}
-                              margin="dense"
-                              native
-                              value={existingGuest ? existingGuest : "-- Choose --"}
-                              onChange={event => handleChange(event.target.name, event.target.value)}
-                            >
-                              <option key={"-- Choose --"} value={"-- Choose --"}>{t("-- Choose --")}</option>
-                              {allGuests.map(guest => (
-                                <option key={guest.name} value={guest.name}>{guest.name}</option>
-                              ))}
-                            </Select>}
-                          <FormHelperText>{t("Select an existing guest to automatically fill its information")}</FormHelperText>
-                        </FormControl>
-                      </Grid>
                       <Grid item xs={12}>
-                        <Controller
-                          name="guest_name"
+                        <AutocompleteElement
                           control={control}
+                          name="guest_name"
+                          label={t("Full guest name")}
                           rules={{ required: true }}
-                          render={({ field }) =>
-                            <TextField
-                              fullWidth
-                              error={!!errors.guest_name}
-                              helperText={errors.guest_name && t("Guest name is required")}
-                              label={t("Full guest name")}
-                              margin="dense"
-                              required
-                              variant={variant}
-                              {...field}
-                            />}
+                          options={allGuests.map((g) => g.name)}
+                          autocompleteProps={{
+                            freeSolo: true,
+                            onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue),
+                          }}
+                          textFieldProps={{
+                            fullWidth: true,
+                            margin: "dense",
+                            variant: variant,
+                            helperText: errors.guest_name && t("Guest name is required"),
+                            InputProps: {
+                              // endAdornment: null,
+                              startAdornment: <ContactsIcon />
+                            },
+                          }}
                         />
                       </Grid>
                       <Grid item sm={6} xs={12}>
@@ -812,7 +791,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     <Grid container spacing={1}>
                       <Grid item xs={12}>
                         {allOptions &&
-                          <OptionsList form={formContext} duration={duration} allOptions={allOptions} variant={variant} />}
+                          <OptionsList
+                            form={formContext} duration={duration} allOptions={allOptions}
+                            variant={variant}
+                          />}
                       </Grid>
                     </Grid>
                   </AccordionDetails>
