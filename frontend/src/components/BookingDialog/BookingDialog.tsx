@@ -44,7 +44,7 @@ import BookingActions from "../BookingActions";
 import { Booking, Lodging, Service } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
-import { AutocompleteElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { AutocompleteElement, FormContainer, SelectElement, TextFieldElement } from "react-hook-form-mui";
 
 
 
@@ -578,51 +578,49 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         alignItems="center"
                         justifyContent={!isFlatRate ? "space-around" : "flex-start"}
                       >
-                        {!isFlatRate &&
-                          <Grid item sm={7} xs={12} className="flex-box-stretched">
-                            <FormControl variant={variant}>
-                              <InputLabel htmlFor="duration">{t("Nights")}</InputLabel>
-                              <Controller
-                                name="duration"
+                        <Grid item sm={isFlatRate ? 5 : 7} xs={isFlatRate ? 5 : 12} className="flex-box-stretched">
+                          <SelectElement
+                            control={control}
+                            name="duration"
+                            label={t("Nights")}
+                            variant={variant}
+                            margin="dense"
+                            type="number"
+                            sx={{ width: "4em" }}
+                            onChange={(value) => handleChange("duration", Number(value))}
+                            options={[
+                              ...Array.from({ length: 31 }, (v, k) => k + 1).map(n => ({
+                                id: n,
+                                label: n
+                              })),
+                              ...(duration > 31) ? [{id: duration, label: duration}] : [],
+                            ]}
+                          />
+                          {!isFlatRate &&
+                            <>
+                              <span>&nbsp;x&nbsp;</span>
+                              <TextFieldElement
                                 control={control}
-                                render={({ field }) =>
-                                  <Select
-                                    label={t("Nights")}
-                                    margin="dense"
-                                    {...field}
-                                    onChange={(event) => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                                  >
-                                    {Array.from({ length: 31 }, (v, k) => k + 1).map(n => (
-                                      <MenuItem key={n} value={n}>{n}</MenuItem>
-                                    ))}
-                                    {(duration > 31) &&
-                                      <MenuItem key={duration} value={duration}>{duration}</MenuItem>
-                                    }
-                                  </Select>}
+                                name={"daily_rate"}
+                                label={t("Daily rate")}
+                                className="price-input"
+                                type={"number"}
+                                required
+                                validation={{
+                                  min: { value: 0, message: t("Rate can't be negative") },
+                                  validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                                }}
+                                InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                                margin="dense"
+                                variant={variant}
+                                onChange={event => handleChange(event.target.name, event.target.value)}
                               />
-                            </FormControl>
-                            <span>&nbsp;x&nbsp;</span>
-                            <TextFieldElement
-                              control={control}
-                              name={"daily_rate"}
-                              label={t("Daily rate")}
-                              className="price-input"
-                              type={"number"}
-                              required
-                              validation={{
-                                min: { value: 0, message: t("Rate can't be negative") },
-                                validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
-                              }}
-                              InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                              margin="dense"
-                              variant={variant}
-                              onChange={event => handleChange(event.target.name, event.target.value)}
-                            />
-                            <div className="spacer" />
-                            =
-                            <div className="spacer" />
-                          </Grid>}
-                        <Grid item sm={5} xs={12} className="flex-box-align-left">
+                            </>}
+                          <div className="spacer" />
+                          =
+                          <div className="spacer" />
+                        </Grid>
+                        <Grid item sm={isFlatRate ? 7 : 5} xs={isFlatRate ? 7 : 12} className="flex-box-align-left">
                           <TextFieldElement
                             control={control}
                             name={"price"}
@@ -714,66 +712,38 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       </Grid>
                       {/* number of persons */}
                       <Grid item xs={12} className="flex-box-align-left">
-                        <FormControl variant={variant}>
-                          <InputLabel htmlFor="adults">{t("Adults")}</InputLabel>
-                          <Controller
-                            name="adults"
-                            control={control}
-                            rules={{}}
-                            render={({ field }) =>
-                              <Select
-                                label={t("Adults")}
-                                margin="dense"
-                                native
-                                {...field}
-                                onChange={event => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                              >
-                                {[...Array(10).keys()].map(n => (
-                                  <option key={n} value={n}>{n}</option>
-                                ))}
-                              </Select>}
-                          />
-                        </FormControl>
+                        <SelectElement
+                          control={control}
+                          name="adults"
+                          label={t("Adults")}
+                          variant={variant}
+                          margin="dense"
+                          type="number"
+                          sx={{ width: "4em" }}
+                          options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
+                        />
                         <div className="spacer" />
-                        <FormControl variant={variant}>
-                          <InputLabel htmlFor="children">{t("Children")}</InputLabel>
-                          <Controller
-                            name="children"
-                            control={control}
-                            render={({ field }) =>
-                              <Select
-                                label={t("Children")}
-                                margin="dense"
-                                native
-                                {...field}
-                                onChange={event => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                              >
-                                {[...Array(10).keys()].map(n => (
-                                  <option key={n} value={n}>{n}</option>
-                                ))}
-                              </Select>}
-                          />
-                        </FormControl>
+                        <SelectElement
+                          control={control}
+                          name="children"
+                          label={t("Children")}
+                          variant={variant}
+                          margin="dense"
+                          type="number"
+                          sx={{ width: "4em" }}
+                          options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
+                        />
                         <div className="spacer" />
-                        <FormControl variant={variant}>
-                          <InputLabel htmlFor="babies">{t("Babies")}</InputLabel>
-                          <Controller
-                            name="babies"
-                            control={control}
-                            render={({ field }) =>
-                              <Select
-                                label={t("Babies")}
-                                margin="dense"
-                                native
-                                {...field}
-                                onChange={event => field.onChange(handleChange(event.target.name, Number(event.target.value)))}
-                              >
-                                {[...Array(10).keys()].map(n => (
-                                  <option key={n} value={n}>{n}</option>
-                                ))}
-                              </Select>}
-                          />
-                        </FormControl>
+                        <SelectElement
+                          control={control}
+                          name="babies"
+                          label={t("Babies")}
+                          variant={variant}
+                          margin="dense"
+                          type="number"
+                          sx={{ width: "4em" }}
+                          options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
+                        />
                       </Grid>
                     </Grid>
                   </AccordionDetails>
