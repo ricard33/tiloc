@@ -12,7 +12,8 @@ export const DecimalPrecision = {
   round: function(n: number, p = 2) {
     let r = 0.5 * Number.EPSILON * n;
     let o = 1;
-    while (p-- > 0) o *= 10;
+    if(p<0) while (p++ < 0) o /= 10
+    else while (p-- > 0) o *= 10;
     if (n < 0)
       o *= -1;
     return Math.round((n + r) * o) / o;
@@ -53,7 +54,7 @@ export const computeBookingPrice = (beginDate: Date, endDate: Date, dailyRate: n
   return {
     price: {
       price: DecimalPrecision.round(price),
-      deposit: DecimalPrecision.round(price * depositPercent / 100, 0),
+      deposit: DecimalPrecision.round(price * depositPercent / 100, -1),
       daily_rate: DecimalPrecision.round(rate)
     },
     price_details: [

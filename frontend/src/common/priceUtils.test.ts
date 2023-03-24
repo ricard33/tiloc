@@ -54,7 +54,10 @@ describe("Module priceUtils:", () => {
       expect(DecimalPrecision.round(2.175495134384, 7)).toEqual(2.1754951);
       expect(DecimalPrecision.round(2.1753543549, 8)).toEqual(2.17535435);
       expect(DecimalPrecision.round(2.1755465135353, 4)).toEqual(2.1755);
-
+    });
+    it("should rounding value to nearest ten", () => {
+      expect(DecimalPrecision.round(123.005, -1)).toEqual(120);
+      expect(DecimalPrecision.round(128.005, -1)).toEqual(130);
     });
   });
 })
