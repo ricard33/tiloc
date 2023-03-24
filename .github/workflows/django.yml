@@ -43,7 +43,7 @@ jobs:
         poetry run flake8 core location --show-source --statistics
 
     - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
+      uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         files: test-reports/**/*.xml
