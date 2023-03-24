@@ -86,13 +86,14 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
               startIcon={<EditIcon />}
               onClick={onEdit}
             >{t("Edit")}</Button>}
-          {canEdit && onSave &&
+          {canEdit &&
             <Button
               type="submit"
               color="primary"
               className="button"
               startIcon={<SaveIcon />}
               onClick={onSave}
+              disabled={!onSave}
             >{t("Save")}</Button>}
         </Grid>
       </Grid>

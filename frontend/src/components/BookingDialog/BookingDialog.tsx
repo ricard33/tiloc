@@ -9,23 +9,19 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
-  FormControlLabel,
   Grid,
   Hidden,
   InputAdornment,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
   Typography
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
 import useWindowDimensions from "../../common/windowDimensions";
 import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
@@ -44,8 +40,13 @@ import BookingActions from "../BookingActions";
 import { Booking, Lodging, Service } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
-import { AutocompleteElement, FormContainer, SelectElement, TextFieldElement } from "react-hook-form-mui";
-
+import {
+  AutocompleteElement,
+  CheckboxElement, DatePickerElement,
+  FormContainer,
+  SelectElement,
+  TextFieldElement
+} from "react-hook-form-mui";
 
 
 type BookingDialogProps = {
@@ -77,7 +78,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [createBooking] = useCreateBookingMutation();
   const [updateBooking] = useUpdateBookingMutation();
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
-  const variant = "filled";
+  const variant = "outlined";
+  const margin = "none";
   const depositPercent = 30; // TODO load this from owner or lodging preferences
 
   // console.debug("booking", booking);
@@ -231,34 +233,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           setMultipleValues(priceObj);
           return false;
         }
-      // case "deposit":
-      //   if (value) {
-      //     let deposit = Number(value);
-      //     const price = getValues().price ?? 0;
-      //     if (deposit && deposit >= 0) {
-      //       if (deposit > price)
-      //         deposit = price;
-      //       return deposit;
-      //     }
-      //   }
-      //   return 0;
-      // case "commission_fees":
-      //   if (value) {
-      //     let commission_fees = Number(value);
-      //     if (commission_fees && commission_fees >= 0) {
-      //       return commission_fees;
-      //     }
-      //   }
-      //   return 0;
-      case "adults":
-      case "children":
-      case "babies":
-        // setBooking({ ...booking, [fieldName]: Number(value) });
-        return Number(value);
-      case "source":
-        // value = Number(value) > 0 ? value : null;
-        // setBooking({ ...booking, [fieldName]: Number(value) });
-        return value;
       default:
         console.warn("Unhandled input:", fieldName);
         return value;
@@ -295,16 +269,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setMultipleValues(priceObj);
     setValue("duration", duration);
     return newBooking[fieldName];
-  }
-
-  function handleBeginDateChange(newDate: Date | null, onChange: (date: Date | null) => void) {
-    onChange(newDate);
-    return onDateChange(newDate, "begin_date");
-  }
-
-  function handleEndDateChange(newDate: Date | null, onChange: (date: Date | null) => void) {
-    onChange(newDate);
-    return onDateChange(newDate, "end_date");
   }
 
   function openContract() {
@@ -416,7 +380,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       render={({ field }) =>
                         <Select
                           labelId="status-label"
-                          margin="dense"
+                          margin={margin}
+                          label={t("Booking status")}
                           className="booking-status-select"
                           {...field}
                         >
@@ -434,26 +399,19 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               </Grid>
               { /* LODGING */}
               <Grid item sm={8} xs={12}>
-                <FormControl className="full-width" variant={variant}>
-                  <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
-                  {lodgings &&
-                    <Controller
-                      name="lodging_id"
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field }) =>
-                        <Select
-                          label={t("Lodging")}
-                          margin="dense"
-                          {...field}
-                          onChange={(event) => field.onChange(handleChange(event.target.name, event.target.value))}
-                        >
-                          {lodgings.map(lodging => (
-                            <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
-                          ))}
-                        </Select>}
-                    />}
-                </FormControl>
+                {lodgings &&
+                <SelectElement
+                  control={control}
+                  name="lodging_id"
+                  label={t("Lodging")}
+                  className="full-width"
+                  margin={margin}
+                  variant={variant}
+                  options={lodgings.map(lodging => (
+                    {id: lodging.id, label: lodging.name}
+                  ))}
+                  onChange={(value) => handleChange("lodging_id", value)}
+                />}
               </Grid>
               { /* GUEST */}
               <Grid item lg={6} xs={12}>
@@ -472,50 +430,42 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           options={allGuests.map((g) => g.name)}
                           autocompleteProps={{
                             freeSolo: true,
-                            onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue),
+                            onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue)
                           }}
                           textFieldProps={{
                             fullWidth: true,
-                            margin: "dense",
+                            margin: margin,
                             variant: variant,
                             helperText: errors.guest_name && t("Guest name is required"),
                             InputProps: {
                               // endAdornment: null,
                               startAdornment: <ContactsIcon />
-                            },
+                            }
                           }}
                         />
                       </Grid>
                       <Grid item sm={6} xs={12}>
-                        <Controller
-                          name="guest_contact"
+                        <TextFieldElement
                           control={control}
-                          render={({ field }) =>
-                            <TextField
-                              fullWidth
-                              label={t("Phone / email")}
-                              margin="dense"
-                              multiline
-                              rows={2}
-                              variant={variant}
-                              {...field}
-                            />}
+                          name="guest_contact"
+                          label={t("Phone / email")}
+                          fullWidth
+                          margin={margin}
+                          variant={variant}
+                          multiline
+                          rows={2}
                         />
                       </Grid>
                       <Grid item sm={6} xs={12}>
-                        <Controller
+                        <TextFieldElement
                           control={control}
                           name="guest_address"
-                          render={({ field }) =>
-                            <TextField
-                              fullWidth
-                              label={t("Address")}
-                              margin="dense"
-                              multiline
-                              rows={2}
-                              variant={variant}
-                              {...field}
-                            />}
+                          label={t("Address")}
+                          fullWidth
+                          margin={margin}
+                          variant={variant}
+                          multiline
+                          rows={2}
                         />
                       </Grid>
                     </Grid>
@@ -534,19 +484,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       <Grid item xs={12}>
                         <Grid container justifyContent="space-around" alignItems="center">
                           <Grid item sm={5} xs={12}>
-                            <Controller
+                            <DatePickerElement
                               control={control}
                               name="begin_date"
-                              render={({ field }) =>
-                                <DatePicker
-                                  renderInput={(props) =>
-                                    <TextField
-                                      label={t("Arrival")}
-                                      variant={variant} {...props}
-                                    />}
-                                  {...field}
-                                  onChange={(date) => handleBeginDateChange(date, field.onChange)}
-                                />}
+                              label={t("Arrival")}
+                              onChange={(date) => onDateChange(date, "begin_date")}
                             />
                           </Grid>
                           <Hidden smDown>
@@ -555,19 +497,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             </Grid>
                           </Hidden>
                           <Grid item sm={5} xs={12}>
-                            <Controller
+                            <DatePickerElement
                               control={control}
                               name="end_date"
-                              render={({ field }) =>
-                                <DatePicker
-                                  renderInput={(props) =>
-                                    <TextField
-                                      label={t("Departure")}
-                                      variant={variant} {...props}
-                                    />}
-                                  {...field}
-                                  onChange={(date) => handleEndDateChange(date, field.onChange)}
-                                />}
+                              label={t("Departure")}
+                              onChange={(date) => onDateChange(date, "end_date")}
                             />
                           </Grid>
                         </Grid>
@@ -584,7 +518,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             name="duration"
                             label={t("Nights")}
                             variant={variant}
-                            margin="dense"
+                            margin={margin}
                             type="number"
                             sx={{ width: "4em" }}
                             onChange={(value) => handleChange("duration", Number(value))}
@@ -593,7 +527,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                                 id: n,
                                 label: n
                               })),
-                              ...(duration > 31) ? [{id: duration, label: duration}] : [],
+                              ...(duration > 31) ? [{ id: duration, label: duration }] : []
                             ]}
                           />
                           {!isFlatRate &&
@@ -611,7 +545,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                                   validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
                                 }}
                                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                                margin="dense"
+                                margin={margin}
                                 variant={variant}
                                 onChange={event => handleChange(event.target.name, event.target.value)}
                               />
@@ -633,28 +567,19 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                               validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
                             }}
                             InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                            margin="dense"
+                            margin={margin}
                             variant={variant}
                             onChange={event => handleChange(event.target.name, event.target.value)}
                           />
                           <div className="spacer" />
-                          <FormControlLabel
-                            control={
-                              <Controller
-                                control={control}
-                                name="is_flat_rate"
-                                render={({ field }) =>
-                                  <Checkbox
-                                    color="primary"
-                                    // defaultChecked={initialState.is_flat_rate}
-                                    {...field}
-                                    checked={field.value}
-                                    onChange={event => field.onChange(handleChange(event.target.name, event.target.checked))}
-                                  />}
-                              />
-                            }
+                          <CheckboxElement
+                            control={control}
+                            name="is_flat_rate"
                             label={t("Flat rate")}
-                            labelPlacement="start"
+                            labelProps={{
+                              labelPlacement: "start"
+                            }}
+                            onChange={event => handleChange(event.target.name, event.target.checked)}
                           />
                         </Grid>
                       </Grid>
@@ -684,7 +609,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
                           }}
                           InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                          margin="dense"
+                          margin={margin}
                           variant={variant}
                         />
                         <div className="spacer" />
@@ -698,7 +623,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           control={control}
                           name={"commission_fees"}
                           label={t("Commission fees")}
-                          className="price-input"
+                          sx={{ width: "10em;" }}
                           type={"number"}
                           // required
                           validation={{
@@ -706,7 +631,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
                           }}
                           InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                          margin="dense"
+                          margin={margin}
                           variant={variant}
                         />
                       </Grid>
@@ -717,7 +642,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           name="adults"
                           label={t("Adults")}
                           variant={variant}
-                          margin="dense"
+                          margin={margin}
                           type="number"
                           sx={{ width: "4em" }}
                           options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
@@ -728,7 +653,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           name="children"
                           label={t("Children")}
                           variant={variant}
-                          margin="dense"
+                          margin={margin}
                           type="number"
                           sx={{ width: "4em" }}
                           options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
@@ -739,7 +664,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           name="babies"
                           label={t("Babies")}
                           variant={variant}
-                          margin="dense"
+                          margin={margin}
                           type="number"
                           sx={{ width: "4em" }}
                           options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
@@ -781,60 +706,44 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     <Grid container spacing={1}>
                       {/* statistics */}
                       <Grid item xs={12}>
-                        <FormControl className="full-width" variant={variant}>
-                          <InputLabel htmlFor="booking-source">{t("Statistics")}</InputLabel>
-                          {bookingChannels &&
-                            <Controller
-                              name="source_id"
-                              control={control}
-                              render={({ field }) =>
-                                <Select
-                                  label={t("Statistics")}
-                                  margin="dense"
-                                  // native
-                                  {...field}
-                                  onChange={event => field.onChange(handleChange(event.target.name, event.target.value))}
-                                >
-                                  <MenuItem key={0} value={0} />
-                                  {bookingChannels.map(channel => (
-                                    <MenuItem key={channel.id} value={channel.id}>{channel.name}</MenuItem>
-                                  ))}
-                                </Select>}
-                            />}
-                        </FormControl>
+                        {bookingChannels &&
+                          <SelectElement
+                            control={control}
+                            name="source_id"
+                            label={t("Statistics")}
+                            className="full-width"
+                            variant={variant}
+                            margin={margin}
+                            type="number"
+                            sx={{ width: "4em" }}
+                            options={[
+                              { id: undefined, label: "" },
+                              ...bookingChannels.map(channel => ({ id: channel.id, label: channel.name }))
+                            ]}
+                          />}
                       </Grid>
                       {/* arrival_details */}
                       <Grid item xs={12}>
-                        <Controller
+                        <TextFieldElement
                           control={control}
-                          name="arrival_details"
-                          render={({ field }) =>
-                            <TextField
-                              fullWidth
-                              // inputRef={register("arrival_details")}
-                              label={t("Arrival details")}
-                              margin="dense"
-                              variant={variant}
-                              {...field}
-                            />}
+                          name={"arrival_details"}
+                          label={t("Arrival details")}
+                          margin={margin}
+                          variant={variant}
+                          fullWidth
                         />
                       </Grid>
                       {/* notes */}
                       <Grid item xs={12}>
-                        <Controller
+                        <TextFieldElement
                           control={control}
-                          name="notes"
-                          render={({ field }) =>
-                            <TextField
-                              fullWidth
-                              // inputRef={register("notes")}
-                              label={t("Further information")}
-                              margin="dense"
-                              multiline
-                              rows={4}
-                              variant={variant}
-                              {...field}
-                            />}
+                          name={"notes"}
+                          label={t("Further information")}
+                          margin={margin}
+                          variant={variant}
+                          fullWidth
+                          multiline
+                          rows={4}
                         />
                       </Grid>
                     </Grid>
@@ -878,7 +787,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       <DialogActions>
         <BookingActions
           booking={booking} onClose={onCloseHandler} onDelete={onDelete}
-          onSave={formContext.handleSubmit(onSubmit)}
+          onSave={isDirty ? formContext.handleSubmit(onSubmit) : undefined}
           onOpenContract={() => openContract()}
           onCancelBooking={onCancelBooking}
           onUncancelBooking={onUncancelBooking}
