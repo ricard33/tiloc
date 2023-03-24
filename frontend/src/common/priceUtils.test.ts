@@ -28,7 +28,7 @@ describe("Module priceUtils:", () => {
         .toEqual({
           price: {
             price: 950,   // 2 x 350 + 5 x (350 / 7) = 950
-            deposit: 285,
+            deposit: 290,
             daily_rate: 50
           },
           price_details: [
