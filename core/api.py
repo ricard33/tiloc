@@ -13,7 +13,7 @@ from knox.auth import TokenAuthentication
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, viewsets, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
@@ -107,9 +107,11 @@ class LogoutAPI(KnoxLogoutView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        response = super(LogoutAPI, self).post(request, format=None)
         logout(request)
-        return response
+        if request._auth:
+            response = super(LogoutAPI, self).post(request, format=None)
+            return response
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class UserAPI(generics.RetrieveAPIView):
