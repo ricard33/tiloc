@@ -16,7 +16,7 @@ import {
   User
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { api2Booking, api2Lodging, api2Owner, api2Payment, booking2api } from "../types/models-convertion";
+import { api2Booking, api2Lodging, api2Owner, api2Payment, api2Service, booking2api } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
 export const serviceURL = "/api/";
@@ -211,7 +211,7 @@ const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatu
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate");
 const contractApi = makeApi<Contract>("contract/", "Contract");
-const serviceApi = makeApi<Service>("service/", "Service");
+const serviceApi = makeApi<Service>("service/", "Service", api2Service);
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
@@ -251,6 +251,16 @@ export const api = createApi({
     createBookingStatus: bookingStatusApi.create(builder),
     updateBookingStatus: bookingStatusApi.update(builder),
     deleteBookingStatus: bookingStatusApi.delete(builder),
+    moveUpBookingStatus: builder.mutation<BookingStatus, { statusId: number }>({
+      query: ({ statusId }) => {
+        return { url: `booking_status/${statusId}/moveUp/`, method: "POST" };
+      }
+    }),
+    moveDownBookingStatus: builder.mutation<BookingStatus, { statusId: number }>({
+      query: ({ statusId }) => {
+        return { url: `booking_status/${statusId}/moveDown/`, method: "POST" };
+      }
+    }),
 
     // BookingChannel
     listBookingChannels: bookingChannelApi.list(builder),
@@ -352,6 +362,8 @@ export const {
   useCreateBookingStatusMutation,
   useUpdateBookingStatusMutation,
   useDeleteBookingStatusMutation,
+  useMoveUpBookingStatusMutation,
+  useMoveDownBookingStatusMutation,
 
   useListBookingChannelsQuery,
   useGetBookingChannelQuery,

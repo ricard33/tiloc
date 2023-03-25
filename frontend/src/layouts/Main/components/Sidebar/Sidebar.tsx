@@ -10,7 +10,10 @@ import MovingIcon from "@mui/icons-material/Moving";
 import CalendarIcon from "@mui/icons-material/CalendarToday";
 import ListIcon from "@mui/icons-material/List";
 import MoneyIcon from "@mui/icons-material/AttachMoney";
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import HolidayVillage from "@mui/icons-material/HolidayVillage";
+import RoomServiceIcon from '@mui/icons-material/RoomService';
+import GradingIcon from '@mui/icons-material/Grading';
 // import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 import { parseISO } from "date-fns";
 
@@ -81,7 +84,10 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
         { title: t("General parameters"), href: "/settings/general", icon: <SettingsIcon />, disabled: true },
+        { title: t("Owners"), href: "/settings/owners", icon: <PeopleAltIcon /> },
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HolidayVillage /> },
+        { title: t("Booking status"), href: "/settings/booking_status", icon: <GradingIcon /> },
+        { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },
         { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> }
       ]
     },

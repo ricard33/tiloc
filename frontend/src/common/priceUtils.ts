@@ -91,3 +91,4 @@ export const computeOptionsPrice = (options: Service[], duration: number) => {
 };
 
 export const formatPrice = (params: GridValueFormatterParams<number>) => DecimalPrecision.round(params.value) + " €";
+export const formatPercent = (params: GridValueFormatterParams<number>) => DecimalPrecision.round(params.value) + " %";

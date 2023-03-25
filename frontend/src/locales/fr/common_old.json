@@ -34,5 +34,11 @@
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "Cancelled": "Annulée",
   "Modify description": "Modifier la description",
-  "Page break": "Séparation de page"
+  "Page break": "Séparation de page",
+  "Existing guest": "Locataire existant",
+  "-- Choose --": "-- Choisir --",
+  "Select an existing guest to automatically fill its information": "Sélectionnez un locataire existant pour remplir automatiquement ses informations",
+  "{{count}} night_one": "{{count}} nuit",
+  "{{count}} night_many": "{{count}} nuits",
+  "{{count}} night_other": "{{count}} nuits"
 }

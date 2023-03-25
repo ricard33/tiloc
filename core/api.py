@@ -234,6 +234,38 @@ class BookingStatusViewSet(viewsets.ModelViewSet):
     queryset = models.BookingStatus.objects.all()
     serializer_class = BookingStatusSerializer
 
+    @transaction.atomic
+    @action(detail=True, methods=["post"])
+    def moveDown(self, request, pk):
+        booking_status = self.get_object()
+        current_rank = booking_status.rank
+        next_status = (
+            self.queryset.filter(rank__gte=current_rank).exclude(id=booking_status.id).order_by("rank").first()
+        )
+        if next_status:
+            booking_status.rank = next_status.rank
+            booking_status.save(update_fields=["rank"])
+            next_status.rank = current_rank
+            next_status.save(update_fields=["rank"])
+        serializer = BookingStatusSerializer(instance=booking_status)
+        return Response(serializer.data)
+
+    @transaction.atomic
+    @action(detail=True, methods=["post"])
+    def moveUp(self, request, pk):
+        booking_status = self.get_object()
+        current_rank = booking_status.rank
+        next_status = (
+            self.queryset.filter(rank__lte=current_rank).exclude(id=booking_status.id).order_by("-rank").first()
+        )
+        if next_status:
+            booking_status.rank = next_status.rank
+            booking_status.save(update_fields=["rank"])
+            next_status.rank = current_rank
+            next_status.save(update_fields=["rank"])
+        serializer = BookingStatusSerializer(instance=booking_status)
+        return Response(serializer.data)
+
 
 class BookingChannelViewSet(viewsets.ModelViewSet):
     queryset = models.BookingChannel.objects.all()

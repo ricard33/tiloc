@@ -34,5 +34,10 @@
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
   "Cancelled": "Cancelled",
   "Modify description": "Modify description",
-  "Page break": "Page break"
+  "Page break": "Page break",
+  "Existing guest": "Existing guest",
+  "-- Choose --": "-- Choose --",
+  "Select an existing guest to automatically fill its information": "Select an existing guest to automatically fill its information",
+  "{{count}} night_one": "{{count}} night",
+  "{{count}} night_other": "{{count}} nights"
 }
