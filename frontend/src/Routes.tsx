@@ -22,6 +22,7 @@ import OwnersList from "./views/Owner/OwnersList";
 import BookingStatusesList from "./views/BookingStatus/BookingStatusesList";
 import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
+import GuestsList from "./views/Guests/GuestsList";
 
 
 
@@ -43,6 +44,7 @@ const MyRoutes = () => {
           <Route path="/bookings/*" element={<BookingList />} />
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/reports" element={<TestPage />} />
+          <Route path="/guests" element={<GuestsList />} />
           <Route path="/settings/" element={<Settings />} />
           <Route path="/settings/owners" element={<OwnersList />} />
           {/*<Route path="/settings/owners/:ownerId" element={<OwnerPage />} />*/}

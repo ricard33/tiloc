@@ -106,7 +106,7 @@ const Sidebar: React.FC<Props> = props => {
         // },
         { title: t("Reports"), href: "/reports", icon: <MovingIcon /> },
         { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
-        { title: t("Contacts"), href: "/contacts", icon: <GroupIcon />, disabled: true },
+        { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false },
         { title: t("My account"), href: "/account", icon: <AccountBoxIcon />, disabled: true },
         { title: t("Settings"), href: "/settings", icon: <SettingsIcon /> }
       ]
