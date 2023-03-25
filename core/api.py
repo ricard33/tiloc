@@ -6,7 +6,7 @@ import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
-from django.db.models import F, Max, Min, Value
+from django.db.models import F, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from knox.auth import TokenAuthentication
@@ -21,7 +21,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from location import __date__, __version__
-
 from . import models
 from .filters import BookingFilter
 from .pagination import LargeResultsSetPagination
@@ -151,10 +150,19 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def all_guests(self, request, pk=None):
         serializer = GuestSerializer(
-            models.Booking.objects.all()
-            .order_by("guest_name")
-            .values("guest_name")
-            .annotate(name=Min("guest_name"), contact=Max("guest_contact"), address=Max("guest_address")),
+            models.Booking.objects.raw(
+                """WITH added_row_number AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER(PARTITION BY guest_name ORDER BY begin_date DESC) AS row_number
+  FROM core_booking
+)
+SELECT
+  id, guest_name as name, guest_contact as contact, guest_address as address
+FROM added_row_number
+WHERE row_number = 1
+ORDER BY guest_name"""
+            ),
             many=True,
         )
         return Response(serializer.data)

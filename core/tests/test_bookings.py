@@ -198,8 +198,24 @@ class BookingQueriesTestCase(APITestCase):
         response = self.client.get("/api/booking/all_guests/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
         guests = response.data
-        self.assertEqual(len(guests), 3, json.dumps(guests))
+        self.assertEqual(3, len(guests), json.dumps(guests))
         self.assertIn("Franck HERBERT", map(lambda g: g["name"], guests), json.dumps(guests))
+
+    def testAllGuestsGetLastAddress(self):
+        for [name, days, address] in [
+            ["Franck HERBERT", 0, "123 road X"],
+            ["Franck HERBERT", 30, "999 road Y"],
+            ["Franck HERBERT", 60, "666 road Z"],
+        ]:
+            factories.BookingFactory.create(
+                guest_name=name, begin_date=arrow.utcnow().shift(days=days).date(), guest_address=address
+            )
+
+        response = self.client.get("/api/booking/all_guests/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        guests = response.data
+        self.assertEqual(1, len(guests), json.dumps(guests))
+        self.assertEqual("666 road Z", guests[0]["address"], json.dumps(guests))
 
     def testNextEvents(self):
         now = arrow.utcnow()
