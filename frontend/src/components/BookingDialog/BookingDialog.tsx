@@ -482,7 +482,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     <Grid container spacing={1}>
                       {/* Dates */}
                       <Grid item xs={12}>
-                        <Grid container justifyContent="space-around" alignItems="center">
+                        <Grid container spacing={1} justifyContent="space-around" alignItems="center">
                           <Grid item sm={5} xs={12}>
                             <DatePickerElement
                               control={control}
@@ -509,7 +509,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       {/* Price */}
                       <Grid
                         item container xs={12}
-                        alignItems="center"
+                        spacing={1} alignItems="center"
                         justifyContent={!isFlatRate ? "space-around" : "flex-start"}
                       >
                         <Grid item sm={isFlatRate ? 5 : 7} xs={isFlatRate ? 5 : 12} className="flex-box-stretched">
