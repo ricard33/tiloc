@@ -27,18 +27,30 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
     lodging = sync.lodging
     channel = sync.channel
     c = Calendar(ical_content)
+    event_uids = []
     for event in c.events:
+        event_uids.append(event.uid)
 
         # HACK Ignoring fake event created by Airbnb. Until we find other cases like this, we can keep this simple hack
         if event.summary in ["Airbnb (Not available)"]:
             continue
 
-        if event.uid and models.Booking.objects.filter(lodging=lodging, source_uid=event.uid).exists():
+        if (
+            event.uid
+            and models.Booking.objects.filter(
+                lodging=lodging, source_uid=event.uid, cancelled=False, deleted=False
+            ).exists()
+        ):
             logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.summary)
             continue
 
         same_bookings = models.Booking.objects.filter(
-            lodging=lodging, source_uid__isnull=True, begin_date=event.begin.date(), end_date=event.end.date()
+            lodging=lodging,
+            source_uid__isnull=True,
+            begin_date=event.begin.date(),
+            end_date=event.end.date(),
+            cancelled=False,
+            deleted=False,
         )
 
         if same_bookings.exists():
@@ -62,6 +74,17 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             price=0,
             deposit=0,
         )
+
+    # try to detect booking that were cancelled by OTA
+    for booking in models.Booking.objects.filter(
+        source=channel, end_date__gt=arrow.utcnow().date(), cancelled=False, deleted=False
+    ):
+        if booking.source_uid not in event_uids:
+            logger.warning("found booking deleted by OTA: %s", booking)
+            booking.cancelled = True
+            booking.notes = ("**CANCELLED by %s on %s\n" % (channel.name, arrow.utcnow().date())) + booking.notes
+            booking.save(update_fields=["cancelled", "notes"])
+
     sync.last_import = arrow.utcnow().datetime
     sync.last_import_error = ""
     sync.save()
