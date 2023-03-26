@@ -389,7 +389,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             <MenuItem key={status.id} value={status.id}>
                               <span
                                 className="booking-status-item"
-                                style={{ background: "#" + status.color }}
+                                style={{ background: status.color }}
                               >{status.name}</span>
                             </MenuItem>
                           ))}

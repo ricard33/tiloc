@@ -165,7 +165,7 @@ class Service(models.Model):
 
 class BookingStatus(models.Model):
     name = models.CharField(_("name"), max_length=100)
-    color = models.CharField(_("color"), max_length=10)
+    color = models.CharField(_("color"), max_length=20)
     rank = models.PositiveSmallIntegerField(_("rank"))
     no_stats = models.BooleanField(
         default=False, help_text=_("Check to ignore from statistics bookings with this status")

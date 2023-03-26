@@ -233,7 +233,7 @@ const BookingScheduler: React.FC<Props> = props => {
         console.log("You clicked double!");
       },
       style: {
-        background: "#" + booking.status.color,
+        background: booking.status.color,
         color: "black",
         opacity: booking.lodging_id > 0 && !booking.cancelled ? undefined : "50%"
       }

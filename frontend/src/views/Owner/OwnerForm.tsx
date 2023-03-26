@@ -28,12 +28,9 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<Owner>({ defaultValues: owner });
-  const { control, register, watch, setValue } = formContext;
+  const { control, watch } = formContext;
   const { isDirty } = useFormState({ control });
   const no_vat = watch("no_vat", owner.no_vat);
-  // const [logoUrl, setLogoUrl] = useState(owner.logo || "");
-  // console.log("owner", owner);
-  // console.log("LOGO URL", logoUrl);
 
   usePageUnloadAlert(isDirty);
 
@@ -44,26 +41,7 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel }) => {
       });
   };
 
-  // const handleUploadClick = (event: ChangeEvent<HTMLInputElement>) => {
-  //   console.log();
-  //   if (!event.target.files) {
-  //     return;
-  //   }
-  //   var file = event.target.files[0];
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(file);
-  //
-  //   reader.onloadend = function(e) {
-  //     setLogoUrl(reader.result as string);
-  //   };
-  // };
-  //
-  // const handleClearLogoClick = () => {
-  //   setValue("logo", null, { shouldDirty: true });
-  //   setLogoUrl("");
-  // };
 
-  // console.log("redraw", dirtyFields, touchedFields);
   return (
     <FormContainer
       defaultValues={owner}

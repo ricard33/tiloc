@@ -214,7 +214,7 @@ const Planning = () => {
               <span key={status.id}>
                 <span
                   className="status-legend"
-                  style={{ background: "#" + status.color }}
+                  style={{ background: status.color }}
                 >{status.name}</span> </span>);
           })}
         </CardContent>

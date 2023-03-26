@@ -24,6 +24,7 @@ import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
 import GuestsList from "./views/Guests/GuestsList";
 import { OwnerPage } from "./views/Owner/OwnerPage";
+import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 
 
 
@@ -52,7 +53,7 @@ const MyRoutes = () => {
           <Route path="/settings/lodgings" element={<LodgingsList />} />
           <Route path="/settings/lodgings/:lodgingId" element={<LodgingPage />} />
           <Route path="/settings/booking_status" element={<BookingStatusesList />} />
-          {/*<Route path="/settings/booking_status/:statusId" element={<BookingStatusPage />} />*/}
+          <Route path="/settings/booking_status/:bookingStatusId" element={<BookingStatusPage />} />
           <Route path="/settings/services" element={<ServicesList />} />
           {/*<Route path="/settings/services/:serviceId" element={<ServicePage />} />*/}
           <Route path="/settings/contract-templates" element={<ContractTemplateList />} />

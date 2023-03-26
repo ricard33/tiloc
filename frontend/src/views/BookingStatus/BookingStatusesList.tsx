@@ -17,7 +17,7 @@ import {
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
-import { ButtonGroup, Card, CardContent, IconButton } from "@mui/material";
+import { Card, CardContent } from "@mui/material";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { fetchErrorDecode } from "../../common/apiUtils";
@@ -55,12 +55,14 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
         field: "color", headerName: t("Color"), width: 100, sortable: false,
         renderCell: (params: GridRenderCellParams<string>) => (
           <div
-            style={{ marginLeft: 16, width: "6em", height: "1em", backgroundColor: "#" + params.value }}
+            style={{ marginLeft: 16, width: "6em", height: "1em", backgroundColor: params.value }}
           >
             &nbsp;
           </div>
         )
       },
+      { field: "no_stats", headerName: t("No statistics"), width: 100, type: "boolean" },
+      { field: "finalized", headerName: t("Final state"), width: 100, type: "boolean" },
       {
         field: "actions",
         type: "actions",
