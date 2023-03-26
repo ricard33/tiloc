@@ -64,7 +64,7 @@ const ContractTemplateEdit = (/*props*/) => {
 
   function onLodgingChange(event) {
     const value = event.target.value;
-    console.debug(value);
+    // console.debug(value);
     setLodgingId(value);
   }
 

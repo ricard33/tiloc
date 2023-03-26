@@ -58,8 +58,8 @@ class Owner(models.Model):
         choices=DepositOrDownPayment.choices,
         default=DepositOrDownPayment.DEPOSIT,
     )
-    logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True)
-    signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True)
+    logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True, null=True)
+    signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True, null=True)
     display_week = models.BooleanField(_("display week number"), default=False)
 
     history = HistoricalRecords()
@@ -316,8 +316,13 @@ class Booking(models.Model):
         if self.lodging.contract_template:
             from core.jinja2_tools import render_template
 
-            signature_img = '<img style="max-width: 200px; max-height: 100px" ' 'src="%s" alt="Signature"' % (
-                url_server + self.lodging.owner.signature.url
+            signature_img = (
+                self.lodging.owner.signature
+                and (
+                    '<img style="max-width: 200px; max-height: 100px" '
+                    'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
+                )
+                or ""
             )
 
             page_break = '<div style="display: block; page-break-before: always;"></div>'

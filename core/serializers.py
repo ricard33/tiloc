@@ -45,6 +45,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class OwnerSerializer(serializers.ModelSerializer):
+    logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
+    signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
+
     class Meta:
         model = models.Owner
         fields = "__all__"

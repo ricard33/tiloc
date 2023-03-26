@@ -31,8 +31,8 @@ export interface Owner {
   note: string;
   invoice_label: string;
   deposit_label: string;
-  logo: string;
-  signature: string;
+  logo: string|null;
+  signature: string|null;
   display_week: boolean;
 }
 

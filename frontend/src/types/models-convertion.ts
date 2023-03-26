@@ -26,6 +26,14 @@ export function api2Owner(owner: Record<string, any>): Owner {
   };
 }
 
+export function owner2api(owner: Partial<Owner>): Record<string, any> {
+  const {logo, signature, ...rest} = owner;
+  return {
+    ...rest,
+    ...typeof signature === "string" ? { } : { signature },
+    ...typeof logo === "string" ? { } : { logo },
+  };
+}
 // ----- LODGING -----
 
 export function api2Lodging(lodging: Record<string, any>): Lodging {

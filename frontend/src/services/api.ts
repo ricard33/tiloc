@@ -16,7 +16,15 @@ import {
   User
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { api2Booking, api2Lodging, api2Owner, api2Payment, api2Service, booking2api } from "../types/models-convertion";
+import {
+  api2Booking,
+  api2Lodging,
+  api2Owner,
+  api2Payment,
+  api2Service,
+  booking2api,
+  owner2api
+} from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
 export const serviceURL = "/api/";
@@ -53,6 +61,30 @@ const axiosBaseQuery =
       const { url, method = "get", params = undefined, data = undefined } = typeof arg == "string" ? { url: arg } : arg;
       let meta: AxiosQueryMeta;
       const requestArgs: AxiosRequestConfig = { url: baseUrl + url, method, params, data };
+      if(method.toLowerCase() === "put" || method.toLowerCase() === "patch" || method.toLowerCase() === "post") {
+        let form_data = new FormData();
+        let fileUpload = false;
+        for (var propertyName in data) {
+          // propertyName is what you want
+          // you can get the value like this: myObject[propertyName]
+          if (data.hasOwnProperty(propertyName)) {
+            let value = data[propertyName];
+
+            if (FileList && value instanceof FileList) {
+              // Safari, Firefox, IE land here
+              fileUpload = true;
+              if(value.length > 0)
+                form_data.append(propertyName, value[0], value[0].name);
+            }
+            else
+              form_data.append(propertyName, value)
+          }
+        }
+        if(fileUpload) {
+          requestArgs.data = form_data;
+          requestArgs.headers = {"Content-Type": "multipart/form-data"}
+        }
+      }
       meta = { request: requestArgs };
       try {
         const result = await axios(requestArgs);
@@ -206,7 +238,7 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
-const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner);
+const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner, owner2api);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate");

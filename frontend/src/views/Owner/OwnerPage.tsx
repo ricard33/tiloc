@@ -3,26 +3,26 @@ import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  useCreateLodgingMutation,
-  useGetLodgingQuery,
+  useCreateOwnerMutation,
+  useGetOwnerQuery,
   useListOwnersQuery,
-  useUpdateLodgingMutation
+  useUpdateOwnerMutation
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
-import { LodgingForm } from "./LodgingForm";
+import { OwnerForm } from "./OwnerForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 
-export function LodgingPage() {
+export function OwnerPage() {
   const { t } = useTranslation();
-  let { lodgingId } = useParams();
+  let { ownerId } = useParams();
   const {
-    data: lodging,
+    data: owner,
     isLoading
-  } = useGetLodgingQuery(Number(lodgingId), { skip: typeof lodgingId === "undefined" });
-  const [createLodging] = useCreateLodgingMutation();
-  const [updateLodging] = useUpdateLodgingMutation();
+  } = useGetOwnerQuery(Number(ownerId), { skip: typeof ownerId === "undefined" });
+  const [createOwner] = useCreateOwnerMutation();
+  const [updateOwner] = useUpdateOwnerMutation();
   const { data: owners, isLoading: isOwnerLoading } = useListOwnersQuery();
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
@@ -34,25 +34,25 @@ export function LodgingPage() {
 
   const onSubmit = (data) => {
     // console.log(data);
-    if(!lodging || !lodging.id) {
-      createLodging(data).then((result) => {
+    if(!owner || !owner.id) {
+      createOwner(data).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
-          console.error("Error during lodging creation", error);
-          showError(t("Impossible to create lodging: ") + fetchErrorDecode(error));
+          console.error("Error during owner creation", error);
+          showError(t("Impossible to create owner: ") + fetchErrorDecode(error));
         } else {
-          showSuccess(t("Lodging added"));
+          showSuccess(t("Owner added"));
           navigate(-1)
         }
       });
     } else {
-      updateLodging({ ...lodging, ...data }).then((result) => {
+      updateOwner({ ...owner, ...data }).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
           console.error("Error during payment change", error);
-          showError(t("Impossible to modify lodging: ") + fetchErrorDecode(error));
+          showError(t("Impossible to modify owner: ") + fetchErrorDecode(error));
         } else {
-          showSuccess(t("Lodging changed"));
+          showSuccess(t("Owner changed"));
           navigate(-1)
         }
       });
@@ -62,7 +62,7 @@ export function LodgingPage() {
   if (isLoading || isOwnerLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <LodgingForm lodging={lodging} owners={owners} onSubmit={onSubmit} onCancel={onCancel} />
+      <OwnerForm owner={owner} owners={owners} onSubmit={onSubmit} onCancel={onCancel} />
     </Page>
   )
   ;

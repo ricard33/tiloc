@@ -196,7 +196,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       }
       case "existing-guest":
         const guest = allGuests.filter(guest => guest.name === value);
-        console.log(guest, typeof guest);
+        // console.log(guest, typeof guest);
         if (guest && guest.length > 0) {
           setValue("guest_name", guest[0].name);
           setValue("guest_contact", guest[0].contact);

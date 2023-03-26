@@ -23,6 +23,7 @@ import BookingStatusesList from "./views/BookingStatus/BookingStatusesList";
 import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
 import GuestsList from "./views/Guests/GuestsList";
+import { OwnerPage } from "./views/Owner/OwnerPage";
 
 
 
@@ -47,7 +48,7 @@ const MyRoutes = () => {
           <Route path="/guests" element={<GuestsList />} />
           <Route path="/settings/" element={<Settings />} />
           <Route path="/settings/owners" element={<OwnersList />} />
-          {/*<Route path="/settings/owners/:ownerId" element={<OwnerPage />} />*/}
+          <Route path="/settings/owners/:ownerId" element={<OwnerPage />} />
           <Route path="/settings/lodgings" element={<LodgingsList />} />
           <Route path="/settings/lodgings/:lodgingId" element={<LodgingPage />} />
           <Route path="/settings/booking_status" element={<BookingStatusesList />} />

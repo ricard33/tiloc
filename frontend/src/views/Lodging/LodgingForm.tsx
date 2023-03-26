@@ -78,12 +78,12 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
               <input type="hidden" name={"rank"} value={lodging!.rank} />
             </Grid2>
             <Grid2 sm={3} xs={6}>
-              <TextFieldElement label={"Capacity"} name={"capacity"} required type={"number"} />
+              <TextFieldElement label={t("Capacity")} name={"capacity"} required type={"number"} />
             </Grid2>
             <Grid2 sm={3} xs={6}>
               <TextFieldElement
                 name={"daily_rate"}
-                label={"Daily rate"}
+                label={t("Daily rate")}
                 type={"number"}
                 required
                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
@@ -92,7 +92,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
             <Grid2 sm={3} xs={6}>
               <TextFieldElement
                 name={"guaranty"}
-                label={"Guaranty"}
+                label={t("Guaranty")}
                 type={"number"}
                 required
                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
@@ -101,7 +101,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
             <Grid2 sm={3} xs={6}>
               <TextFieldElement
                 name={"tourist_tax"}
-                label={"Tourist tax"}
+                label={t("Tourist tax")}
                 type={"number"}
                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
               />
