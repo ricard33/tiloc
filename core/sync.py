@@ -77,10 +77,9 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
 
     # try to detect booking that were cancelled by OTA
     for booking in models.Booking.objects.filter(
-        source=channel, end_date__gt=arrow.utcnow().date(), cancelled=False, deleted=False
+        source=channel, lodging=lodging, end_date__gt=arrow.utcnow().date(), cancelled=False, deleted=False
     ):
         if booking.source_uid not in event_uids:
-            logger.warning("found booking deleted by OTA: %s", booking)
             booking.cancelled = True
             booking.notes = ("**CANCELLED by %s on %s\n" % (channel.name, arrow.utcnow().date())) + booking.notes
             booking.save(update_fields=["cancelled", "notes"])

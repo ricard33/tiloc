@@ -56,7 +56,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           onClose={onClose}
           onCancelBooking={() => onCancelBooking(booking)}
           onUncancelBooking={() => onUncancelBooking(booking)}
-          onDelete={() => onDeleteBooking(booking)}
+          onDelete={() => onDeleteBooking(booking).then(() => onClose())}
           onOpenContract={onOpenContract}
         />
       );
