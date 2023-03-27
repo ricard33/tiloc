@@ -31,7 +31,7 @@ const Settings = () => {
       icon: <HolidayVillage />
     },
     {
-      title: t('Booking status'),
+      title: t('Booking statuses'),
       href: './booking_status',
       icon: <GradingIcon />
     },

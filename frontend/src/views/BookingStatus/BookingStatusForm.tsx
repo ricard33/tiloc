@@ -46,7 +46,7 @@ export const BookingStatusForm: React.FC<Props> = ({ bookingStatus, onSubmit, on
       formContext={formContext}
     >
       <Card sx={{ maxWidth: "800px" }}>
-        <CardHeader title={t("BookingStatus properties")} />
+        <CardHeader title={t("Booking status properties")} />
         <CardContent sx={{}}>
           <input type="hidden" name={"id"} value={bookingStatus!.id} />
           <Grid2 container spacing={2}>

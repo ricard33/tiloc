@@ -86,7 +86,7 @@ const Sidebar: React.FC<Props> = props => {
         { title: t("General parameters"), href: "/settings/general", icon: <SettingsIcon />, disabled: true },
         { title: t("Owners"), href: "/settings/owners", icon: <PeopleAltIcon /> },
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HolidayVillage /> },
-        { title: t("Booking status"), href: "/settings/booking_status", icon: <GradingIcon /> },
+        { title: t("Booking statuses"), href: "/settings/booking_status", icon: <GradingIcon /> },
         { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },
         { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> }
       ]

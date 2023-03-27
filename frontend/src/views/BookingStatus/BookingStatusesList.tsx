@@ -82,7 +82,7 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar title={t("Booking status")} />
+      <ListToolbar title={t("Booking statuses")} />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
