@@ -120,6 +120,19 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             </React.Fragment>}
           </Grid>
           <Grid xs={6}>
+            {showPayments && booking.commission_fees! > 0 && <React.Fragment>
+              <div className="label">{t("Commission fees:")}</div>
+              <div className="value">{formatCurrency(booking.commission_fees || 0)}</div>
+            </React.Fragment>}
+          </Grid>
+          {/* Removed because value is not reliable with the one (maybe modified) in contract */}
+          <Grid xs={6}>
+            {showPayments && booking.lodging && booking.lodging.tourist_tax > 0 && <React.Fragment>
+              <div className="label">{t("Tourist tax:")}</div>
+              <div className="value">{formatCurrency((booking.lodging.tourist_tax || 0)*booking.duration*booking.adults)}</div>
+            </React.Fragment>}
+          </Grid>
+          <Grid xs={6}>
             <div className="label">{t("Channel:")}</div>
             <div className="value">{booking.source?.name}</div>
           </Grid>
