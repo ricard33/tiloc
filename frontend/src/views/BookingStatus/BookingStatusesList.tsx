@@ -6,7 +6,7 @@ import {
   useMoveUpBookingStatusMutation
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { BookingStatus } from "../../types";
+import { BookingStatus, User } from "../../types";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -22,6 +22,8 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 type Props = {};
 
@@ -32,6 +34,8 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
   const [moveDown] = useMoveDownBookingStatusMutation();
   const navigate = useNavigate();
   const { showError, showSuccess } = useAlert();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canAdd = user.permissions.includes("core.add_bookingstatus");
 
   const onRankUpDown = React.useCallback((status: BookingStatus, direction: "up" | "down") => {
     const action = direction === "up" ? moveUp : moveDown;
@@ -80,9 +84,17 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
     navigate(bookingStatus.id.toString());
   };
 
+  const onCreateBookingStatus = () => {
+    navigate("new");
+  };
+
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar title={t("Booking statuses")} />
+      <ListToolbar
+        title={t("Booking statuses")} tools={[
+          { label: t("Create"), onClick: onCreateBookingStatus, disabled: !canAdd }
+        ]}
+      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid

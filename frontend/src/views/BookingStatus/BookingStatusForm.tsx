@@ -18,7 +18,7 @@ import ColorPickerElement from "../../components/Fields/ColorPickerElement";
 
 
 type Props = {
-  bookingStatus: BookingStatus;
+  bookingStatus?: BookingStatus;
   onSubmit: (bookingStatus: BookingStatus) => void;
   onCancel: () => void;
 };
@@ -48,7 +48,8 @@ export const BookingStatusForm: React.FC<Props> = ({ bookingStatus, onSubmit, on
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("Booking status properties")} />
         <CardContent sx={{}}>
-          <input type="hidden" name={"id"} value={bookingStatus!.id} />
+          <input type="hidden" name={"id"} value={bookingStatus ? bookingStatus.id : 0} />
+          <input type="hidden" name={"rank"} value={bookingStatus ? bookingStatus.rank : 0} />
           <Grid2 container spacing={2}>
             <Grid2 sm={6} xs={12}>
               <TextFieldElement name={"name"} label={t("Name")} fullWidth required />

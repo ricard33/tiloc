@@ -1,7 +1,12 @@
+import logging
+
 from django.contrib.auth import get_user_model
+from django.db.models import Max
 from rest_framework import serializers
 
 from core import models
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -94,9 +99,19 @@ class LodgingSubSerializer(serializers.ModelSerializer):
 
 
 class BookingStatusSerializer(serializers.ModelSerializer):
+    rank = serializers.IntegerField(required=False)
+
     class Meta:
         model = models.BookingStatus
         fields = "__all__"
+
+    def create(self, validated_data: dict):
+        rank = validated_data.pop("bookedservice_set", -1)
+        if rank < 0:
+            rank = (models.BookingStatus.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
+        validated_data["rank"] = rank
+        instance = super().create(validated_data)
+        return instance
 
 
 class BookingChannelSerializer(serializers.ModelSerializer):

@@ -49,3 +49,10 @@ class BookingStatusTestCase(APITestCase):
         self.assertEqual(new_statuses[1].id, statuses[2].id)
         self.assertEqual(new_statuses[2].id, statuses[1].id)
         self.assertEqual(new_statuses[3].id, statuses[3].id)
+
+    def test_create(self):
+        status_count = models.BookingStatus.objects.all().count()
+        data = {"name": "my custom status", "color": "#002244"}
+        response = self.client.post("/api/booking_status/", data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+        self.assertEqual(status_count + 1, models.BookingStatus.objects.all().count())

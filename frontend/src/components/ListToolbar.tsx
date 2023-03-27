@@ -105,11 +105,6 @@ const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
             disabled={tool.disabled}
             startIcon={tool.icon}
           >
-            {/*{tool.icon && (*/}
-            {/*  // <IconButton aria-label={tool.label} size="large">*/}
-            {/*  {tool.icon}*/}
-            {/*  // </IconButton>*/}
-            {/*)}*/}
             {tool.label}
           </Button>
         ))}
