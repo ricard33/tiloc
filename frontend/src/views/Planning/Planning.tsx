@@ -42,8 +42,13 @@ const Planning = () => {
   const {
     data: bookings,
     isLoading: isLoadingBookings,
-    isFetching: IsFetchingBooking
-  } = useListBookingsQuery({ for_dates: dateFilter }, { pollingInterval: 60000 });
+    isFetching: IsFetchingBooking,
+    refetch
+  } = useListBookingsQuery({ for_dates: dateFilter }, {
+    pollingInterval: 60000,
+    // refetchOnMountOrArgChange: 20,
+    refetchOnReconnect: true,
+  });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const [selected, setSelected] = useState<Booking | null>(null);
@@ -79,7 +84,9 @@ const Planning = () => {
 
   const handleCloseEdit = () => {
     navigate(-1);
-    setSelected(null);
+    refetch();
+    // Need to be postponed to allow UI refresh
+    setTimeout(() => setSelected(null), 1000);
   };
 
   const onSelectBooking = (booking: Booking) => {

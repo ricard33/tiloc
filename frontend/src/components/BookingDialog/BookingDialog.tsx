@@ -430,7 +430,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           options={allGuests.map((g) => g.name)}
                           autocompleteProps={{
                             freeSolo: true,
-                            onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue)
+                            onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue),
+                            onInputChange: (event: React.SyntheticEvent, value: string, reason: string) => {
+                              setValue("guest_name", value, {shouldDirty: true, shouldTouch: true})
+                            },
                           }}
                           textFieldProps={{
                             fullWidth: true,
