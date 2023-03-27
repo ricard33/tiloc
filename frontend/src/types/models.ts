@@ -66,7 +66,7 @@ export interface Service {
   unit_price: number;
   vat: number;
   is_flat_rate: boolean;
-  included_in_booking: boolean;
+  // included_in_booking: boolean;
   not_included_in_price: boolean;
   auto_add_booking: boolean;
   auto_add_invoice: boolean;

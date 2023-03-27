@@ -3,25 +3,25 @@ import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  useCreateOwnerMutation,
-  useGetOwnerQuery,
-  useUpdateOwnerMutation
+  useCreateServiceMutation,
+  useGetServiceQuery,
+  useUpdateServiceMutation
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
-import { OwnerForm } from "./OwnerForm";
+import { ServiceForm } from "./ServiceForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 
-export function OwnerPage() {
+export function ServicePage() {
   const { t } = useTranslation();
-  let { ownerId } = useParams();
+  let { serviceId } = useParams();
   const {
-    data: owner,
+    data: service,
     isLoading
-  } = useGetOwnerQuery(Number(ownerId), { skip: typeof ownerId === "undefined" });
-  const [createOwner] = useCreateOwnerMutation();
-  const [updateOwner] = useUpdateOwnerMutation();
+  } = useGetServiceQuery(Number(serviceId), { skip: typeof serviceId === "undefined" });
+  const [createService] = useCreateServiceMutation();
+  const [updateService] = useUpdateServiceMutation();
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
 
@@ -32,25 +32,25 @@ export function OwnerPage() {
 
   const onSubmit = (data) => {
     // console.log(data);
-    if(!owner || !owner.id) {
-      createOwner(data).then((result) => {
+    if(!service || !service.id) {
+      createService(data).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
-          console.error("Error during owner creation", error);
-          showError(t("Impossible to create owner: ") + fetchErrorDecode(error));
+          console.error("Error during service creation", error);
+          showError(t("Impossible to create service: ") + fetchErrorDecode(error));
         } else {
-          showSuccess(t("Owner added"));
+          showSuccess(t("Service added"));
           navigate(-1)
         }
       });
     } else {
-      updateOwner({ ...owner, ...data }).then((result) => {
+      updateService({ ...service, ...data }).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
           console.error("Error during payment change", error);
-          showError(t("Impossible to modify owner: ") + fetchErrorDecode(error));
+          showError(t("Impossible to modify service: ") + fetchErrorDecode(error));
         } else {
-          showSuccess(t("Owner changed"));
+          showSuccess(t("Service changed"));
           navigate(-1)
         }
       });
@@ -60,7 +60,7 @@ export function OwnerPage() {
   if (isLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <OwnerForm owner={owner} onSubmit={onSubmit} onCancel={onCancel} />
+      <ServiceForm service={service} onSubmit={onSubmit} onCancel={onCancel} />
     </Page>
   )
   ;

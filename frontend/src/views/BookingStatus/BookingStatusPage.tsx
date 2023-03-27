@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   useCreateBookingStatusMutation,
   useGetBookingStatusQuery,
-  useListBookingStatusesQuery,
   useUpdateBookingStatusMutation
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";
@@ -23,7 +22,6 @@ export function BookingStatusPage() {
   } = useGetBookingStatusQuery(Number(bookingStatusId), { skip: typeof bookingStatusId === "undefined" });
   const [createBookingStatus] = useCreateBookingStatusMutation();
   const [updateBookingStatus] = useUpdateBookingStatusMutation();
-  const { data: bookingStatuses, isLoading: isBookingStatusLoading } = useListBookingStatusesQuery();
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
 
@@ -59,10 +57,10 @@ export function BookingStatusPage() {
     }
   };
 
-  if (isLoading || isBookingStatusLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <BookingStatusForm bookingStatus={bookingStatus} bookingStatuses={bookingStatuses} onSubmit={onSubmit} onCancel={onCancel} />
+      <BookingStatusForm bookingStatus={bookingStatus} onSubmit={onSubmit} onCancel={onCancel} />
     </Page>
   )
   ;

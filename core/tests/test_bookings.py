@@ -44,7 +44,7 @@ class BookingTestCase(APITestCase):
         self.assertIn("designation", obj["options"][0])
         self.assertIn("is_flat_rate", obj["options"][0])
         self.assertIn("unit_price", obj["options"][0])
-        self.assertIn("included_in_booking", obj["options"][0])
+        # self.assertIn("included_in_booking", obj["options"][0])
 
     def test_create_booking(self):
         data = {
@@ -93,7 +93,7 @@ class BookingTestCase(APITestCase):
                     "designation": service.designation,
                     "is_flat_rate": service.is_flat_rate,
                     "unit_price": service.unit_price,
-                    "included_in_booking": service.included_in_booking,
+                    # "included_in_booking": service.included_in_booking,
                 }
             ],
         }
@@ -122,7 +122,7 @@ class BookingTestCase(APITestCase):
                     "designation": service.designation,
                     "is_flat_rate": service.is_flat_rate,
                     "unit_price": service.unit_price,
-                    "included_in_booking": service.included_in_booking,
+                    # "included_in_booking": service.included_in_booking,
                 }
             ],
         }
@@ -153,7 +153,7 @@ class BookingTestCase(APITestCase):
                     "designation": service.designation,
                     "is_flat_rate": not service.is_flat_rate,
                     "unit_price": 123,
-                    "included_in_booking": service.included_in_booking,
+                    # "included_in_booking": service.included_in_booking,
                 }
             ],
         }
