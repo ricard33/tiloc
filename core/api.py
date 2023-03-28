@@ -171,7 +171,9 @@ ORDER BY guest_name"""
     @action(detail=False, methods=["get"])
     def next_events(self, request, pk=None):
         qs1 = (
-            models.Booking.objects.filter(begin_date__gte=timezone.now(), lodging__isnull=False)
+            models.Booking.objects.filter(
+                begin_date__gte=timezone.now(), lodging__isnull=False, cancelled=False, deleted=False
+            )
             .order_by()
             .annotate(date=F("begin_date"), event_type=Value("CHECKIN"))
             .values(
