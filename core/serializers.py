@@ -70,10 +70,19 @@ class OwnerSubSerializer(serializers.ModelSerializer):
 class LodgingSerializer(serializers.ModelSerializer):
     owner = OwnerSubSerializer(read_only=True)
     owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.Owner.objects.all())
+    rank = serializers.IntegerField(required=False)
 
     class Meta:
         model = models.Lodging
         fields = "__all__"
+
+    def create(self, validated_data: dict):
+        rank = validated_data.pop("rank", -1)
+        if rank < 0:
+            rank = (models.Lodging.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
+        validated_data["rank"] = rank
+        instance = super().create(validated_data)
+        return instance
 
 
 class LodgingSubSerializer(serializers.ModelSerializer):
@@ -106,7 +115,7 @@ class BookingStatusSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data: dict):
-        rank = validated_data.pop("bookedservice_set", -1)
+        rank = validated_data.pop("rank", -1)
         if rank < 0:
             rank = (models.BookingStatus.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
         validated_data["rank"] = rank

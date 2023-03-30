@@ -2,12 +2,14 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useListLodgingsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Lodging, Owner } from "../../types";
+import { Lodging, Owner, User } from "../../types";
 import { DataGrid, GridColDef, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
 import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 type Props = {};
 
@@ -16,6 +18,8 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
   const { data } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
   // const { data: owners } = useListOwnersQuery();
   const navigate = useNavigate();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canAdd = user.permissions.includes("core.add_lodging");
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
@@ -53,9 +57,18 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
     navigate(lodging.id.toString());
   };
 
+  const onCreate = () => {
+    navigate("new");
+  };
+
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar title={t("Lodgings")} />
+      <ListToolbar
+        title={t("Lodgings")}
+        tools={[
+          { label: t("Create"), onClick: onCreate, disabled: !canAdd }
+        ]}
+      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid

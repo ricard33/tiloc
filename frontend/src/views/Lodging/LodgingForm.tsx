@@ -6,8 +6,8 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  InputAdornment,
-  Unstable_Grid2 as Grid2,
+  InputAdornment, Stack,
+  Unstable_Grid2 as Grid2
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { FormContainer, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
@@ -17,23 +17,23 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import RichTextEditorElement from "../../components/Fields/RichTextEditorElement";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type Props = {
-  lodging: Lodging;
+  lodging?: Lodging;
   owners: Owner[];
-  onSubmit: (lodging: Lodging) => void;
+  onSubmit?: (lodging: Lodging) => void;
   onCancel: () => void;
+  onDelete?: (lodging: Lodging) => void;
 };
 
-export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCancel }) => {
+export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-  const formContext = useForm<Lodging>({ defaultValues: lodging });
+  const formContext = useForm<Lodging>({ defaultValues: lodging ?? {description: ""}});
   const { control } = formContext;
   const {isDirty} = useFormState({ control });
-  // const [description, setDescription] = useState<string | undefined>(undefined);
-  // usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
   usePageUnloadAlert(isDirty);
 
   const ownersOptions: { label: string, id: number }[] = owners ? owners.map((owner) => {
@@ -58,7 +58,8 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("Lodging properties")} />
         <CardContent sx={{}}>
-          <input type="hidden" name={"id"} value={lodging!.id} />
+          <input type="hidden" name={"id"} value={lodging ? lodging.id : undefined} />
+          <input type="hidden" name={"rank"} value={lodging ? lodging.rank : 0} />
           <Grid2 container spacing={4}>
             <Grid2 xs={12}>
               <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
@@ -68,14 +69,13 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
             </Grid2>
             <Grid2 sm={6} xs={12}>
               <SelectElement
-                name={"owner"}
+                name={"owner_id"}
                 label={t("Owner")}
                 options={ownersOptions}
                 fullWidth
               />
               <SwitchElement name={"active"} label={t("Active ?")} />
               <SwitchElement name={"shown"} label={t("Shown ?")} />
-              <input type="hidden" name={"rank"} value={lodging!.rank} />
             </Grid2>
             <Grid2 sm={3} xs={6}>
               <TextFieldElement label={t("Capacity")} name={"capacity"} required type={"number"} />
@@ -117,20 +117,26 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
             </Grid2>
           </Grid2>
         </CardContent>
-        <CardActions
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "flex-end"
-          }}
-        >
-          {isDirty ?
-            <>
-              <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
-              <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
-            </> :
-            <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
-          }
+        <CardActions>
+          <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
+            {onDelete && lodging &&
+              <Button
+                type="button"
+                className="delete-button"
+                sx={{ color: "red" }}
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={() => onDelete(lodging)}
+              >{t("Delete")}</Button>
+            }
+            {isDirty && onSubmit ?
+              <>
+                <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
+                <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
+              </> :
+              <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
+            }
+          </Stack>
         </CardActions>
       </Card>
     </FormContainer>

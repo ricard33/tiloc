@@ -116,7 +116,8 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
       <ListToolbar
-        title={t("Booking statuses")} tools={[
+        title={t("Booking statuses")}
+        tools={[
           { label: t("Create"), onClick: onCreateBookingStatus, disabled: !canAdd }
         ]}
         numSelected={numSelected}

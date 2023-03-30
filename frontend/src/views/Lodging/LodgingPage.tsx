@@ -3,7 +3,7 @@ import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  useCreateLodgingMutation,
+  useCreateLodgingMutation, useDeleteLodgingMutation,
   useGetLodgingQuery,
   useListOwnersQuery,
   useUpdateLodgingMutation
@@ -13,6 +13,10 @@ import { useTranslation } from "react-i18next";
 import { LodgingForm } from "./LodgingForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { Lodging, User } from "../../types";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { useConfirm } from "../../libs/MuiConfirm";
 
 export function LodgingPage() {
   const { t } = useTranslation();
@@ -23,14 +27,44 @@ export function LodgingPage() {
   } = useGetLodgingQuery(Number(lodgingId), { skip: typeof lodgingId === "undefined" });
   const [createLodging] = useCreateLodgingMutation();
   const [updateLodging] = useUpdateLodgingMutation();
+  const [deleteLodging] = useDeleteLodgingMutation();
   const { data: owners, isLoading: isOwnerLoading } = useListOwnersQuery();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canChange = user.permissions.includes("core.change_lodging");
+  const canDelete = user.permissions.includes("core.delete_lodging");
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
+  const confirm = useConfirm();
 
 
   const onCancel = () => {
     navigate(-1);
   };
+
+  const onDelete = async (lodging: Lodging) => {
+    if (!canDelete) return await Promise.resolve();
+    return confirm({
+      title: t("Delete lodging: {{ name }}", {
+        name: lodging.name,
+      }),
+      description: t("Do you really want to permanently delete this lodging?")
+    })
+      .then(() => {
+        return deleteLodging(lodging.id).then((result) => {
+          if ((result as any).error) {
+            const error = (result as any).error;
+            console.error("Error deleting lodging", error);
+            showError(t("Impossible to delete the lodging: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Lodging deleted"));
+            navigate(-1);
+          }
+        });
+      })
+      .catch(() => { /* ... */
+      });
+  };
+
 
   const onSubmit = (data) => {
     // console.log(data);
@@ -62,7 +96,11 @@ export function LodgingPage() {
   if (isLoading || isOwnerLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <LodgingForm lodging={lodging} owners={owners} onSubmit={onSubmit} onCancel={onCancel} />
+      <LodgingForm
+        lodging={lodging} owners={owners} onSubmit={canChange && onSubmit}
+        onCancel={onCancel}
+        onDelete={canDelete && onDelete}
+      />
     </Page>
   )
   ;
