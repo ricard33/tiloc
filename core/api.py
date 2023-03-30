@@ -157,6 +157,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     *,
     ROW_NUMBER() OVER(PARTITION BY guest_name ORDER BY begin_date DESC) AS row_number
   FROM core_booking
+  WHERE deleted = 0
 )
 SELECT
   id, guest_name as name, guest_contact as contact, guest_address as address
