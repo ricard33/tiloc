@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Unstable_Grid2 as Grid2
-} from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Stack, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { FormContainer, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
@@ -15,15 +8,17 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import ColorPickerElement from "../../components/Fields/ColorPickerElement";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type Props = {
   bookingStatus?: BookingStatus;
-  onSubmit: (bookingStatus: BookingStatus) => void;
+  onSubmit?: (bookingStatus: BookingStatus) => void;
   onCancel: () => void;
+  onDelete?: (bookingStatus: BookingStatus) => void;
 };
 
-export const BookingStatusForm: React.FC<Props> = ({ bookingStatus, onSubmit, onCancel }) => {
+export const BookingStatusForm: React.FC<Props> = ({ bookingStatus, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<BookingStatus>({ defaultValues: bookingStatus });
@@ -65,20 +60,26 @@ export const BookingStatusForm: React.FC<Props> = ({ bookingStatus, onSubmit, on
             </Grid2>
           </Grid2>
         </CardContent>
-        <CardActions
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "flex-end"
-          }}
-        >
-          {isDirty ?
-            <>
-              <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
-              <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
-            </> :
-            <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
-          }
+        <CardActions>
+          <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
+            {onDelete && bookingStatus &&
+              <Button
+                type="button"
+                className="delete-button"
+                sx={{ color: "red" }}
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={() => onDelete(bookingStatus)}
+              >{t("Delete")}</Button>
+            }
+            {isDirty && onSubmit ?
+              <>
+                <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
+                <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
+              </> :
+              <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
+            }
+          </Stack>
         </CardActions>
       </Card>
     </FormContainer>

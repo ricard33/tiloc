@@ -67,6 +67,7 @@ const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
 
   const classes = useStyles();
   const { t } = useTranslation();
+  const variant = "outlined";
 
   return (
     <Toolbar
@@ -104,6 +105,7 @@ const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
             onClick={tool.onClick}
             disabled={tool.disabled}
             startIcon={tool.icon}
+            variant={variant}
           >
             {tool.label}
           </Button>

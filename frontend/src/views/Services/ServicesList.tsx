@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useListServicesQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Service } from "../../types";
-import { DataGrid, GridColDef, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { formatPercent, formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";

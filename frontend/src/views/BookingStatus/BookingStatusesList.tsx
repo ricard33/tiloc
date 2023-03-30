@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  useDeleteBookingStatusMutation,
   useListBookingStatusesQuery,
   useMoveDownBookingStatusMutation,
   useMoveUpBookingStatusMutation
@@ -12,7 +13,7 @@ import {
   GridActionsCellItem,
   GridColumns,
   GridRenderCellParams,
-  GridRowParams,
+  GridRowParams, GridSelectionModel,
   GridToolbar
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
@@ -30,12 +31,36 @@ type Props = {};
 const BookingStatusesList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data, refetch: refetchStatuses } = useListBookingStatusesQuery({}, { refetchOnMountOrArgChange: 20 });
+  const [ deleteBookingStatus ] = useDeleteBookingStatusMutation();
   const [moveUp] = useMoveUpBookingStatusMutation();
   const [moveDown] = useMoveDownBookingStatusMutation();
   const navigate = useNavigate();
   const { showError, showSuccess } = useAlert();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_bookingstatus");
+  const canDelete = user.permissions.includes("core.delete_bookingstatus");
+  const [selected, setSelected] = useState<number[]>([]);
+  const numSelected = selected.length;
+
+  const onSelectionChange = (newSelection: GridSelectionModel) => {
+    setSelected(newSelection as number[]);
+  };
+
+  const onDelete = useCallback(
+    () => {
+      if(canDelete)
+      {
+        Promise.all(selected.map(statusId => deleteBookingStatus(statusId))).then((results) => {
+          if (selected.length > 1)
+            showSuccess(t("Booking statuses were successfully deleted"));
+          else
+            showSuccess(t("Booking status was successfully deleted"));
+          refetchStatuses();
+        });
+      }
+    },
+    [canDelete, deleteBookingStatus, refetchStatuses, selected, showSuccess, t]
+  );
 
   const onRankUpDown = React.useCallback((status: BookingStatus, direction: "up" | "down") => {
     const action = direction === "up" ? moveUp : moveDown;
@@ -94,6 +119,8 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
         title={t("Booking statuses")} tools={[
           { label: t("Create"), onClick: onCreateBookingStatus, disabled: !canAdd }
         ]}
+        numSelected={numSelected}
+        onDeleteSelected={canDelete ? onDelete : undefined}
       />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
@@ -105,9 +132,11 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
             rows={data || []}
             columns={columns}
             disableColumnFilter
+            checkboxSelection
             pageSize={20}
             rowsPerPageOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
+            onSelectionModelChange={onSelectionChange}
             components={{
               Toolbar: GridToolbar
             }}
