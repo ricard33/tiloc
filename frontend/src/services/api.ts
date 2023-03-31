@@ -285,12 +285,12 @@ export const api = createApi({
     deleteBookingStatus: bookingStatusApi.delete(builder),
     moveUpBookingStatus: builder.mutation<BookingStatus, { statusId: number }>({
       query: ({ statusId }) => {
-        return { url: `booking_status/${statusId}/moveUp/`, method: "POST" };
+        return { url: `booking_status/${statusId}/move_up/`, method: "POST" };
       }
     }),
     moveDownBookingStatus: builder.mutation<BookingStatus, { statusId: number }>({
       query: ({ statusId }) => {
-        return { url: `booking_status/${statusId}/moveDown/`, method: "POST" };
+        return { url: `booking_status/${statusId}/move_down/`, method: "POST" };
       }
     }),
 
@@ -314,6 +314,16 @@ export const api = createApi({
     createLodging: lodgingApi.create(builder),
     updateLodging: lodgingApi.update(builder),
     deleteLodging: lodgingApi.delete(builder),
+    moveUpLodging: builder.mutation<Lodging, { lodgingId: number }>({
+      query: ({ lodgingId }) => {
+        return { url: `lodging/${lodgingId}/move_up/`, method: "POST" };
+      }
+    }),
+    moveDownLodging: builder.mutation<Lodging, { lodgingId: number }>({
+      query: ({ lodgingId }) => {
+        return { url: `lodging/${lodgingId}/move_down/`, method: "POST" };
+      }
+    }),
 
     // Booking
     listBookings: bookingApi.list(builder),
@@ -414,6 +424,8 @@ export const {
   useCreateLodgingMutation,
   useUpdateLodgingMutation,
   useDeleteLodgingMutation,
+  useMoveUpLodgingMutation,
+  useMoveDownLodgingMutation,
 
   useListBookingsQuery,
   useListBookingsPaginatedQuery,

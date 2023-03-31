@@ -14,7 +14,6 @@ from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, status, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.permissions import AllowAny
@@ -49,6 +48,36 @@ from .serializers import (
 )
 
 logger = logging.getLogger("api")
+
+
+class OrderedModelMixin:
+    @transaction.atomic
+    @action(detail=True, methods=["post"])
+    def move_down(self, request, pk):
+        obj = self.get_object()
+        current_rank = obj.rank
+        next_obj = self.queryset.filter(rank__gte=current_rank).exclude(id=obj.id).order_by("rank").first()
+        if next_obj:
+            obj.rank = next_obj.rank
+            obj.save(update_fields=["rank"])
+            next_obj.rank = current_rank
+            next_obj.save(update_fields=["rank"])
+        serializer = self.get_serializer(instance=obj)
+        return Response(serializer.data)
+
+    @transaction.atomic
+    @action(detail=True, methods=["post"])
+    def move_up(self, request, pk):
+        obj = self.get_object()
+        current_rank = obj.rank
+        next_obj = self.queryset.filter(rank__lte=current_rank).exclude(id=obj.id).order_by("-rank").first()
+        if next_obj:
+            obj.rank = next_obj.rank
+            obj.save(update_fields=["rank"])
+            next_obj.rank = current_rank
+            next_obj.save(update_fields=["rank"])
+        serializer = self.get_serializer(instance=obj)
+        return Response(serializer.data)
 
 
 @api_view()
@@ -242,41 +271,9 @@ ORDER BY guest_name"""
         return Response(serializer.data)
 
 
-class BookingStatusViewSet(viewsets.ModelViewSet):
+class BookingStatusViewSet(viewsets.ModelViewSet, OrderedModelMixin):
     queryset = models.BookingStatus.objects.all()
     serializer_class = BookingStatusSerializer
-
-    @transaction.atomic
-    @action(detail=True, methods=["post"])
-    def moveDown(self, request, pk):
-        booking_status = self.get_object()
-        current_rank = booking_status.rank
-        next_status = (
-            self.queryset.filter(rank__gte=current_rank).exclude(id=booking_status.id).order_by("rank").first()
-        )
-        if next_status:
-            booking_status.rank = next_status.rank
-            booking_status.save(update_fields=["rank"])
-            next_status.rank = current_rank
-            next_status.save(update_fields=["rank"])
-        serializer = BookingStatusSerializer(instance=booking_status)
-        return Response(serializer.data)
-
-    @transaction.atomic
-    @action(detail=True, methods=["post"])
-    def moveUp(self, request, pk):
-        booking_status = self.get_object()
-        current_rank = booking_status.rank
-        next_status = (
-            self.queryset.filter(rank__lte=current_rank).exclude(id=booking_status.id).order_by("-rank").first()
-        )
-        if next_status:
-            booking_status.rank = next_status.rank
-            booking_status.save(update_fields=["rank"])
-            next_status.rank = current_rank
-            next_status.save(update_fields=["rank"])
-        serializer = BookingStatusSerializer(instance=booking_status)
-        return Response(serializer.data)
 
 
 class BookingChannelViewSet(viewsets.ModelViewSet):
@@ -289,9 +286,9 @@ class BookingChannelSyncViewSet(viewsets.ModelViewSet):
     serializer_class = BookingChannelSyncSerializer
 
 
-class LodgingViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    queryset = models.Lodging.objects.all().order_by("name")
+class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
+    authentication_classes = [TokenAuthentication]  # , SessionAuthentication]
+    queryset = models.Lodging.objects.all()  # .order_by("name")
     serializer_class = LodgingSerializer
     filterset_fields = ["shown", "active"]
 

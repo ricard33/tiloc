@@ -10,7 +10,7 @@ class BookingStatusTestCase(APITestCase):
     def setUp(self) -> None:
         factories.BookingStatusFactory.create_batch(4)
         self.user = factories.AdminFactory.create()
-        self.client.force_login(self.user)
+        # self.client.force_login(self.user)
         instance, token = AuthToken.objects.create(self.user)
         self.header = {"HTTP_AUTHORIZATION": "Token " + token}
 
@@ -27,7 +27,7 @@ class BookingStatusTestCase(APITestCase):
     def testMoveUp(self):
         statuses = list(models.BookingStatus.objects.all())
         # move 2nd to 1st
-        response = self.client.post("/api/booking_status/%d/moveUp/" % statuses[1].id, **self.header)
+        response = self.client.post("/api/booking_status/%d/move_up/" % statuses[1].id, **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(obj["rank"], statuses[0].rank)
@@ -40,7 +40,7 @@ class BookingStatusTestCase(APITestCase):
     def testMoveDown(self):
         statuses = list(models.BookingStatus.objects.all())
         # move 2nd to 3rd
-        response = self.client.post("/api/booking_status/%d/moveDown/" % statuses[1].id, **self.header)
+        response = self.client.post("/api/booking_status/%d/move_down/" % statuses[1].id, **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(obj["rank"], statuses[2].rank)

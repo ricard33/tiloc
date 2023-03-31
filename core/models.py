@@ -99,7 +99,7 @@ class Lodging(models.Model):
 
     class Meta:
         verbose_name = _("Lodging")
-        ordering = ["owner", "rank"]
+        ordering = ["rank"]
 
     def __str__(self):
         return self.name
