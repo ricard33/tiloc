@@ -4,7 +4,7 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardHeader, InputAdornment,
+  CardHeader, InputAdornment, Stack,
   Unstable_Grid2 as Grid2
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -14,16 +14,17 @@ import { Service } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
-import ColorPickerElement from "../../components/Fields/ColorPickerElement";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type Props = {
   service: Service;
-  onSubmit: (service: Service) => void;
+  onSubmit?: (service: Service) => void;
   onCancel: () => void;
+  onDelete?: (service: Service) => void;
 };
 
-export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel }) => {
+export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<Service>({ defaultValues: service });
@@ -48,7 +49,7 @@ export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel }) =>
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("Booking status properties")} />
         <CardContent sx={{}}>
-          <input type="hidden" name={"id"} value={service!.id} />
+          <input type="hidden" name={"id"} value={service ? service.id : 0} />
           <Grid2 container spacing={2}>
             <Grid2 xs={12}>
               <TextFieldElement name={"designation"} label={t("Designation")} fullWidth required />
@@ -90,20 +91,26 @@ export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel }) =>
             {/*</Grid2>*/}
           </Grid2>
         </CardContent>
-        <CardActions
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "flex-end"
-          }}
-        >
-          {isDirty ?
-            <>
-              <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
-              <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
-            </> :
-            <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
-          }
+        <CardActions>
+          <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
+            {onDelete && service &&
+              <Button
+                type="button"
+                className="delete-button"
+                sx={{ color: "red" }}
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={() => onDelete(service)}
+              >{t("Delete")}</Button>
+            }
+            {isDirty && onSubmit ?
+              <>
+                <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
+                <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
+              </> :
+              <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
+            }
+          </Stack>
         </CardActions>
       </Card>
     </FormContainer>

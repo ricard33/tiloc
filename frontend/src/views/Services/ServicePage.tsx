@@ -3,7 +3,7 @@ import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  useCreateServiceMutation,
+  useCreateServiceMutation, useDeleteServiceMutation,
   useGetServiceQuery,
   useUpdateServiceMutation
 } from "../../services/api";
@@ -12,6 +12,10 @@ import { useTranslation } from "react-i18next";
 import { ServiceForm } from "./ServiceForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { useConfirm } from "../../libs/MuiConfirm";
+import { Service, User } from "../../types";
 
 export function ServicePage() {
   const { t } = useTranslation();
@@ -22,13 +26,43 @@ export function ServicePage() {
   } = useGetServiceQuery(Number(serviceId), { skip: typeof serviceId === "undefined" });
   const [createService] = useCreateServiceMutation();
   const [updateService] = useUpdateServiceMutation();
+  const [deleteService] = useDeleteServiceMutation();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canChange = user.permissions.includes("core.change_service");
+  const canDelete = user.permissions.includes("core.delete_service");
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
+  const confirm = useConfirm();
 
 
   const onCancel = () => {
     navigate(-1);
   };
+
+  const onDelete = async (service: Service) => {
+    if (!canDelete) return await Promise.resolve();
+    return confirm({
+      title: t("Delete service: {{ name }}", {
+        name: service.name,
+      }),
+      description: t("Do you really want to permanently delete this service?")
+    })
+      .then(() => {
+        return deleteService(service.id).then((result) => {
+          if ((result as any).error) {
+            const error = (result as any).error;
+            console.error("Error deleting service", error);
+            showError(t("Impossible to delete the service: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Service deleted"));
+            navigate(-1);
+          }
+        });
+      })
+      .catch(() => { /* ... */
+      });
+  };
+
 
   const onSubmit = (data) => {
     // console.log(data);
@@ -60,7 +94,10 @@ export function ServicePage() {
   if (isLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <ServiceForm service={service} onSubmit={onSubmit} onCancel={onCancel} />
+      <ServiceForm
+        service={service} onSubmit={canChange && onSubmit} onCancel={onCancel}
+        onDelete={canDelete && onDelete}
+      />
     </Page>
   )
   ;

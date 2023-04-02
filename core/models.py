@@ -133,7 +133,7 @@ class Category(models.Model):
 
 class Service(models.Model):
     reference = models.CharField(_("reference"), blank=True, null=True, max_length=20)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, blank=True, null=True)
     designation = models.CharField(_("designation"), max_length=256)
     unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=20, decimal_places=2, blank=True, null=True)
