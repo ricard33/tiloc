@@ -18,7 +18,7 @@ import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type Props = {
-  service: Service;
+  service?: Service;
   onSubmit?: (service: Service) => void;
   onCancel: () => void;
   onDelete?: (service: Service) => void;

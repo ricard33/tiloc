@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,6 +20,8 @@ import { useConfirm } from "../../libs/MuiConfirm";
 export function BookingStatusPage() {
   const { t } = useTranslation();
   let { bookingStatusId } = useParams();
+  console.log("bookingStatusId", bookingStatusId, typeof bookingStatusId)
+
   const {
     data: bookingStatus,
     isLoading
@@ -65,7 +66,7 @@ export function BookingStatusPage() {
   };
 
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: BookingStatus) => {
     // console.log(data);
     if (!bookingStatus || !bookingStatus.id) {
       createBookingStatus(data).then((result) => {
@@ -96,8 +97,9 @@ export function BookingStatusPage() {
   return (
     <Page>
       <BookingStatusForm
-        bookingStatus={bookingStatus} onSubmit={canChange && onSubmit} onCancel={onCancel}
-        onDelete={canDelete && onDelete}
+        bookingStatus={bookingStatus}
+        onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
+        onDelete={canDelete ? onDelete : undefined}
       />
     </Page>
   );

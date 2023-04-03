@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,6 +19,7 @@ import { Service, User } from "../../types";
 export function ServicePage() {
   const { t } = useTranslation();
   let { serviceId } = useParams();
+  console.log("serviceId", serviceId, typeof serviceId)
   const {
     data: service,
     isLoading
@@ -43,7 +43,7 @@ export function ServicePage() {
     if (!canDelete) return await Promise.resolve();
     return confirm({
       title: t("Delete service: {{ name }}", {
-        name: service.name,
+        name: service.designation,
       }),
       description: t("Do you really want to permanently delete this service?")
     })
@@ -64,7 +64,7 @@ export function ServicePage() {
   };
 
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: Service) => {
     // console.log(data);
     if(!service || !service.id) {
       createService(data).then((result) => {
@@ -95,8 +95,9 @@ export function ServicePage() {
   return (
     <Page>
       <ServiceForm
-        service={service} onSubmit={canChange && onSubmit} onCancel={onCancel}
-        onDelete={canDelete && onDelete}
+        service={service}
+        onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
+        onDelete={canDelete ? onDelete : undefined}
       />
     </Page>
   )

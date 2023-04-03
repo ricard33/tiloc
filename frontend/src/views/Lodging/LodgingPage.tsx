@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -66,7 +65,7 @@ export function LodgingPage() {
   };
 
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: Lodging) => {
     // console.log(data);
     if(!lodging || !lodging.id) {
       createLodging(data).then((result) => {
@@ -97,9 +96,9 @@ export function LodgingPage() {
   return (
     <Page>
       <LodgingForm
-        lodging={lodging} owners={owners} onSubmit={canChange && onSubmit}
-        onCancel={onCancel}
-        onDelete={canDelete && onDelete}
+        lodging={lodging} owners={owners ?? []}
+        onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
+        onDelete={canDelete ? onDelete : undefined}
       />
     </Page>
   )

@@ -50,15 +50,19 @@ const MyRoutes = () => {
           <Route path="/guests" element={<GuestsList />} />
           <Route path="/settings/" element={<Settings />} />
           <Route path="/settings/owners" element={<OwnersList />} />
+          <Route path="/settings/owners/new" element={<OwnerPage />} />
           <Route path="/settings/owners/:ownerId" element={<OwnerPage />} />
           <Route path="/settings/lodgings" element={<LodgingsList />} />
+          <Route path="/settings/lodgings/new" element={<LodgingPage />} />
           <Route path="/settings/lodgings/:lodgingId" element={<LodgingPage />} />
           <Route path="/settings/booking_status" element={<BookingStatusesList />} />
           <Route path="/settings/booking_status/new" element={<BookingStatusPage />} />
           <Route path="/settings/booking_status/:bookingStatusId" element={<BookingStatusPage />} />
           <Route path="/settings/services" element={<ServicesList />} />
+          <Route path="/settings/services/new" element={<ServicePage />} />
           <Route path="/settings/services/:serviceId" element={<ServicePage />} />
           <Route path="/settings/contract-templates" element={<ContractTemplateList />} />
+          <Route path="/settings/contract-templates/new" element={<ContractTemplateEdit />} />
           <Route path="/settings/contract-templates/:templateId" element={<ContractTemplateEdit />} />
           <Route path="/test-page" element={<TestPage />} />
           <Route path="*" element={<NotFoundView />} />

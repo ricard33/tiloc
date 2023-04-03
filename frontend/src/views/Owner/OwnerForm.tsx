@@ -5,7 +5,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  InputAdornment,
+  InputAdornment, Stack,
   Unstable_Grid2 as Grid2
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -16,21 +16,28 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import ImageUploadElement from "../../components/Fields/ImageUploadElement";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type Props = {
-  owner: Owner;
-  onSubmit: (owner: Owner) => void;
+  owner?: Owner;
+  onSubmit?: (owner: Owner) => void;
   onCancel: () => void;
+  onDelete?: (owner: Owner) => void;
 };
 
-export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel }) => {
+export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-  const formContext = useForm<Owner>({ defaultValues: owner });
+  const formContext = useForm<Owner>({
+    defaultValues: owner ?? {
+      active: true, no_vat: true, vat_rate: 0, invoice_label: "invoice", deposit_label: "deposit",
+      note: "", billing: "", payment: "", legal: ""
+    }
+  });
   const { control, watch } = formContext;
   const { isDirty } = useFormState({ control });
-  const no_vat = watch("no_vat", owner.no_vat);
+  const no_vat = watch("no_vat", owner ? owner.no_vat : true);
 
   usePageUnloadAlert(isDirty);
 
@@ -41,7 +48,6 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel }) => {
       });
   };
 
-
   return (
     <FormContainer
       defaultValues={owner}
@@ -51,13 +57,13 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel }) => {
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("Owner properties")} />
         <CardContent sx={{}}>
-          <input type="hidden" name={"id"} value={owner!.id} />
+          <input type="hidden" name={"id"} value={owner ? owner.id : 0} />
           <Grid2 container spacing={2}>
             <Grid2 xs={12}>
               <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
             </Grid2>
             <Grid2 sm={6} xs={12}>
-              <TextFieldElement name={"email"} label={t("Email")} fullWidth required />
+              <TextFieldElement name={"email"} type={'email'} label={t("Email")} fullWidth required />
             </Grid2>
             <Grid2 sm={6} xs={12}>
               <TextFieldElement name={"phone"} label={t("Phone")} fullWidth required />
@@ -140,20 +146,26 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel }) => {
             </Grid2>
           </Grid2>
         </CardContent>
-        <CardActions
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "flex-end"
-          }}
-        >
-          {isDirty ?
-            <>
-              <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
-              <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
-            </> :
-            <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
-          }
+        <CardActions>
+          <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
+            {onDelete && owner &&
+              <Button
+                type="button"
+                className="delete-button"
+                sx={{ color: "red" }}
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={() => onDelete(owner)}
+              >{t("Delete")}</Button>
+            }
+            {isDirty && onSubmit ?
+              <>
+                <Button color={"secondary"} onClick={() => onCancelHandler()}>{t("Cancel")}</Button>
+                <Button type={"submit"} color={"primary"} startIcon={<SaveIcon />}>{t("Save")}</Button>
+              </> :
+              <Button onClick={() => onCancel()} color={"primary"}>{t("Close")}</Button>
+            }
+          </Stack>
         </CardActions>
       </Card>
     </FormContainer>
