@@ -124,8 +124,8 @@ export interface ContractTemplate {
   id: number;
   name: string;
   content: string;
-  created: string;
-  modified: string;
+  created: Date;
+  modified: Date;
 }
 
 export interface Contract {
@@ -135,8 +135,8 @@ export interface Contract {
   pdf: string;
   pdf_created: string;
   signed: string;
-  created: string;
-  modified: string;
+  created: Date;
+  modified: Date;
 }
 
 export interface Payment {

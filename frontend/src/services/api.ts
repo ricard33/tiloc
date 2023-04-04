@@ -17,7 +17,7 @@ import {
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
-  api2Booking,
+  api2Booking, api2Contract, api2ContractTemplate,
   api2Lodging,
   api2Owner,
   api2Payment,
@@ -241,8 +241,8 @@ const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
 const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner, owner2api);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
-const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate");
-const contractApi = makeApi<Contract>("contract/", "Contract");
+const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate", api2ContractTemplate);
+const contractApi = makeApi<Contract>("contract/", "Contract", api2Contract);
 const serviceApi = makeApi<Service>("service/", "Service", api2Service);
 
 // Define a service using a base URL and expected endpoints

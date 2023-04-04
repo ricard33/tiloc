@@ -26,27 +26,33 @@ import {
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
-import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
+import { ContractTemplate, User } from "../../types";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { useConfirm } from "../../libs/MuiConfirm";
 
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 const ContractTemplateEdit = (/*props*/) => {
   let { templateId } = useParams();
-  templateId = Number(templateId);
   const { t } = useTranslation();
   const {
-    data: template,
-  } = useGetContractTemplateQuery(templateId, { skip: typeof templateId === "undefined" });
+    data: template, isLoading
+  } = useGetContractTemplateQuery(Number(templateId), { skip: typeof templateId === "undefined" });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const [createContractTemplate] = useCreateContractTemplateMutation();
   const [updateContractTemplate] = useUpdateContractTemplateMutation();
   const [deleteContractTemplate] = useDeleteContractTemplateMutation();
   const navigate = useNavigate();
-  const [content, setContent] = useState(template ? template.content : undefined);
+  const [content, setContent] = useState(template ? template.content : "");
   const [name, setName] = useState(template ? template.name : "");
   const [lodgingId, setLodgingId] = useState(0);
   const { showError, showSuccess } = useAlert();
+  const confirm = useConfirm();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canChange = user.permissions.includes("core.change_contracttemplate");
+  const canDelete = user.permissions.includes("core.delete_contrattemplate");
 
   // console.assert(!!templateId, "Template id not initialized");
 
@@ -58,18 +64,19 @@ const ContractTemplateEdit = (/*props*/) => {
     }
   }, [template]);
 
-  function onChange(newContent) {
-    setContent(newContent);
+  function onChange(newContent: string) {
+    if (canChange)
+      setContent(newContent);
   }
 
-  function onLodgingChange(event) {
-    const value = event.target.value;
+  function onLodgingChange(value: string | number) {
     // console.debug(value);
-    setLodgingId(value);
+    setLodgingId(value as number);
   }
 
   function makePDF() {
-    window.open("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, "_blank");
+    if (template)
+      window.open("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, "_blank");
   }
 
   function onClose() {
@@ -80,12 +87,30 @@ const ContractTemplateEdit = (/*props*/) => {
     onClose();
   }
 
-  function onDelete() {
-    if (template.id)
-      deleteContractTemplate(template.id).then(() => {
-        console.debug("Closing...");
-        onClose();
-      });
+  const onDelete = async (template: ContractTemplate) => {
+    if (template && template.id) {
+      if (!canDelete) return await Promise.resolve();
+      return confirm({
+        title: t("Delete contract template: {{ name }}", {
+          name: template.name
+        }),
+        description: t("Do you really want to permanently delete this contract template?")
+      })
+        .then(() => {
+          deleteContractTemplate(template.id).then((result) => {
+            if ((result as any).error) {
+              const error = (result as any).error;
+              console.error("Error deleting contract template", error);
+              showError(t("Impossible to delete the contract template: ") + fetchErrorDecode(error));
+            } else {
+              showSuccess(t("Contract template deleted"));
+              onClose();
+            }
+          });
+        })
+        .catch(() => { /* ... */
+        });
+    }
   }
 
   function onSave() {
@@ -100,7 +125,7 @@ const ContractTemplateEdit = (/*props*/) => {
     _onSave(makePDF);
   }
 
-  function _onSave(callback/*: (template) => void*/) {
+  function _onSave(callback?: (template: ContractTemplate) => void) {
     const submittedTemplate = {
       id: template ? template.id : undefined,
       name: name,
@@ -108,18 +133,18 @@ const ContractTemplateEdit = (/*props*/) => {
     };
     const action = template && template.id ? updateContractTemplate : createContractTemplate;
     action(submittedTemplate).then((result) => {
-      const { data, error } = result;
-      if (error) {
+      if ((result as any).error) {
+        const error = (result as any).error;
         console.error("Error during template saving", error);
         showError(t("Impossible to save template: ") + fetchErrorDecode(error));
       } else {
+        const data = (result as any).data as ContractTemplate;
         if (!template || !template.id) {
           console.debug("change url");
-          templateId = data.id;
-          navigate(`/settings/contract-templates/${templateId}`, { replace: true });
+          navigate(`/settings/contract-templates/${data.id}`, { replace: true });
         }
         showSuccess(t("Template saved"));
-        if (callback) callback(submittedTemplate);
+        if (callback) callback(data);
       }
     });
   }
@@ -127,7 +152,7 @@ const ContractTemplateEdit = (/*props*/) => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, color: "#fff" }} open={typeof content === "undefined"}>
+      <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, color: "#fff" }} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
@@ -154,7 +179,7 @@ const ContractTemplateEdit = (/*props*/) => {
           {template &&
             <Typography variant="caption" display="block" gutterBottom>
               {t("Template saved {{modified_date}}.",
-                { modified_date: formatDistanceToNow(parseISO(template.modified)) })}
+                { modified_date: formatDistanceToNow(template.modified) })}
             </Typography>
           }
         </Box>
@@ -164,6 +189,7 @@ const ContractTemplateEdit = (/*props*/) => {
               <RichTextEditor
                 content={content}
                 onChange={onChange}
+                readOnly={!canChange}
               />}
           </Suspense>
         </Box>
@@ -175,7 +201,8 @@ const ContractTemplateEdit = (/*props*/) => {
                 sx={{ color: "red", margin: (theme) => theme.spacing(1) }}
                 color="secondary"
                 startIcon={<DeleteIcon />}
-                onClick={onDelete}
+                onClick={() => onDelete(template)}
+                disabled={!canDelete}
               >{t("Delete")}</Button>}
           </Grid>
           <Grid item>
@@ -187,7 +214,7 @@ const ContractTemplateEdit = (/*props*/) => {
                 margin="dense"
                 // native
                 value={lodgingId}
-                onChange={onLodgingChange}
+                onChange={(event) => onLodgingChange(event.target.value)}
               >
                 <MenuItem key={0} value={0}>{t("--- select a lodging ---")}</MenuItem>
                 {lodgings && lodgings.map(lodging => (
@@ -208,7 +235,7 @@ const ContractTemplateEdit = (/*props*/) => {
               sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
-              disabled={!lodgingId}
+              disabled={!lodgingId || !canChange}
               title={t("PDF")}
             >{t("Save and make PDF")}</Button>
           </Grid>
@@ -220,6 +247,7 @@ const ContractTemplateEdit = (/*props*/) => {
               sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<SaveIcon />}
               onClick={onSave}
+              disabled={!canChange}
             >{t("Save")}</Button>
             <Button
               type="submit"
@@ -227,6 +255,7 @@ const ContractTemplateEdit = (/*props*/) => {
               sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<SaveIcon />}
               onClick={onSaveAndClose}
+              disabled={!canChange}
             >{t("Save and Close")}</Button>
           </Grid>
         </Grid>

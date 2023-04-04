@@ -1,4 +1,4 @@
-import { Booking, Lodging, Owner, Payment, Service } from "./models";
+import { Booking, Contract, ContractTemplate, Lodging, Owner, Payment, Service } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
@@ -88,5 +88,25 @@ export function api2Service(service: Record<string, any>): Service {
     ...service as Service,
     unit_price: Number(service.unit_price),
     vat: Number(service.vat)
+  };
+}
+
+// ----- CONTRACT TEMPLATE -----
+
+export function api2ContractTemplate(contractTemplate: Record<string, any>): ContractTemplate {
+  return {
+    ...contractTemplate as ContractTemplate,
+    created: parseISO(contractTemplate.created),
+    modified: parseISO(contractTemplate.modified),
+  };
+}
+
+// ----- CONTRACT -----
+
+export function api2Contract(contract: Record<string, any>): Contract {
+  return {
+    ...contract as Contract,
+    created: parseISO(contract.created),
+    modified: parseISO(contract.modified),
   };
 }

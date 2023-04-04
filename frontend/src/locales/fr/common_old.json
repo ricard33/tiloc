@@ -40,5 +40,7 @@
   "Select an existing guest to automatically fill its information": "Sélectionnez un locataire existant pour remplir automatiquement ses informations",
   "{{count}} night_one": "{{count}} nuit",
   "{{count}} night_many": "{{count}} nuits",
-  "{{count}} night_other": "{{count}} nuits"
+  "{{count}} night_other": "{{count}} nuits",
+  "Actions": "Actions",
+  "Add template": "Ajouter un modèle"
 }

@@ -7,7 +7,6 @@ import {
   BookingList,
   ContractEdit,
   ContractTemplateEdit,
-  ContractTemplateList,
   Dashboard as DashboardView,
   LoggedOut,
   NotFound as NotFoundView,
@@ -26,6 +25,7 @@ import GuestsList from "./views/Guests/GuestsList";
 import { OwnerPage } from "./views/Owner/OwnerPage";
 import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
+import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
 
 
 

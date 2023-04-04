@@ -39,5 +39,7 @@
   "-- Choose --": "-- Choose --",
   "Select an existing guest to automatically fill its information": "Select an existing guest to automatically fill its information",
   "{{count}} night_one": "{{count}} night",
-  "{{count}} night_other": "{{count}} nights"
+  "{{count}} night_other": "{{count}} nights",
+  "Actions": "Actions",
+  "Add template": "Add template"
 }
