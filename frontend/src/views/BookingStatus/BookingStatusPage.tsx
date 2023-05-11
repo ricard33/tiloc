@@ -20,7 +20,6 @@ import { useConfirm } from "../../libs/MuiConfirm";
 export function BookingStatusPage() {
   const { t } = useTranslation();
   let { bookingStatusId } = useParams();
-  console.log("bookingStatusId", bookingStatusId, typeof bookingStatusId)
 
   const {
     data: bookingStatus,
@@ -72,10 +71,10 @@ export function BookingStatusPage() {
       createBookingStatus(data).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
-          console.error("Error during bookingStatus creation", error);
-          showError(t("Impossible to create bookingStatus: ") + fetchErrorDecode(error));
+          console.error("Error during booking status creation", error);
+          showError(t("Impossible to create booking status: ") + fetchErrorDecode(error));
         } else {
-          showSuccess(t("BookingStatus added"));
+          showSuccess(t("Booking status added"));
           navigate(-1);
         }
       });
@@ -83,10 +82,10 @@ export function BookingStatusPage() {
       updateBookingStatus({ ...bookingStatus, ...data }).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
-          console.error("Error during payment change", error);
-          showError(t("Impossible to modify bookingStatus: ") + fetchErrorDecode(error));
+          console.error("Error during booking status change", error);
+          showError(t("Impossible to modify booking status: ") + fetchErrorDecode(error));
         } else {
-          showSuccess(t("BookingStatus changed"));
+          showSuccess(t("Booking status changed"));
           navigate(-1);
         }
       });

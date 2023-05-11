@@ -8,6 +8,8 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import HolidayVillage from "@mui/icons-material/HolidayVillage";
 import RoomServiceIcon from '@mui/icons-material/RoomService';
 import GradingIcon from '@mui/icons-material/Grading';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking sources.svg";
 import Page from "../../layouts/Main/Page";
 
 
@@ -32,7 +34,7 @@ const Settings = () => {
     },
     {
       title: t('Booking statuses'),
-      href: './booking_status',
+      href: './booking-status',
       icon: <GradingIcon />
     },
     {
@@ -44,6 +46,16 @@ const Settings = () => {
       title: t('Contract templates'),
       href: './contract-templates',
       icon: <DashboardIcon />
+    },
+    {
+      title: t('Booking channels'),
+      href: './booking-channels',
+      icon: <BookingSourcesIcon />
+    },
+    {
+      title: t('Calendars sync'),
+      href: './calendars-sync',
+      icon: <CalendarMonthIcon />
     },
   ];
 

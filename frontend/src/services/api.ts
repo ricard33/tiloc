@@ -3,7 +3,7 @@ import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import {
   Booking,
   BookingChannel,
-  BookingStatus,
+  BookingStatus, CalendarSync,
   Contract,
   ContractTemplate,
   Guest,
@@ -17,7 +17,7 @@ import {
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
-  api2Booking, api2Contract, api2ContractTemplate,
+  api2Booking, api2CalendarSync, api2Contract, api2ContractTemplate,
   api2Lodging,
   api2Owner,
   api2Payment,
@@ -244,6 +244,7 @@ const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingCh
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate", api2ContractTemplate);
 const contractApi = makeApi<Contract>("contract/", "Contract", api2Contract);
 const serviceApi = makeApi<Service>("service/", "Service", api2Service);
+const calendarSyncApi = makeApi<CalendarSync>("booking_channel_sync/", "CalendarSync", api2CalendarSync);
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
@@ -388,6 +389,13 @@ export const api = createApi({
     updateService: serviceApi.update(builder),
     deleteService: serviceApi.delete(builder),
 
+    // Calendar sync
+    listCalendarSyncs: calendarSyncApi.list(builder),
+    getCalendarSync: calendarSyncApi.get(builder),
+    createCalendarSync: calendarSyncApi.create(builder),
+    updateCalendarSync: calendarSyncApi.update(builder),
+    deleteCalendarSync: calendarSyncApi.delete(builder),
+
   })
 });
 
@@ -464,5 +472,11 @@ export const {
   useCreateServiceMutation,
   useUpdateServiceMutation,
   useDeleteServiceMutation,
+
+  useGetCalendarSyncQuery,
+  useListCalendarSyncsQuery,
+  useCreateCalendarSyncMutation,
+  useUpdateCalendarSyncMutation,
+  useDeleteCalendarSyncMutation,
 
 } = api;

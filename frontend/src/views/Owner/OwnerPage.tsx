@@ -80,7 +80,7 @@ export function OwnerPage() {
       updateOwner({ ...owner, ...data }).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
-          console.error("Error during payment change", error);
+          console.error("Error during owner change", error);
           showError(t("Impossible to modify owner: ") + fetchErrorDecode(error));
         } else {
           showSuccess(t("Owner changed"));

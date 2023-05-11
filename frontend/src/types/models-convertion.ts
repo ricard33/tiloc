@@ -1,4 +1,4 @@
-import { Booking, Contract, ContractTemplate, Lodging, Owner, Payment, Service } from "./models";
+import { Booking, CalendarSync, Contract, ContractTemplate, Lodging, Owner, Payment, Service } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
@@ -108,5 +108,15 @@ export function api2Contract(contract: Record<string, any>): Contract {
     ...contract as Contract,
     created: parseISO(contract.created),
     modified: parseISO(contract.modified),
+  };
+}
+
+// ----- CALENDAR SYNC -----
+
+export function api2CalendarSync(calendarSync: Record<string, any>): CalendarSync {
+  return {
+    ...calendarSync as CalendarSync,
+    last_import: parseISO(calendarSync.last_import),
+    last_export: parseISO(calendarSync.last_export),
   };
 }

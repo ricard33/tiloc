@@ -42,5 +42,9 @@
   "{{count}} night_many": "{{count}} nuits",
   "{{count}} night_other": "{{count}} nuits",
   "Actions": "Actions",
-  "Add template": "Ajouter un modèle"
+  "Add template": "Ajouter un modèle",
+  "Impossible to create bookingStatus: ": "Impossible de créer un statut: ",
+  "BookingStatus added": "Statut de réservation ajouté",
+  "Impossible to modify bookingStatus: ": "Impossible de modifier le statut: ",
+  "BookingStatus changed": "Statut de réservation modifié"
 }

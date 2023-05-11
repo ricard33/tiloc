@@ -8,7 +8,7 @@ import {
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
-import { ServiceForm } from "./ServiceForm";
+import { CaledarSyncForm } from "./CaledarSyncForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { useSelector } from "react-redux";
@@ -16,9 +16,10 @@ import { RootState } from "../../store";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { Service, User } from "../../types";
 
-export function ServicePage() {
+export function CalendarSyncPage() {
   const { t } = useTranslation();
   let { serviceId } = useParams();
+  console.log("serviceId", serviceId, typeof serviceId)
   const {
     data: service,
     isLoading
@@ -93,7 +94,7 @@ export function ServicePage() {
   if (isLoading) return <div>Loading...</div>;
   return (
     <Page>
-      <ServiceForm
+      <CaledarSyncForm
         service={service}
         onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
         onDelete={canDelete ? onDelete : undefined}

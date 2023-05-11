@@ -24,7 +24,7 @@ type Props = {
   onDelete?: (service: Service) => void;
 };
 
-export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDelete }) => {
+export const CaledarSyncForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<Service>({ defaultValues: service });
@@ -47,7 +47,7 @@ export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDe
       formContext={formContext}
     >
       <Card sx={{ maxWidth: "800px" }}>
-        <CardHeader title={t("Service properties")} />
+        <CardHeader title={t("Booking status properties")} />
         <CardContent sx={{}}>
           <input type="hidden" name={"id"} value={service ? service.id : 0} />
           <Grid2 container spacing={2}>

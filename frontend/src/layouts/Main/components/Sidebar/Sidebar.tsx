@@ -14,6 +14,8 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import HolidayVillage from "@mui/icons-material/HolidayVillage";
 import RoomServiceIcon from '@mui/icons-material/RoomService';
 import GradingIcon from '@mui/icons-material/Grading';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { ReactComponent as BookingSourcesIcon } from "../../../../assets/icones/booking sources.svg";
 // import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 import { parseISO } from "date-fns";
 
@@ -86,9 +88,11 @@ const Sidebar: React.FC<Props> = props => {
         { title: t("General parameters"), href: "/settings/general", icon: <SettingsIcon />, disabled: true },
         { title: t("Owners"), href: "/settings/owners", icon: <PeopleAltIcon /> },
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HolidayVillage /> },
-        { title: t("Booking statuses"), href: "/settings/booking_status", icon: <GradingIcon /> },
+        { title: t("Booking statuses"), href: "/settings/booking-status", icon: <GradingIcon /> },
         { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },
-        { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> }
+        { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> },
+        { title: t("Booking channels"), href: "/settings/booking-channels", icon: <BookingSourcesIcon /> },
+        { title: t("Calendars sync"), href: "/settings/calendars-sync", icon: <CalendarMonthIcon /> },
       ]
     },
     {

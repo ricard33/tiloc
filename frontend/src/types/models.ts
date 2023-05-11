@@ -82,6 +82,8 @@ export interface BookingStatus {
 export interface BookingChannel {
   id: number;
   name: string;
+  default_booking_status_id?: number | null;
+  default_booking_status?: BookingStatus;
 }
 
 export interface Booking {
@@ -173,4 +175,16 @@ export interface NextEvent {
   event_type: "CHECKOUT"|"CHECKIN";
   guest_name: string;
   booking_channel: string;
+}
+
+export interface CalendarSync {   // name is BookingChannelSync on API
+  id: number;
+  channel_id: number;
+  channel: BookingChannel;
+  lodging_id: number;
+  source_url: string;
+  active: boolean;
+  last_import: Date;
+  last_export: Date;
+  last_import_error: string;
 }

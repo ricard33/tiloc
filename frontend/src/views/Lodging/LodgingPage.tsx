@@ -82,7 +82,7 @@ export function LodgingPage() {
       updateLodging({ ...lodging, ...data }).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
-          console.error("Error during payment change", error);
+          console.error("Error during lodging change", error);
           showError(t("Impossible to modify lodging: ") + fetchErrorDecode(error));
         } else {
           showSuccess(t("Lodging changed"));

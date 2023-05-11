@@ -41,5 +41,9 @@
   "{{count}} night_one": "{{count}} night",
   "{{count}} night_other": "{{count}} nights",
   "Actions": "Actions",
-  "Add template": "Add template"
+  "Add template": "Add template",
+  "Impossible to create bookingStatus: ": "Impossible to create bookingStatus: ",
+  "BookingStatus added": "BookingStatus added",
+  "Impossible to modify bookingStatus: ": "Impossible to modify bookingStatus: ",
+  "BookingStatus changed": "BookingStatus changed"
 }

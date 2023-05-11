@@ -26,6 +26,10 @@ import { OwnerPage } from "./views/Owner/OwnerPage";
 import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
 import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
+import CalendarSyncsList from "./views/CalendarSync/CalendarSyncsList";
+import { CalendarSyncPage } from "./views/CalendarSync/CalendarSyncPage";
+import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
+import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 
 
 
@@ -55,15 +59,21 @@ const MyRoutes = () => {
           <Route path="/settings/lodgings" element={<LodgingsList />} />
           <Route path="/settings/lodgings/new" element={<LodgingPage />} />
           <Route path="/settings/lodgings/:lodgingId" element={<LodgingPage />} />
-          <Route path="/settings/booking_status" element={<BookingStatusesList />} />
-          <Route path="/settings/booking_status/new" element={<BookingStatusPage />} />
-          <Route path="/settings/booking_status/:bookingStatusId" element={<BookingStatusPage />} />
+          <Route path="/settings/booking-status" element={<BookingStatusesList />} />
+          <Route path="/settings/booking-status/new" element={<BookingStatusPage />} />
+          <Route path="/settings/booking-status/:bookingStatusId" element={<BookingStatusPage />} />
+          <Route path="/settings/booking-channels" element={<BookingChannelList />} />
+          <Route path="/settings/booking-channels/new" element={<BookingChannelPage />} />
+          <Route path="/settings/booking-channels/:bookingChannelId" element={<BookingChannelPage />} />
           <Route path="/settings/services" element={<ServicesList />} />
           <Route path="/settings/services/new" element={<ServicePage />} />
           <Route path="/settings/services/:serviceId" element={<ServicePage />} />
           <Route path="/settings/contract-templates" element={<ContractTemplateList />} />
           <Route path="/settings/contract-templates/new" element={<ContractTemplateEdit />} />
           <Route path="/settings/contract-templates/:templateId" element={<ContractTemplateEdit />} />
+          <Route path="/settings/calendar-syncs" element={<CalendarSyncsList />} />
+          <Route path="/settings/calendar-syncs/new" element={<CalendarSyncPage />} />
+          <Route path="/settings/calendar-syncs/:calendarSyncId" element={<CalendarSyncPage />} />
           <Route path="/test-page" element={<TestPage />} />
           <Route path="*" element={<NotFoundView />} />
         </Route>

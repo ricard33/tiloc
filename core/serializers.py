@@ -124,6 +124,12 @@ class BookingStatusSerializer(serializers.ModelSerializer):
 
 
 class BookingChannelSerializer(serializers.ModelSerializer):
+    default_booking_status = BookingStatusSerializer(read_only=True)
+    default_booking_status_id = serializers.PrimaryKeyRelatedField(
+        source="default_booking_status", queryset=models.BookingStatus.objects.all(),
+        required=False, allow_null=True
+    )
+
     class Meta:
         model = models.BookingChannel
         fields = "__all__"
