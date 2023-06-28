@@ -26,7 +26,11 @@ def retrieve_ical(url) -> str:
 def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
     lodging = sync.lodging
     channel = sync.channel
-    c = Calendar(ical_content)
+    if ical_content:
+        c = Calendar(ical_content)
+    else:
+        # Some OTA (like Booking) return empty string for empty calendar
+        c = Calendar()
     event_uids = []
     for event in c.events:
         event_uids.append(event.uid)
@@ -81,7 +85,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
     ):
         if booking.source_uid not in event_uids:
             booking.cancelled = True
-            booking.notes = ("**CANCELLED by %s on %s\n" % (channel.name, arrow.utcnow().date())) + booking.notes
+            booking.notes = ("**CANCELLED by %s on %s\n" % (channel.name, arrow.utcnow().date())) + (booking.notes or "")
             booking.save(update_fields=["cancelled", "notes"])
 
     sync.last_import = arrow.utcnow().datetime

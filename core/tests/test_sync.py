@@ -11,6 +11,21 @@ from core import models
 from core.sync import synchronize_bookings
 from core.tests import factories
 
+empty_ical = r"""BEGIN:VCALENDAR
+PRODID;X-RICAL-TZSOURCE=TZINFO:-//Airbnb Inc//Hosting Calendar 0.8.8//EN
+CALSCALE:GREGORIAN
+VERSION:2.0
+BEGIN:VEVENT
+DTEND;VALUE=DATE:20240629
+DTSTART;VALUE=DATE:20230626
+UID:6fec1092d3fa-85d6b3a607ea0eb64564d5c9c6f3bdb1@airbnb.com
+SUMMARY:Airbnb (Not available)
+END:VEVENT
+END:VCALENDAR
+"""
+
+booking_empty_ical = ""
+
 airbnb_ical = r"""BEGIN:VCALENDAR
 PRODID;X-RICAL-TZSOURCE=TZINFO:-//Airbnb Inc//Hosting Calendar 0.8.8//EN
 CALSCALE:GREGORIAN
@@ -123,6 +138,17 @@ class SyncBookingsTestCase(TestCase):
         )
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
+
+    def test_booking_cancelled_by_ota(self):
+        booking = factories.BookingFactory(lodging=self.lodging, source=self.sync.channel)
+        synchronize_bookings(self.sync, empty_ical)
+        self.assertEqual(models.Booking.objects.all().count(), 1)
+        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 0)
+
+    def test_empty_string_answer(self):
+        """Change on 26/06/2023: Booking returns empty string if calendar is empty"""
+        synchronize_bookings(self.sync, booking_empty_ical)
+        self.assertEqual(models.Booking.objects.all().count(), 0)
 
 
 class ExportCalendarTestCase(TestCase):
