@@ -54,7 +54,7 @@ const Settings = () => {
     },
     {
       title: t('Calendars sync'),
-      href: './calendars-sync',
+      href: './calendar-syncs',
       icon: <CalendarMonthIcon />
     },
   ];

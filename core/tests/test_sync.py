@@ -140,7 +140,7 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
     def test_booking_cancelled_by_ota(self):
-        booking = factories.BookingFactory(lodging=self.lodging, source=self.sync.channel)
+        factories.BookingFactory(lodging=self.lodging, source=self.sync.channel)
         synchronize_bookings(self.sync, empty_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
         self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 0)

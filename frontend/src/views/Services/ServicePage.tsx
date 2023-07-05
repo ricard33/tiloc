@@ -90,7 +90,7 @@ export function ServicePage() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>{t("Loading...")}</div>;
   return (
     <Page>
       <ServiceForm

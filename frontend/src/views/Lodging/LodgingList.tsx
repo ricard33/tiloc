@@ -90,7 +90,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
           />
         ]
       }
-    ], [onRankUpDown, t]);
+    ], [canChange, onRankUpDown, t]);
 
   // const getOwnerName = (ownerId: number) => {
   //   if (owners) {

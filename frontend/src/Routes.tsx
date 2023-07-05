@@ -27,7 +27,7 @@ import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
 import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
 import CalendarSyncsList from "./views/CalendarSync/CalendarSyncsList";
-import { CalendarSyncPage } from "./views/CalendarSync/CalendarSyncPage";
+import CalendarSyncPage from "./views/CalendarSync/CalendarSyncPage";
 import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 

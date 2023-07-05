@@ -90,7 +90,7 @@ export function OwnerPage() {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>{t("Loading...")}</div>;
   return (
     <Page>
       <OwnerForm

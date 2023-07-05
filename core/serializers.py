@@ -136,9 +136,39 @@ class BookingChannelSerializer(serializers.ModelSerializer):
 
 
 class BookingChannelSyncSerializer(serializers.ModelSerializer):
+    channel = BookingChannelSerializer(read_only=True)
+    channel_id = serializers.PrimaryKeyRelatedField(source="channel", queryset=models.BookingChannel.objects.all())
+    lodging = LodgingSubSerializer(read_only=True)
+    lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
+    url_for_remote = serializers.SerializerMethodField()
+
     class Meta:
         model = models.BookingChannelSync
-        fields = "__all__"
+        fields = [
+            "id",
+            "channel_id",
+            "channel",
+            "lodging_id",
+            "lodging",
+            "source_url",
+            "url_for_remote",
+            "active",
+            "last_import",
+            "last_export",
+            "last_import_error",
+        ]
+        read_only_fields = [
+            "id",
+            "channel",
+            "lodging",
+            "url_for_remote",
+            "last_import",
+            "last_export",
+            "last_import_error",
+        ]
+
+    def get_url_for_remote(self, obj: models.BookingChannelSync):
+        return obj.url_for_remote(self.context['request'])
 
 
 class ServiceSerializer(serializers.ModelSerializer):

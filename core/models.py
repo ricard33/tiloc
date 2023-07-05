@@ -10,6 +10,7 @@ from django.db.models import Sum
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
+from rest_framework.reverse import reverse as drf_reverse
 
 logger = logging.getLogger("api")
 
@@ -211,6 +212,9 @@ class BookingChannelSync(models.Model):
         blank=True, null=True, help_text=_("Last time the calendar has been successfully requested by remote channel.")
     )
     last_import_error = models.TextField(null=True, blank=True)
+
+    def url_for_remote(self, request):
+        return drf_reverse("calendar_sync", kwargs={"uid": self.lodging.uid}, request=request) + "?s=%d" % self.id
 
 
 class Booking(models.Model):

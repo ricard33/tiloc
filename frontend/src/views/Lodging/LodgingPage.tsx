@@ -92,7 +92,7 @@ export function LodgingPage() {
     }
   };
 
-  if (isLoading || isOwnerLoading) return <div>Loading...</div>;
+  if (isLoading || isOwnerLoading) return <div>{t("Loading...")}</div>;
   return (
     <Page>
       <LodgingForm

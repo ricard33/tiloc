@@ -98,7 +98,8 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
         return qs
 
     def url_for_remote(self, obj):
-        return reverse("calendar_sync", kwargs={"uid": obj.lodging.uid}, request=self.request) + "?s=%d" % obj.id
+        return obj.url_for_remote(self.request)
+        # return reverse("calendar_sync", kwargs={"uid": obj.lodging.uid}, request=self.request) + "?s=%d" % obj.id
 
     @admin.action(description="Run synchronization")
     def synchronize(self, request, queryset):

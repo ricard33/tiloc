@@ -1,53 +1,67 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useListServicesQuery } from "../../services/api";
+import { useListCalendarSyncsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Service, User } from "../../types";
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { formatPercent, formatPrice } from "../../common/priceUtils";
+import { BookingChannel, CalendarSync, Lodging, User } from "../../types";
+import { DataGrid, GridColumns, GridRenderCellParams, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
-import { Card, CardContent } from "@mui/material";
+import { Card, CardContent, Tooltip } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { formatDate, formatDistanceToNow } from "../../common/dateUtils";
 
 type Props = {};
 
 const CalendarSyncsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
-  const { data } = useListServicesQuery({}, { refetchOnMountOrArgChange: 20 });
+  const { data } = useListCalendarSyncsQuery({}, { refetchOnMountOrArgChange: 20 });
   const navigate = useNavigate();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canAdd = user.permissions.includes("core.add_service");
+  const canAdd = user.permissions.includes("core.add_bookingchannelsync");
 
-  const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "designation", headerName: t("Designation"), width: 400 },
-    {
-      field: "unit_price", headerName: t("Unit price"), type: "number", width: 90,
-      valueFormatter: formatPrice
-    },
-    {
-      field: "vat", headerName: t("VAT"), type: "number", width: 90,
-      valueFormatter: formatPercent
-    },
-    { field: "is_flat_rate", headerName: t("Is flat rate?"), type: "boolean", width: 70 }
-  ];
+  const distanceFormatter = (params: GridValueFormatterParams<Date>) => formatDistanceToNow(params.value);
 
-  const onClick = (service: Service) => {
-    navigate(service.id.toString());
+  const renderDateCell = (params: GridRenderCellParams<any, CalendarSync, any>) => (
+    <Tooltip title={formatDate(params.value, "PPpp")}>
+      <span className="table-cell-trucate">{formatDistanceToNow(params.value)}</span>
+    </Tooltip>
+  );
+
+  const columns = React.useMemo<GridColumns<CalendarSync>>(
+    () => [
+      { field: "id", headerName: "ID", width: 70 },
+      {
+        field: "lodging", headerName: t("Lodging"), width: 200,
+        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value.name ?? ""
+      },
+      {
+        field: "channel", headerName: t("Booking channel"), width: 200,
+        valueFormatter: (params: GridValueFormatterParams<BookingChannel>) => params.value.name ?? ""
+      },
+      { field: "active", headerName: t("Active ?"), type: "boolean", width: 70 },
+      { field: "last_import", headerName: t("Last import"), width: 200, valueFormatter: distanceFormatter,
+        renderCell: renderDateCell
+      },
+      { field: "last_export", headerName: t("Last export"), width: 200, valueFormatter: distanceFormatter,
+        renderCell: renderDateCell
+      },
+    ], [t]);
+
+  const onClick = (calendarSync: CalendarSync) => {
+    navigate(calendarSync.id.toString());
   };
 
-  const onCreateService = () => {
+  const onCreateCalendarSync = () => {
     navigate("new");
   };
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
       <ListToolbar
-        title={t("Services")}
+        title={t("Calendars synchronization")}
         tools={[
-          { label: t("Create"), onClick: onCreateService, disabled: !canAdd }
+          { label: t("Create"), onClick: onCreateCalendarSync, disabled: !canAdd }
         ]}
       />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>

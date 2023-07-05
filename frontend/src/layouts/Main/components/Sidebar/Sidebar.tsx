@@ -92,7 +92,7 @@ const Sidebar: React.FC<Props> = props => {
         { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },
         { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> },
         { title: t("Booking channels"), href: "/settings/booking-channels", icon: <BookingSourcesIcon /> },
-        { title: t("Calendars sync"), href: "/settings/calendars-sync", icon: <CalendarMonthIcon /> },
+        { title: t("Calendars sync"), href: "/settings/calendar-syncs", icon: <CalendarMonthIcon /> },
       ]
     },
     {

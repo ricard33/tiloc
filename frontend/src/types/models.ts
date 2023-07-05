@@ -182,7 +182,9 @@ export interface CalendarSync {   // name is BookingChannelSync on API
   channel_id: number;
   channel: BookingChannel;
   lodging_id: number;
+  lodging: Lodging;
   source_url: string;
+  url_for_remote: string;
   active: boolean;
   last_import: Date;
   last_export: Date;

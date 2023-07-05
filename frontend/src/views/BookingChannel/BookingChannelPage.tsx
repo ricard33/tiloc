@@ -91,7 +91,7 @@ export function BookingChannelPage() {
     }
   };
 
-  if (isLoading || isStatusLoading) return <div>Loading...</div>;
+  if (isLoading || isStatusLoading) return <div>{t("Loading...")}</div>;
   return (
     <Page>
       <BookingChannelForm
