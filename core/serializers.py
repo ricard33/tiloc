@@ -199,6 +199,31 @@ class BookedServiceSerializer(serializers.ModelSerializer):
         )
 
 
+class BookingSubSerializer(serializers.ModelSerializer):
+    status = BookingStatusSerializer(read_only=True)
+    status_id = serializers.PrimaryKeyRelatedField(source="status", queryset=models.BookingStatus.objects.all())
+    lodging = LodgingSubSerializer(read_only=True)
+    lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
+    source = BookingChannelSerializer(read_only=True)
+    source_id = serializers.PrimaryKeyRelatedField(
+        source="source", queryset=models.BookingChannel.objects.all(), required=False, allow_null=True
+    )
+
+    class Meta:
+        model = models.Booking
+        fields = ["id", "status", "status_id", "lodging", "lodging_id", "guest_name", "source", "source_id",
+                  "begin_date", "end_date", "duration", "price",
+                  "deposit", "guaranty", "commission_fees", "commission_fees", "cancelled", "deleted"]
+
+
+class PaymentExtSerializer(serializers.ModelSerializer):
+    booking = BookingSubSerializer(read_only=True)
+
+    class Meta:
+        model = models.Payment
+        fields = "__all__"
+
+
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Payment

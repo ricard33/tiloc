@@ -139,7 +139,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
         </Grid>
 
         {showPayments && <>
-          <div className="label">{t("Payments:")}</div>
+          <div className="label">{t("Payment:")}</div>
           <div className="value">
             <PaymentList payments={data && data.results ? data.results : []} />
           </div>

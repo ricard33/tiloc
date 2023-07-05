@@ -147,7 +147,17 @@ export interface Payment {
   description: string;
   amount: number;
   method: string;
-  date: string;
+  date: Date;
+}
+
+export interface PaymentExt {
+  id?: number;
+  booking_id: number;
+  booking: Booking;
+  description: string;
+  amount: number;
+  method: string;
+  date: Date;
 }
 
 export const paymentMethods = (t: (key: string) => string) => {

@@ -23,7 +23,7 @@ import {
   api2Payment,
   api2Service,
   booking2api,
-  owner2api
+  owner2api, payment2Api
 } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
@@ -235,7 +235,7 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
   };
 }
 
-const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment);
+const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment, payment2Api);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
 const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner, owner2api);
@@ -355,6 +355,7 @@ export const api = createApi({
       }
     }),
     listPayments: paymentApi.list(builder),
+    listPaymentsPaginated: paymentApi.pages(builder),
     getPayment: paymentApi.get(builder),
     createPayment: paymentApi.create(builder),
     updatePayment: paymentApi.update(builder),
@@ -450,6 +451,7 @@ export const {
   useLazyGetPaymentQuery,
   useListPaymentsQuery,
   useLazyListPaymentsQuery,
+  useListPaymentsPaginatedQuery,
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
   useDeletePaymentMutation,

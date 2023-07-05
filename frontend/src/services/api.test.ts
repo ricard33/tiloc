@@ -2,7 +2,8 @@ import { api, serviceURL } from './api';
 import axios, { AxiosRequestConfig } from "axios";
 import { setupApiStore } from "../common/testUtils2";
 import { auth as authReducer } from '../reducers';
-import { newPayment, payment, paymentsList } from "./testData";
+import { newPayment, payment, paymentREST, paymentsList } from "./testData";
+import { payment2Api } from "../types/models-convertion";
 
 // beforeEach((): void => {
 //   fetchMock.resetMocks();
@@ -10,7 +11,7 @@ import { newPayment, payment, paymentsList } from "./testData";
 jest.mock("axios");
 const axiosMock = axios as jest.Mocked<typeof axios>;
 
-describe("List Payments", () => {
+describe("List Payment", () => {
 
   test("request is correct", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
@@ -44,7 +45,7 @@ describe("List Payments", () => {
         const { status, data, isSuccess } = action;
         expect(status).toBe("fulfilled");
         expect(isSuccess).toBe(true);
-        expect(data).toStrictEqual(paymentsList.results);
+        expect(data).toStrictEqual([payment]);
       });
   });
   test("unsuccessful response", () => {
@@ -70,7 +71,7 @@ describe("Create Payment", () => {
   test("request is correct", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockResolvedValue({ data: payment,  status: 201});
+    axiosMock.mockResolvedValue({ data: paymentREST,  status: 201});
     return storeRef.store
       .dispatch<any>(api.endpoints.createPayment.initiate(newPayment))
       .then(() => {
@@ -80,7 +81,7 @@ describe("Create Payment", () => {
         const { method, url, data } = request;
         console.log(request)
 
-        expect(data).toStrictEqual(newPayment);
+        expect(data).toStrictEqual(payment2Api(newPayment));
 
         expect(method).toBe("POST");
         expect(url).toBe(`${serviceURL}payment/`);
@@ -89,7 +90,7 @@ describe("Create Payment", () => {
   test("successful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockResolvedValue({ data: payment,  status: 200});
+    axiosMock.mockResolvedValue({ data: paymentREST,  status: 200});
 
     return storeRef.store
       .dispatch<any>(api.endpoints.createPayment.initiate(newPayment))

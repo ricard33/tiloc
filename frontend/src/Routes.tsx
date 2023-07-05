@@ -30,6 +30,7 @@ import CalendarSyncsList from "./views/CalendarSync/CalendarSyncsList";
 import CalendarSyncPage from "./views/CalendarSync/CalendarSyncPage";
 import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
+import PaymentsList from "./views/Payment/PaymentsList";
 
 
 
@@ -50,6 +51,7 @@ const MyRoutes = () => {
           <Route path="/planning/*" element={<PlanningView />} />
           <Route path="/bookings/*" element={<BookingList />} />
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
+          <Route path="/payments" element={<PaymentsList />} />
           <Route path="/reports" element={<TestPage />} />
           <Route path="/guests" element={<GuestsList />} />
           <Route path="/settings/" element={<Settings />} />

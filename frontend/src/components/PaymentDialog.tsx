@@ -59,7 +59,6 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
     const date = typeof data.date === "string" ? parseISO(data.date) : data.date;
     onValidate({
       ...data,
-      date: formatISO(date),
       amount: Number(data.amount)
     });
   };
@@ -85,7 +84,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
           <Controller
             name="date"
             control={control}
-            defaultValue={payment!.id ? payment!.date : new Date().toISOString()}
+            defaultValue={payment!.id ? payment!.date : new Date()}
             render={({ field }) =>
               <DatePicker
                 label={t("date")}

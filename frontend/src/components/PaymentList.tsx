@@ -34,7 +34,7 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onMo
       <TableBody>
         {payments && payments.map(p => (
           <TableRow key={p.id}>
-            <TableCell>{formatDate(parseISO(p.date))}</TableCell>
+            <TableCell>{formatDate(p.date)}</TableCell>
             <TableCell>{p.description}</TableCell>
             <TableCell>{paymentLabels[p.method]}</TableCell>
             <TableCell>{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>

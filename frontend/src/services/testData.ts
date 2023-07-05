@@ -1,5 +1,6 @@
 import { RootState } from "../store";
-import { Pagination, Payment } from "../types";
+import { Pagination } from "../types";
+import { parseISO } from "date-fns";
 
 export const initialState: Partial<RootState> = {
   auth: {
@@ -25,7 +26,16 @@ export const initialState: Partial<RootState> = {
   },
 };
 
-export const payment: Payment = {
+export const payment: Record<string, any> = {
+  id: 1,
+  booking: 22,
+  amount: 0,
+  date: parseISO("2021-01-15"),
+  description: "",
+  method: "cash",
+}
+
+export const paymentREST: Record<string, any> = {
   id: 1,
   booking: 22,
   amount: 0,
@@ -34,16 +44,17 @@ export const payment: Payment = {
   method: "cash",
 }
 
-export const paymentsList: Pagination<Payment> = {
+export const paymentsList: Pagination<Record<string, any>> = {
   count: 1,
-  results: [payment]
+  results: [paymentREST]
 }
 
 
-export const newPayment: Payment = {
+export const newPayment: Record<string, any> = {
   booking: 22,
   amount: 0,
-  date: "2021-01-15",
+  date: parseISO("2021-01-15"),
+  // date: "2021-01-15",
   description: "",
   method: "cash",
 }

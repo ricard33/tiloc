@@ -44,7 +44,7 @@ from .serializers import (
     PricingSerializer,
     SeasonalVariationSerializer,
     ServiceSerializer,
-    UserSerializer,
+    UserSerializer, PaymentExtSerializer,
 )
 
 logger = logging.getLogger("api")
@@ -365,7 +365,7 @@ class ContractViewSet(viewsets.ModelViewSet):
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = models.Payment.objects.all().order_by("date")
-    serializer_class = PaymentSerializer
+    serializer_class = PaymentExtSerializer
     filterset_fields = ["booking_id"]
 
 

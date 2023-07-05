@@ -15,6 +15,7 @@ import HolidayVillage from "@mui/icons-material/HolidayVillage";
 import RoomServiceIcon from '@mui/icons-material/RoomService';
 import GradingIcon from '@mui/icons-material/Grading';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PriceCheckIcon from '@mui/icons-material/PriceCheck';
 import { ReactComponent as BookingSourcesIcon } from "../../../../assets/icones/booking sources.svg";
 // import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 import { parseISO } from "date-fns";
@@ -108,6 +109,7 @@ const Sidebar: React.FC<Props> = props => {
         //   disabled: false,
         //   external: true
         // },
+        { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon /> },
         { title: t("Reports"), href: "/reports", icon: <MovingIcon /> },
         { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
         { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false },

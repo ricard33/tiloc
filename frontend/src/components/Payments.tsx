@@ -50,7 +50,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   function onAddPayment() {
     setEdited({
       booking: bookingId,
-      date: shiftUTCDateToLocalDate(new Date()).toISOString(),
+      date: shiftUTCDateToLocalDate(new Date()),
       description: "",
       method: "",
       amount: 0,
@@ -95,7 +95,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
     confirm({
       title: t("Delete payment: {{ amount }} € on {{ date }}", {
         amount: payment.amount,
-        date: formatDate(parseISO(payment.date))
+        date: formatDate(payment.date)
       }),
       description: t("Do you really want to permanently delete this payment?")
     })

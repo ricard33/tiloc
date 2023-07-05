@@ -6,14 +6,17 @@ import { formatISO } from "../common/tzUtils";
 export function api2Payment(p: Record<string, any>): Payment {
   return {
     ...p as Payment,
+    booking: isNaN(p.booking) ? api2Booking(p.booking) : p.booking,
+    date: parseISO(p.date),
     amount: Number(p.amount)
   };
 }
 
-export function payment2Api(p: Payment): Record<string, any> {
+export function payment2Api(p: Partial<Payment>): Record<string, any> {
   return {
     ...p,
-    amount: p.amount.toFixed(2)
+    ...(p.date && { date: formatISO(p.date) }),
+    amount: p.amount!.toFixed(2)
   };
 }
 
@@ -61,7 +64,7 @@ export function api2Booking(booking: Record<string, any>): Booking {
     total_payments: Number(booking.total_payments),
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
-    options: booking.options.map(api2Service),
+    options: booking.options ? booking.options.map(api2Service) : [],
     created: parseISO(booking.created),
     modified: parseISO(booking.modified),
   };
