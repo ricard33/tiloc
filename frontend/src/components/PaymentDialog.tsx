@@ -44,7 +44,7 @@ const useStyles = makeStyles((/*theme: Theme*/) => ({
 }));
 
 type Props = {
-  payment?: Payment;
+  payment?: Omit<Payment, 'booking'>;
   bookingId: number;
   onValidate: (payment: Payment) => void;
   onClose: () => void;
@@ -78,8 +78,8 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
         <form onSubmit={handleSubmit(onSubmit)}>
           <input
             type="hidden"
-            {...register("booking")}
-            defaultValue={payment!.booking}
+            {...register("booking_id")}
+            defaultValue={payment!.booking_id}
           />
           <Controller
             name="date"

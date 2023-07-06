@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useListPaymentsPaginatedQuery } from "../../services/api";
 // import { useNavigate } from "react-router-dom";
-import { paymentMethods, Lodging, User, PaymentExt } from "../../types";
+import { paymentMethods, Lodging, User, Payment } from "../../types";
 import {
   DataGrid, GridColDef,
   GridSortModel,
@@ -46,7 +46,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     );
   }, [data?.count, setRowCountState]);
 
-  const payments = data ? (data.results as never as PaymentExt[]).map((p: PaymentExt) => {
+  const payments = data ? (data.results as never as Payment[]).map((p: Payment) => {
     return {
       ...p,
       lodging: p.booking.lodging,

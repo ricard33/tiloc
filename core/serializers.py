@@ -216,15 +216,10 @@ class BookingSubSerializer(serializers.ModelSerializer):
                   "deposit", "guaranty", "commission_fees", "commission_fees", "cancelled", "deleted"]
 
 
-class PaymentExtSerializer(serializers.ModelSerializer):
-    booking = BookingSubSerializer(read_only=True)
-
-    class Meta:
-        model = models.Payment
-        fields = "__all__"
-
-
 class PaymentSerializer(serializers.ModelSerializer):
+    booking = BookingSubSerializer(read_only=True)
+    booking_id = serializers.PrimaryKeyRelatedField(source="booking", queryset=models.Booking.objects.all())
+
     class Meta:
         model = models.Payment
         fields = "__all__"

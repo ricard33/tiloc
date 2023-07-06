@@ -143,15 +143,6 @@ export interface Contract {
 
 export interface Payment {
   id?: number;
-  booking: number;
-  description: string;
-  amount: number;
-  method: string;
-  date: Date;
-}
-
-export interface PaymentExt {
-  id?: number;
   booking_id: number;
   booking: Booking;
   description: string;

@@ -29,7 +29,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   bookingId,
   onPaymentsUpdate
 }: PaymentListProps) => {
-  const [edited, setEdited] = useState<Payment | null>(null);
+  const [edited, setEdited] = useState<Omit<Payment, 'booking'> | null>(null);
   const confirm = useConfirm();
   const { t } = useTranslation();
   const { data } = useGetPaymentsForBookingQuery(bookingId);
@@ -49,7 +49,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
 
   function onAddPayment() {
     setEdited({
-      booking: bookingId,
+      booking_id: bookingId,
       date: shiftUTCDateToLocalDate(new Date()),
       description: "",
       method: "",
