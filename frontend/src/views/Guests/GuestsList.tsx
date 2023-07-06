@@ -44,7 +44,7 @@ const GuestsList: React.FunctionComponent<Props> = () => {
             getRowId={row => row.name}
             columns={columns}
             getRowHeight={() => 'auto'}
-            rowsPerPageOptions={[5, 10, 20, 50]}
+            pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             components={{
               Toolbar: GridToolbar

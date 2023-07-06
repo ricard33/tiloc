@@ -6,11 +6,9 @@ import { makeStyles } from "@mui/styles";
 import { useTheme } from "@mui/material/styles";
 import { Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/material";
 import { Footer, Sidebar, Topbar } from "./components";
-import { Link as RouterLink, LinkProps, Outlet, useLocation } from "react-router-dom";
+import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-
-const LinkRouter = (props: LinkProps) => <Link {...props} component={RouterLink} />;
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -86,9 +84,9 @@ const Main = () => {
       />
       <main className={classes.content}>
         <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
-          <LinkRouter color="inherit" to="/">
+          <Link color="inherit" component={RouterLink} to="/">
             {t("Home")}
-          </LinkRouter>
+          </Link>
           {pathnames.map((value, index) => {
             const last = index === pathnames.length - 1;
             const to = `/${pathnames.slice(0, index + 1).join("/")}/`;
@@ -98,9 +96,9 @@ const Main = () => {
                 {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
               </Typography>
             ) : (
-              <LinkRouter color="inherit" to={to} key={to}>
+              <Link color="inherit" component={RouterLink} to={to} key={to}>
                 {breadcrumbNameMap[to] || breadcrumbNameMap[value] || value}
-              </LinkRouter>
+              </Link>
             );
           })}
         </Breadcrumbs>

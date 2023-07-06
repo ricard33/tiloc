@@ -50,6 +50,7 @@ function App(props: Props) {
 
   return (
     // <StyledEngineProvider injectFirst>
+    // </StyledEngineProvider>
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
         <DateProvider locale={frLocale}>
@@ -62,7 +63,6 @@ function App(props: Props) {
         </DateProvider>
       </LocalizationProvider>
     </ThemeProvider>
-    // </StyledEngineProvider>
   );
 }
 

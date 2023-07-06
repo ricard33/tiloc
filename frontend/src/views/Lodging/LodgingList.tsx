@@ -9,8 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { Lodging, Owner, User } from "../../types";
 import {
   DataGrid,
-  GridActionsCellItem,
-  GridColumns,
+  GridActionsCellItem, GridColDef,
   GridRowParams,
   GridToolbar,
   GridValueFormatterParams
@@ -54,7 +53,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
     });
   }, [moveDown, moveUp, refetch, showError, showSuccess, t]);
 
-  const columns = React.useMemo<GridColumns<Lodging>>(
+  const columns = React.useMemo<GridColDef[]>(
     () => [
       { field: "id", headerName: "ID", width: 70 },
       { field: "name", headerName: t("Name"), width: 130 },
@@ -124,8 +123,9 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
             }}
             rows={data || []}
             columns={columns}
-            pageSize={20}
-            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoPageSize
+            // pageSize={20}
+            // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             components={{
               Toolbar: GridToolbar

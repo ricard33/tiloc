@@ -90,10 +90,11 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
                 label={t("date")}
                 openTo="day"
                 views={["year", "month", "day"]}
-                inputFormat="dd/MM/yyyy"
-                renderInput={(props: JSX.IntrinsicAttributes & TextFieldProps) => <TextField label={t("date")} variant={variant} {...props} />}
+                format="dd/MM/yyyy"
+                slotProps={{ textField: { variant: variant } }}
                 className={classes.date}
                 {...field}
+                onChange={date => field.onChange(date!)}
               />}
           />
           <Controller

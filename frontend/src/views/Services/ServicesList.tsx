@@ -59,8 +59,9 @@ const ServicesList: React.FunctionComponent<Props> = () => {
             }}
             rows={data || []}
             columns={columns}
-            pageSize={20}
-            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoPageSize
+            // pageSize={20}
+            // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             components={{
               Toolbar: GridToolbar

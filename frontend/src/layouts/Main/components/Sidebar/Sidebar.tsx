@@ -110,7 +110,7 @@ const Sidebar: React.FC<Props> = props => {
         //   external: true
         // },
         { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon /> },
-        { title: t("Reports"), href: "/reports", icon: <MovingIcon /> },
+        { title: t("Reports"), href: "/reports", icon: <MovingIcon />, disabled: true },
         { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
         { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false },
         { title: t("My account"), href: "/account", icon: <AccountBoxIcon />, disabled: true },

@@ -1,49 +1,42 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useListPaymentsPaginatedQuery } from "../../services/api";
-import { useNavigate } from "react-router-dom";
-import { Payment, paymentMethods, Lodging, User, Booking, PaymentExt } from "../../types";
+// import { useNavigate } from "react-router-dom";
+import { paymentMethods, Lodging, User, PaymentExt } from "../../types";
 import {
-  DataGrid,
-  GridColumns,
-  GridRenderCellParams,
+  DataGrid, GridColDef,
   GridSortModel,
   GridToolbar,
   GridValueFormatterParams
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
-import { Card, CardContent, Tooltip } from "@mui/material";
+import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { formatDate, formatDistanceToNow } from "../../common/dateUtils";
+import { formatDate } from "../../common/dateUtils";
 import { formatPrice } from "../../common/priceUtils";
 import { GridSortItem } from "@mui/x-data-grid/models/gridSortModel";
 import { DateRange } from "../../components/DateRangeSelector";
-import { endOfMonth, startOfMonth } from "date-fns";
 import { formatISO } from "../../common/tzUtils";
 
 type Props = {};
 
 const PaymentsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
-  const today = new Date();
-  const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [page, setPage] = useState(0);
+  const [paginationModel, setPaginationModel] = React.useState({ pageSize: 20, page: 0, });
   const [ordering, setOrdering] = useState<GridSortItem | undefined>({ field: "date", sort: "desc" });
-  const [search, setSearch] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange>({ startDate: startOfMonth(today), endDate: endOfMonth(today) });
-  const dateFilter = formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate);
+  const [dateRange, setDateRange] = useState<DateRange>();
+  const dateFilter = dateRange ? formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate) : "";
   const { data } = useListPaymentsPaginatedQuery({
-    page_size: rowsPerPage,
-    page: page + 1,
+    page_size: paginationModel.pageSize,
+    page: paginationModel.page + 1,
     ...(ordering ? { ordering: (ordering.sort === "desc" ? "-" : "") + ordering.field } : {}),
-    guest_name__icontains: search,
     for_dates: dateFilter
 
   }, { refetchOnMountOrArgChange: 20 });
   const [rowCountState, setRowCountState] = React.useState(data?.count ?? 0);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canDoReconciliation = user.permissions.includes("core.do_reconciliation");
 
@@ -61,14 +54,6 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     }
   }) : [];
 
-  const distanceFormatter = (params: GridValueFormatterParams<Date>) => formatDistanceToNow(params.value);
-
-  const renderDateCell = (params: GridRenderCellParams<any, Payment, any>) => (
-    <Tooltip title={formatDate(params.value, "PPpp")}>
-      <span className="table-cell-trucate">{formatDistanceToNow(params.value)}</span>
-    </Tooltip>
-  );
-
   const paymentLabels = paymentMethods(t).reduce<Record<string, string>>((obj, cur) => ({
     ...obj,
     [cur[0]]: cur[1]
@@ -81,41 +66,39 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
 
   console.log(paymentLabelsArray);
 
-  const columns = React.useMemo<GridColumns<PaymentExt>>(
+  const columns = React.useMemo<GridColDef[]>(
     () => [
       // { field: "id", headerName: "ID", width: 70 },
       {
-        field: "date", headerName: t("Date"), width: 200, valueFormatter: (params: GridValueFormatterParams<Date>) => formatDate(params.value, "PPP"),
+        field: "date", headerName: t("Date"), width: 200,
+        valueFormatter: (params: GridValueFormatterParams<Date>) => formatDate(params.value, "PPP"),
       },
       {
         field: "lodging", headerName: t("Lodging"), width: 200,
         valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value ? params.value.name ?? "" : ""
-        // valueFormatter: (params: GridValueFormatterParams<Partial<Booking>>) => params.value
       },
-      {
-        field: "guest_name", headerName: t("Guest"), width: 200,
-        // valueFormatter: (params: GridValueFormatterParams<Booking>) => params.value ?? ""
-      },
+      { field: "guest_name", headerName: t("Guest"), width: 200, },
       { field: "description", headerName: t("Description"), width: 130 },
       {
         field: "amount", headerName: t("Amount"), type: "number", width: 90,
         valueFormatter: formatPrice
       },
       {
-        field: "method", headerName: t("Method"), width: 150, valueFormatter: params => paymentLabels[params.value],
+        field: "method", headerName: t("Method"), width: 150,
+        valueFormatter: params => paymentLabels[params.value],
         type: "singleSelect",
         valueOptions: paymentLabelsArray,
         editable: true
       }
-    ], [paymentLabels, t]);
+    ], [paymentLabels, paymentLabelsArray, t]);
 
-  const onClick = (payment: Payment) => {
-    navigate(payment.id!.toString());
+  const onDateRangeChange = (range: DateRange) => {
+    setDateRange(range);
   };
 
-  const onCreatePayment = () => {
-    navigate("new");
-  };
+  // const onClick = (payment: Payment) => {
+  //   navigate(payment.id!.toString());
+  // };
 
   const onChangeOrdering = (properties: GridSortModel) => {
     if (properties.length > 0) {
@@ -128,14 +111,11 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     setOrdering(undefined);
   };
 
-  const onSearch = (value: string) => {
-    setSearch(value);
-  };
-
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
       <ListToolbar
         title={t("Payments")}
+        dateRange={dateRange} onDateRangeChange={onDateRangeChange}
         // tools={[
         //   { label: t("Create"), onClick: onCreatePayment, disabled: !canAdd }
         // ]}
@@ -157,10 +137,9 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
             columns={columns}
             pagination
             paginationMode="server"
-            page={page}
             autoPageSize
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setRowsPerPage(newPageSize)}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
             sortingMode="server"
             onSortModelChange={onChangeOrdering}
             // pageSize={20}

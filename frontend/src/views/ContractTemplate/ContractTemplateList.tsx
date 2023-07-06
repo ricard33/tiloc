@@ -4,7 +4,7 @@ import { useListContractTemplatesQuery } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 
 import { Card, CardContent, Tooltip } from "@mui/material";
-import { DataGrid, GridColumns, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
 import { useTranslation } from "react-i18next";
 import { ContractTemplate, User } from "../../types";
 import ListToolbar from "../../components/ListToolbar";
@@ -26,7 +26,7 @@ const ContractTemplateList: React.FunctionComponent<Props> = () => {
     return <Tooltip title={value}><span>{value}</span></Tooltip>;
   };
 
-  const columns = React.useMemo<GridColumns<ContractTemplate>>(
+  const columns = React.useMemo<GridColDef[]>(
     () => [
       { field: "id", headerName: "ID", width: 50 },
       { field: "name", headerName: t("Name"), flex: 1, minWidth: 100 },
@@ -64,8 +64,9 @@ const ContractTemplateList: React.FunctionComponent<Props> = () => {
             }}
             rows={data || []}
             columns={columns}
-            pageSize={20}
-            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoPageSize
+            // pageSize={20}
+            // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             components={{
               Toolbar: GridToolbar

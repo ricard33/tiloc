@@ -384,6 +384,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           label={t("Booking status")}
                           className="booking-status-select"
                           {...field}
+                          // TODO fix type
+                          onChange={event => field.onChange(event as never)}
                         >
                           {bookingStatuses.map(status => (
                             <MenuItem key={status.id} value={status.id}>
@@ -431,7 +433,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           autocompleteProps={{
                             freeSolo: true,
                             onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue),
-                            onInputChange: (event: React.SyntheticEvent, value: string, reason: string) => {
+                            onInputChange: (event: React.SyntheticEvent, value: string) => {
                               setValue("guest_name", value, {shouldDirty: true, shouldTouch: true})
                             },
                           }}
@@ -530,7 +532,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                                 id: n,
                                 label: n
                               })),
-                              ...(duration > 31) ? [{ id: duration, label: duration }] : []
+                              ...(duration > 31 ? [{ id: duration, label: duration }] : [])
                             ]}
                           />
                           {!isFlatRate &&

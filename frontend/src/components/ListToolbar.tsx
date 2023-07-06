@@ -93,8 +93,12 @@ const ListToolbar: React.FunctionComponent<ListToolbarProps> = (props) => {
           onChange={value => onSearch(value)}
         />
       </div>}
-      {dateRange && onDateRangeChange && <div>
-        <DateRangeSelector startDate={dateRange.startDate} endDate={dateRange.endDate} onChange={onDateRangeChange} />
+      {onDateRangeChange && <div>
+        <DateRangeSelector
+          startDate={dateRange ? dateRange.startDate : undefined}
+          endDate={dateRange ? dateRange.endDate : undefined}
+          onChange={onDateRangeChange}
+        />
       </div>}
       <span className={classes.spacer} />
       <div className={classes.actions}>

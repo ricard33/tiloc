@@ -31,8 +31,8 @@ export interface DateRange {
 }
 
 type Props = {
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   onChange: (range: DateRange) => void;
   definedRanges?: DefinedRange[]
 };
@@ -42,9 +42,12 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
   // const [dateRangePopup, setDateRangePopup] = useState({ open: false, anchorEl: undefined });
   const today = new Date();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [range, setRange] = useState<MuiDateRange>({ startDate, endDate });
   const maxDate = new Date(2100, 12, 31);
   const minDate = new Date(2000, 1, 1);
+  const [range, setRange] = useState<MuiDateRange>({
+    startDate: startDate ?? minDate,
+    endDate: endDate ?? maxDate
+  });
 
 
   const defaultRanges = definedRanges ?? [
@@ -139,8 +142,8 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
     if (ranges.length > 0) {
       return ranges[0].label;
     }
-    return format(startDate, "dd MMM yyyy", { locale: frLocale }) + " - " +
-      format(endDate, "dd MMM yyyy", { locale: frLocale });
+    return format(range.startDate ?? minDate, "dd MMM yyyy", { locale: frLocale }) + " - " +
+      format(range.endDate ?? maxDate, "dd MMM yyyy", { locale: frLocale });
   };
 
   return (

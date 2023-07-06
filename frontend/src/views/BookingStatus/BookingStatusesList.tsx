@@ -10,10 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { BookingStatus, User } from "../../types";
 import {
   DataGrid,
-  GridActionsCellItem,
-  GridColumns,
+  GridActionsCellItem, GridColDef,
   GridRenderCellParams,
-  GridRowParams, GridSelectionModel,
+  GridRowParams, GridRowSelectionModel,
   GridToolbar
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
@@ -42,7 +41,7 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
   const [selected, setSelected] = useState<number[]>([]);
   const numSelected = selected.length;
 
-  const onSelectionChange = (newSelection: GridSelectionModel) => {
+  const onSelectionChange = (newSelection: GridRowSelectionModel) => {
     setSelected(newSelection as number[]);
   };
 
@@ -76,13 +75,13 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
     });
   }, [moveDown, moveUp, refetchStatuses, showError, showSuccess, t]);
 
-  const columns = React.useMemo<GridColumns<BookingStatus>>(
+  const columns = React.useMemo<GridColDef[]>(
     () => [
       { field: "id", headerName: "ID", width: 70, sortable: false },
       { field: "name", headerName: t("Name"), width: 150, sortable: false },
       {
         field: "color", headerName: t("Color"), width: 100, sortable: false,
-        renderCell: (params: GridRenderCellParams<string>) => (
+        renderCell: (params: GridRenderCellParams) => (
           <div
             style={{ marginLeft: 16, width: "6em", height: "1em", backgroundColor: params.value }}
           >
@@ -134,10 +133,11 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
             columns={columns}
             disableColumnFilter
             checkboxSelection
-            pageSize={20}
-            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoPageSize
+            // pageSize={20}
+            // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
-            onSelectionModelChange={onSelectionChange}
+            onRowSelectionModelChange={onSelectionChange}
             components={{
               Toolbar: GridToolbar
             }}

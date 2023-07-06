@@ -13,7 +13,7 @@ import { BookingsImportDialog, SearchInput } from "../../components";
 import {
   DataGrid,
   GridColDef,
-  GridSelectionModel,
+  GridRowSelectionModel,
   GridSortModel,
   GridToolbarColumnsButton,
   GridToolbarContainer,
@@ -33,8 +33,10 @@ const BookingList = () => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<number[]>([]);
   const numSelected = selected.length;
-  const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [page, setPage] = useState(0);
+  const [paginationModel, setPaginationModel] = React.useState({
+    pageSize: 20,
+    page: 0,
+  });
   const [ordering, setOrdering] = useState<GridSortItem | undefined>({ field: "begin_date", sort: "asc" });
   const [search, setSearch] = useState("");
   const [openImport, setOpenImport] = useState<boolean>(false);
@@ -42,8 +44,8 @@ const BookingList = () => {
   const [dateRange, setDateRange] = useState<DateRange>({ startDate: startOfMonth(today), endDate: endOfMonth(today) });
   const dateFilter = formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate);
   const { data: bookings, isFetching } = useListBookingsPaginatedQuery({
-    page_size: rowsPerPage,
-    page: page + 1,
+    page_size: paginationModel.pageSize,
+    page: paginationModel.page + 1,
     ...(ordering ? { ordering: (ordering.sort === "desc" ? "-" : "") + ordering.field } : {}),
     guest_name__icontains: search,
     for_dates: dateFilter
@@ -77,7 +79,7 @@ const BookingList = () => {
   ];
 
 
-  const onSelectionChange = (newSelection: GridSelectionModel) => {
+  const onSelectionChange = (newSelection: GridRowSelectionModel) => {
     setSelected(newSelection as number[]);
   };
 
@@ -177,7 +179,8 @@ const BookingList = () => {
             initialState={{
               sorting: {
                 sortModel: [ordering as GridSortItem]
-              }
+              },
+              pagination: { paginationModel: { page: 1, pageSize: 10 } }
             }}
 
             rows={bookings?.results || []}
@@ -185,10 +188,9 @@ const BookingList = () => {
             columns={columns}
             pagination
             paginationMode="server"
-            page={page}
             autoPageSize
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setRowsPerPage(newPageSize)}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
             sortingMode="server"
             onSortModelChange={onChangeOrdering}
             disableColumnFilter
@@ -197,14 +199,13 @@ const BookingList = () => {
 
             loading={isFetching}
             checkboxSelection
-            disableSelectionOnClick
+            disableRowSelectionOnClick
             onRowClick={(params) => onEditBooking(params.row)}
-            onSelectionModelChange={onSelectionChange}
+            onRowSelectionModelChange={onSelectionChange}
             components={{
               Toolbar: CustomToolbar,
               LoadingOverlay: LinearProgress
             }}
-            experimentalFeatures={{ newEditingApi: true }}
           />
 
           {/*<PerfectScrollbar>*/}

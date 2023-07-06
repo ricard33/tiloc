@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useListCalendarSyncsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { BookingChannel, CalendarSync, Lodging, User } from "../../types";
-import { DataGrid, GridColumns, GridRenderCellParams, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent, Tooltip } from "@mui/material";
@@ -22,13 +22,13 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
 
   const distanceFormatter = (params: GridValueFormatterParams<Date>) => formatDistanceToNow(params.value);
 
-  const renderDateCell = (params: GridRenderCellParams<any, CalendarSync, any>) => (
-    <Tooltip title={formatDate(params.value, "PPpp")}>
-      <span className="table-cell-trucate">{formatDistanceToNow(params.value)}</span>
+  const renderDateCell = (params: GridRenderCellParams<any, Date, any>) => (
+    <Tooltip title={formatDate(params.value!, "PPpp")}>
+      <span className="table-cell-trucate">{formatDistanceToNow(params.value!)}</span>
     </Tooltip>
   );
 
-  const columns = React.useMemo<GridColumns<CalendarSync>>(
+  const columns = React.useMemo<GridColDef<CalendarSync>[]>(
     () => [
       { field: "id", headerName: "ID", width: 70 },
       {
@@ -73,8 +73,9 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
             }}
             rows={data || []}
             columns={columns}
-            pageSize={20}
-            rowsPerPageOptions={[5, 10, 20, 50]}
+            autoPageSize
+            // pageSize={20}
+            // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             components={{
               Toolbar: GridToolbar

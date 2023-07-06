@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from location import __date__, __version__
 
 from . import models
-from .filters import BookingFilter
+from .filters import BookingFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
 from .serializers import (
@@ -366,7 +366,7 @@ class ContractViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = models.Payment.objects.all().order_by("date")
     serializer_class = PaymentExtSerializer
-    filterset_fields = ["booking_id"]
+    filterset_class = PaymentFilter
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
