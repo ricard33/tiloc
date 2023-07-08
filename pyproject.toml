@@ -53,7 +53,7 @@ django-webpack-loader = "^1.6.0"
 djangorestframework = "^3.14.0"
 gunicorn = "^20.0.4"
 ics = { git = "https://github.com/ricard33/ics-py", branch="more-permissive-parsing" }
-invoke = "^1.7.3"
+invoke = "^2.1.3"
 jinja2 = "^3.1.2"
 JSON-log-formatter = "^0.5.1"
 loggly-python-handler = "^1.0.1"
@@ -68,11 +68,11 @@ psycopg2-binary = "==2.9.6"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.5.0"
-fabric = "^2.6.0"
+fabric = "^3.0"
 factory_boy = "*"
 flake8 = "^5.0.4"
 isort = "^5.6.4"
-patchwork = "^1.0.1"
+patchwork = {git = "https://github.com/ricard33/patchwork.git", rev = "fabric3"}
 pep8 = "^1.7.1"
 pytest = "^6.2.5"
 pytest-django = "^4.5.2"
