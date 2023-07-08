@@ -30,32 +30,6 @@ const timeSteps = {
   year: 1
 };
 
-function debounce(fn: Function, ms: number) {
-  let timeoutId: number;
-  return () => {
-    clearTimeout(timeoutId);
-    // @ts-ignore
-    timeoutId = window.setTimeout(() => fn.apply(this, arguments), ms);
-  };
-}
-
-function useWindowSize() {
-  const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
-  useLayoutEffect(() => {
-    // console.debug("useLayoutEffect");
-
-    const debouncedUpdateSize = debounce(function updateSize() {
-      setSize([window.innerWidth, window.innerHeight]);
-    }, 100);
-
-    window.addEventListener("resize", debouncedUpdateSize);
-
-    return () => window.removeEventListener("resize", debouncedUpdateSize);
-  }, []);
-
-  return size;
-}
-
 type TimelineGroup = {
     id: number,
     title: string,
@@ -140,14 +114,13 @@ const BookingScheduler: React.FC<Props> = props => {
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
     showPaymentStatus, showTooltips, monthsToDisplay, disabled
   } = props;
-  const { width: windowWidth } = useWindowDimensions();
-  const isDesktop = windowWidth >= 900;
+  const { width, height } = useWindowDimensions();
+  const isDesktop = width >= 900;
   const [horizontalMonths, setHorizontalMonths] = useState(1);
   const [lineHeight, setLineHeight] = useState(20);
   const [collapsedState, setCollapsed] = useState<boolean|undefined>(undefined);
   const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
   const [selected, setSelected] = useState<number[]>([]);
-  const [width, height] = useWindowSize();
   const { t } = useTranslation();
 
   const beginDate = _beginDate ?? startOfMonth(new Date());
@@ -251,6 +224,7 @@ const BookingScheduler: React.FC<Props> = props => {
   function eventItemSelected(bookingId: number) {
     setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
+    onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function eventItemDeselected(bookingId: number) {
@@ -290,7 +264,7 @@ const BookingScheduler: React.FC<Props> = props => {
         lineHeight={lineHeight}
         stackItems
         clickTolerance={1}
-        // itemTouchSendsClick
+        itemTouchSendsClick
         // useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 130}
