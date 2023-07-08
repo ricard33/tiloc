@@ -4,7 +4,7 @@ function getStorageValue(key: string, defaultValue: string | {}) {
   // getting stored value
   const saved = localStorage.getItem(key);
   const initial = saved ? JSON.parse(saved) : defaultValue;
-  return initial || defaultValue;
+  return typeof initial === "undefined" ? defaultValue : initial;
 }
 
 export const useLocalStorage = (key: string, defaultValue: string | {}) => {
