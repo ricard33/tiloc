@@ -45,5 +45,9 @@
   "Impossible to create bookingStatus: ": "Impossible to create bookingStatus: ",
   "BookingStatus added": "BookingStatus added",
   "Impossible to modify bookingStatus: ": "Impossible to modify bookingStatus: ",
-  "BookingStatus changed": "BookingStatus changed"
+  "BookingStatus changed": "BookingStatus changed",
+  "Payments:": "Payments:",
+  "Calendar Synchronizations": "Calendar Synchronizations",
+  "Edit booking": "Edit booking",
+  "Method": "Method"
 }

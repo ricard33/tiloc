@@ -3,7 +3,6 @@ import PaymentList from "./PaymentList";
 import { useConfirm } from "../libs/MuiConfirm";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../common/dateUtils";
-import { parseISO } from "date-fns";
 import { AddCircle as AddIcon } from "@mui/icons-material";
 import PaymentDialog from "./PaymentDialog";
 import { Payment, User } from "../types";
@@ -57,7 +56,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
     });
   }
 
-  function onCreateorModifyPayment(payment: Payment) {
+  function onCreateOrModifyPayment(payment: Payment) {
     if(!edited || !edited.id) {
       createPayment(payment).then((result) => {
         if ((result as any).error) {
@@ -133,7 +132,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
           <AddIcon />{t("Add payment")}
         </IconButton>
         {edited !== null &&
-        <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateorModifyPayment} onClose={onClose} />}
+        <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose} />}
       </>}</div>
   );
 };

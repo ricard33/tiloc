@@ -8,6 +8,8 @@ export type PlanningSettings = {
   showPaymentStatus: boolean;
   monthsToDisplay: number;
   showTooltips: boolean;
+  smallTooltips: boolean;
+  scrollingTimeline: boolean;
 }
 
 
@@ -24,10 +26,13 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
     defaultValues: {
       showPaymentStatus: settings.showPaymentStatus,
       monthsToDisplay: settings.monthsToDisplay,
-      showTooltips: settings.showTooltips
+      showTooltips: settings.showTooltips,
+      smallTooltips: settings.smallTooltips,
+      scrollingTimeline: settings.scrollingTimeline,
     }
   });
-  const { handleSubmit, control } = formContext;
+  const { handleSubmit, control, watch } = formContext;
+  const showTooltips = watch("showTooltips", settings.showTooltips);
 
   const onSubmit: SubmitHandler<PlanningSettings> = data => {
     // console.log(data);
@@ -70,6 +75,19 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
               control={control}
               name="showTooltips"
               label={t<string>("Show booking details on tooltip")}
+            />
+
+            <CheckboxElement
+              control={control}
+              name="smallTooltips"
+              disabled={!showTooltips}
+              label={t<string>("Show only summary in tooltip")}
+            />
+
+            <CheckboxElement
+              control={control}
+              name="scrollingTimeline"
+              label={t<string>("Display bookings as scrolling timeline")}
             />
           </Stack>
 

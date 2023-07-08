@@ -84,7 +84,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
         valueFormatter: formatPrice
       },
       {
-        field: "method", headerName: t("Method"), width: 150,
+        field: "method", headerName: t("payment method"), width: 150,
         valueFormatter: params => paymentLabels[params.value],
         type: "singleSelect",
         valueOptions: paymentLabelsArray,

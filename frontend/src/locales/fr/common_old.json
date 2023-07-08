@@ -46,5 +46,9 @@
   "Impossible to create bookingStatus: ": "Impossible de créer un statut: ",
   "BookingStatus added": "Statut de réservation ajouté",
   "Impossible to modify bookingStatus: ": "Impossible de modifier le statut: ",
-  "BookingStatus changed": "Statut de réservation modifié"
+  "BookingStatus changed": "Statut de réservation modifié",
+  "Payments:": "Paiements :",
+  "Calendar Synchronizations": "Synchronisation de calendrier",
+  "Edit booking": "Éditer la réservation",
+  "Method": "Methode"
 }

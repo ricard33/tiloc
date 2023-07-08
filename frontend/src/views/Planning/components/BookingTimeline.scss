@@ -1,0 +1,86 @@
+.booking-timeline {
+
+  .react-calendar-timeline .rct-header-root {
+    background: #4050b5;
+  }
+
+  .react-calendar-timeline * {
+    //font-size: x-small;
+  }
+
+  .react-calendar-timeline .rct-dateHeader * {
+    //font-size: xx-small;
+  }
+
+  .react-calendar-timeline .rct-scroll {
+    //overflow-x: hidden;
+  }
+
+  .disabled {
+    opacity: 0.3;
+  }
+
+  .collapse-button {
+    width: 100%;
+    min-width: inherit;
+    padding: inherit;
+    //height: 30px;
+  }
+
+  .backdrop {
+    z-index: 10000;
+    color: #fff
+  }
+
+  .lodging {
+    text-overflow: ellipsis
+  }
+
+  .group-separator {
+  }
+
+  .special-group {
+    font-weight: bold
+  }
+
+  .timeline {
+    margin-bottom: 10px;
+  }
+
+  .timeline-header {
+    //height: 40px
+  }
+
+  .date-header {
+    //height: 16px
+  }
+
+  .item-content {
+    width: 100%;
+  }
+
+  .item-title {
+    // position: relative;
+  }
+
+  .item-icon {
+    font-size: 1em;
+    /* float: right; */
+    position: absolute;
+    right: 0;
+    top: 0;
+    border-left: 1px solid black;
+  }
+
+  .rct-horizontal-lines {
+    cursor: copy;
+  }
+
+  .partially-paid {
+    background: orange;
+  }
+
+  .fully-paid {
+    background: rgb(182, 230, 158);
+  }
+}
