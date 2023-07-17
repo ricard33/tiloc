@@ -4,7 +4,6 @@ from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
-from rest_framework.reverse import reverse
 from simple_history.admin import SimpleHistoryAdmin
 
 from core import models
