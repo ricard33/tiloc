@@ -44,7 +44,7 @@ class PaymentTestCase(APITestCase):
         response = self.client.post(
             "/api/payment/",
             {
-                "booking": booking.id,
+                "booking_id": booking.id,
                 "description": "solde",
                 "amount": 123.4,
                 "method": models.Payment.PaymentMethod.TRANSFER.value,
@@ -55,5 +55,5 @@ class PaymentTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         self.assertEqual(models.Payment.objects.all().count(), 1)
         obj = response.data
-        self.assertEqual(obj["booking"], booking.id)
+        self.assertEqual(obj["booking_id"], booking.id)
         self.assertEqual(obj["amount"], "123.40")
