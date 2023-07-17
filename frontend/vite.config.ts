@@ -38,6 +38,11 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
         "/stats": "http://127.0.0.1:8000"
         // '/authorization/': '...',
       }
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: 'src/setupTests.ts',
     }
   };
 });

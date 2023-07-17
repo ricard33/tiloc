@@ -1,31 +1,36 @@
-import { api, serviceURL } from './api';
+import { api, serviceURL } from "./api";
+// import { vi } from 'vitest';
 import axios, { AxiosRequestConfig } from "axios";
 import { setupApiStore } from "../common/testUtils2";
-import { auth as authReducer } from '../reducers';
+import { auth as authReducer } from "../reducers";
 import { newPayment, payment, paymentREST, paymentsList } from "./testData";
 import { payment2Api } from "../types/models-convertion";
 
 // beforeEach((): void => {
 //   fetchMock.resetMocks();
 // });
-jest.mock("axios");
-const axiosMock = axios as jest.Mocked<typeof axios>;
+vi.mock("axios");
+// const axiosMock = axios as jest.Mocked<typeof axios>;
 
 describe("List Payment", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  });
 
   test("request is correct", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockResolvedValue({ data: paymentsList,  status: 200});
+    axios.mockResolvedValue({ data: paymentsList, status: 200 });
 
     return storeRef.store
       .dispatch<any>(
         api.endpoints.listPayments.initiate({})
       )
       .then(() => {
-        expect(axiosMock).toBeCalledTimes(1);
+        expect(axios).toBeCalledTimes(1);
         // @ts-ignore
-        const { method, url } = axiosMock.mock.calls[0][0] as AxiosRequestConfig;
+        const { method, url } = axios.mock.calls[0][0] as AxiosRequestConfig;
 
         expect(method).toBe("GET");
         expect(url).toBe(`${serviceURL}payment/`);
@@ -34,14 +39,14 @@ describe("List Payment", () => {
   test("successful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockResolvedValue({ data: paymentsList,  status: 200});
+    axios.mockResolvedValue({ data: paymentsList, status: 200 });
 
     return storeRef.store
       .dispatch<any>(
         api.endpoints.listPayments.initiate({})
       )
       .then((action: any) => {
-        console.log(action)
+        console.log(action);
         const { status, data, isSuccess } = action;
         expect(status).toBe("fulfilled");
         expect(isSuccess).toBe(true);
@@ -51,7 +56,7 @@ describe("List Payment", () => {
   test("unsuccessful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockRejectedValue({ response: {status: 400, statusText: "Internal Server Error"}});
+    axios.mockRejectedValue({ response: { status: 400, statusText: "Internal Server Error" } });
 
     return storeRef.store
       .dispatch<any>(
@@ -71,15 +76,15 @@ describe("Create Payment", () => {
   test("request is correct", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockResolvedValue({ data: paymentREST,  status: 201});
+    axios.mockResolvedValue({ data: paymentREST, status: 201 });
     return storeRef.store
       .dispatch<any>(api.endpoints.createPayment.initiate(newPayment))
       .then(() => {
-        expect(axiosMock).toBeCalledTimes(1);
+        expect(axios).toBeCalledTimes(1);
         // @ts-ignore
-        const request = axiosMock.mock.calls[0][0] as AxiosRequestConfig;
+        const request = axios.mock.calls[0][0] as AxiosRequestConfig;
         const { method, url, data } = request;
-        console.log(request)
+        console.log(request);
 
         expect(data).toStrictEqual(payment2Api(newPayment));
 
@@ -90,7 +95,7 @@ describe("Create Payment", () => {
   test("successful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockResolvedValue({ data: paymentREST,  status: 200});
+    axios.mockResolvedValue({ data: paymentREST, status: 200 });
 
     return storeRef.store
       .dispatch<any>(api.endpoints.createPayment.initiate(newPayment))
@@ -102,7 +107,7 @@ describe("Create Payment", () => {
   test("unsuccessful response", () => {
     const storeRef = setupApiStore(api, { auth: authReducer });
     // @ts-ignore
-    axiosMock.mockRejectedValue({ response: {status: 400, statusText: "Internal Server Error"}});
+    axios.mockRejectedValue({ response: { status: 400, statusText: "Internal Server Error" } });
 
     return storeRef.store
       .dispatch<any>(
