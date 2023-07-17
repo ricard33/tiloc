@@ -1,53 +1,55 @@
-{% load render_bundle from webpack_loader %}
+{% load django_vite %}
 {% load settings %}
 {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8"/>
-    <link rel="icon" href="{% static "favicon.ico" %}"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-    <meta name="theme-color" content="#000000"/>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="{% static "favicon.ico" %}" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <meta name="theme-color" content="#000000" />
     <meta
         name="description"
         content="Ti Loc apps"
     />
-    <link rel="apple-touch-icon" href="{% static "apple-touch-icon.png" %}"/>
-    <link rel="manifest" href="{% static "manifest.json" %}"/>
+    <link rel="apple-touch-icon" href="{% static "apple-touch-icon.png" %}" />
+    <link rel="manifest" href="{% static "manifest.json" %}" />
     <title>{% settings_value "APP_NAME" %}</title>
+    {% vite_hmr_client %}
+    <link rel="stylesheet" href="{% vite_asset_url 'index.css' %}" />
+    <script type="module" src="{% vite_asset_url 'index.html' %}"></script>
+    {% vite_react_refresh %}
     {% if settings.DEBUG or settings.ENV != 'prod' %}
         <style>
-          .debug-alert {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 20px;
-            background-color: red;
-            border-top: solid black 1px;
-            padding: 5px;
-            padding-top: 0;
-            color: white;
-            opacity: .8;
-            filter: alpha(opacity=80);
-            box-shadow: 1px 10px 12px #000000;
-            zoom: 1;
-            z-index: 10000;
-            text-align: center;
-          }
+            .debug-alert {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: 20px;
+                background-color: red;
+                border-top: solid black 1px;
+                padding: 5px;
+                padding-top: 0;
+                color: white;
+                opacity: .8;
+                filter: alpha(opacity=80);
+                box-shadow: 1px 10px 12px #000000;
+                zoom: 1;
+                z-index: 10000;
+                text-align: center;
+            }
 
-          body > .debug-alert {
-            position: fixed
-          }
+            body > .debug-alert {
+                position: fixed
+            }
 
         </style>
     {% endif %}
 </head>
 <body>
-<div id="root">
-</div>
-{% render_bundle 'main' %}
+<div id="root"></div>
 {% if settings.DEBUG or settings.ENV != 'prod' %}
     <div class="debug-alert">ENV = {{ settings.ENV }} | DEBUG = {{ settings.DEBUG }}</div>
 {% endif %}

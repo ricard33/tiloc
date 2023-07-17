@@ -176,7 +176,7 @@ def build(c):
 def prepare_frontend_env(c):
     with c.cd(os.path.join(WORKSPACE, "frontend")):
         c.local("yarn install --pure-lockfile")
-        c.local("npm rebuild node-sass")
+        # c.local("npm rebuild node-sass")
 
 
 @task
@@ -313,7 +313,6 @@ def deploy_location(c):
             print("create virtual env")
             c.run("python%s -m venv .env" % c.PYTHON_VERSION)
 
-        c.run("rm -rf www/static")
         with c.prefix(". .env/bin/activate"):
             c.run("pip install pip --upgrade")
             c.run("pip install -r requirements-prod.txt --upgrade")

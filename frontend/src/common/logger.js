@@ -3,9 +3,9 @@ import { LogglyTracker } from "loggly-jslogger";
 const loggly = new LogglyTracker();
 
 loggly.push({
-  logglyKey: process.env.REACT_APP_LOGGLY_CUSTOMER_TOKEN,
+  logglyKey: import.meta.env.VITE_LOGGLY_CUSTOMER_TOKEN,
   sendConsoleErrors: true,
-  tag: process.env.REACT_APP_LOGGLY_TAG,
+  tag: import.meta.env.VITE_LOGGLY_TAG,
   useUtfEncoding: true,
   useDomainProxy : true,
 });
@@ -14,7 +14,7 @@ let previous;
 
 const logFn = (level, data, extended_data = {}, once = false) => {
 
-  if(!process.env.REACT_APP_LOGGLY_ACTIVE)
+  if(!import.meta.env.VITE_LOGGLY_ACTIVE)
     return;
 
   if (!loggly.key) {

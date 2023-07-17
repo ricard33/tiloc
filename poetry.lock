@@ -816,6 +816,24 @@ files = [
 ]
 
 [[package]]
+name = "django-vite"
+version = "2.1.3"
+description = "Integration of ViteJS in a Django project."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-vite-2.1.3.tar.gz", hash = "sha256:c59b3bbd85501bc1faf63c500df66542abed2951cfa10dfbf8be8ecf229f7652"},
+    {file = "django_vite-2.1.3-py3-none-any.whl", hash = "sha256:97984ac495910b7b71039228ccddff52d132231fa6612d3d31c6c228c95b0217"},
+]
+
+[package.dependencies]
+Django = ">=1.11"
+
+[package.extras]
+dev = ["black", "flake8"]
+
+[[package]]
 name = "django-webpack-loader"
 version = "1.8.1"
 description = "Transparently use webpack with django"
@@ -2188,4 +2206,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1f86cdd395d8b7125cff0b761ad60d7abd18b4e416a98b89663817d9d32ef8f8"
+content-hash = "17dd5c01fc36590047cc0a15505e194106ef951301e702568f52fb9aab0a5365"

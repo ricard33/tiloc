@@ -88,7 +88,7 @@ INSTALLED_APPS = [
     "django_cron",
     "core",
     # 'frontend',
-    "webpack_loader",
+    "django_vite",
 ]
 
 MIDDLEWARE = [
@@ -207,9 +207,13 @@ STATIC_URL = config.get("APP", "STATIC_URL", "/static/")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-PROD_ASSETS_DIR = os.path.join(BASE_DIR, "frontend", "build")
-if os.path.exists(PROD_ASSETS_DIR):
-    STATICFILES_DIRS.append(PROD_ASSETS_DIR)
+
+DJANGO_VITE_ASSETS_PATH = os.path.join(BASE_DIR, "frontend", "build")
+DJANGO_VITE_MANIFEST_PATH = os.path.join(DJANGO_VITE_ASSETS_PATH, "vite-manifest.json")
+DJANGO_VITE_DEV_MODE = ENV == "dev"  # default to DEBUG
+
+if os.path.exists(DJANGO_VITE_ASSETS_PATH):
+    STATICFILES_DIRS.append(DJANGO_VITE_ASSETS_PATH)
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 

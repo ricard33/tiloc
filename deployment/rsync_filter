@@ -12,8 +12,6 @@
 + /requirement.txt
 + /frontend/
 + /frontend/build/
-+ /frontend/static/
-+ /frontend/webpack-stats.*
 - /frontend/*
 - /log/
 - *.pyc

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ESNext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -22,7 +22,8 @@
     "sourceMap": true,
     "declaration": true,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "types": ["vite/client", "vite-plugin-svgr/client"]
   },
   "include": [
     "src/**/*"
