@@ -223,7 +223,7 @@ const BookingTimeline: React.FC<Props> = props => {
   function eventItemSelected(bookingId: number) {
     setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
-    onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
+    // onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function eventItemDeselected(bookingId: number) {
@@ -268,7 +268,7 @@ const BookingTimeline: React.FC<Props> = props => {
           // lineHeight={lineHeight}
           stackItems
           clickTolerance={1}
-          itemTouchSendsClick
+          // itemTouchSendsClick
           // useResizeHandle
           timeSteps={timeSteps}
           sidebarWidth={collapsed ? 30 : 130}

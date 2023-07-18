@@ -224,7 +224,7 @@ const BookingScheduler: React.FC<Props> = props => {
   function eventItemSelected(bookingId: number) {
     setSelected([bookingId]);
     onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
-    onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
+    // onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function eventItemDeselected(bookingId: number) {
@@ -263,8 +263,8 @@ const BookingScheduler: React.FC<Props> = props => {
         dragSnap={24 * 60 * 60 * 1000}
         lineHeight={lineHeight}
         stackItems
-        clickTolerance={1}
-        itemTouchSendsClick
+        clickTolerance={30}
+        // itemTouchSendsClick
         // useResizeHandle
         timeSteps={timeSteps}
         sidebarWidth={collapsed ? 30 : 130}
