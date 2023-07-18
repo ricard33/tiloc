@@ -43,9 +43,9 @@ const Planning = () => {
 
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
   if (isNaN(requestedDate.valueOf()))
-    requestedDate = new Date();
+    requestedDate = startOfMonth(new Date());
 
-  // const [beginDate, setBeginDate] = useState(requestedDate);
+  // const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   const [dates, setDates] = useState({
     start: scrollingTimeline ? sub(requestedDate, {months: 3}) : requestedDate,
     end: scrollingTimeline ? add(requestedDate, { months: 5 }) : add(requestedDate, { years: 1 })});

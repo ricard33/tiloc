@@ -265,7 +265,7 @@ const BookingTimeline: React.FC<Props> = props => {
           canChangeGroup={false}
           canResize={false}
           dragSnap={24 * 60 * 60 * 1000}
-          // lineHeight={lineHeight}
+          lineHeight={50}
           stackItems
           clickTolerance={1}
           // itemTouchSendsClick
