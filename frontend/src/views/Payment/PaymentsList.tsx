@@ -70,11 +70,11 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     () => [
       // { field: "id", headerName: "ID", width: 70 },
       {
-        field: "date", headerName: t("Date"), width: 200,
+        field: "date", headerName: t("Date"), width: 140,
         valueFormatter: (params: GridValueFormatterParams<Date>) => formatDate(params.value, "PPP"),
       },
       {
-        field: "lodging", headerName: t("Lodging"), width: 200,
+        field: "lodging", headerName: t("Lodging"), width: 110,
         valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value ? params.value.name ?? "" : ""
       },
       { field: "guest_name", headerName: t("Guest"), width: 200, },

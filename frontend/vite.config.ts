@@ -16,13 +16,13 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
     },
     plugins: [
       react(),
-      // checker({
-      //   overlay: { initialIsOpen: false },
-      //   typescript: true,
-      //   eslint: {
-      //     lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      //   },
-      // }),
+      checker({
+        overlay: { initialIsOpen: false },
+        typescript: true,
+        eslint: {
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
       reactRefresh(),
       viteTsconfigPaths(),
       svgrPlugin()

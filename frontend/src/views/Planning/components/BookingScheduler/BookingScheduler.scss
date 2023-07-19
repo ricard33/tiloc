@@ -4,13 +4,28 @@
     font-size: x-small;
   }
 
-  .react-calendar-timeline .rct-dateHeader * {
-    font-size: xx-small;
+  .react-calendar-timeline {
+
+    .collapse-button {
+      border: 1px black solid;
+      height: 100%;
+    }
+
+    .timeline-header {
+      background: grey;
+    }
+    .calendar-header {
+    }
+
+    .rct-dateHeader * {
+      font-size: xx-small;
+    }
+
+    .rct-scroll {
+      overflow-x: hidden;
+    }
   }
 
-  .react-calendar-timeline .rct-scroll {
-    overflow-x: hidden;
-  }
 
   .disabled {
     opacity: 0.3;

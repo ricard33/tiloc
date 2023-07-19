@@ -4,7 +4,6 @@ import { useListBookingChannelsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { BookingChannel, User } from "../../types";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { formatPercent, formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";

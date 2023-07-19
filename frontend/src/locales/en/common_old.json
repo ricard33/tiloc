@@ -49,5 +49,7 @@
   "Payments:": "Payments:",
   "Calendar Synchronizations": "Calendar Synchronizations",
   "Edit booking": "Edit booking",
-  "Method": "Method"
+  "Method": "Method",
+  "Only show a small resume on tooltip": "Only show a small resume on tooltip",
+  "1 month": "1 month"
 }

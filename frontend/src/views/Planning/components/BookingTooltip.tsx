@@ -1,7 +1,4 @@
 import * as React from "react";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Booking } from "../../../types";
@@ -17,8 +14,6 @@ export default function BookingTooltip(props: Props) {
   const { booking, onOpenBooking } = props;
   const { t } = useTranslation();
   return (
-    // <Card sx={{ minWidth: 275 }}>
-    //   <CardContent>
     <>
       <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
         {formatDate(booking.begin_date, "PPPP")} &rarr; {formatDate(booking.end_date, "PPPP")}
@@ -32,13 +27,9 @@ export default function BookingTooltip(props: Props) {
       <Typography variant="body2" style={{ background: booking.status.color }}>
         {booking.status.name}
       </Typography>
-      {/*</CardContent>*/}
       {onOpenBooking &&
-        // <CardActions>
         <Button size="small" onClick={() => onOpenBooking(booking)}>{t("Display")}</Button>
-        // </CardActions>
       }
     </>
-    // </Card>
   );
 }

@@ -1,7 +1,6 @@
 import React, {  } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { formatISO } from "../common/tzUtils";
 import {
   Button,
   Dialog,
@@ -9,12 +8,10 @@ import {
   DialogContent,
   DialogTitle, InputAdornment, MenuItem,
   TextField,
-  TextFieldProps
 } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers';
 import makeStyles from "@mui/styles/makeStyles";
 import { Payment, paymentMethods } from "../types";
-import { parseISO } from "date-fns";
 
 
 const useStyles = makeStyles((/*theme: Theme*/) => ({
@@ -55,8 +52,6 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
   const { t } = useTranslation();
   const { register, handleSubmit, control, formState: { errors } } = useForm<Payment>();
   const onSubmit: SubmitHandler<Payment> = data => {
-    // noinspection SuspiciousTypeOfGuard
-    const date = typeof data.date === "string" ? parseISO(data.date) : data.date;
     onValidate({
       ...data,
       amount: Number(data.amount)

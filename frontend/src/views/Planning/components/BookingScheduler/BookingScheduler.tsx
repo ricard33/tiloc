@@ -129,7 +129,6 @@ const BookingScheduler: React.FC<Props> = props => {
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected,
     showPaymentStatus, showTooltips, monthsToDisplay, disabled
   } = props;
-  console.log(_beginDate)
   const { width, height } = useWindowDimensions();
   const isDesktop = width >= 900;
   const [horizontalMonths, setHorizontalMonths] = useState(1);
@@ -147,7 +146,7 @@ const BookingScheduler: React.FC<Props> = props => {
       console.debug("Changing nb months to " + nbMonths);
       setHorizontalMonths(nbMonths);
     }
-    const newLineHeight = nbMonths < 1 ? 50 : 24;
+    const newLineHeight = nbMonths < 1 ? 40 : 24;
     if (newLineHeight !== lineHeight)
       setLineHeight(newLineHeight);
   };
@@ -286,7 +285,7 @@ const BookingScheduler: React.FC<Props> = props => {
         groupRenderer={renderGroup}
         itemRenderer={renderItem}
       >
-        <TimelineHeaders className={"sticky timeline-header"}>
+        <TimelineHeaders className={"sticky timeline-header"} calendarHeaderClassName={"calendar-header"}>
           <SidebarHeader variant="left" headerData={{}}>
             {renderSidebarHeader}
           </SidebarHeader>
@@ -375,9 +374,7 @@ const BookingScheduler: React.FC<Props> = props => {
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
 
     function getItem() {
-      return <div
-        {...itemProps}
-      >
+      return <div{...itemProps}>
         {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
         <div

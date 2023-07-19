@@ -1,9 +1,6 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useRef, useCallback } from "react";
 import Timeline, {
-  CursorMarker,
-  DateHeader,
-  SidebarHeader,
-  TimelineHeaders,
+  CursorMarker, DateHeader, SidebarHeader, TimelineHeaders,
   TimelineMarkers,
   TodayMarker
 } from "@ti-gecko/react-calendar-timeline";
@@ -12,7 +9,6 @@ import { add } from "date-fns";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import EuroIcon from "@mui/icons-material/Euro";
-import { startOfMonth } from "date-fns";
 import { BookingQuickView, HtmlTooltip, Tooltip } from "../../../components";
 import { useTranslation } from "react-i18next";
 import "./BookingTimeline.scss";
@@ -22,6 +18,7 @@ import useWindowDimensions from "../../../common/windowDimensions";
 import { Booking, Lodging } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import BookingTooltip from "./BookingTooltip";
+import { ZoomNavBar } from "./NavBar";
 
 const timeSteps = {
   second: 0,
@@ -108,6 +105,7 @@ type ResizeProps = {
 
 type Props = {
   beginDate: Date,
+  endDate: Date,
   bookings: Booking[],
   disabled: boolean,
   lodgings: Lodging[],
@@ -122,19 +120,18 @@ type Props = {
 
 const BookingTimeline: React.FC<Props> = props => {
   const {
-    bookings, lodgings, beginDate: _beginDate,
+    bookings, lodgings, beginDate, endDate,
     onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected, onBoundsChange,
     settings, disabled
   } = props;
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
-  const [horizontalMonths, setHorizontalMonths] = useState(1);
   const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
   const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
   const [selected, setSelected] = useState<number[]>([]);
   const { t } = useTranslation();
-
-  const beginDate = _beginDate ?? startOfMonth(new Date());
+  const timelineRef = useRef<Timeline>(null);
+  const [visibleDates, setVisibleDates] = useState({ start: beginDate.valueOf(), end: endDate.valueOf() });
 
   lodgings && lodgings.sort((a, b) => a.rank - b.rank);
   let groups: TimelineGroup[] = lodgings.map(lodging => ({
@@ -201,9 +198,9 @@ const BookingTimeline: React.FC<Props> = props => {
       // these optional attributes are passed to the root <div /> of each item as <div {...itemProps} />
       // "data-custom-attribute": "Random content",
       "aria-hidden": true,
-      onDoubleClick: () => {
-        console.log("You clicked double!");
-      },
+      // onDoubleClick: () => {
+      //   console.log("You clicked double!");
+      // },
       style: {
         background: booking.status.color,
         color: "black",
@@ -241,60 +238,80 @@ const BookingTimeline: React.FC<Props> = props => {
   }, []);
 
   // eslint-disable-next-line react/no-multi-comp
-  var start = beginDate;
-  var end = add(beginDate, { months: horizontalMonths });
+  // var start = beginDate;
+  // var end = add(beginDate, { months: horizontalMonths });
+  const onZoom = (months: number) => {
+    const oldZoom = visibleDates.end - visibleDates.start;
+    const newZoom = months * 31 * 24 * 3600 * 1000;
+    if (timelineRef.current)
+      timelineRef.current.changeZoom(newZoom / oldZoom, 0);
+  };
+
+  const onTimeChange = useCallback((visibleTimeStart: number, visibleTimeEnd: number, updateScrollCanvas: (visibleTimeStart: number, visibleTimeEnd: number) => void, unit: string) => {
+    updateScrollCanvas(visibleTimeStart, visibleTimeEnd);
+    setVisibleDates({ start: visibleTimeStart, end: visibleTimeEnd });
+  }, []);
 
 
   return (
-    <div className={clsx({ "booking-timeline": true, disabled: disabled })}>
-      <div className="timeline">
-        <Timeline
-          groups={groups}
-          items={items}
-          // keys={keys}
-          defaultTimeStart={start}
-          defaultTimeEnd={end}
-          onItemClick={eventClicked}
-          selected={selected}
-          onItemSelect={eventItemSelected}
-          onItemDeselect={eventItemDeselected}
-          onCanvasClick={onCanvasClick}
-          minZoom={14 * 86400 * 1000}
-          canMove={false}
-          // canSelect={false}
-          canChangeGroup={false}
-          canResize={false}
-          dragSnap={24 * 60 * 60 * 1000}
-          lineHeight={50}
-          stackItems
-          clickTolerance={1}
-          // itemTouchSendsClick
-          // useResizeHandle
-          timeSteps={timeSteps}
-          sidebarWidth={collapsed ? 30 : 130}
-          sidebarContent={<div>Above The Left</div>}
-          groupRenderer={renderGroup}
-          itemRenderer={renderItem}
-          onBoundsChange={onBoundsChange}
-        >
-          {/*<TimelineHeaders className={"sticky timeline-header"}>*/}
-          {/*  <SidebarHeader variant="left">*/}
-          {/*    {renderSidebarHeader}*/}
-          {/*  </SidebarHeader>*/}
-          {/*  /!*<DateHeader unit="month" className="date-header" height={15} />*!/*/}
-          {/*  /!*<DateHeader unit="day" className="date-header" height={15} />*!/*/}
-          {/*</TimelineHeaders>*/}
-          <TimelineMarkers>
-            <TodayMarker>
-              {({ styles }: { styles: object, date: number }) =>
-                <div style={{ ...styles, backgroundColor: "red" }} />
-              }
-            </TodayMarker>
-            <CursorMarker />
-          </TimelineMarkers>
-        </Timeline>
+    <>
+      <ZoomNavBar onChange={onZoom} />
+      <div className={clsx({ "booking-timeline": true, disabled: disabled })}>
+        <div className="timeline">
+          <Timeline
+            ref={timelineRef}
+            groups={groups}
+            items={items}
+            // keys={keys}
+            defaultTimeStart={beginDate}
+            defaultTimeEnd={endDate}
+            // visibleTimeStart={beginDate.valueOf()}
+            // visibleTimeEnd={endDate.valueOf()}
+            onItemClick={eventClicked}
+            selected={selected}
+            onItemSelect={eventItemSelected}
+            onItemDeselect={eventItemDeselected}
+            onCanvasClick={onCanvasClick}
+            minZoom={14 * 86400 * 1000}
+            canMove={false}
+            // canSelect={false}
+            canChangeGroup={false}
+            canResize={false}
+            dragSnap={24 * 60 * 60 * 1000}
+            lineHeight={50}
+            stackItems
+            clickTolerance={1}
+            // itemTouchSendsClick
+            // useResizeHandle
+            timeSteps={timeSteps}
+            sidebarWidth={collapsed ? 30 : 130}
+            sidebarContent={<div>Above The Left</div>}
+            groupRenderer={renderGroup}
+            itemRenderer={renderItem}
+            onBoundsChange={onBoundsChange}
+            onTimeChange={onTimeChange}
+          >
+            <TimelineHeaders className={"sticky timeline-header"}>
+              <SidebarHeader variant="left">
+                {renderSidebarHeader}
+              </SidebarHeader>
+              <DateHeader unit="primaryHeader" />
+              <DateHeader />
+              {/*<DateHeader unit="month" className="date-header" />*/}
+              {/*<DateHeader unit="day" className="date-header" />*/}
+            </TimelineHeaders>
+            <TimelineMarkers>
+              <TodayMarker>
+                {({ styles }: { styles: object, date: number }) =>
+                  <div style={{ ...styles, backgroundColor: "red" }} />
+                }
+              </TodayMarker>
+              <CursorMarker />
+            </TimelineMarkers>
+          </Timeline>
+        </div>
       </div>
-    </div>
+    </>
   );
 
   // eslint-disable-next-line react/no-multi-comp,react/prop-types
@@ -345,7 +362,10 @@ const BookingTimeline: React.FC<Props> = props => {
             {getItem()}
           </HtmlTooltip>
           :
-          <HtmlTooltip title={<BookingQuickView booking={item.booking} />} enterDelay={500} arrow /*disableInteractive*/>
+          <HtmlTooltip
+            title={<BookingQuickView booking={item.booking} />} enterDelay={500}
+            arrow
+          >
             {getItem()}
           </HtmlTooltip>
       );

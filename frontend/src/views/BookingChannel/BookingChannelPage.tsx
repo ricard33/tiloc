@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useCreateBookingChannelMutation, useDeleteBookingChannelMutation,
-  useGetBookingChannelQuery, useListBookingsPaginatedQuery, useListBookingStatusesQuery, useListOwnersQuery,
+  useGetBookingChannelQuery, useListBookingStatusesQuery,
   useUpdateBookingChannelMutation
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";

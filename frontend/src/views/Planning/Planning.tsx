@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { add, parse, startOfMonth, sub } from "date-fns";
 import { BookingScheduler, BookingTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Grid, Button, IconButton, Card, CardContent, Typography } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/DeleteForever";
-import DescriptionIcon from "@mui/icons-material/Description";
-import EditIcon from "@mui/icons-material/Edit";
+import { IconButton, Card, CardContent, Typography } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import queryString from "query-string";
-import NavBar from "./components/NavBar";
+import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import { useLocalStorage } from "../../common/useLocalStorage";
 import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningSettingsDialog";
@@ -24,8 +21,8 @@ import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
 import { RootState } from "../../store";
 import { Booking, Lodging, User } from "../../types";
-import { useBookingActions } from "../../common/bookingActions";
 import { useDeviceDetector } from "../../common/useDeviceDetector";
+import useWindowDimensions from "../../common/windowDimensions";
 
 
 const Planning = () => {
@@ -33,6 +30,8 @@ const Planning = () => {
   const location = useLocation();
   const { hasTouchScreen } = useDeviceDetector();
   const query = queryString.parse(location.search);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 900;
 
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
@@ -41,15 +40,20 @@ const Planning = () => {
   const [smallTooltips, setSmallTooltips] = useLocalStorage("planning.smallTooltips", false);
   const [scrollingTimeline, setScrollingTimeline] = useLocalStorage("planning.scrollingTimeline", false);
 
+  const initialZoomLevel = isDesktop ? 2 : 1;
+
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
   if (isNaN(requestedDate.valueOf()))
     requestedDate = startOfMonth(new Date());
 
   // const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   const [dates, setDates] = useState({
-    start: scrollingTimeline ? sub(requestedDate, {months: 3}) : requestedDate,
-    end: scrollingTimeline ? add(requestedDate, { months: 5 }) : add(requestedDate, { years: 1 })});
-  const dateFilter = formatISO(dates.start) + ":" + formatISO(dates.end);
+    start: requestedDate,
+    end: scrollingTimeline ? add(requestedDate, { months: initialZoomLevel }) : add(requestedDate, { years: 1 })
+  });
+  const dateFilter = scrollingTimeline
+    ? formatISO(sub(dates.start, { months: 3 })) + ":" + formatISO(add(dates.end, { months: 5 }))
+    : formatISO(dates.start) + ":" + formatISO(dates.end);
   const {
     data: bookings,
     isLoading: isLoadingBookings,
@@ -62,14 +66,10 @@ const Planning = () => {
   });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
-  const [selected, setSelected] = useState<Booking | null>(null);
   const navigate = useNavigate();
 
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_booking");
-  const canDelete = user.permissions.includes("core.delete_booking");
-  const canViewContract = user.permissions.includes("core.view_contract");
-  const { onDeleteBooking } = useBookingActions();
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -78,43 +78,39 @@ const Planning = () => {
     // console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
   }, [IsFetchingBooking]);
 
-  const onBoundsChange = (canvasTimeStart: number, canvasTimeEnd: number) => {
+  const onBoundsChange = useCallback((canvasTimeStart: number, canvasTimeEnd: number) => {
     console.info(new Date(canvasTimeStart).toDateString(), new Date(canvasTimeEnd).toDateString());
     // const delta = canvasTimeEnd - canvasTimeStart;
-    setDates({start: new Date(canvasTimeStart), end: new Date(canvasTimeEnd)});
-  }
+    setDates({ start: new Date(canvasTimeStart), end: new Date(canvasTimeEnd) });
+  }, []);
 
-  const onEditBooking = (booking: Booking) => {
+  const onEditBooking = useCallback((booking: Booking) => {
     console.debug("EDIT ", booking.id);
     navigate(`${booking.id}`);
-  };
+  }, [navigate]);
 
-  const onCreateBooking = (lodging: Lodging, begin_date: Date) => {
+  const onCreateBooking = useCallback((lodging: Lodging, begin_date: Date) => {
     console.debug("CREATE ", lodging ? lodging.id : null, begin_date);
     navigate(`new?lodging_id=${lodging.id}&begin_date=${formatISO(begin_date)}`);
-  };
+  }, [navigate]);
 
-  const handleCloseEdit = () => {
+  const handleCloseEdit = useCallback(() => {
     navigate(-1);
     refetch();
-    // Need to be postponed to allow UI refresh
-    setTimeout(() => setSelected(null), 1000);
-  };
+  }, [navigate, refetch]);
 
-  const onSelectBooking = (booking: Booking) => {
+  const onSelectBooking = useCallback((booking: Booking) => {
     console.debug("onSelectBooking", booking);
-    setSelected(booking);
-  };
+  }, []);
 
-  const onDeselectBooking = () => {
-    setSelected(null);
-  };
+  const onDeselectBooking = useCallback(() => {
+  }, []);
 
-  const onEditContract = (booking: Booking) => {
+  const onEditContract = useCallback((booking: Booking) => {
     navigate("/bookings/" + booking.id + "/contract");
-  };
+  }, [navigate]);
 
-  const onCloseSettings = (newSettings?: PlanningSettings) => {
+  const onCloseSettings = useCallback((newSettings?: PlanningSettings) => {
     setSettingsOpened(false);
     if (typeof newSettings !== "undefined") {
       setShowPaymentStatus(newSettings.showPaymentStatus);
@@ -123,7 +119,7 @@ const Planning = () => {
       setSmallTooltips(newSettings.smallTooltips);
       setScrollingTimeline(newSettings.scrollingTimeline);
     }
-  };
+  }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus, setShowTooltips, setSmallTooltips]);
 
   // const bookings2 = bookings.map(booking => ({
   //   ...booking,
@@ -145,29 +141,6 @@ const Planning = () => {
         />
       </Routes>
       <div className="toolbar">
-        {/*<IconButton*/}
-        {/*  type="button"*/}
-        {/*  className="delete-button"*/}
-        {/*  color="secondary"*/}
-        {/*  onClick={() => onDeleteBooking(selected!)}*/}
-        {/*  disabled={!canDelete || !selected}*/}
-        {/*  size="large"*/}
-        {/*><DeleteIcon /></IconButton>*/}
-        {/*<IconButton*/}
-        {/*  type="button"*/}
-        {/*  color="default"*/}
-        {/*  onClick={() => onEditContract(selected!)}*/}
-        {/*  title={t("Contract")}*/}
-        {/*  disabled={!canViewContract || !selected}*/}
-        {/*  size="large"*/}
-        {/*><DescriptionIcon /></IconButton>*/}
-        {/*<IconButton*/}
-        {/*  type="submit"*/}
-        {/*  color="primary"*/}
-        {/*  onClick={() => onEditBooking(selected!)}*/}
-        {/*  disabled={!selected}*/}
-        {/*  size="large"*/}
-        {/*><EditIcon /></IconButton>*/}
         <IconButton
           type="button"
           color="default"
@@ -176,26 +149,29 @@ const Planning = () => {
         ><SettingsIcon /></IconButton>
       </div>
       {scrollingTimeline ?
-        <BookingTimeline
-          bookings={bookings ?? []}
-          lodgings={[...(lodgings ?? [])]}
-          beginDate={requestedDate}
-          onCreateBooking={canAdd ? onCreateBooking : undefined}
-          onOpenBooking={onEditBooking}
-          onItemSelected={onSelectBooking}
-          onItemDeselected={onDeselectBooking}
-          onBoundsChange={onBoundsChange}
-          settings={{
-            showPaymentStatus,
-            monthsToDisplay,
-            showTooltips,
-            smallTooltips,
-            scrollingTimeline,
-          }}
-          disabled={isLoadingBookings}
-        /> : <>
-          <NavBar
-            date={dates.start} onChange={(newDate) => setDates({start: newDate, end: add(newDate, {years: 1})})}
+        <>
+          <BookingTimeline
+            bookings={bookings ?? []}
+            lodgings={[...(lodgings ?? [])]}
+            beginDate={dates.start}
+            endDate={dates.end}
+            onCreateBooking={canAdd ? onCreateBooking : undefined}
+            onOpenBooking={onEditBooking}
+            onItemSelected={onSelectBooking}
+            onItemDeselected={onDeselectBooking}
+            onBoundsChange={onBoundsChange}
+            settings={{
+              showPaymentStatus,
+              monthsToDisplay,
+              showTooltips,
+              smallTooltips,
+              scrollingTimeline
+            }}
+            disabled={isLoadingBookings}
+          />
+        </> : <>
+          <DateNavBar
+            date={dates.start} onChange={(newDate) => setDates({ start: newDate, end: add(newDate, { years: 1 }) })}
           />
           <BookingScheduler
             bookings={bookings ?? []}
@@ -212,36 +188,6 @@ const Planning = () => {
           />
         </>
       }
-      {/*<Grid container justifyContent="space-between" alignItems="flex-start">*/}
-      {/*  <Grid item>*/}
-      {/*    <Button*/}
-      {/*      type="button"*/}
-      {/*      className="delete-button"*/}
-      {/*      color="secondary"*/}
-      {/*      startIcon={<DeleteIcon />}*/}
-      {/*      onClick={() => onDeleteBooking(selected!)}*/}
-      {/*      disabled={!selected}*/}
-      {/*    >{t("Delete")}</Button>*/}
-      {/*  </Grid>*/}
-      {/*  <Grid item>*/}
-      {/*    <Button*/}
-      {/*      type="button"*/}
-      {/*      startIcon={<DescriptionIcon />}*/}
-      {/*      onClick={() => onEditContract(selected!)}*/}
-      {/*      title={t("Contract")}*/}
-      {/*      disabled={!selected}*/}
-      {/*    >{t("Contract")}</Button>*/}
-      {/*  </Grid>*/}
-      {/*  <Grid item>*/}
-      {/*    <Button*/}
-      {/*      type="submit"*/}
-      {/*      color="primary"*/}
-      {/*      startIcon={<EditIcon />}*/}
-      {/*      onClick={() => onEditBooking(selected!)}*/}
-      {/*      disabled={!selected}*/}
-      {/*    >{t("Edit booking")}</Button>*/}
-      {/*  </Grid>*/}
-      {/*</Grid>*/}
 
       <br />
       <Card className="planning-legend">

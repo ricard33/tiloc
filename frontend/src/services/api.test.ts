@@ -1,5 +1,5 @@
 import { api, serviceURL } from "./api";
-// import { vi } from 'vitest';
+import { vi } from 'vitest';
 import axios, { AxiosRequestConfig } from "axios";
 import { setupApiStore } from "../common/testUtils2";
 import { auth as authReducer } from "../reducers";
