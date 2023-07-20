@@ -45,10 +45,10 @@ const GuestsList: React.FunctionComponent<Props> = () => {
             getRowHeight={() => 'auto'}
             pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
-            components={{
-              Toolbar: GridToolbar
+            slots={{
+              toolbar: GridToolbar
             }}
-            componentsProps={{
+            slotProps={{
               toolbar: {
                 showQuickFilter: true,
                 quickFilterProps: { debounceMs: 500 },

@@ -138,8 +138,8 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
             // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             onRowSelectionModelChange={onSelectionChange}
-            components={{
-              Toolbar: GridToolbar
+            slots={{
+              toolbar: GridToolbar
             }}
           />
         </CardContent>

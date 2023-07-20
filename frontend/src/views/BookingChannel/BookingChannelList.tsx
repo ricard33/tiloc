@@ -53,8 +53,8 @@ const BookingChannelList: React.FunctionComponent<Props> = () => {
             // pageSize={20}
             pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
-            components={{
-              Toolbar: GridToolbar
+            slots={{
+              toolbar: GridToolbar
             }}
           />
         </CardContent>

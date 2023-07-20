@@ -202,9 +202,9 @@ const BookingList = () => {
             disableRowSelectionOnClick
             onRowClick={(params) => onEditBooking(params.row)}
             onRowSelectionModelChange={onSelectionChange}
-            components={{
-              Toolbar: CustomToolbar,
-              LoadingOverlay: LinearProgress
+            slots={{
+              toolbar: CustomToolbar,
+              loadingOverlay: LinearProgress
             }}
           />
 
