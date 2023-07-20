@@ -203,7 +203,7 @@ class ContractTemplateAdmin(ImportExportMixin, SimpleHistoryAdmin):
 
 
 class PaymentAdmin(ImportExportModelAdmin):
-    list_display = ("id", "booking", "description", "amount", "method", "date")
+    list_display = ("id", "booking", "description", "amount", "method", "date", "checked")
     ordering = ("-date",)
 
 

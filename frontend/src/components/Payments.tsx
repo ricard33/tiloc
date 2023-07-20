@@ -17,7 +17,7 @@ import { fetchErrorDecode } from "../common/apiUtils";
 import { shiftUTCDateToLocalDate } from "../common/tzUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { IconButton } from '@mui/material';
+import { IconButton } from "@mui/material";
 
 type PaymentListProps = {
   bookingId: number;
@@ -28,7 +28,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   bookingId,
   onPaymentsUpdate
 }: PaymentListProps) => {
-  const [edited, setEdited] = useState<Omit<Payment, 'booking'> | null>(null);
+  const [edited, setEdited] = useState<Omit<Payment, "booking"> | null>(null);
   const confirm = useConfirm();
   const { t } = useTranslation();
   const { data } = useGetPaymentsForBookingQuery(bookingId);
@@ -37,7 +37,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   const [deletePayment] = useDeletePaymentMutation();
   const { showError, showSuccess } = useAlert();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const showPayments = user.permissions.includes('core.view_payment')
+  const showPayments = user.permissions.includes("core.view_payment");
 
   let totalPaid = 0;
   if (data) {
@@ -53,11 +53,12 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
       description: "",
       method: "",
       amount: 0,
+      checked: false,
     });
   }
 
   function onCreateOrModifyPayment(payment: Payment) {
-    if(!edited || !edited.id) {
+    if (!edited || !edited.id) {
       createPayment(payment).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
@@ -71,7 +72,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
         }
       });
     } else {
-      updatePayment({...edited, ...payment}).then((result) => {
+      updatePayment({ ...edited, ...payment }).then((result) => {
         if ((result as any).error) {
           const error = (result as any).error;
           console.error("Error during payment change", error);
@@ -132,7 +133,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
           <AddIcon />{t("Add payment")}
         </IconButton>
         {edited !== null &&
-        <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose} />}
+          <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose} />}
       </>}</div>
   );
 };

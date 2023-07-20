@@ -487,6 +487,10 @@ class Payment(models.Model):
     amount = models.DecimalField(_("amount"), max_digits=20, decimal_places=2)
     method = models.CharField(_("Payment method"), max_length=30, choices=PaymentMethod.choices)
     date = models.DateField(_("Payment date"))
+    checked = models.BooleanField("Checked", default=False, help_text=_("Used for account reconciliation"))
 
     class Meta:
         ordering = ["date"]
+        permissions = [
+            ("reconciliation", "Can do account reconciliation"),
+        ]

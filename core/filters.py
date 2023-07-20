@@ -44,6 +44,7 @@ class PaymentFilter(filters.FilterSet):
             "booking_id": ["exact", "isnull", "in"],
             "date": ["lte", "gte"],
             "method": ["exact"],
+            "checked": ["exact"],
         }
 
     def for_dates_filter(self, queryset, name, value):

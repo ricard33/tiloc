@@ -149,6 +149,7 @@ export interface Payment {
   amount: number;
   method: string;
   date: Date;
+  checked: boolean;
 }
 
 export const paymentMethods = (t: (key: string) => string) => {

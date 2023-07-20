@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export const useDeviceDetector = () => {
   let hasTouchScreen = false;
   if ("maxTouchPoints" in navigator) {
