@@ -1,21 +1,29 @@
 import React, { useEffect } from "react";
-import PropTypes from "prop-types";
+// @ts-ignore
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+// @ts-ignore
 import CustomEditor from "@ti-gecko/tiloc-ckeditor5/build/ckeditor";  // import symbol ClassicEditor
 // import DocumentEditor from "@ckeditor/ckeditor5-build-decoupled-document";
 // import CustomFigureAttributes from 'tiloc-ckeditor5/plugins/custom-figure-attributes';
 // import AllowImageWidth from 'tiloc-ckeditor5/plugins/image_width_and_height';
 import "./Editor.css";
 
-const Editor = props => {
+type Props = {
+  content: string;
+  onChange: (content: string) => void;
+  readOnly: boolean;
+};
+
+const Editor: React.FunctionComponent<Props> = (props) => {
   const { content, onChange, readOnly } = props;
-  let editorInstance = null;
+  let editorInstance: any = null;
 
   useEffect(() => {
     if (editorInstance)
       editorInstance.setData(content);
-  }, [editorInstance, content]);
+  }, [content, editorInstance]);
 
+  // @ts-ignore
   function _onChange(event, editor) {
     onChange && onChange(editor.getData());
   }
@@ -26,13 +34,14 @@ const Editor = props => {
       <div className="document-editor__editable-container">
         <CKEditor
           className="document-editor__editable"
-          onReady={editor => {
+          onReady={(editor: any) => {
             console.log("Editor is ready to use!", editor);
             editorInstance = editor;
 
             const toolbarContainer = document.querySelector(".document-editor__toolbar");
-            toolbarContainer.appendChild(
-              editor.ui.view.toolbar.element);
+            if (toolbarContainer)
+              toolbarContainer.appendChild(
+                editor.ui.view.toolbar.element);
           }}
           readOnly={readOnly}
           onChange={_onChange}
@@ -71,7 +80,7 @@ const Editor = props => {
                 "horizontalLine",
                 "pageBreak",
                 "|",
-                "specialCharacters",
+                "specialCharacters"
                 // "|",
                 // "insertSignature"
               ]
@@ -84,7 +93,7 @@ const Editor = props => {
                 11,
                 12,
                 13,
-                'default',
+                "default",
                 17,
                 19,
                 21
@@ -133,7 +142,7 @@ const Editor = props => {
               // Headers sent along with the XMLHttpRequest to the upload server.
               headers: {
                 // "X-CSRF-TOKEN": "CSRF-Token",
-                Authorization: 'Token ' + localStorage.getItem("token")
+                Authorization: "Token " + localStorage.getItem("token")
               }
             },
             table: {
@@ -151,12 +160,6 @@ const Editor = props => {
     </div>
 
   );
-};
-
-Editor.propTypes = {
-  content: PropTypes.string,
-  onChange: PropTypes.func,
-  readOnly: PropTypes.bool,
 };
 
 export default Editor;

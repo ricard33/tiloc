@@ -9,7 +9,7 @@ import HolidayVillage from "@mui/icons-material/HolidayVillage";
 import RoomServiceIcon from '@mui/icons-material/RoomService';
 import GradingIcon from '@mui/icons-material/Grading';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking sources.svg";
+import { ReactComponent as BookingSourcesIcon }  from "../../assets/icones/booking-sources.svg";
 import Page from "../../layouts/Main/Page";
 
 
