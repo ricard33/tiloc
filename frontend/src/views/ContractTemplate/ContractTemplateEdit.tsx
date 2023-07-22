@@ -33,6 +33,7 @@ import { RootState } from "../../store";
 import { useConfirm } from "../../libs/MuiConfirm";
 
 import RichTextEditor from "../../components/Editor";
+import { makePDF } from "../../common/pdf-tools";
 // const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 const ContractTemplateEdit = (/*props*/) => {
@@ -75,9 +76,9 @@ const ContractTemplateEdit = (/*props*/) => {
     setLodgingId(value as number);
   }
 
-  function makePDF() {
+  function _makePDF() {
     if (template)
-      window.open("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, "_blank");
+      makePDF("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, "empty-contract.pdf");
   }
 
   function onClose() {
@@ -123,7 +124,7 @@ const ContractTemplateEdit = (/*props*/) => {
   }
 
   function onSaveAndMakePDF() {
-    _onSave(makePDF);
+    _onSave(_makePDF);
   }
 
   function _onSave(callback?: (template: ContractTemplate) => void) {
@@ -160,10 +161,6 @@ const ContractTemplateEdit = (/*props*/) => {
       <Typography variant="h1">
         {t("Rental agreement template")}
       </Typography>
-      {/*<Alert severity="info">*/}
-      {/*  {t("The model contract is provided as an example only and does not replace legal advice or professional assistance. " +*/}
-      {/*    "No legal or other liability is accepted by the software publisher.")}*/}
-      {/*</Alert>*/}
       <Stack
         style={{ flex: "1 1 auto" }}
         spacing={1}
@@ -227,7 +224,7 @@ const ContractTemplateEdit = (/*props*/) => {
               type="button"
               sx={{ margin: (theme) => theme.spacing(1) }}
               startIcon={<PdfIcon />}
-              onClick={makePDF}
+              onClick={_makePDF}
               disabled={!lodgingId}
               title={t("PDF")}
             >{t("PDF")}</Button>

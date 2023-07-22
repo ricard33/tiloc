@@ -32,6 +32,7 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
+import { makePDF } from "../../common/pdf-tools";
 
 import RichTextEditor from "../Editor";
 // const RichTextEditor = React.lazy(() => import("../Editor"));
@@ -107,24 +108,6 @@ const ContractDialog = props => {
   function regenerateContract() {
     setContent(undefined);
     getOrGenerateContract({bookingId: booking.id, regenerate: true});
-  }
-
-  function makePDF() {
-    const fileDownload = require("js-file-download");
-    axios.get("/api/contract/" + contract.id + "/pdf/",
-      {
-        responseType: "blob" // important
-      })
-      .then((response) => {
-        const contentDisposition = response.headers["content-disposition"];
-        let fileName = "contract.pdf";
-        if (contentDisposition) {
-          fileName = contentDisposition.split("filename=")[1];
-        }
-
-        fileDownload(response.data, fileName);
-      });
-
   }
 
   function onCancel() {
@@ -229,7 +212,7 @@ const ContractDialog = props => {
           type="button"
           className={classes.button}
           startIcon={<PdfIcon />}
-          onClick={makePDF}
+          onClick={() => makePDF("/api/contract/" + contract.id + "/pdf/", "contract.pdf")}
           title={t("PDF")}
         >{t("PDF")}</Button>
         <div style={{ flex: "1 0 0" }} />
