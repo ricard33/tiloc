@@ -21,7 +21,8 @@ import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
 
-const RichTextEditor = React.lazy(() => import("../../components/Editor"));
+import RichTextEditor from "../../components/Editor";
+// const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 
 const useStyles = makeStyles(theme => ({

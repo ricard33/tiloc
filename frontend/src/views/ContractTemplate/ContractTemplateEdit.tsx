@@ -32,7 +32,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useConfirm } from "../../libs/MuiConfirm";
 
-const RichTextEditor = React.lazy(() => import("../../components/Editor"));
+import RichTextEditor from "../../components/Editor";
+// const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 const ContractTemplateEdit = (/*props*/) => {
   let { templateId } = useParams();

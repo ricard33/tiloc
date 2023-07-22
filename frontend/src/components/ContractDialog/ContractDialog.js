@@ -33,7 +33,8 @@ import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
 
-const RichTextEditor = React.lazy(() => import("../Editor"));
+import RichTextEditor from "../Editor";
+// const RichTextEditor = React.lazy(() => import("../Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {
