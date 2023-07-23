@@ -11,7 +11,7 @@ import "./Editor.css";
 type Props = {
   content: string;
   onChange: (content: string) => void;
-  readOnly: boolean;
+  readOnly?: boolean;
 };
 
 const Editor: React.FunctionComponent<Props> = (props) => {

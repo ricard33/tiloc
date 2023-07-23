@@ -8,7 +8,6 @@ import {
   Refresh as RefreshIcon,
   Save as SaveIcon
 } from "@mui/icons-material";
-import axios from "axios";
 import { Grid, Button, Typography, Alert, Backdrop, CircularProgress } from "@mui/material";
 import {
   useDeleteContractMutation,
@@ -123,7 +122,7 @@ const ContractEdit = () => {
   }
 
   function onSaveAndMakePDF() {
-    _onSave(makePDF);
+    _onSave((contract) => makePDF("/api/contract/" + contract.id + "/pdf/", "contract.pdf"));
   }
 
   function _onSave(callback/*: (contract) => void*/) {
