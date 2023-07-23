@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     "django_cron",
     "core",
     # 'frontend',
-    "django_vite",
 ]
 
 MIDDLEWARE = [

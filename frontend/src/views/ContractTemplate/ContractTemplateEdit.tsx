@@ -31,10 +31,9 @@ import { ContractTemplate, User } from "../../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useConfirm } from "../../libs/MuiConfirm";
-
-import RichTextEditor from "../../components/Editor";
 import { makePDF } from "../../common/pdf-tools";
-// const RichTextEditor = React.lazy(() => import("../../components/Editor"));
+
+const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 const ContractTemplateEdit = (/*props*/) => {
   let { templateId } = useParams();

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "server": "vite preview",
+    "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "extract": "i18next -c config/i18next-parser.config.js",

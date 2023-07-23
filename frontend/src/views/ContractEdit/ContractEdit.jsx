@@ -22,8 +22,7 @@ import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
 import { makePDF } from "../../common/pdf-tools";
 
-import RichTextEditor from "../../components/Editor";
-// const RichTextEditor = React.lazy(() => import("../../components/Editor"));
+const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 
 const useStyles = makeStyles(theme => ({

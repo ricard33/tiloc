@@ -34,8 +34,7 @@ import { formatDistanceToNow } from "../../common/dateUtils";
 import { parseISO } from "date-fns";
 import { makePDF } from "../../common/pdf-tools";
 
-import RichTextEditor from "../Editor";
-// const RichTextEditor = React.lazy(() => import("../Editor"));
+const RichTextEditor = React.lazy(() => import("../Editor"));
 
 const useStyles = makeStyles(theme => ({
   root: {

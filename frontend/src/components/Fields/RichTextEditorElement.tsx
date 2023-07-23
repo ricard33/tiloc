@@ -3,8 +3,7 @@ import { Path, useFormContext } from "react-hook-form";
 import { FieldValues } from "react-hook-form/dist/types/fields";
 import { useTranslation } from "react-i18next";
 
-import RichTextEditor from "../Editor";
-// const RichTextEditor = React.lazy(() => import("../Editor"));
+const RichTextEditor = React.lazy(() => import("../Editor"));
 
 type RichTextEditorElementProps<T extends FieldValues = FieldValues> = {
   name: Path<T>,
