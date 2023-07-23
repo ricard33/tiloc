@@ -24,7 +24,6 @@ from django.views.decorators.cache import never_cache
 from rest_framework import routers
 
 from core import api, views
-from core.views import IndexPage
 from location.serve_static_file import serve_static_file
 
 router = routers.DefaultRouter()
@@ -79,7 +78,6 @@ if settings.ENV == "dev":
                 -1, re_path(relative_path, never_cache(serve_static_file), kwargs={"document_path": fullpath})
             )
 
-# urlpatterns.append(re_path(r"^", IndexPage.as_view(template_name="index.html"), name="home"))
 urlpatterns.append(re_path(r"^", never_cache(serve_static_file),
                            kwargs={"document_path": os.path.join(settings.STATIC_ROOT, "index.html")},
                            name="home"))
