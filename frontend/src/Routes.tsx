@@ -10,7 +10,6 @@ import {
   Dashboard as DashboardView,
   LoggedOut,
   NotFound as NotFoundView,
-  Planning as PlanningView,
   Settings,
   SignIn,
   TestPage
@@ -21,7 +20,6 @@ import OwnersList from "./views/Owner/OwnersList";
 import BookingStatusesList from "./views/BookingStatus/BookingStatusesList";
 import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
-import GuestsList from "./views/Guests/GuestsList";
 import { OwnerPage } from "./views/Owner/OwnerPage";
 import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
@@ -32,7 +30,8 @@ import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 import PaymentsList from "./views/Payment/PaymentsList";
 
-
+const PlanningView = React.lazy(() => import("./views/Planning"));
+const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
 
 const MyRoutes = () => {
   return (
@@ -48,12 +47,26 @@ const MyRoutes = () => {
           {/*<Route path="/" element={<Navigate to={"/dashboard"} replace />} />*/}
           {/*<Route path="/dashboard" element={<DashboardView />} />*/}
           <Route index element={<DashboardView />} />
-          <Route path="/planning/*" element={<PlanningView />} />
+          <Route
+            path="/planning/*"
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <PlanningView />
+              </React.Suspense>
+            }
+          />
           <Route path="/bookings/*" element={<BookingList />} />
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/payments" element={<PaymentsList />} />
           <Route path="/reports" element={<TestPage />} />
-          <Route path="/guests" element={<GuestsList />} />
+          <Route
+            path="/guests"
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <GuestsList />
+              </React.Suspense>
+            }
+          />
           <Route path="/settings/" element={<Settings />} />
           <Route path="/settings/owners" element={<OwnersList />} />
           <Route path="/settings/owners/new" element={<OwnerPage />} />

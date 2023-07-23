@@ -6,13 +6,38 @@ import viteTsconfigPaths from "vite-tsconfig-paths";
 import svgrPlugin from "vite-plugin-svgr";
 import reactRefresh from "@vitejs/plugin-react-refresh";
 
+// // @ts-ignore
+// import { dependencies } from './package.json';
+//
+// const exclVendors = ['react', 'react-router-dom', 'react-dom']
+// function renderChunks(deps: Record<string, string>) {
+//   let chunks = {}
+//   Object.keys(deps).forEach((key) => {
+//     if (exclVendors.includes(key)) return
+//     chunks[key] = [key]
+//   })
+//   return chunks
+// }
+
 export default defineConfig(({ command, mode, ssrBuild }) => {
   return {
     base: mode === "production" ? "/static/" : "/",
     // base: "/static/",
     build: {
       outDir: "build",
-      manifest: "vite-manifest.json"
+      manifest: "vite-manifest.json",
+      // minify: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-router-dom', 'react-dom'],
+            'chart.js': ['chart.js'],
+            'date-fns': ['date-fns'],
+            'mui': ['@mui/icons-material', '@mui/material', "@mui/styles", "@mui/system", "@mui/x-data-grid", "@mui/x-date-pickers"]
+            // ...renderChunks(dependencies),
+          },
+        },
+      },
     },
     plugins: [
       react(),

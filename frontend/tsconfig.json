@@ -8,15 +8,15 @@
 
     "allowJs": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "declaration": true,
     "types": ["vite/client", "vite-plugin-svgr/client", "vitest/globals"],
+//    "noImplicitAny": false,
 
     /* Bundler mode */
     "moduleResolution": "node",
-//    "moduleResolution": "node16",
+    "allowSyntheticDefaultImports": true,
 //    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
