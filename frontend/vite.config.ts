@@ -4,7 +4,6 @@ import react from "@vitejs/plugin-react";
 import checker from "vite-plugin-checker";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 import svgrPlugin from "vite-plugin-svgr";
-import reactRefresh from "@vitejs/plugin-react-refresh";
 
 // // @ts-ignore
 // import { dependencies } from './package.json';
@@ -48,7 +47,6 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
           lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
         },
       }),
-      reactRefresh(),
       viteTsconfigPaths(),
       svgrPlugin()
       // handlebars({
