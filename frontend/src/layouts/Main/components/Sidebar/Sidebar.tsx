@@ -87,7 +87,7 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
         { title: t("General parameters"), href: "/settings/general", icon: <SettingsIcon />, disabled: true },
-        { title: t("Owners"), href: "/settings/owners", icon: <PeopleAltIcon /> },
+        { title: t("Properties"), href: "/settings/properties", icon: <PeopleAltIcon /> },
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HolidayVillage /> },
         { title: t("Booking statuses"), href: "/settings/booking-status", icon: <GradingIcon /> },
         { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },

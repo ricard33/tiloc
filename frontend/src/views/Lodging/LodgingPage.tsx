@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   useCreateLodgingMutation, useDeleteLodgingMutation,
   useGetLodgingQuery,
-  useListOwnersQuery,
+  useListPropertiesQuery,
   useUpdateLodgingMutation
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";
@@ -27,7 +27,7 @@ export function LodgingPage() {
   const [createLodging] = useCreateLodgingMutation();
   const [updateLodging] = useUpdateLodgingMutation();
   const [deleteLodging] = useDeleteLodgingMutation();
-  const { data: owners, isLoading: isOwnerLoading } = useListOwnersQuery();
+  const { data: properties, isLoading: isPropertyLoading } = useListPropertiesQuery();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canChange = user.permissions.includes("core.change_lodging");
   const canDelete = user.permissions.includes("core.delete_lodging");
@@ -92,11 +92,11 @@ export function LodgingPage() {
     }
   };
 
-  if (isLoading || isOwnerLoading) return <div>{t("Loading...")}</div>;
+  if (isLoading || isPropertyLoading) return <div>{t("Loading...")}</div>;
   return (
     <Page>
       <LodgingForm
-        lodging={lodging} owners={owners ?? []}
+        lodging={lodging} properties={properties ?? []}
         onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
         onDelete={canDelete ? onDelete : undefined}
       />

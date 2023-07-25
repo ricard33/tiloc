@@ -9,7 +9,7 @@ import {
   Guest,
   Lodging,
   LoginInfo,
-  NextEvent, Owner,
+  NextEvent, Property,
   Pagination,
   Payment,
   Service,
@@ -19,11 +19,11 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
   api2Booking, api2CalendarSync, api2Contract, api2ContractTemplate,
   api2Lodging,
-  api2Owner,
+  api2Property,
   api2Payment,
   api2Service,
   booking2api,
-  owner2api, payment2Api
+  property2api, payment2Api
 } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
@@ -238,7 +238,7 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment, payment2Api);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
-const ownerApi = makeApi<Owner>("owner/", "Owner", api2Owner, owner2api);
+const propertyApi = makeApi<Property>("property/", "Property", api2Property, property2api);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate", api2ContractTemplate);
@@ -302,12 +302,12 @@ export const api = createApi({
     updateBookingChannel: bookingChannelApi.update(builder),
     deleteBookingChannel: bookingChannelApi.delete(builder),
 
-    // owner
-    listOwners: ownerApi.list(builder),
-    getOwner: ownerApi.get(builder),
-    createOwner: ownerApi.create(builder),
-    updateOwner: ownerApi.update(builder),
-    deleteOwner: ownerApi.delete(builder),
+    // property
+    listProperties: propertyApi.list(builder),
+    getProperty: propertyApi.get(builder),
+    createProperty: propertyApi.create(builder),
+    updateProperty: propertyApi.update(builder),
+    deleteProperty: propertyApi.delete(builder),
 
     // Lodging
     listLodgings: lodgingApi.list(builder),
@@ -422,11 +422,11 @@ export const {
   useUpdateBookingChannelMutation,
   useDeleteBookingChannelMutation,
 
-  useListOwnersQuery,
-  useGetOwnerQuery,
-  useCreateOwnerMutation,
-  useUpdateOwnerMutation,
-  useDeleteOwnerMutation,
+  useListPropertiesQuery,
+  useGetPropertyQuery,
+  useCreatePropertyMutation,
+  useUpdatePropertyMutation,
+  useDeletePropertyMutation,
 
   useListLodgingsQuery,
   useGetLodgingQuery,

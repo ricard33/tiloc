@@ -6,7 +6,7 @@ import {
   useMoveDownLodgingMutation,
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Lodging, Owner, User } from "../../types";
+import { Lodging, Property, User } from "../../types";
 import {
   DataGrid,
   GridActionsCellItem, GridColDef,
@@ -32,7 +32,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
   const { data, refetch } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
   const [moveUp] = useMoveUpLodgingMutation();
   const [moveDown] = useMoveDownLodgingMutation();
-  // const { data: owners } = useListOwnersQuery();
+  // const { data: properties } = useListPropertiesQuery();
   const navigate = useNavigate();
   const { showError, showSuccess } = useAlert();
   const user = useSelector<RootState>(store => store.auth.user) as User;
@@ -58,9 +58,9 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
       { field: "id", headerName: "ID", width: 70 },
       { field: "name", headerName: t("Name"), width: 130 },
       {
-        field: "owner", headerName: t("Owner"), width: 130,
-        valueFormatter: (params: GridValueFormatterParams<Partial<Owner>>) => params.value.name ?? ""
-        // valueFormatter: (params: GridValueFormatterParams<number>) => getOwnerName(params.value) ?? ""
+        field: "property", headerName: t("Property"), width: 130,
+        valueFormatter: (params: GridValueFormatterParams<Partial<Property>>) => params.value.name ?? ""
+        // valueFormatter: (params: GridValueFormatterParams<number>) => getPropertyName(params.value) ?? ""
       },
       { field: "active", headerName: t("Active"), type: "boolean", width: 70 },
       { field: "shown", headerName: t("Shown"), type: "boolean", width: 70 },
@@ -91,10 +91,10 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
       }
     ], [canChange, onRankUpDown, t]);
 
-  // const getOwnerName = (ownerId: number) => {
-  //   if (owners) {
-  //     const owner = owners.find(o => o.id === ownerId);
-  //     return owner ? owner.name : "";
+  // const getPropertyName = (propertyId: number) => {
+  //   if (properties) {
+  //     const property = properties.find(o => o.id === propertyId);
+  //     return property ? property.name : "";
   //   }
   // };
 

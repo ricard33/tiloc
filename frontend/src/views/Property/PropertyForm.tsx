@@ -11,7 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { FormContainer, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
-import { Owner } from "../../types";
+import { Property } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
@@ -20,24 +20,24 @@ import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type Props = {
-  owner?: Owner;
-  onSubmit?: (owner: Owner) => void;
+  property?: Property;
+  onSubmit?: (property: Property) => void;
   onCancel: () => void;
-  onDelete?: (owner: Owner) => void;
+  onDelete?: (property: Property) => void;
 };
 
-export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel, onDelete }) => {
+export const PropertyForm: React.FC<Props> = ({ property, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-  const formContext = useForm<Owner>({
-    defaultValues: owner ?? {
+  const formContext = useForm<Property>({
+    defaultValues: property ?? {
       active: true, no_vat: true, vat_rate: 0, invoice_label: "invoice", deposit_label: "deposit",
       note: "", billing: "", payment: "", legal: ""
     }
   });
   const { control, watch } = formContext;
   const { isDirty } = useFormState({ control });
-  const no_vat = watch("no_vat", owner ? owner.no_vat : true);
+  const no_vat = watch("no_vat", property ? property.no_vat : true);
 
   usePageUnloadAlert(isDirty);
 
@@ -50,14 +50,14 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel, onDelete
 
   return (
     <FormContainer
-      defaultValues={owner}
+      defaultValues={property}
       onSuccess={onSubmit}
       formContext={formContext}
     >
       <Card sx={{ maxWidth: "800px" }}>
-        <CardHeader title={t("Owner properties")} />
+        <CardHeader title={t("Property properties")} />
         <CardContent sx={{}}>
-          <input type="hidden" name={"id"} value={owner ? owner.id : 0} />
+          <input type="hidden" name={"id"} value={property ? property.id : 0} />
           <Grid2 container spacing={2}>
             <Grid2 xs={12}>
               <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
@@ -148,14 +148,14 @@ export const OwnerForm: React.FC<Props> = ({ owner, onSubmit, onCancel, onDelete
         </CardContent>
         <CardActions>
           <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
-            {onDelete && owner &&
+            {onDelete && property &&
               <Button
                 type="button"
                 className="delete-button"
                 sx={{ color: "red" }}
                 color="secondary"
                 startIcon={<DeleteIcon />}
-                onClick={() => onDelete(owner)}
+                onClick={() => onDelete(property)}
               >{t("Delete")}</Button>
             }
             {isDirty && onSubmit ?

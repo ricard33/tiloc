@@ -39,9 +39,9 @@ from .serializers import (
     LodgingSerializer,
     LoginUserSerializer,
     NextEventSerializer,
-    OwnerSerializer,
     PaymentSerializer,
     PricingSerializer,
+    PropertySerializer,
     SeasonalVariationSerializer,
     ServiceSerializer,
     UserSerializer,
@@ -316,9 +316,9 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
         raise Http404
 
 
-class OwnerViewSet(viewsets.ModelViewSet):
-    queryset = models.Owner.objects.all().order_by("name")
-    serializer_class = OwnerSerializer
+class PropertyViewSet(viewsets.ModelViewSet):
+    queryset = models.Property.objects.all().order_by("name")
+    serializer_class = PropertySerializer
 
 
 class HolidaysViewSet(viewsets.ModelViewSet):

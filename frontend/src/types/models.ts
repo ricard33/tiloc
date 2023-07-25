@@ -15,7 +15,7 @@ export interface User {
   permissions: string[];
 }
 
-export interface Owner {
+export interface Property {
   id: number;
   active: boolean;
   name: string;
@@ -41,8 +41,8 @@ export interface Lodging {
   active: boolean;
   shown: boolean;
   name: string;
-  owner_id: number;
-  owner: Extract<Owner, "id" | "name">;
+  property_id: number;
+  property: Extract<Property, "id" | "name">;
   rank: number;
   address: string;
   daily_rate: number;

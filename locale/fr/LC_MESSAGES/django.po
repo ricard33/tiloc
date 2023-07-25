@@ -133,7 +133,7 @@ msgid "display week number"
 msgstr "afficher le numéro de la semaine"
 
 #: core/models.py:55
-msgid "Owner"
+msgid "Property"
 msgstr "Propriétaire"
 
 #: core/models.py:64

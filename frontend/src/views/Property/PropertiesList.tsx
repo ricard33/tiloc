@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useListOwnersQuery } from "../../services/api";
+import { useListPropertiesQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Owner, User } from "../../types";
+import { Property, User } from "../../types";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
 import ListToolbar from "../../components/ListToolbar";
@@ -12,12 +12,12 @@ import { RootState } from "../../store";
 
 type Props = {};
 
-const OwnersList: React.FunctionComponent<Props> = () => {
+const PropertiesList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
-  const { data } = useListOwnersQuery({}, { refetchOnMountOrArgChange: 20 });
+  const { data } = useListPropertiesQuery({}, { refetchOnMountOrArgChange: 20 });
   const navigate = useNavigate();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canAdd = user.permissions.includes("core.add_owner");
+  const canAdd = user.permissions.includes("core.add_property");
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
@@ -27,20 +27,20 @@ const OwnersList: React.FunctionComponent<Props> = () => {
     { field: "active", headerName: t("Active"), type: "boolean", width: 70 }
   ];
 
-  const onClick = (owner: Owner) => {
-    navigate(owner.id.toString());
+  const onClick = (property: Property) => {
+    navigate(property.id.toString());
   };
 
-  const onCreateOwner = () => {
+  const onCreateProperty = () => {
     navigate("new");
   };
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
       <ListToolbar
-        title={t("Owners")}
+        title={t("Properties")}
         tools={[
-          { label: t("Create"), onClick: onCreateOwner, disabled: !canAdd }
+          { label: t("Create"), onClick: onCreateProperty, disabled: !canAdd }
         ]}
       />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
@@ -66,4 +66,4 @@ const OwnersList: React.FunctionComponent<Props> = () => {
   );
 };
 
-export default OwnersList;
+export default PropertiesList;

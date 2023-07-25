@@ -49,18 +49,18 @@ class UserSerializer(serializers.ModelSerializer):
         return user.get_all_permissions()
 
 
-class OwnerSerializer(serializers.ModelSerializer):
+class PropertySerializer(serializers.ModelSerializer):
     logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
 
     class Meta:
-        model = models.Owner
+        model = models.Property
         fields = "__all__"
 
 
-class OwnerSubSerializer(serializers.ModelSerializer):
+class PropertySubSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Owner
+        model = models.Property
         fields = [
             "id",
             "name",
@@ -68,8 +68,8 @@ class OwnerSubSerializer(serializers.ModelSerializer):
 
 
 class LodgingSerializer(serializers.ModelSerializer):
-    owner = OwnerSubSerializer(read_only=True)
-    owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.Owner.objects.all())
+    property = PropertySubSerializer(read_only=True)
+    property_id = serializers.PrimaryKeyRelatedField(source="property", queryset=models.Property.objects.all())
     rank = serializers.IntegerField(required=False)
 
     class Meta:
@@ -86,7 +86,7 @@ class LodgingSerializer(serializers.ModelSerializer):
 
 
 class LodgingSubSerializer(serializers.ModelSerializer):
-    owner = OwnerSubSerializer(read_only=True)
+    property = PropertySubSerializer(read_only=True)
 
     class Meta:
         model = models.Lodging
@@ -96,8 +96,8 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "active",
             "shown",
             "name",
-            "owner_id",
-            "owner",
+            "property_id",
+            "property",
             "rank",
             "daily_rate",
             "guaranty",

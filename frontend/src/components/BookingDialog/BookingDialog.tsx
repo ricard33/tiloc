@@ -4,7 +4,7 @@ import { Contacts as ContactsIcon, ExpandMore as ExpandMoreIcon, Forward as Forw
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
-import { getDepositLabel } from "../../common/ownerPrefsUtils";
+import { getDepositLabel } from "../../common/propertyPrefsUtils";
 import {
   Accordion,
   AccordionDetails,
@@ -28,7 +28,7 @@ import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
 import {
   useCreateBookingMutation,
-  useGetOwnerQuery,
+  useGetPropertyQuery,
   useListBookingChannelsQuery,
   useListBookingStatusesQuery,
   useUpdateBookingMutation
@@ -71,8 +71,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
   const {
-    data: owner
-  } = useGetOwnerQuery(booking?.lodging ? booking!.lodging.owner_id : -1, { skip: typeof booking === "undefined" || typeof booking.lodging === "undefined" });
+    data: property
+  } = useGetPropertyQuery(booking?.lodging ? booking!.lodging.property_id : -1, { skip: typeof booking === "undefined" || typeof booking.lodging === "undefined" });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const { data: bookingChannels } = useListBookingChannelsQuery();
   const [createBooking] = useCreateBookingMutation();
@@ -80,7 +80,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const variant = "outlined";
   const margin = "none";
-  const depositPercent = 30; // TODO load this from owner or lodging preferences
+  const depositPercent = 30; // TODO load this from property or lodging preferences
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -121,7 +121,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const leftToPay = fullPrice - totalPayment - (commissionFees ?? 0);
   // console.log("options", options, fullPrice);
 
-  const depositLabel = owner ? getDepositLabel(t, owner.deposit_label) : t("Deposit");
+  const depositLabel = property ? getDepositLabel(t, property.deposit_label) : t("Deposit");
 
   useEffect(() => {
     if (formValues.status_id === undefined && bookingStatuses) {

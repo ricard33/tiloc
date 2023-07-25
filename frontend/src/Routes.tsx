@@ -16,11 +16,11 @@ import {
 } from "./views";
 import { RequireAuth } from "./components/RequireAuth";
 import LodgingsList from "./views/Lodging/LodgingList";
-import OwnersList from "./views/Owner/OwnersList";
+import PropertiesList from "./views/Property/PropertiesList";
 import BookingStatusesList from "./views/BookingStatus/BookingStatusesList";
 import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
-import { OwnerPage } from "./views/Owner/OwnerPage";
+import { PropertyPage } from "./views/Property/PropertyPage";
 import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
 import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
@@ -68,9 +68,9 @@ const MyRoutes = () => {
             }
           />
           <Route path="/settings/" element={<Settings />} />
-          <Route path="/settings/owners" element={<OwnersList />} />
-          <Route path="/settings/owners/new" element={<OwnerPage />} />
-          <Route path="/settings/owners/:ownerId" element={<OwnerPage />} />
+          <Route path="/settings/properties" element={<PropertiesList />} />
+          <Route path="/settings/properties/new" element={<PropertyPage />} />
+          <Route path="/settings/properties/:propertyId" element={<PropertyPage />} />
           <Route path="/settings/lodgings" element={<LodgingsList />} />
           <Route path="/settings/lodgings/new" element={<LodgingPage />} />
           <Route path="/settings/lodgings/:lodgingId" element={<LodgingPage />} />

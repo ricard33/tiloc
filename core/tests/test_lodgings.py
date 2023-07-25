@@ -54,9 +54,9 @@ class LodgingTestCase(APITestCase):
         self.assertEqual(new_lodgings[3].id, lodgings[3].id)
 
     def test_create(self):
-        owner = factories.OwnerFactory()
+        property = factories.PropertyFactory()
         status_count = models.Lodging.objects.all().count()
-        data = {"name": "my beautiful lodge", "owner_id": owner.id, "address": "here", "daily_rate": 30}
+        data = {"name": "my beautiful lodge", "property_id": property.id, "address": "here", "daily_rate": 30}
         response = self.client.post("/api/lodging/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         self.assertEqual(status_count + 1, models.Lodging.objects.all().count())

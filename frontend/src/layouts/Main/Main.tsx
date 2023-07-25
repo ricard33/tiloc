@@ -50,7 +50,7 @@ const Main = () => {
     "contract": t("Contract"),
     "lodgings": t("Lodgings"),
     "reports": t("Reports"),
-    "owners": t("Owners"),
+    "properties": t("Properties"),
     "services": t("Services"),
     "booking-status": t("Booking statuses"),
     "booking-channels": t("Booking channels"),

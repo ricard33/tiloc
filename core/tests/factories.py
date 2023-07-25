@@ -19,9 +19,9 @@ class AdminFactory(UserFactory):
     is_superuser = True
 
 
-class OwnerFactory(factory.django.DjangoModelFactory):
+class PropertyFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Owner
+        model = models.Property
 
     name = factory.Faker("name")
     email = factory.Faker("email")
@@ -34,7 +34,7 @@ class LodgingFactory(factory.django.DjangoModelFactory):
         model = models.Lodging
 
     name = factory.Faker("name")
-    owner = factory.SubFactory(OwnerFactory)
+    property = factory.SubFactory(PropertyFactory)
     rank = factory.Sequence(lambda n: n)
     address = factory.Faker("address")
     daily_rate = 50

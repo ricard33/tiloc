@@ -250,10 +250,10 @@ class ExportFullPlanningTestCase(TestCase):
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 2)
 
-    def test_owner_export(self):
+    def test_property_export(self):
         admin = factories.AdminFactory()
         self.client.force_login(admin)
-        r = self.client.get("/full_planning/%d/" % self.lodging1.owner_id)
+        r = self.client.get("/full_planning/%d/" % self.lodging1.property_id)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
         c = Calendar(r.content.decode())

@@ -17,10 +17,10 @@ logger = logging.getLogger("api")
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
-    return "owner_{0}/{1}".format(instance.id, filename)
+    return "property_{0}/{1}".format(instance.id, filename)
 
 
-class Owner(models.Model):
+class Property(models.Model):
     class DepositOrDownPayment(models.TextChoices):
         DEPOSIT = "deposit", _("Deposit")
         DOWN_PAYMENT = "down_payment", _("Down payment")
@@ -66,7 +66,7 @@ class Owner(models.Model):
     history = HistoricalRecords()
 
     class Meta:
-        verbose_name = _("Owner")
+        verbose_name = _("Property")
 
     def __str__(self):
         return self.name
@@ -77,7 +77,7 @@ class Lodging(models.Model):
     active = models.BooleanField(_("active"), default=True)
     shown = models.BooleanField(_("shown"), default=True)
     name = models.CharField(_("name"), max_length=200, unique=True)
-    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
     rank = models.IntegerField(
         _("rank"),
     )
@@ -321,10 +321,10 @@ class Booking(models.Model):
             from core.jinja2_tools import render_template
 
             signature_img = (
-                self.lodging.owner.signature
+                self.lodging.property.signature
                 and (
                     '<img style="max-width: 200px; max-height: 100px" '
-                    'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
+                    'src="%s" alt="Signature"' % (url_server + self.lodging.property.signature.url)
                 )
                 or ""
             )
@@ -335,7 +335,7 @@ class Booking(models.Model):
                 {
                     "booking": self,
                     "lodging": self.lodging,
-                    "owner": self.lodging.owner,
+                    "property": self.lodging.property,
                     "options": self.id and list(self.bookedservice_set.all()) or [],
                     "included_options": self.id
                     and self.bookedservice_set.filter(service__not_included_in_price=False)

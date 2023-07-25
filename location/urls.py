@@ -33,7 +33,7 @@ router.register(r"booking_channel", api.BookingChannelViewSet, "booking_channel"
 router.register(r"booking_channel_sync", api.BookingChannelSyncViewSet, "booking_channel_sync")
 router.register(r"service", api.ServiceViewSet, "service")
 router.register(r"lodging", api.LodgingViewSet, "lodging")
-router.register(r"owner", api.OwnerViewSet, "owner")
+router.register(r"property", api.PropertyViewSet, "property")
 router.register(r"holidays", api.HolidaysViewSet, "holidays")
 router.register(r"pricing", api.PricingViewSet, "pricing")
 router.register(r"seasonal_variation", api.SeasonalVariationViewSet, "seasonal_variation")
@@ -53,7 +53,7 @@ urlpatterns = [
     path(r"calendar/<uuid:uid>/", views.export_calendar, name="calendar_sync"),
     path(r"calendar/<uuid:uid>.ics", views.export_calendar, name="calendar_sync"),
     # path(r'full_planning/', views.export_full_planning),
-    # path(r'full_planning/<int:owner_id>/', views.export_full_planning),
+    # path(r'full_planning/<int:property_id>/', views.export_full_planning),
     # path(r'full_planning/fbf830a8-7e47-43c6-9f25-d1734d1fc07d/', views.export_full_planning),
     path(r"stats/filling_rate/", views.filling_rate),
     path(r"stats/filling_rate/<str:begin>/<str:end>/", views.filling_rate),

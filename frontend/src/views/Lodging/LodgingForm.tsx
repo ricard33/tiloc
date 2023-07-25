@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { FormContainer, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
-import { Lodging, Owner } from "../../types";
+import { Lodging, Property } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
@@ -22,13 +22,13 @@ import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 type Props = {
   lodging?: Lodging;
-  owners: Owner[];
+  properties: Property[];
   onSubmit?: (lodging: Lodging) => void;
   onCancel: () => void;
   onDelete?: (lodging: Lodging) => void;
 };
 
-export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCancel, onDelete }) => {
+export const LodgingForm: React.FC<Props> = ({ lodging, properties, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<Lodging>({ defaultValues: lodging ?? {description: ""}});
@@ -36,8 +36,8 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
   const {isDirty} = useFormState({ control });
   usePageUnloadAlert(isDirty);
 
-  const ownersOptions: { label: string, id: number }[] = owners ? owners.map((owner) => {
-    return { label: owner.name, id: owner.id };
+  const propertiesOptions: { label: string, id: number }[] = properties ? properties.map((property) => {
+    return { label: property.name, id: property.id };
   }) : [];
 
 
@@ -69,9 +69,9 @@ export const LodgingForm: React.FC<Props> = ({ lodging, owners, onSubmit, onCanc
             </Grid2>
             <Grid2 sm={6} xs={12}>
               <SelectElement
-                name={"owner_id"}
-                label={t("Owner")}
-                options={ownersOptions}
+                name={"property_id"}
+                label={t("Property")}
+                options={propertiesOptions}
                 fullWidth
               />
               <SwitchElement name={"active"} label={t("Active ?")} />

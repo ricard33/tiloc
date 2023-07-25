@@ -23,8 +23,8 @@ const Settings = () => {
       disabled: true,
     },
     {
-      title: t('Owners'),
-      href: './owners',
+      title: t('Properties'),
+      href: './properties',
       icon: <PeopleAltIcon />
     },
     {

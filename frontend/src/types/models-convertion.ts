@@ -1,4 +1,4 @@
-import { Booking, CalendarSync, Contract, ContractTemplate, Lodging, Owner, Payment, Service } from "./models";
+import { Booking, CalendarSync, Contract, ContractTemplate, Lodging, Property, Payment, Service } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
@@ -20,17 +20,17 @@ export function payment2Api(p: Partial<Payment>): Record<string, any> {
   };
 }
 
-// ----- OWNER -----
+// ----- PROPERTY -----
 
-export function api2Owner(owner: Record<string, any>): Owner {
+export function api2Property(property: Record<string, any>): Property {
   return {
-    ...owner as Owner,
-    vat_rate: Number(owner.vat_rate)
+    ...property as Property,
+    vat_rate: Number(property.vat_rate)
   };
 }
 
-export function owner2api(owner: Partial<Owner>): Record<string, any> {
-  const {logo, signature, ...rest} = owner;
+export function property2api(property: Partial<Property>): Record<string, any> {
+  const {logo, signature, ...rest} = property;
   return {
     ...rest,
     ...(typeof signature === "string" ? { } : { signature }),

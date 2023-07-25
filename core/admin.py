@@ -87,7 +87,7 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
         "last_import_error",
     )
     list_display_links = ("channel", "lodging")
-    list_filter = ("lodging", "lodging__owner", "channel", "active")
+    list_filter = ("lodging", "lodging__property", "channel", "active")
     list_editable = ("active",)
     actions = ["synchronize"]
 
@@ -122,7 +122,7 @@ class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
         "__str__",
         "id",
         "name",
-        "owner",
+        "property",
         "rank",
         "active",
         "shown",
@@ -143,10 +143,10 @@ class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
         "tourist_tax",
         "contract_template",
     )
-    list_filter = ("owner", "active", "shown")
+    list_filter = ("property", "active", "shown")
 
 
-class OwnerAdmin(ImportExportMixin, SimpleHistoryAdmin):
+class PropertyAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = ("id", "name", "email", "phone", "active")
     list_display_links = ("name",)
 
@@ -226,7 +226,7 @@ admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.Service, ServiceAdmin)
 admin.site.register(models.Lodging, LodgingAdmin)
 admin.site.register(models.Category)
-admin.site.register(models.Owner, OwnerAdmin)
+admin.site.register(models.Property, PropertyAdmin)
 admin.site.register(models.BookingChannel, BookingChannelAdmin)
 admin.site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
 admin.site.register(models.BookingStatus, BookingStatusAdmin)

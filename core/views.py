@@ -70,7 +70,7 @@ def export_calendar(request, uid):
 
 @never_cache
 @transaction.atomic
-def export_full_planning(request, owner_id=None):
+def export_full_planning(request, property_id=None):
     # user = None
     # if not request.user.is_authenticated:
     #     auth_header = request.META.get('HTTP_AUTHORIZATION', '')
@@ -83,14 +83,14 @@ def export_full_planning(request, owner_id=None):
     #         r = HttpResponse(status=401)
     #         r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
     #         return r
-    owner = owner_id and get_object_or_404(models.Owner, id=owner_id) or None
-    if owner and owner_id != request.user.id and not request.user.is_superuser:
-        raise Http404("No owner matches the given query.")
+    property = property_id and get_object_or_404(models.Property, id=property_id) or None
+    if property and property_id != request.user.id and not request.user.is_superuser:
+        raise Http404("No property matches the given query.")
 
     qs = models.Booking.objects.filter(cancelled=False, deleted=False)
-    if owner:
-        qs = qs.filter(lodging__owner=owner)
-        logger.info("Full planning requested for owner [%s]", owner.name)
+    if property:
+        qs = qs.filter(lodging__property=property)
+        logger.info("Full planning requested for property [%s]", property.name)
     else:
         logger.info("Full planning requested")
 
