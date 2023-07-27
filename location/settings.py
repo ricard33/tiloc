@@ -150,6 +150,9 @@ DATABASES = {
 
 # DATABASE_ROUTERS = ['core.db_router.Router', ]
 
+AUTH_USER_MODEL = 'core.User'
+SILENCED_SYSTEM_CHECKS = ["auth.W004"]  # 'User.username' is named as the 'USERNAME_FIELD', but it is not unique.
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 

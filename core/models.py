@@ -5,6 +5,7 @@ import uuid
 from datetime import date
 
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Sum
 from django.urls import reverse
@@ -18,6 +19,10 @@ logger = logging.getLogger("api")
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
     return "property_{0}/{1}".format(instance.id, filename)
+
+
+class User(AbstractUser):
+    pass
 
 
 class Property(models.Model):
