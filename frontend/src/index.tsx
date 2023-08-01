@@ -1,6 +1,6 @@
 import "typeface-roboto";
 import React from "react";
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
 import axios from "axios";
 import App from "./App";
 import { auth as authActions } from "./actions";
@@ -12,45 +12,48 @@ import { store, sagaMiddleware } from "./store";
 import "./index.css";
 import { createBrowserHistory } from "history";
 import logger from "./common/logger";
-import { SnackbarProvider } from 'notistack';
+import { SnackbarProvider } from "notistack";
 import { dispatchError } from "./common/alertUtils";
-import 'vite/modulepreload-polyfill';
-
+import "vite/modulepreload-polyfill";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 const browserHistory = createBrowserHistory();
 
 sagaMiddleware.run(rootSaga);
 
-
 // Add a request interceptor
 axios.interceptors.request.use(
-  function(config) {
+  function (config) {
     // Do something before request is sent
     const token = localStorage.getItem("token");
     if (token) {
-      if (typeof config.headers === 'undefined')
-        config.headers = {};
+      if (typeof config.headers === "undefined") config.headers = {};
       config.headers.Authorization = `Token ${token}`;
     }
     return config;
-  }, function(error) {
+  },
+  function (error) {
     // Do something with request error
     logger.error(error);
     return Promise.reject(error);
-  });
+  }
+);
 
 // Response interceptor.
 axios.interceptors.response.use(
-  function(response) {
+  function (response) {
     // Do something with response data
     // console.debug("set-cookie", response.headers["set-cookie"]);
     return response;
   },
-  function(error) {
+  function (error) {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.error(error.config.method + " " + error.config.url + " => Code " + error.response.status, error.response.data);
+      console.error(
+        error.config.method + " " + error.config.url + " => Code " + error.response.status,
+        error.response.data
+      );
 
       if (error.response.status === 401) {
         if (["/login", "/logged-out"].indexOf(browserHistory.location.pathname) < 0) {
@@ -59,15 +62,10 @@ axios.interceptors.response.use(
           store.dispatch(authActions.tokenExpired());
           console.warn("Push to /login from", location);
           browserHistory.push("/login", { from: location });
-        }
-        else
-          return Promise.reject(error);
+        } else return Promise.reject(error);
       }
-      if (error.response.data.detail)
-        dispatchError(error.response.data.detail);
-      else
-        dispatchError("Server error");
-
+      if (error.response.data.detail) dispatchError(error.response.data.detail);
+      else dispatchError("Server error");
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -84,16 +82,33 @@ axios.interceptors.response.use(
   }
 );
 
+function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  // Call resetErrorBoundary() to reset the error boundary and retry the render.
+
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+    </div>
+  );
+}
+
+const logError = (error: Error, info: { componentStack: string }) => {
+  // Do something with the error, e.g. log to an external API
+  logger.error(error, info);
+};
+
 const root = createRoot(document.getElementById("root")!);
 root.render(
   // <React.StrictMode>
-  <Provider store={store}>
-    <I18nextProvider i18n={i18n}>
-      <SnackbarProvider maxSnack={3}>
-        <App />
-      </SnackbarProvider>
-    </I18nextProvider>
-  </Provider>
+  <ErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+    <Provider store={store}>
+      <I18nextProvider i18n={i18n}>
+        <SnackbarProvider maxSnack={3}>
+          <App />
+        </SnackbarProvider>
+      </I18nextProvider>
+    </Provider>
+  </ErrorBoundary>
   // </React.StrictMode>
 );
-

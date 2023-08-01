@@ -25,6 +25,7 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
     build: {
       outDir: "build",
       manifest: "vite-manifest.json",
+      sourcemap: true,
       // minify: false,
       rollupOptions: {
         output: {

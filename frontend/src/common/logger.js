@@ -50,15 +50,15 @@ const logFn = (level, data, extended_data = {}, once = false) => {
 };
 
 const info = (data, once = false) => {
-  logFn("info", data, {}, once);
+  logFn("INFO", data, {}, once);
 };
 
 const warn = (data, once = false) => {
-  logFn("warn", data, {}, once);
+  logFn("WARNING", data, {}, once);
 };
 
 const error = (err, data = {}, once = false) => {
-  logFn("error", data,
+  logFn("ERROR", data,
     {
       file: err.fileName || err.filename,
       line: err.lineNumber || err.lineno,

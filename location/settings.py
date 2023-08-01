@@ -61,7 +61,7 @@ LOGGING = configure_logging("location", CONFIG_DIR, LOG_DIR, DEFAULT_LOG_FORMAT,
 if ENV not in ["dev", "prod"]:
     logging.critical("Bad value for APP_ENV environment settings: %s", ENV)
 
-logging.info("Starting django application (%s) %s", ENV, DEBUG and "**DEBUG MODE ACTIVATED**" or "")
+logging.info("Starting django application (%s) %s %s", ENV, sys.argv[1:], DEBUG and "**DEBUG MODE ACTIVATED**" or "")
 
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
