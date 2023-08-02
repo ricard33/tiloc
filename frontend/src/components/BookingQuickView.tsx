@@ -12,7 +12,7 @@ import { Unstable_Grid2 as Grid } from "@mui/material";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons/faWhatsapp";
 import IconButton from "@mui/material/IconButton";
 import FontAwesomeSvgIcon from "./FontAwesomeSvgIcon";
-import reactStringReplace from "react-string-replace";
+import reactStringReplace from "../common/reactStringReplace";
 import { green } from "@mui/material/colors";
 
 type BookingQuickViewProps = {
@@ -41,7 +41,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
     ));
     result = reactStringReplace(
       result,
-      /(([+][\s./0-9]*)?[(]?[0-9]{1,4}[)]?[0-9][-\s./0-9]{6,12}[0-9])/g,
+      /([+]?[\s./0-9]*[(]?[0-9]{1,4}[)]?[0-9][-\s./0-9]{6,12}[0-9])/g,
       (phone, i) => (
         <span key={i}>
           <a href={"tel:" + phone}>{phone}</a>
