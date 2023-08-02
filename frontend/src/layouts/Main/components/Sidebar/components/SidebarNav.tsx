@@ -1,5 +1,4 @@
 /* eslint-disable react/no-multi-comp */
-/* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
 import React from "react";
 import { NavLink, NavLinkProps } from "react-router-dom";
@@ -82,6 +81,7 @@ const CustomNavLink = React.forwardRef<HTMLAnchorElement, CustomNavLinkProps>((p
   );
 });
 
+CustomNavLink.displayName = "CustomNavLink";
 
 type Page = {
   title: string;
