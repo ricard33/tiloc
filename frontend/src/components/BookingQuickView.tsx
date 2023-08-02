@@ -28,6 +28,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
 
   const whatsAppPhoneNumber = (phone: string): string => {
     return phone.replace(/^00/, "")
+      .replace(/^0696/, "596696")
+      .replace(/^0596/, "596696")
+      .replace(/^00/, "")
       .replace(/^0/, "33")
       .replace("+", "")
       .replaceAll(" ", "")
