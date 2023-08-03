@@ -2,6 +2,7 @@
 <project version="4">
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
+    <option name="enabledOnSave" value="true" />
     <option name="sdkUUID" value="cd8a4ef8-ffb8-40e3-ad3d-be42df000092" />
   </component>
   <component name="JavaScriptSettings">
