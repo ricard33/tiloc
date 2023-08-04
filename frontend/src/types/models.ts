@@ -53,15 +53,9 @@ export interface Lodging {
   description: string;
 }
 
-export interface Category {
-  id: number;
-  name: string;
-}
-
 export interface Service {
   id: number;
   reference: string;
-  category: number;
   designation: string;
   unit_price: number;
   vat: number;

@@ -3,13 +3,13 @@ from datetime import date
 
 import arrow
 from django.test import TestCase
-
 # Create your tests here.
 from ics import Calendar
 
 from core import models
 from core.sync import synchronize_bookings
 from core.tests import factories
+from core.tests.helpers import force_login
 
 empty_ical = r"""BEGIN:VCALENDAR
 PRODID;X-RICAL-TZSOURCE=TZINFO:-//Airbnb Inc//Hosting Calendar 0.8.8//EN
@@ -242,18 +242,18 @@ class ExportFullPlanningTestCase(TestCase):
         factories.BookingFactory(lodging=self.lodging2, guest_name="Daniel")
 
     def test_full_export_by_admin(self):
-        admin = factories.AdminFactory()
-        self.client.force_login(admin)
-        r = self.client.get("/full_planning/")
+        admin = factories.SuperUserFactory()
+        header = force_login(admin)
+        r = self.client.get("/full_planning/", **header)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 2)
 
     def test_property_export(self):
-        admin = factories.AdminFactory()
-        self.client.force_login(admin)
-        r = self.client.get("/full_planning/%d/" % self.lodging1.property_id)
+        admin = factories.SuperUserFactory()
+        header = force_login(admin)
+        r = self.client.get("/full_planning/%d/" % self.lodging1.property_id, **header)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
         c = Calendar(r.content.decode())

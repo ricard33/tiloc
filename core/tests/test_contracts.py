@@ -1,11 +1,13 @@
-from knox.models import AuthToken
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core.tests import factories
+from core.tests.helpers import force_login
 
 
 class ContractTestCase(APITestCase):
+    fixtures = ["default-groups"]
+
     def setUp(self) -> None:
         for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory.create(name=name)
@@ -28,14 +30,12 @@ class ContractTestCase(APITestCase):
         self.assertEqual("", booking.contract.content)
 
     def test_generate_contract_with_api(self):
-        user = factories.AdminFactory.create()
+        user = factories.StandardUserFactory.create()
         contract_template = factories.ContractTemplateFactory.create(
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
         )
         booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
-        self.client.force_login(user)
-        instance, token = AuthToken.objects.create(user)
-        header = {"HTTP_AUTHORIZATION": "Token " + token}
+        header = force_login(user)
         response = self.client.post("/api/booking/%d/generate_contract/" % booking.id, **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(booking.contract)

@@ -9,6 +9,7 @@ from django.db import transaction
 from django.db.models import F, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from knox.auth import TokenAuthentication
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
@@ -20,12 +21,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from location import __date__, __version__
-
 from . import models
 from .filters import BookingFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
+from .permissions import IsSuperUserPermission
 from .serializers import (
+    AccountSerializer,
     BookingChannelSerializer,
     BookingChannelSyncSerializer,
     BookingNoPriceSerializer,
@@ -143,12 +145,64 @@ class LogoutAPI(KnoxLogoutView):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
-class UserAPI(generics.RetrieveAPIView):
+class AccountViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsSuperUserPermission]
+    queryset = models.Account.objects.all()
+    serializer_class = AccountSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
+
+class CurrentAccountViewSet(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API endpoint that allows current account to be viewed, edited or deleted.
+    """
+    queryset = models.Account.objects.all()
+    serializer_class = AccountSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
+    def get_object(self):
+        self.check_object_permissions(self.request, self.request.user.account)
+        return self.request.user.account
+
+    def destroy(self, request, *args, **kwargs):
+        # self.send_account_deletion_request_email_to_si(request.user)
+        # if request.user.email:
+        #     self.send_account_deletion_request_email_to_user(request.user)
+
+        request.user.account.is_active = False
+        request.user.account.save()
+
+        return Response(data={"result": _("Request of deletion of all your account's data successfully sent.")},
+                        status=200)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows user(s) to be viewed/listed.
+    """
+
+    queryset = models.User.objects.all()
+    # filter_class = filters.UserFilter
+    serializer_class = UserSerializer
+    ordering_fields = '__all__'
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
+
+class CurrentUserAPI(generics.RetrieveAPIView):
     # authentication_classes = (TokenAuthentication,)
     permission_classes = [
         permissions.IsAuthenticated,
     ]
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
     def get_object(self):
         return self.request.user
@@ -167,6 +221,9 @@ class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
     filterset_class = BookingFilter
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
     def get_serializer_class(self):
         if not self.request.user.has_perm("core.view_prices"):
@@ -275,15 +332,24 @@ class BookingStatusViewSet(viewsets.ModelViewSet, OrderedModelMixin):
     queryset = models.BookingStatus.objects.all()
     serializer_class = BookingStatusSerializer
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 class BookingChannelViewSet(viewsets.ModelViewSet):
     queryset = models.BookingChannel.objects.all()
     serializer_class = BookingChannelSerializer
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 class BookingChannelSyncViewSet(viewsets.ModelViewSet):
     queryset = models.BookingChannelSync.objects.all()
     serializer_class = BookingChannelSyncSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
 
 class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
@@ -291,6 +357,9 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
     queryset = models.Lodging.objects.all()  # .order_by("name")
     serializer_class = LodgingSerializer
     filterset_fields = ["shown", "active"]
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
     @action(detail=True, methods=["get"])
     @transaction.atomic
@@ -320,31 +389,49 @@ class PropertyViewSet(viewsets.ModelViewSet):
     queryset = models.Property.objects.all().order_by("name")
     serializer_class = PropertySerializer
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 class HolidaysViewSet(viewsets.ModelViewSet):
     queryset = models.Holidays.objects.all().order_by("begin_date")
     serializer_class = HolidaysSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
 
 class PricingViewSet(viewsets.ModelViewSet):
     queryset = models.Pricing.objects.all().order_by("name")
     serializer_class = PricingSerializer
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 class SeasonalVariationViewSet(viewsets.ModelViewSet):
     queryset = models.SeasonalVariation.objects.all().order_by("begin_date")
     serializer_class = SeasonalVariationSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
 
 class ContractTemplateViewSet(viewsets.ModelViewSet):
     queryset = models.ContractTemplate.objects.all().order_by("name")
     serializer_class = ContractTemplateSerializer
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 class ContractViewSet(viewsets.ModelViewSet):
     queryset = models.Contract.objects.all().order_by("created")
     serializer_class = ContractSerializer
     filterset_fields = ["booking_id"]
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
 
     @action(detail=True, methods=["get"])
     def pdf(self, request, pk=None):
@@ -368,7 +455,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentSerializer
     filterset_class = PaymentFilter
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = models.Service.objects.all().order_by("reference")
     serializer_class = ServiceSerializer
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)

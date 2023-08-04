@@ -1,19 +1,19 @@
-from knox.models import AuthToken
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core import models
 from core.tests import factories
+from core.tests.helpers import force_login
 
 
 class PaymentTestCase(APITestCase):
+    fixtures = ["default-groups"]
+
     def setUp(self) -> None:
         factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
-        self.user = factories.AdminFactory.create()
-        self.client.force_login(self.user)
-        instance, token = AuthToken.objects.create(self.user)
-        self.header = {"HTTP_AUTHORIZATION": "Token " + token}
+        self.user = factories.StandardUserFactory.create()
+        self.header = force_login(self.user)
 
     def test_need_authentication(self):
         payment = factories.PaymentFactory.create()

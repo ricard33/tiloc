@@ -27,6 +27,7 @@ from core import api, views
 from location.serve_static_file import serve_static_file
 
 router = routers.DefaultRouter()
+router.register(r"account", api.AccountViewSet, "account")
 router.register(r"booking", api.BookingViewSet, "booking")
 router.register(r"booking_status", api.BookingStatusViewSet, "booking_status")
 router.register(r"booking_channel", api.BookingChannelViewSet, "booking_channel")
@@ -40,6 +41,7 @@ router.register(r"seasonal_variation", api.SeasonalVariationViewSet, "seasonal_v
 router.register(r"contract_template", api.ContractTemplateViewSet, "contract_template")
 router.register(r"contract", api.ContractViewSet, "contract")
 router.register(r"payment", api.PaymentViewSet, "payment")
+router.register(r"user", api.UserViewSet, "user")
 
 urlpatterns = [
     path("api/", include((router.urls, "drf"), namespace="api")),
@@ -48,8 +50,11 @@ urlpatterns = [
     # re_path("^api/auth/register/$", api.RegistrationAPI.as_view()),
     re_path("^api/auth/login/$", api.LoginAPI.as_view()),
     re_path("^api/auth/logout/$", api.LogoutAPI.as_view()),
-    re_path("^api/auth/user/$", api.UserAPI.as_view()),
+    re_path("^api/auth/user/$", api.CurrentUserAPI.as_view()),
     re_path(r"^api/auth/", include("knox.urls")),
+
+    re_path(r'^api/my-account/$', api.CurrentAccountViewSet.as_view(), name='my-account'),
+
     path(r"calendar/<uuid:uid>/", views.export_calendar, name="calendar_sync"),
     path(r"calendar/<uuid:uid>.ics", views.export_calendar, name="calendar_sync"),
     # path(r'full_planning/', views.export_full_planning),

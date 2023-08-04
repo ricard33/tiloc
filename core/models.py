@@ -5,9 +5,11 @@ import uuid
 from datetime import date
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import models as auth_models
+from django.contrib.auth.models import UserManager
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse as drf_reverse
@@ -15,14 +17,206 @@ from simple_history.models import HistoricalRecords
 
 logger = logging.getLogger("api")
 
+# -------------------------------------------------------------------------------------------------
+# Note: for all models that depends on an account, a field is mandatory in model: _account_qs_path
+# it should define the query path to get the account field
+# -------------------------------------------------------------------------------------------------
+
+
+class ForUserQuerySet(models.QuerySet):
+    """Generic QuerySet allowing to make filters for a specific user, depending on its account."""
+
+    def for_user(self, user):
+        """
+        Filter objects to only those visible by the given user.
+        Object should have a 'user' or a 'account' property
+
+        :param user:
+        :return:
+        """
+
+        # query path to get user from object
+        user_path = getattr(self.model, "_user_qs_path", None)  # not used as v1.0 (2023)
+        # query path to get account from object
+        account_path = getattr(self.model, "_account_qs_path", "account") or (
+            user_path and user_path + "__account" or None
+        )
+        property_path = getattr(self.model, "_property_qs_path", None)
+
+        if user.is_superuser:
+            return self
+        account_query = property_query = user_query = Q(**{})
+        # account_path = self.account_path or (self.user_path and self.user_path + "__account" or None)
+        if account_path and hasattr(user, "account"):
+            account_query = Q(**{account_path: user.account, account_path + "__is_active": True}) | Q(
+                **{account_path + "__isnull": True}
+            )
+
+        if property_path:
+            property_query |= Q(**{property_path + "__in": user.properties.all()})
+        if user_path:
+            user_query = Q(**{user_path: user})
+
+        return self.filter(account_query & (property_query | user_query)).distinct()
+
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
     return "property_{0}/{1}".format(instance.id, filename)
 
 
-class User(AbstractUser):
-    pass
+class AccountQuerySet(models.QuerySet):
+    def create(self, **kwargs):
+        if kwargs.get("name") == "__template__" and Account.objects.filter(name="__template__").exists():
+            raise ValidationError(
+                "'__template__' account already exists. You're not allowed to create multiple templates."
+            )
+
+        account = super().create(**kwargs)
+        return account
+
+    def for_user(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(pk=user.account.pk)
+
+
+class Account(models.Model):
+    name = models.CharField(_("name"), max_length=200, unique=True, help_text=_("Internal name, should be unique"))
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        permissions = (("administrator", "Can administer all account data"),)
+
+    objects = AccountQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return (self.name,)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        creating = self.pk is None or force_insert
+        if self.pk is None and self.name == "__template__" and Account.objects.filter(name="__template__").exists():
+            raise ValidationError(
+                "'__template__' account already exists. " "You're not allowed to create multiple templates."
+            )
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
+        if creating:
+            self.fill_account_with_default_ressources()
+
+    def delete(self, using=None, keep_parents=False):
+
+        Payment.objects.filter(booking__lodging__property__account=self).delete()
+        Contract.objects.filter(booking__lodging__property__account=self).delete()
+        BookedService.objects.filter(booking__lodging__property__account=self).delete()
+        Booking.objects.filter(lodging__property__account=self).delete()
+        BookingChannelSync.objects.filter(lodging__property__account=self).delete()
+        Lodging.objects.filter(property__account=self).delete()
+        Property.objects.filter(account=self).delete()
+        ContractTemplate.objects.filter(account=self).delete()
+        Service.objects.filter(account=self).delete()
+        BookingStatus.objects.filter(account=self).delete()
+        Pricing.objects.filter(account=self).delete()
+        Holidays.objects.filter(account=self).delete()
+        User.objects.filter(account=self).delete()
+
+        super().delete(using, keep_parents)
+
+    def fill_account_with_default_ressources(self, template=None):
+        try:
+            if template is None:
+                template = Account.objects.get(name="__template__")
+            if template.pk == self.pk:
+                # don't apply for the template creation itself
+                return self
+
+            def _set_account(obj):
+                obj.pk = None
+                obj.account = self
+                return obj
+
+            Service.objects.bulk_create(map(_set_account, template.service_set.all()))
+            BookingStatus.objects.bulk_create(map(_set_account, template.bookingstatus_set.all()))
+            BookingChannel.objects.bulk_create(map(_set_account, template.bookingchannel_set.all()))
+            ContractTemplate.objects.bulk_create(map(_set_account, template.contracttemplate_set.all()))
+
+        except Account.DoesNotExist:
+            logging.info(
+                "Template account not found. "
+                "To have default value, create a fictive account whose name is '__template__', "
+                "then create default statuses, services, etc...."
+            )
+            pass
+
+
+# TODO try to remove UserQuerySet and MyUserManager
+class UserQuerySet(models.QuerySet):
+    def for_user(self, user):
+        """
+        Filter queryset to user instances visible by the given user, depending on its status (manager or not)
+        and its services.
+
+        :param user:
+        :return:
+        """
+        if user.is_superuser:
+            return self
+        qs = self.filter(account=user.account, account__is_active=True)
+        if not user.has_perm("core.administrator"):
+            qs = qs.filter(id=user.id)
+        return qs
+
+
+class MyUserManager(UserManager.from_queryset(UserQuerySet)):
+    # Inheritance needed to be able to use Manager.from_queryset() and Manager.use_in_migrations jointly
+    use_in_migrations = True
+
+    def get_by_natural_key(self, username, account_name):
+        return self.get(username=username, account__name=account_name)
+
+
+class User(auth_models.AbstractUser):
+    """
+    A user of this application (= any employee, including managers and bosses)
+    """
+
+    account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
+    # redefine username as not unique
+    username = models.CharField(
+        _("username"),
+        max_length=150,
+        unique=False,
+        help_text=_("Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."),
+        validators=[auth_models.AbstractUser.username_validator],
+        error_messages={
+            "unique": _("A user with that username already exists."),
+        },
+    )
+    properties = models.ManyToManyField(
+        "Property",
+        verbose_name=_("properties"),
+        blank=True,
+        help_text=_("The properties this user has access."),
+        related_name="users",
+        related_query_name="user",
+    )
+
+    _account_qs_path = "account"
+
+    class Meta:
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
+        unique_together = ["account", "username"]
+
+    objects = MyUserManager()
+
+    def natural_key(self):
+        return (self.get_username(),) + self.account.natural_key()
+
+    natural_key.dependencies = ["core.account"]
 
 
 class Property(models.Model):
@@ -36,6 +230,7 @@ class Property(models.Model):
         RECEIPT = "receipt", _("Receipt")
         QUITTANCE = "quittance", _("Quittance")
 
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     active = models.BooleanField(_("active"), default=True)
     name = models.CharField(_("name"), max_length=200, unique=True)
     email = models.EmailField(_("email"))
@@ -73,8 +268,17 @@ class Property(models.Model):
     class Meta:
         verbose_name = _("Property")
 
+    objects = ForUserQuerySet.as_manager()
+
+    _account_qs_path = "account"
+
     def __str__(self):
         return self.name
+
+    def natural_key(self):
+        return (self.name,) + self.account.natural_key()
+
+    natural_key.dependencies = ["core.account"]
 
 
 class Lodging(models.Model):
@@ -107,6 +311,9 @@ class Lodging(models.Model):
         verbose_name = _("Lodging")
         ordering = ["rank"]
 
+    objects = ForUserQuerySet.as_manager()
+    _account_qs_path = "property__account"
+
     def __str__(self):
         return self.name
 
@@ -124,22 +331,9 @@ class Lodging(models.Model):
         return booking.generate_contract(url_server=url_server, save=False).content
 
 
-class Category(models.Model):
-    """Category of receipts, mainly for reports"""
-
-    name = models.CharField(_("name"), max_length=100)
-
-    class Meta:
-        verbose_name = _("Category")
-        verbose_name_plural = _("Categories")
-
-    def __str__(self):
-        return self.name
-
-
 class Service(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     reference = models.CharField(_("reference"), blank=True, null=True, max_length=20)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, blank=True, null=True)
     designation = models.CharField(_("designation"), max_length=256)
     unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=20, decimal_places=2, blank=True, null=True)
@@ -165,11 +359,16 @@ class Service(models.Model):
         verbose_name = _("Service")
         ordering = ("reference",)
 
+    _account_qs_path = "account"
+
+    objects = ForUserQuerySet.as_manager()
+
     def __str__(self):
         return self.designation
 
 
 class BookingStatus(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     name = models.CharField(_("name"), max_length=100)
     color = models.CharField(_("color"), max_length=20)
     rank = models.PositiveSmallIntegerField(_("rank"))
@@ -185,6 +384,9 @@ class BookingStatus(models.Model):
         verbose_name_plural = _("Booking statuses")
         ordering = ["rank"]
 
+    _account_qs_path = "account"
+    objects = ForUserQuerySet.as_manager()
+
     def __str__(self):
         return self.name
 
@@ -192,12 +394,16 @@ class BookingStatus(models.Model):
 class BookingChannel(models.Model):
     """Where does the booking come from, for reports"""
 
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     name = models.CharField(_("name"), max_length=100)
     default_booking_status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Booking channel")
         ordering = ["name"]
+
+    _account_qs_path = "account"
+    objects = ForUserQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -217,6 +423,9 @@ class BookingChannelSync(models.Model):
         blank=True, null=True, help_text=_("Last time the calendar has been successfully requested by remote channel.")
     )
     last_import_error = models.TextField(null=True, blank=True)
+
+    _account_qs_path = "channel__account"
+    objects = ForUserQuerySet.as_manager()
 
     def url_for_remote(self, request):
         return drf_reverse("calendar_sync", kwargs={"uid": self.lodging.uid}, request=request) + "?s=%d" % self.id
@@ -284,6 +493,9 @@ class Booking(models.Model):
         permissions = [
             ("view_prices", "Can view prices informations"),
         ]
+
+    objects = ForUserQuerySet.as_manager()
+    _account_qs_path = "lodging__property__account"
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
@@ -382,13 +594,17 @@ class Contract(models.Model):
     class Meta:
         verbose_name = _("Contract")
 
+    _account_qs_path = "booking__lodging__property__account"
+    objects = ForUserQuerySet.as_manager()
+
     def __str__(self):
         return "%s (%s -> %s)" % (self.booking.guest_name, self.booking.begin_date, self.booking.end_date)
 
     def make_pdf_path(self):
-        def multiple_replace(string, rep_dict):
+        def multiple_replace(string, rep_dict: dict):
+            k: str
             pattern = re.compile(
-                "|".join([re.escape(k) for k in sorted(rep_dict, key=len, reverse=True)]), flags=re.DOTALL
+                "|".join([re.escape(k) for k in sorted(rep_dict.keys(), key=len, reverse=True)]), flags=re.DOTALL
             )
             return pattern.sub(lambda x: rep_dict[x.group(0)], string)
 
@@ -411,6 +627,7 @@ class Contract(models.Model):
 
 
 class ContractTemplate(models.Model):
+    account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
     name = models.CharField(max_length=100)
     content = models.TextField(_("Contract"))
     created = models.DateTimeField(auto_now_add=True)
@@ -419,6 +636,10 @@ class ContractTemplate(models.Model):
 
     class Meta:
         verbose_name = _("Contract template")
+
+    _account_qs_path = "account"
+
+    objects = ForUserQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -435,8 +656,14 @@ class BookedService(models.Model):
     class Meta:
         verbose_name = _("Booking service")
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.booking.lodging.property.account.id != self.service.account.id:
+            raise ValidationError("BookingService: booking and service aren't from same account")
+        super().save(force_insert, force_update, using, update_fields)
+
 
 class Holidays(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     name = models.CharField(_("name"), max_length=256)
     begin_date = models.DateField(
         _("begin date"),
@@ -448,8 +675,13 @@ class Holidays(models.Model):
     class Meta:
         verbose_name_plural = _("holidays")
 
+    _account_qs_path = "account"
+
+    objects = ForUserQuerySet.as_manager()
+
 
 class Pricing(models.Model):  # or RatePlan
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     name = models.CharField(_("name"), max_length=256)
     daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
@@ -460,6 +692,10 @@ class Pricing(models.Model):  # or RatePlan
         _("Supplement per night and per additional guest")
     )
     info = models.TextField(_("info"), blank=True, null=True)
+
+    _account_qs_path = "account"
+
+    objects = ForUserQuerySet.as_manager()
 
 
 class SeasonalVariation(models.Model):
@@ -475,6 +711,9 @@ class SeasonalVariation(models.Model):
     weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     weekly_rate = models.DecimalField(_("weekly rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
+
+    _account_qs_path = "pricing__account"
+    objects = ForUserQuerySet.as_manager()
 
 
 class Payment(models.Model):
@@ -499,3 +738,6 @@ class Payment(models.Model):
         permissions = [
             ("reconciliation", "Can do account reconciliation"),
         ]
+
+    _account_qs_path = "booking__lodging__property__account"
+    objects = ForUserQuerySet.as_manager()

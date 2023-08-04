@@ -29,6 +29,11 @@ csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
 
+@admin.register(models.Account)
+class AccountAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
     add_form_template = "admin/auth/user/add_form.html"
@@ -97,9 +102,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def lookup_allowed(self, lookup, value):
         # Don't allow lookups involving passwords.
-        return not lookup.startswith("password") and super().lookup_allowed(
-            lookup, value
-        )
+        return not lookup.startswith("password") and super().lookup_allowed(lookup, value)
 
     @sensitive_post_parameters_m
     @csrf_protect_m
@@ -197,8 +200,7 @@ class UserAdmin(admin.ModelAdmin):
 
         return TemplateResponse(
             request,
-            self.change_user_password_template
-            or "admin/auth/user/change_password.html",
+            self.change_user_password_template or "admin/auth/user/change_password.html",
             context,
         )
 
@@ -418,7 +420,6 @@ class PaymentAdmin(ImportExportModelAdmin):
 class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "reference",
-        "category",
         "designation",
         "unit_price",
         "vat",
@@ -433,7 +434,6 @@ class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
 admin.site.register(models.Booking, BookingAdmin)
 admin.site.register(models.Service, ServiceAdmin)
 admin.site.register(models.Lodging, LodgingAdmin)
-admin.site.register(models.Category)
 admin.site.register(models.Property, PropertyAdmin)
 admin.site.register(models.BookingChannel, BookingChannelAdmin)
 admin.site.register(models.BookingChannelSync, BookingChannelSyncAdmin)

@@ -5,6 +5,7 @@ from django.db.models import Max
 from rest_framework import serializers
 
 from core import models
+from core.models import Account
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,12 @@ class LoginUserSerializer(serializers.Serializer):
     #     if user and user.is_active:
     #         return user
     #     raise serializers.ValidationError("Unable to log in with provided credentials.")
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -112,9 +119,10 @@ class BookingStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.BookingStatus
-        fields = "__all__"
+        exclude = ["account"]
 
     def create(self, validated_data: dict):
+        validated_data['account'] = self.context['request'].user.account
         rank = validated_data.pop("rank", -1)
         if rank < 0:
             rank = (models.BookingStatus.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
@@ -174,7 +182,11 @@ class BookingChannelSyncSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Service
-        fields = "__all__"
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        validated_data['account'] = self.context['request'].user.account
+        return super().create(validated_data)
 
 
 class BookedServiceSerializer(serializers.ModelSerializer):
