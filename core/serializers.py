@@ -152,7 +152,13 @@ class BookingChannelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.BookingChannel
-        fields = "__all__"
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if 'account' not in validated_data:
+            validated_data['account'] = self.context['request'].user.account
+        instance = super().create(validated_data)
+        return instance
 
 
 class BookingChannelSyncSerializer(serializers.ModelSerializer):
@@ -324,13 +330,25 @@ class BookingNoPriceSerializer(BookingSerializer):
 class HolidaysSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Holidays
-        fields = "__all__"
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if 'account' not in validated_data:
+            validated_data['account'] = self.context['request'].user.account
+        instance = super().create(validated_data)
+        return instance
 
 
 class PricingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Pricing
-        fields = "__all__"
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if 'account' not in validated_data:
+            validated_data['account'] = self.context['request'].user.account
+        instance = super().create(validated_data)
+        return instance
 
 
 class SeasonalVariationSerializer(serializers.ModelSerializer):
@@ -342,7 +360,13 @@ class SeasonalVariationSerializer(serializers.ModelSerializer):
 class ContractTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ContractTemplate
-        fields = "__all__"
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if 'account' not in validated_data:
+            validated_data['account'] = self.context['request'].user.account
+        instance = super().create(validated_data)
+        return instance
 
 
 class ContractSerializer(serializers.ModelSerializer):
