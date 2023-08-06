@@ -648,7 +648,7 @@ class Contract(models.Model):
 
 
 class ContractTemplate(models.Model):
-    account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     name = models.CharField(max_length=100)
     content = models.TextField(_("Contract"))
     created = models.DateTimeField(auto_now_add=True)

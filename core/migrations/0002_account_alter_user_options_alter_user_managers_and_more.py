@@ -99,8 +99,9 @@ class Migration(migrations.Migration):
             model_name="contracttemplate",
             name="account",
             field=models.ForeignKey(
-                null=True, on_delete=django.db.models.deletion.CASCADE, to="core.account", verbose_name="account"
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="core.account", verbose_name="account"
             ),
+            preserve_default=False,
         ),
         migrations.AddField(
             model_name="historicalcontracttemplate",
