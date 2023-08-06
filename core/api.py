@@ -126,7 +126,9 @@ class LoginAPI(KnoxLoginView):
     def post(self, request, format=None):
         serializer = LoginUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = authenticate(**serializer.validated_data)
+        user = authenticate(
+            request, username=serializer.validated_data["email"], password=serializer.validated_data["password"]
+        )
         if not user or not user.is_active:
             raise AuthenticationFailed()
         logging.getLogger("auth").info("User %s successfully logged." % user.email)

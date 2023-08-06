@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import validate from 'validate.js';
-import { makeStyles } from '@mui/styles';
-import {
-  Grid,
-  Button,
-  IconButton,
-  TextField,
-  Link,
-  Typography
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import validate from "validate.js";
+import { makeStyles } from "@mui/styles";
+import { Button, Grid, IconButton, Link, TextField, Typography } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { auth } from "../../actions";
 import { useTranslation } from "react-i18next";
@@ -21,14 +14,14 @@ import { useAlert } from "../../common/alertUtils";
 
 const schema = {
   email: {
-    presence: { allowEmpty: false, message: 'is required' },
+    presence: { allowEmpty: false, message: "is required" },
     email: true,
     length: {
       maximum: 64
     }
   },
   password: {
-    presence: { allowEmpty: false, message: 'is required' },
+    presence: { allowEmpty: false, message: "is required" },
     length: {
       maximum: 128
     }
@@ -144,18 +137,16 @@ const SignIn = props => {
 
   const handleSignIn = event => {
     event.preventDefault();
-    doLogin({username: formState.values.email, password: formState.values.password}).then((result)=> {
-      const {data, error} = result;
-      if(error) {
+    doLogin({ email: formState.values.email, password: formState.values.password }).then((result) => {
+      const { data, error } = result;
+      if (error) {
         showError(t("Login error: ") + fetchErrorDecode(error));
         console.log(result);
         dispatch(auth.loginFailed(data));
-      }
-      else {
-
+      } else {
         dispatch(auth.loginSuccessful(data));
       }
-    })
+    });
   };
 
   const hasError = field =>

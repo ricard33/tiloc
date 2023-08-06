@@ -7,7 +7,6 @@ export interface LoginInfo {
 export interface User {
   id: number;
   is_active: boolean;
-  username: string;
   first_name: string;
   last_name: string;
   full_name: string;

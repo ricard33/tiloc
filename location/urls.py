@@ -18,12 +18,11 @@ import os
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.urls import path, re_path
 from django.views.decorators.cache import never_cache
 from rest_framework import routers
 
-from core import api, views
+from core import admin, api, views
 from location.serve_static_file import serve_static_file
 
 router = routers.DefaultRouter()

@@ -71,7 +71,6 @@ ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
 INSTALLED_APPS = [
     "constance",
     "constance.backends.database",
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -88,6 +87,8 @@ INSTALLED_APPS = [
     "django_cron",
     "core",
     # 'frontend',
+
+    "django.contrib.admin",  # after to allow templates override
 ]
 
 MIDDLEWARE = [
@@ -151,7 +152,6 @@ DATABASES = {
 # DATABASE_ROUTERS = ['core.db_router.Router', ]
 
 AUTH_USER_MODEL = "core.User"
-SILENCED_SYSTEM_CHECKS = ["auth.W004"]  # 'User.username' is named as the 'USERNAME_FIELD', but it is not unique.
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

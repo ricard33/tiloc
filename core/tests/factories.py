@@ -46,7 +46,6 @@ class _UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
 
-    username = factory.Faker("email")
     email = factory.Faker("email")
     account = factory.SubFactory(AccountFactory)
 

@@ -15,16 +15,16 @@ User = get_user_model()
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "password")
+        fields = ("id", "email", "password")
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = User.objects.create_user(validated_data["username"], None, validated_data["password"])
+        user = User.objects.create_user(validated_data["email"], None, validated_data["password"])
         return user
 
 
 class LoginUserSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField()
 
     # def validate(self, data):
@@ -46,8 +46,14 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        # fields = ('id', 'username', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
-        fields = "__all__"
+        # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if 'account' not in validated_data:
+            validated_data['account'] = self.context['request'].user.account
+        instance = super().create(validated_data)
+        return instance
 
     def get_full_name(self, user):
         return user.get_full_name()
@@ -62,7 +68,13 @@ class PropertySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Property
-        fields = "__all__"
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if 'account' not in validated_data:
+            validated_data['account'] = self.context['request'].user.account
+        instance = super().create(validated_data)
+        return instance
 
 
 class PropertySubSerializer(serializers.ModelSerializer):

@@ -6,6 +6,7 @@ from datetime import date
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -174,8 +175,32 @@ class MyUserManager(UserManager.from_queryset(UserQuerySet)):
     # Inheritance needed to be able to use Manager.from_queryset() and Manager.use_in_migrations jointly
     use_in_migrations = True
 
-    def get_by_natural_key(self, username, account_name):
-        return self.get(username=username, account__name=account_name)
+    def get_by_natural_key(self, email):
+        return self.get(email=email)
+
+    def _create_user(self, email, password, **extra_fields):
+        email = self.normalize_email(email)
+
+        user = self.model(email=email, **extra_fields)
+        user.password = make_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(email, password, **extra_fields)
 
 
 class User(auth_models.AbstractUser):
@@ -183,18 +208,12 @@ class User(auth_models.AbstractUser):
     A user of this application (= any employee, including managers and bosses)
     """
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ()
+
     account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
-    # redefine username as not unique
-    username = models.CharField(
-        _("username"),
-        max_length=150,
-        unique=False,
-        help_text=_("Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."),
-        validators=[auth_models.AbstractUser.username_validator],
-        error_messages={
-            "unique": _("A user with that username already exists."),
-        },
-    )
+    username = None
+    email = models.EmailField(_("email address"), unique=True)
     properties = models.ManyToManyField(
         "Property",
         verbose_name=_("properties"),
@@ -209,12 +228,14 @@ class User(auth_models.AbstractUser):
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
-        unique_together = ["account", "username"]
 
     objects = MyUserManager()
 
+    def __str__(self):
+        return str(self.email)
+
     def natural_key(self):
-        return (self.get_username(),) + self.account.natural_key()
+        return (self.get_username(),)
 
     natural_key.dependencies = ["core.account"]
 

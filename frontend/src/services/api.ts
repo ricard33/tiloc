@@ -3,27 +3,33 @@ import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import {
   Booking,
   BookingChannel,
-  BookingStatus, CalendarSync,
+  BookingStatus,
+  CalendarSync,
   Contract,
   ContractTemplate,
   Guest,
   Lodging,
   LoginInfo,
-  NextEvent, Property,
+  NextEvent,
   Pagination,
   Payment,
+  Property,
   Service,
   User
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
-  api2Booking, api2CalendarSync, api2Contract, api2ContractTemplate,
+  api2Booking,
+  api2CalendarSync,
+  api2Contract,
+  api2ContractTemplate,
   api2Lodging,
-  api2Property,
   api2Payment,
+  api2Property,
   api2Service,
   booking2api,
-  property2api, payment2Api
+  payment2Api,
+  property2api
 } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
@@ -251,15 +257,21 @@ export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery({ baseUrl: serviceURL }),
   tagTypes: [
-    "Payment", "Lodging", "Booking", "BookingStatus", "BookingChannel", "Contract", "ContractTemplate", "Service",
+    "Payment",
+    "Lodging",
+    "Booking",
+    "BookingStatus",
+    "BookingChannel",
+    "Contract",
+    "ContractTemplate",
+    "Service"
   ],
   endpoints: (builder) => ({
-
     // Sign in
     currentUser: builder.query<User, void>({
-      query: () => `auth/user/`,
+      query: () => `auth/user/`
     }),
-    login: builder.mutation<LoginInfo, { username: string, password: string }>({
+    login: builder.mutation<LoginInfo, { email: string; password: string }>({
       query(args) {
         return {
           url: `auth/login/`,
@@ -272,11 +284,10 @@ export const api = createApi({
       query() {
         return {
           url: `auth/logout/`,
-          method: "POST",
+          method: "POST"
         };
       }
     }),
-
 
     // BookingStatus
     listBookingStatuses: bookingStatusApi.list(builder),
@@ -334,23 +345,23 @@ export const api = createApi({
     updateBooking: bookingApi.update(builder),
     deleteBooking: bookingApi.delete(builder),
     allGuests: builder.query<Guest[], void>({
-      query: () => 'booking/all_guests/',
+      query: () => "booking/all_guests/"
     }),
     nextEvents: builder.query<NextEvent[], number>({
-      query: (count) => 'booking/next_events/?count='+count,
+      query: (count) => "booking/next_events/?count=" + count
     }),
 
     // Payment
     getPaymentsForBooking: builder.query<Pagination<Payment>, number>({
       query: (bookingId) => `payment/?booking_id=${bookingId}`,
-      providesTags: (data) => data ? [
-        ...data.results.map(({ id }) => ({ type: "Payment", id: id } as const)),
-        { type: "Payment", id: "LIST" }
-      ] : [{ type: "Payment", id: "LIST" }],
+      providesTags: (data) =>
+        data
+          ? [...data.results.map(({ id }) => ({ type: "Payment", id: id } as const)), { type: "Payment", id: "LIST" }]
+          : [{ type: "Payment", id: "LIST" }],
       transformResponse: (response) => {
         return {
-          ...response as Pagination<Payment>,
-          results: (response as Pagination<ApiModel>).results.map(p => api2Payment(p))
+          ...(response as Pagination<Payment>),
+          results: (response as Pagination<ApiModel>).results.map((p) => api2Payment(p))
         };
       }
     }),
@@ -362,7 +373,7 @@ export const api = createApi({
     deletePayment: paymentApi.delete(builder),
 
     // Contract
-    getOrGenerateContract: builder.mutation<Contract, { bookingId: number, regenerate?: boolean }>({
+    getOrGenerateContract: builder.mutation<Contract, { bookingId: number; regenerate?: boolean }>({
       query({ bookingId, regenerate }) {
         return {
           url: `booking/${bookingId}/${regenerate ? "generate_contract" : "get_or_create_contract"}/`,
@@ -395,8 +406,7 @@ export const api = createApi({
     getCalendarSync: calendarSyncApi.get(builder),
     createCalendarSync: calendarSyncApi.create(builder),
     updateCalendarSync: calendarSyncApi.update(builder),
-    deleteCalendarSync: calendarSyncApi.delete(builder),
-
+    deleteCalendarSync: calendarSyncApi.delete(builder)
   })
 });
 

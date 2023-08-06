@@ -1,14 +1,20 @@
+from functools import reduce
+
+from constance.admin import Config, ConstanceAdmin
 from django.conf import settings
 from django.contrib import admin, messages
-from django.contrib.admin import TabularInline
+from django.contrib.admin import FieldListFilter, RelatedOnlyFieldListFilter, TabularInline
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
@@ -18,7 +24,11 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django_cron.admin import CronJobLogAdmin
+from django_cron.models import CronJobLock, CronJobLog
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
+from knox.admin import AuthTokenAdmin
+from knox.models import AuthToken
 from simple_history.admin import SimpleHistoryAdmin
 
 from core import models
@@ -29,17 +39,127 @@ csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
 
-@admin.register(models.Account)
-class AccountAdmin(admin.ModelAdmin):
+# noinspection PyUnresolvedReferences
+class RestrictedModelAdminMixIn(object):
+    def has_add_permission(self, request):
+        return super().has_add_permission(request) or request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return super().has_change_permission(request, obj) or request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return super().has_delete_permission(request, obj) or request.user.is_superuser
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser or not hasattr(qs, 'for_user'):
+            return self.filter_by_account(qs, request)
+        return qs.for_user(request.user)
+
+    def filter_by_account(self, qs, request):
+        if request.session.get('account_goggles') and hasattr(qs.model, '_account_qs_path'):
+            account = request.session['account_goggles']
+            # field account_field should be set by child classes to the queryset path to reach the account
+            account_field = getattr(qs.model, '_account_qs_path', 'account')
+            if isinstance(account_field, list):
+                import operator
+                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + '__id': account['id']}), account_field)))
+
+            return qs.filter(**{account_field + '__id': account['id']})
+        return qs
+
+    def get_field_queryset(self, db, db_field, request):
+        """
+        If the ModelAdmin specifies ordering, the queryset should respect that
+        ordering.  Otherwise, don't specify the queryset, let the field decide
+        (returns None in that case).
+        """
+        qs = super().get_field_queryset(db, db_field, request)
+        if qs is None:
+            qs = db_field.remote_field.model._default_manager.using(db)
+        qs = self.filter_by_account(qs, request)
+        if request.user.is_superuser:
+            return qs
+        if hasattr(qs, 'for_user'):
+            qs = qs.for_user(request.user).distinct()
+        elif db_field.remote_field.model is models.Account:
+            qs = qs.filter(pk=request.user.account.pk)
+        return qs
+
+    # def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    #     if not request.user.is_superuser:
+    #         if 'queryset' in kwargs:
+    #             queryset = kwargs['queryset']
+    #         else:
+    #             db = kwargs.get('using')
+    #             queryset = self.get_field_queryset(db, db_field, request)
+    #         kwargs["queryset"] = queryset.for_user(request.user)
+    #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_list_display(self, request):
+        """
+        Return a sequence containing the fields to be displayed on the
+        changelist.
+        """
+        if request.user.is_superuser and not hasattr(request.session, 'account_goggles'):
+            return self.list_display
+        return [field for field in self.list_display if field != 'account']
+
+    def get_list_filter(self, request):
+        """
+        Returns a sequence containing the fields to be displayed as filters in
+        the right sidebar of the changelist page.
+        """
+        if request.user.is_superuser and not hasattr(request.session, 'account_goggles'):
+            return self.list_filter
+        return [field for field in self.list_filter if field != 'account' and not field.endswith('__account')]
+
+
+class TiLocAdminSite(admin.AdminSite):
+    # Text to put at the end of each page's <title>.
+    site_title = _('TiLoc site admin')
+
+    # Text to put in each page's <h1>.
+    site_header = _('TiLoc administration')
+
+    # Text to put at the top of the admin index page.
+    index_title = _('Site administration')
+
+    # login_form = forms.TiLocAuthenticationForm
+
+    def get_urls(self):
+        urlpatterns = [
+            path("set_active_account/", self.set_active_account, name='set_active_account'),
+        ]
+        urlpatterns += super().get_urls()
+        return urlpatterns
+
+    def set_active_account(self, request):
+        account_id = request.POST['select_account']
+        if account_id:
+            account = get_object_or_404(models.Account, id=account_id)
+            request.session['account_goggles'] = {'id': account.id, 'name': account.name}
+        else:
+            del request.session['account_goggles']
+        return redirect(request.POST['current_location'])
+
+
+site = TiLocAdminSite('tiloc-admin')
+
+FieldListFilter.register(lambda f: f.remote_field, RelatedOnlyFieldListFilter, take_priority=True)
+
+
+@admin.register(models.Account, site=site)
+class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     pass
 
 
-@admin.register(models.User)
-class UserAdmin(admin.ModelAdmin):
+@admin.register(models.User, site=site)
+class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     add_form_template = "admin/auth/user/add_form.html"
     change_user_password_template = None
     fieldsets = (
-        (None, {"fields": ("username", "password")}),
+        (None, {"fields": ("account", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),
         (
             _("Permissions"),
@@ -60,17 +180,17 @@ class UserAdmin(admin.ModelAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "password1", "password2"),
+                "fields": ("account", "email", "password1", "password2"),
             },
         ),
     )
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
-    list_display = ("username", "email", "first_name", "last_name", "is_staff")
+    list_display = ("email", "first_name", "last_name", "is_staff", "account")
     list_filter = ("is_staff", "is_superuser", "is_active", "groups")
-    search_fields = ("username", "first_name", "last_name", "email")
-    ordering = ("username",)
+    search_fields = ("first_name", "last_name", "email")
+    ordering = ("email",)
     filter_horizontal = (
         "groups",
         "user_permissions",
@@ -221,12 +341,12 @@ class UserAdmin(admin.ModelAdmin):
         return super().response_add(request, obj, post_url_continue)
 
 
-class PaymentInlineAdmin(TabularInline):
+class PaymentInlineAdmin(RestrictedModelAdminMixIn, TabularInline):
     model = models.Payment
     ordering = ("-date",)
 
 
-class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
+class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "id",
         "lodging",
@@ -275,16 +395,16 @@ class BookingAdmin(ImportExportMixin, SimpleHistoryAdmin):
         return obj.payment_set.all().aggregate(total=Sum("amount"))["total"]
 
 
-class BookingStatusAdmin(ImportExportModelAdmin):
+class BookingStatusAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = ("id", "name", "color", "rank", "no_stats", "finalized")
     list_editable = ("name", "color", "rank", "no_stats", "finalized")
 
 
-class BookingChannelAdmin(ImportExportModelAdmin):
+class BookingChannelAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = ("name", "default_booking_status")
 
 
-class BookingChannelSyncAdmin(ImportExportModelAdmin):
+class BookingChannelSyncAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = (
         "id",
         "channel",
@@ -327,7 +447,7 @@ class BookingChannelSyncAdmin(ImportExportModelAdmin):
         )
 
 
-class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
+class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "__str__",
         "id",
@@ -356,18 +476,18 @@ class LodgingAdmin(ImportExportMixin, SimpleHistoryAdmin):
     list_filter = ("property", "active", "shown")
 
 
-class PropertyAdmin(ImportExportMixin, SimpleHistoryAdmin):
+class PropertyAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = ("id", "name", "email", "phone", "active")
     list_display_links = ("name",)
 
 
-class HolidaysAdmin(ImportExportModelAdmin):
+class HolidaysAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = ("id", "name", "begin_date", "end_date")
     list_display_links = ("name",)
     ordering = ("begin_date",)
 
 
-class PricingAdmin(ImportExportModelAdmin):
+class PricingAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = (
         "id",
         "name",
@@ -389,7 +509,7 @@ class PricingAdmin(ImportExportModelAdmin):
     )
 
 
-class SeasonalVariationAdmin(ImportExportModelAdmin):
+class SeasonalVariationAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = (
         "id",
         "pricing",
@@ -404,7 +524,7 @@ class SeasonalVariationAdmin(ImportExportModelAdmin):
     list_display_links = ("name",)
 
 
-class ContractTemplateAdmin(ImportExportMixin, SimpleHistoryAdmin):
+class ContractTemplateAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = ("id", "name", "created", "modified")
     list_display_links = (
         "id",
@@ -412,12 +532,12 @@ class ContractTemplateAdmin(ImportExportMixin, SimpleHistoryAdmin):
     )
 
 
-class PaymentAdmin(ImportExportModelAdmin):
+class PaymentAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = ("id", "booking", "description", "amount", "method", "date", "checked")
     ordering = ("-date",)
 
 
-class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
+class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "reference",
         "designation",
@@ -431,17 +551,27 @@ class ServiceAdmin(ImportExportMixin, SimpleHistoryAdmin):
     )
 
 
-admin.site.register(models.Booking, BookingAdmin)
-admin.site.register(models.Service, ServiceAdmin)
-admin.site.register(models.Lodging, LodgingAdmin)
-admin.site.register(models.Property, PropertyAdmin)
-admin.site.register(models.BookingChannel, BookingChannelAdmin)
-admin.site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
-admin.site.register(models.BookingStatus, BookingStatusAdmin)
-admin.site.register(models.BookedService)
-admin.site.register(models.Holidays, HolidaysAdmin)
-admin.site.register(models.Pricing, PricingAdmin)
-admin.site.register(models.SeasonalVariation, SeasonalVariationAdmin)
-admin.site.register(models.Contract)
-admin.site.register(models.ContractTemplate, ContractTemplateAdmin)
-admin.site.register(models.Payment, PaymentAdmin)
+class ContractAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    pass
+
+
+site.register(models.Booking, BookingAdmin)
+site.register(models.Service, ServiceAdmin)
+site.register(models.Lodging, LodgingAdmin)
+site.register(models.Property, PropertyAdmin)
+site.register(models.BookingChannel, BookingChannelAdmin)
+site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
+site.register(models.BookingStatus, BookingStatusAdmin)
+site.register(models.BookedService)
+site.register(models.Holidays, HolidaysAdmin)
+site.register(models.Pricing, PricingAdmin)
+site.register(models.SeasonalVariation, SeasonalVariationAdmin)
+site.register(models.Contract, ContractAdmin)
+site.register(models.ContractTemplate, ContractTemplateAdmin)
+site.register(models.Payment, PaymentAdmin)
+
+site.register([Config], ConstanceAdmin)
+site.register(Group, GroupAdmin)
+site.register(CronJobLog, CronJobLogAdmin)
+site.register(CronJobLock)
+site.register(AuthToken, AuthTokenAdmin)
