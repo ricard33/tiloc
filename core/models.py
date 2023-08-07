@@ -44,8 +44,6 @@ class ForUserQuerySet(models.QuerySet):
         )
         property_path = getattr(self.model, "_property_qs_path", None)
 
-        if user.is_superuser:
-            return self
         account_query = property_query = user_query = Q(**{})
         # account_path = self.account_path or (self.user_path and self.user_path + "__account" or None)
         if account_path and hasattr(user, "account"):
