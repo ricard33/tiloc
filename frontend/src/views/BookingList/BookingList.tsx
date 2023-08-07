@@ -65,15 +65,7 @@ const BookingList = () => {
     },
     { field: "status", headerName: t("Status"), width: 170, valueFormatter: (params) => params.value.name },
     ...(showPayments
-      ? [
-          {
-            field: "price",
-            headerName: t("Price"),
-            type: "number",
-            width: 90,
-            valueFormatter: formatPrice
-          }
-        ]
+      ? [{ field: "price", headerName: t("Price"), type: "number", width: 90, valueFormatter: formatPrice }]
       : [])
   ];
 

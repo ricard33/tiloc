@@ -47,13 +47,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   highlight:
     theme.palette.mode === "light"
       ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85)
-        }
+        color: theme.palette.secondary.main,
+        backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+      }
       : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark
-        },
+        color: theme.palette.text.primary,
+        backgroundColor: theme.palette.secondary.dark
+      },
   actions: {
     color: theme.palette.text.secondary
   }
@@ -102,7 +102,8 @@ const GridToolbar: React.FunctionComponent<Props> = (props) => {
     <GridToolbarContainer
       className={classNames(classes.root, {
         [classes.highlight]: numSelected && numSelected > 0
-      })}>
+      })}
+    >
       {showColumnsButton && <GridToolbarColumnsButton />}
       {showDensitySelector && <GridToolbarDensitySelector />}
       {showExportButton && <GridToolbarExport />}
@@ -149,7 +150,8 @@ const GridToolbar: React.FunctionComponent<Props> = (props) => {
               onClick={tool.onClick}
               disabled={tool.disabled}
               startIcon={tool.icon}
-              variant={variant}>
+              variant={variant}
+            >
               {tool.label}
             </Button>
           ))}
