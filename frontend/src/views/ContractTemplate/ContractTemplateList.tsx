@@ -4,13 +4,13 @@ import { useListContractTemplatesQuery } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 
 import { Card, CardContent, Tooltip } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { useTranslation } from "react-i18next";
 import { ContractTemplate, User } from "../../types";
-import ListToolbar from "../../components/ListToolbar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { formatDistanceToNow } from "../../common/dateUtils";
+import GridToolbar from "../../components/GridToolbar";
 
 type Props = {};
 
@@ -49,12 +49,6 @@ const ContractTemplateList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar
-        title={t("Contract templates")}
-        tools={[
-          { label: t("Create"), onClick: onCreate, disabled: !canAdd }
-        ]}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -70,6 +64,14 @@ const ContractTemplateList: React.FunctionComponent<Props> = () => {
             onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                showDensitySelector: true,
+                showFilterButton: true,
+                tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
+              }
             }}
           />
         </CardContent>

@@ -1,22 +1,21 @@
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDeletePaymentMutation, useListPaymentsPaginatedQuery, useUpdatePaymentMutation } from "../../services/api";
-import { paymentMethods, Lodging, User, Payment } from "../../types";
+import { Lodging, Payment, paymentMethods, User } from "../../types";
 import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridEventListener,
-  GridRowEditStopReasons, GridRowModel,
+  GridRowEditStopReasons,
+  GridRowModel,
   GridRowModes,
   GridRowModesModel,
   GridRowParams,
   GridSortModel,
-  GridToolbar,
   GridValueFormatterParams
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -34,6 +33,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import { formatDate } from "../../common/dateUtils";
 import { useConfirm } from "../../libs/MuiConfirm";
+import GridToolbar from "../../components/GridToolbar";
 
 type Props = {};
 
@@ -262,13 +262,6 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar
-        title={t("Payments")}
-        dateRange={dateRange} onDateRangeChange={onDateRangeChange}
-        // tools={[
-        //   { label: t("Create"), onClick: onCreatePayment, disabled: !canAdd }
-        // ]}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -301,6 +294,16 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
             // onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                showDensitySelector: true,
+                showFilterButton: true,
+                dateRange: dateRange,
+                onDateRangeChange: onDateRangeChange
+                // tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
+              }
             }}
           />
         </CardContent>

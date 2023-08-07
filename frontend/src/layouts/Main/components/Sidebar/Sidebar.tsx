@@ -10,12 +10,13 @@ import MovingIcon from "@mui/icons-material/Moving";
 import CalendarIcon from "@mui/icons-material/CalendarToday";
 import ListIcon from "@mui/icons-material/List";
 import MoneyIcon from "@mui/icons-material/AttachMoney";
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import HotelIcon from "@mui/icons-material/Hotel";
 import HolidayVillage from "@mui/icons-material/HolidayVillage";
-import RoomServiceIcon from '@mui/icons-material/RoomService';
-import GradingIcon from '@mui/icons-material/Grading';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import PriceCheckIcon from '@mui/icons-material/PriceCheck';
+import RoomServiceIcon from "@mui/icons-material/RoomService";
+import GradingIcon from "@mui/icons-material/Grading";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import { ReactComponent as BookingSourcesIcon } from "../../../../assets/icones/booking-sources.svg";
 // import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 import { parseISO } from "date-fns";
@@ -48,7 +49,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(2, 0)
   },
   nav: {
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
+    overflow: "scroll"
   },
   version: {
     fontSize: "x-small",
@@ -87,13 +89,14 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
         { title: t("General parameters"), href: "/settings/general", icon: <SettingsIcon />, disabled: true },
-        { title: t("Properties"), href: "/settings/properties", icon: <PeopleAltIcon /> },
-        { title: t("Lodgings"), href: "/settings/lodgings", icon: <HolidayVillage /> },
+        { title: t("Users"), href: "/settings/users", icon: <PeopleAltIcon />, disabled: true },
+        { title: t("Properties"), href: "/settings/properties", icon: <HolidayVillage /> },
+        { title: t("Lodgings"), href: "/settings/lodgings", icon: <HotelIcon /> },
         { title: t("Booking statuses"), href: "/settings/booking-status", icon: <GradingIcon /> },
         { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },
         { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> },
         { title: t("Booking channels"), href: "/settings/booking-channels", icon: <BookingSourcesIcon /> },
-        { title: t("Calendars sync"), href: "/settings/calendar-syncs", icon: <CalendarMonthIcon /> },
+        { title: t("Calendars sync"), href: "/settings/calendar-syncs", icon: <CalendarMonthIcon /> }
       ]
     },
     {

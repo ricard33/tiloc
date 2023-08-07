@@ -10,20 +10,21 @@ import { useNavigate } from "react-router-dom";
 import { BookingStatus, User } from "../../types";
 import {
   DataGrid,
-  GridActionsCellItem, GridColDef,
+  GridActionsCellItem,
+  GridColDef,
   GridRenderCellParams,
-  GridRowParams, GridRowSelectionModel,
-  GridToolbar
+  GridRowParams,
+  GridRowSelectionModel
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import GridToolbar from "../../components/GridToolbar";
 
 type Props = {};
 
@@ -114,14 +115,6 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar
-        title={t("Booking statuses")}
-        tools={[
-          { label: t("Create"), onClick: onCreateBookingStatus, disabled: !canAdd }
-        ]}
-        numSelected={numSelected}
-        onDeleteSelected={canDelete ? onDelete : undefined}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -140,6 +133,16 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
             onRowSelectionModelChange={onSelectionChange}
             slots={{
               toolbar: GridToolbar
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                showDensitySelector: true,
+                // showFilterButton: true,
+                numSelected: numSelected,
+                onDeleteSelected: canDelete ? onDelete : undefined,
+                tools: [{ label: t("Create"), onClick: onCreateBookingStatus, disabled: !canAdd }]
+              }
             }}
           />
         </CardContent>

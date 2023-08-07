@@ -1,33 +1,22 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useListBookingsPaginatedQuery } from "../../services/api";
-import { Card, LinearProgress, CardContent } from "@mui/material";
+import { Card, CardContent, LinearProgress } from "@mui/material";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
-import ListToolbar from "../../components/ListToolbar";
 import { useTranslation } from "react-i18next";
-import { BookingsImportDialog, SearchInput } from "../../components";
-import {
-  DataGrid,
-  GridColDef,
-  GridRowSelectionModel,
-  GridSortModel,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarDensitySelector,
-  GridToolbarExport,
-  GridValueFormatterParams
-} from "@mui/x-data-grid";
+import { BookingsImportDialog } from "../../components";
+import { DataGrid, GridColDef, GridRowSelectionModel, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
 import { Booking, User } from "../../types";
 import { formatPrice } from "../../common/priceUtils";
 import { RootState } from "../../store";
 import { DateRange } from "../../components/DateRangeSelector";
 import { GridSortItem } from "@mui/x-data-grid/models/gridSortModel";
 import { formatDate } from "../../common/dateUtils";
-
+import GridToolbar from "../../components/GridToolbar";
 
 const BookingList = () => {
   const { t } = useTranslation();
@@ -35,7 +24,7 @@ const BookingList = () => {
   const numSelected = selected.length;
   const [paginationModel, setPaginationModel] = React.useState({
     pageSize: 20,
-    page: 0,
+    page: 0
   });
   const [ordering, setOrdering] = useState<GridSortItem | undefined>({ field: "begin_date", sort: "asc" });
   const [search, setSearch] = useState("");
@@ -50,17 +39,14 @@ const BookingList = () => {
     guest_name__icontains: search,
     for_dates: dateFilter
   });
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const user = useSelector<RootState>((store) => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_booking");
   const navigate = useNavigate();
   const showPayments = user.permissions.includes("core.view_payment");
   const [rowCountState, setRowCountState] = React.useState(bookings?.count ?? 0);
 
-
   React.useEffect(() => {
-    setRowCountState((prevRowCountState) =>
-      bookings?.count !== undefined ? bookings?.count : prevRowCountState
-    );
+    setRowCountState((prevRowCountState) => (bookings?.count !== undefined ? bookings?.count : prevRowCountState));
   }, [bookings?.count, setRowCountState]);
 
   const dateFormatter = (params: GridValueFormatterParams<Date>) => formatDate(params.value, "dd/MM/yyyy");
@@ -70,14 +56,26 @@ const BookingList = () => {
     { field: "begin_date", headerName: t("From"), width: 130, valueFormatter: dateFormatter },
     { field: "end_date", headerName: t("To"), width: 130, valueFormatter: dateFormatter },
     { field: "guest_name", headerName: t("Guest"), minWidth: 130, flex: 1 },
-    { field: "lodging", headerName: t("Lodging"), minWidth: 130, flex: 1, valueFormatter: params => params.value.name },
-    { field: "status", headerName: t("Status"), width: 170, valueFormatter: params => params.value.name },
-    ...(showPayments ? [{
-      field: "price", headerName: t("Price"), type: "number", width: 90,
-      valueFormatter: formatPrice
-    }] : [])
+    {
+      field: "lodging",
+      headerName: t("Lodging"),
+      minWidth: 130,
+      flex: 1,
+      valueFormatter: (params) => params.value.name
+    },
+    { field: "status", headerName: t("Status"), width: 170, valueFormatter: (params) => params.value.name },
+    ...(showPayments
+      ? [
+          {
+            field: "price",
+            headerName: t("Price"),
+            type: "number",
+            width: 90,
+            valueFormatter: formatPrice
+          }
+        ]
+      : [])
   ];
-
 
   const onSelectionChange = (newSelection: GridRowSelectionModel) => {
     setSelected(newSelection as number[]);
@@ -104,8 +102,7 @@ const BookingList = () => {
     if (properties.length > 0) {
       const property = properties[0];
 
-      if (property.sort === "asc" || property.sort === "desc")
-        setOrdering(property);
+      if (property.sort === "asc" || property.sort === "desc") setOrdering(property);
       return;
     }
     setOrdering(undefined);
@@ -119,56 +116,18 @@ const BookingList = () => {
     setDateRange(range);
   };
 
-  const handleClickOpen = () => {
-    setOpenImport(true);
-  };
-
   const handleCloseImport = () => {
     setOpenImport(false);
   };
-
-  const CustomToolbar = useCallback(
-    () => {
-      return (
-        <GridToolbarContainer>
-          <GridToolbarColumnsButton />
-          <GridToolbarDensitySelector />
-          <GridToolbarExport />
-          {/*<GridToolbarQuickFilter />*/}
-          <SearchInput
-            style={{marginLeft: "auto"}}
-            placeholder={t("Search booking")}
-            onChange={onSearch}
-          />
-        </GridToolbarContainer>
-      );
-    },
-    [t]
-  );
-
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
       <Routes>
         <Route
           path=":bookingId"
-          element={
-            <BookingDialogLoader
-              onClose={handleCloseEdit}
-              onOpenContract={onEditContract}
-            />}
+          element={<BookingDialogLoader onClose={handleCloseEdit} onOpenContract={onEditContract} />}
         />
       </Routes>
-      <ListToolbar
-        title={t("Bookings")}
-        numSelected={numSelected}
-        dateRange={dateRange} onDateRangeChange={onDateRangeChange}
-        tools={[
-          { label: t("Import"), onClick: handleClickOpen, disabled: !canAdd },
-          { label: t("Export"), onClick: () => undefined, disabled: true },
-          { label: t("Add booking"), onClick: onCreateBooking, disabled: !canAdd }
-        ]}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -182,7 +141,6 @@ const BookingList = () => {
               },
               pagination: { paginationModel: { page: 1, pageSize: 10 } }
             }}
-
             rows={bookings?.results || []}
             rowCount={rowCountState}
             columns={columns}
@@ -203,8 +161,23 @@ const BookingList = () => {
             onRowClick={(params) => onEditBooking(params.row)}
             onRowSelectionModelChange={onSelectionChange}
             slots={{
-              toolbar: CustomToolbar,
+              toolbar: GridToolbar,
               loadingOverlay: LinearProgress
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                numSelected: numSelected,
+                dateRange: dateRange,
+                onDateRangeChange: onDateRangeChange,
+                onSearch: onSearch,
+                onSearchLabel: t("Search booking"),
+                tools: [
+                  // { label: t("Import"), onClick: handleClickOpen, disabled: !canAdd },
+                  // { label: t("Export"), onClick: () => undefined, disabled: true },
+                  { label: t("Add booking"), onClick: onCreateBooking, disabled: !canAdd }
+                ]
+              }
             }}
           />
 

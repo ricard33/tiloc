@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { useListPropertiesQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Property, User } from "../../types";
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import GridToolbar from "../../components/GridToolbar";
 
 type Props = {};
 
@@ -16,7 +16,7 @@ const PropertiesList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data } = useListPropertiesQuery({}, { refetchOnMountOrArgChange: 20 });
   const navigate = useNavigate();
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const user = useSelector<RootState>((store) => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_property");
 
   const columns: GridColDef[] = [
@@ -37,12 +37,6 @@ const PropertiesList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar
-        title={t("Properties")}
-        tools={[
-          { label: t("Create"), onClick: onCreateProperty, disabled: !canAdd }
-        ]}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -58,6 +52,14 @@ const PropertiesList: React.FunctionComponent<Props> = () => {
             onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                showDensitySelector: true,
+                showFilterButton: true,
+                tools: [{ label: t("Create"), onClick: onCreateProperty, disabled: !canAdd }]
+              }
             }}
           />
         </CardContent>

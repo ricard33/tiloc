@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { useListCalendarSyncsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { BookingChannel, CalendarSync, Lodging, User } from "../../types";
-import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar, GridValueFormatterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent, Tooltip } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { formatDate, formatDistanceToNow } from "../../common/dateUtils";
+import GridToolbar from "../../components/GridToolbar";
 
 type Props = {};
 
@@ -58,12 +58,6 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar
-        title={t("Calendars synchronization")}
-        tools={[
-          { label: t("Create"), onClick: onCreateCalendarSync, disabled: !canAdd }
-        ]}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -79,6 +73,14 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
             onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                showDensitySelector: true,
+                showFilterButton: true,
+                tools: [{ label: t("Create"), onClick: onCreateCalendarSync, disabled: !canAdd }]
+              }
             }}
           />
         </CardContent>

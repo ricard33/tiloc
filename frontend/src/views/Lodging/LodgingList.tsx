@@ -1,22 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {
-  useListLodgingsQuery,
-  useMoveUpLodgingMutation,
-  useMoveDownLodgingMutation,
-} from "../../services/api";
+import { useListLodgingsQuery, useMoveDownLodgingMutation, useMoveUpLodgingMutation } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Lodging, Property, User } from "../../types";
-import {
-  DataGrid,
-  GridActionsCellItem, GridColDef,
-  GridRowParams,
-  GridToolbar,
-  GridValueFormatterParams
-} from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem, GridColDef, GridRowParams, GridValueFormatterParams } from "@mui/x-data-grid";
 import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
-import ListToolbar from "../../components/ListToolbar";
 import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -24,6 +13,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import GridToolbar from "../../components/GridToolbar";
 
 type Props = {};
 
@@ -108,12 +98,6 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <ListToolbar
-        title={t("Lodgings")}
-        tools={[
-          { label: t("Create"), onClick: onCreate, disabled: !canAdd }
-        ]}
-      />
       <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
         <CardContent sx={{ padding: 0, height: "100%" }}>
           <DataGrid
@@ -129,6 +113,14 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
             onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar
+            }}
+            slotProps={{
+              toolbar: {
+                showColumnsButton: true,
+                showDensitySelector: true,
+                showFilterButton: true,
+                tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
+              }
             }}
           />
         </CardContent>
