@@ -21,6 +21,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from location import __date__, __version__
+
 from . import models
 from .filters import BookingFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
@@ -260,7 +261,7 @@ ORDER BY guest_name"""
     @action(detail=False, methods=["get"])
     def next_events(self, request, pk=None):
         qs1 = (
-            models.Booking.objects.filter(
+            self.get_queryset().filter(
                 begin_date__gte=timezone.now(), lodging__isnull=False, cancelled=False, deleted=False
             )
             .order_by()
@@ -276,7 +277,7 @@ ORDER BY guest_name"""
             )
         )
         qs2 = (
-            models.Booking.objects.filter(end_date__gte=timezone.now(), lodging__isnull=False)
+            self.get_queryset().filter(end_date__gte=timezone.now(), lodging__isnull=False)
             .order_by()
             .annotate(date=F("end_date"), event_type=Value("CHECKOUT"))
             .values(

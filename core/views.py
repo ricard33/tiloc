@@ -116,8 +116,14 @@ def export_full_planning(request, property_id=None):
     ]
 )
 @permission_classes([IsAuthenticated])
-def filling_rate(request, begin=arrow.utcnow().shift(years=-1), end=arrow.utcnow()):
-    sorted_data = get_filling_rate_and_turnover(begin, end, with_turnover=request.user.has_perm("core.view_prices"))
+def filling_rate(request, begin=None, end=arrow.utcnow()):
+    if end is None:
+        end = arrow.utcnow().shift(months=+1).replace(day=1).shift(days=-1)
+    if begin is None:
+        begin = arrow.utcnow().shift(months=-11).replace(day=1)
+    sorted_data = get_filling_rate_and_turnover(
+        request.user.account, begin, end, with_turnover=request.user.has_perm("core.view_prices")
+    )
     return Response(sorted_data)
 
 
@@ -139,14 +145,19 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
         & Q(booking__deleted=False)
         & Q(booking__status__no_stats=False),
     )  # noqa: E127
-    channels = models.BookingChannel.objects.annotate(booking_count=booking_count)
+    channels = models.BookingChannel.objects.filter(account=request.user.account).annotate(booking_count=booking_count)
     for row in channels:
         data.append({"channel": row.name, "count": row.booking_count})
     data.append(
         {
             "channel": None,
             "count": models.Booking.objects.filter(
-                cancelled=False, deleted=False, status__no_stats=False, status__finalized=True, source_id__isnull=True
+                lodging__property__account=request.user.account,
+                cancelled=False,
+                deleted=False,
+                status__no_stats=False,
+                status__finalized=True,
+                source_id__isnull=True,
             ).aggregate(count=Count("id"))["count"],
         }
     )
