@@ -101,7 +101,7 @@ class RestrictedModelAdminMixIn(object):
         Return a sequence containing the fields to be displayed on the
         changelist.
         """
-        if request.user.is_superuser and not hasattr(request.session, 'account_goggles'):
+        if request.user.is_superuser and not request.session.get('account_goggles'):
             return self.list_display
         return [field for field in self.list_display if field != 'account']
 
@@ -396,12 +396,12 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
 
 
 class BookingStatusAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = ("id", "name", "color", "rank", "no_stats", "finalized")
+    list_display = ("id", "name", "color", "rank", "no_stats", "finalized", "account")
     list_editable = ("name", "color", "rank", "no_stats", "finalized")
 
 
 class BookingChannelAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = ("name", "default_booking_status")
+    list_display = ("name", "default_booking_status", "account")
 
 
 class BookingChannelSyncAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
@@ -477,12 +477,12 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
 
 
 class PropertyAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
-    list_display = ("id", "name", "email", "phone", "active")
+    list_display = ("id", "name", "email", "phone", "active", "account")
     list_display_links = ("name",)
 
 
 class HolidaysAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = ("id", "name", "begin_date", "end_date")
+    list_display = ("id", "name", "begin_date", "end_date", "account")
     list_display_links = ("name",)
     ordering = ("begin_date",)
 
@@ -497,6 +497,7 @@ class PricingAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
         "minimum_stay",
         "included_guests",
         "supplement_per_additional_guest",
+        "account",
     )
     list_display_links = ("name",)
     list_editable = (
@@ -525,7 +526,7 @@ class SeasonalVariationAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
 
 
 class ContractTemplateAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
-    list_display = ("id", "name", "created", "modified")
+    list_display = ("id", "name", "created", "modified", "account")
     list_display_links = (
         "id",
         "name",
@@ -548,11 +549,18 @@ class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "not_included_in_price",
         "auto_add_booking",
         "auto_add_invoice",
+        "account",
     )
 
 
 class ContractAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    pass
+    list_display = (
+        "booking",
+        "created",
+        "modified",
+        "pdf_created"
+    )
+    list_filter = ("booking__lodging", "created", "modified")
 
 
 site.register(models.Booking, BookingAdmin)

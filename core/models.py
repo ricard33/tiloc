@@ -288,6 +288,7 @@ class Property(models.Model):
 
     class Meta:
         verbose_name = _("Property")
+        verbose_name_plural = _("Properties")
 
     objects = ForUserQuerySet.as_manager()
 
@@ -676,6 +677,9 @@ class BookedService(models.Model):
 
     class Meta:
         verbose_name = _("Booking service")
+
+    def __str__(self):
+        return "%s -> %s" % (self.service.designation, self.booking)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.booking.lodging.property.account.id != self.service.account.id:
