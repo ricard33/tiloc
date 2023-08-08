@@ -114,6 +114,16 @@ class RestrictedModelAdminMixIn(object):
             return self.list_filter
         return [field for field in self.list_filter if field != 'account' and not field.endswith('__account')]
 
+    def get_changeform_initial_data(self, request):
+        """
+        Get the initial form data from the request's GET params.
+        """
+        initial = super().get_changeform_initial_data(request)
+        selected_account = request.session.get("account_goggles")
+        if "account" not in initial and selected_account:
+            initial["account"] = selected_account["id"]
+        return initial
+
 
 class TiLocAdminSite(admin.AdminSite):
     # Text to put at the end of each page's <title>.
