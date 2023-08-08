@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useListBookingsPaginatedQuery } from "../../services/api";
+import { useListBookingsPaginatedQuery, useListBookingStatusesQuery, useListLodgingsQuery } from "../../services/api";
 import { Card, CardContent, LinearProgress } from "@mui/material";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
@@ -9,7 +9,14 @@ import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
 import { BookingsImportDialog } from "../../components";
-import { DataGrid, GridColDef, GridRowSelectionModel, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridFilterModel,
+  GridRowSelectionModel,
+  GridSortModel,
+  GridValueFormatterParams
+} from "@mui/x-data-grid";
 import { Booking, User } from "../../types";
 import { formatPrice } from "../../common/priceUtils";
 import { RootState } from "../../store";
@@ -28,6 +35,7 @@ const BookingList = () => {
   });
   const [ordering, setOrdering] = useState<GridSortItem | undefined>({ field: "begin_date", sort: "asc" });
   const [search, setSearch] = useState("");
+  const [filterQuery, setFilterQuery] = useState({});
   const [openImport, setOpenImport] = useState<boolean>(false);
   const today = new Date();
   const [dateRange, setDateRange] = useState<DateRange>({ startDate: startOfMonth(today), endDate: endOfMonth(today) });
@@ -37,13 +45,16 @@ const BookingList = () => {
     page: paginationModel.page + 1,
     ...(ordering ? { ordering: (ordering.sort === "desc" ? "-" : "") + ordering.field } : {}),
     guest_name__icontains: search,
-    for_dates: dateFilter
+    for_dates: dateFilter,
+    ...filterQuery
   });
   const user = useSelector<RootState>((store) => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_booking");
   const navigate = useNavigate();
   const showPayments = user.permissions.includes("core.view_payment");
   const [rowCountState, setRowCountState] = React.useState(bookings?.count ?? 0);
+  const { data: lodgings } = useListLodgingsQuery();
+  const { data: statuses } = useListBookingStatusesQuery();
 
   React.useEffect(() => {
     setRowCountState((prevRowCountState) => (bookings?.count !== undefined ? bookings?.count : prevRowCountState));
@@ -53,19 +64,31 @@ const BookingList = () => {
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "begin_date", headerName: t("From"), width: 130, valueFormatter: dateFormatter },
-    { field: "end_date", headerName: t("To"), width: 130, valueFormatter: dateFormatter },
-    { field: "guest_name", headerName: t("Guest"), minWidth: 130, flex: 1 },
+    { field: "begin_date", headerName: t("From"), width: 130, valueFormatter: dateFormatter, filterable: false },
+    { field: "end_date", headerName: t("To"), width: 130, valueFormatter: dateFormatter, filterable: false },
+    { field: "guest_name", headerName: t("Guest"), minWidth: 130, flex: 1, filterable: false },
     {
       field: "lodging",
+      type: "singleSelect",
       headerName: t("Lodging"),
       minWidth: 130,
       flex: 1,
-      valueFormatter: (params) => params.value.name
+      valueFormatter: (params) => params.value.name,
+      valueOptions: lodgings && [...lodgings.map((l) => {
+        return { value: l.id, label: l.name };
+      })]
+
     },
-    { field: "status", headerName: t("Status"), width: 170, valueFormatter: (params) => params.value.name },
+    {
+      field: "status", headerName: t("Status"), width: 170,
+      type: "singleSelect",
+      valueFormatter: (params) => params.value.name,
+      valueOptions: statuses && [...statuses.map((s) => {
+        return { value: s.id, label: s.name };
+      })]
+    },
     ...(showPayments
-      ? [{ field: "price", headerName: t("Price"), type: "number", width: 90, valueFormatter: formatPrice }]
+      ? [{ field: "price", headerName: t("Price"), type: "number", width: 90, valueFormatter: formatPrice, filterable: false }]
       : [])
   ];
 
@@ -112,6 +135,16 @@ const BookingList = () => {
     setOpenImport(false);
   };
 
+  const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
+    // console.log(filterModel)
+    setFilterQuery(filterModel.items.reduce<{ [key: string]: number | string }>((qs, i) => {
+      // if(i.field === 'lodging')
+      //   return {...qs, lodging: i.value}
+      qs[i.field] = i.value;
+      return qs;
+    }, {}));
+  }, []);
+
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
       <Routes>
@@ -143,9 +176,9 @@ const BookingList = () => {
             onPaginationModelChange={setPaginationModel}
             sortingMode="server"
             onSortModelChange={onChangeOrdering}
-            disableColumnFilter
-            // filterMode="server"
-            // onFilterModelChange={onFilterChange}
+            // disableColumnFilter
+            filterMode="server"
+            onFilterModelChange={onFilterChange}
 
             loading={isFetching}
             checkboxSelection
@@ -159,6 +192,7 @@ const BookingList = () => {
             slotProps={{
               toolbar: {
                 showColumnsButton: true,
+                showFilterButton: true,
                 numSelected: numSelected,
                 dateRange: dateRange,
                 onDateRangeChange: onDateRangeChange,
@@ -173,42 +207,8 @@ const BookingList = () => {
             }}
           />
 
-          {/*<PerfectScrollbar>*/}
-          {/*  <div className={classes.inner}>*/}
-          {/*    <BookingsTable*/}
-          {/*      bookings={bookings?.results || []}*/}
-          {/*      onEdit={onEditBooking}*/}
-          {/*      onSelectionChange={onSelectionChange}*/}
-          {/*      ordering={ordering}*/}
-          {/*      onChangeOrdering={onChangeOrdering}*/}
-          {/*    />*/}
-          {/*    <Backdrop className={classes.backdrop} open={isLoadingBookings} timeout={0}>*/}
-          {/*      <CircularProgress color="inherit" />*/}
-          {/*    </Backdrop>*/}
-          {/*  </div>*/}
-          {/*</PerfectScrollbar>*/}
         </CardContent>
-        {/*<CardActions>*/}
-        {/*  <TablePagination*/}
-        {/*    component="div"*/}
-        {/*    count={bookings ? bookings.count : 0}*/}
-        {/*    onPageChange={handlePageChange}*/}
-        {/*    onRowsPerPageChange={handleRowsPerPageChange}*/}
-        {/*    page={page}*/}
-        {/*    rowsPerPage={rowsPerPage}*/}
-        {/*    rowsPerPageOptions={[5, 10, 25]}*/}
-        {/*  />*/}
-        {/*</CardActions>*/}
       </Card>
-      {/*{editBooking &&*/}
-      {/*  <BookingDialogLoader*/}
-      {/*    booking={editBooking}*/}
-      {/*    onClose={handleCloseEdit}*/}
-      {/*    onOpenContract={onEditContract}*/}
-      {/*    onCancelBooking={onCancelBooking}*/}
-      {/*    onUncancelBooking={onUncancelBooking}*/}
-      {/*    onDelete={onDeleteBooking}*/}
-      {/*  />}*/}
       <BookingsImportDialog url="something" open={openImport} onClose={handleCloseImport} />
     </Page>
   );

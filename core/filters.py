@@ -17,6 +17,7 @@ class BookingFilter(filters.FilterSet):
         fields = {
             "id": ["exact"],
             "lodging": ["exact", "isnull", "in"],
+            "status": ["exact", "in"],
             "begin_date": ["lte", "gte"],
             "end_date": ["lte", "gte"],
             "guest_name": ["exact", "icontains"],
@@ -36,12 +37,14 @@ class BookingFilter(filters.FilterSet):
 
 class PaymentFilter(filters.FilterSet):
     for_dates = django_filters.CharFilter(method="for_dates_filter")
+    lodging = django_filters.Filter(field_name="booking__lodging")
 
     class Meta:
         model = Payment
         fields = {
             "id": ["exact"],
-            "booking_id": ["exact", "isnull", "in"],
+            "booking_id": ["exact", "in"],
+            # "booking__lodging": ["exact", "in"],
             "date": ["lte", "gte"],
             "method": ["exact"],
             "checked": ["exact"],

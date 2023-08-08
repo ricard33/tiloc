@@ -1,12 +1,18 @@
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDeletePaymentMutation, useListPaymentsPaginatedQuery, useUpdatePaymentMutation } from "../../services/api";
+import {
+  useDeletePaymentMutation,
+  useListLodgingsQuery,
+  useListPaymentsPaginatedQuery,
+  useUpdatePaymentMutation
+} from "../../services/api";
 import { Lodging, Payment, paymentMethods, User } from "../../types";
 import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridEventListener,
+  GridFilterModel,
   GridRowEditStopReasons,
   GridRowModel,
   GridRowModes,
@@ -41,17 +47,19 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const [paginationModel, setPaginationModel] = React.useState({ pageSize: 20, page: 0 });
   const [ordering, setOrdering] = useState<GridSortItem | undefined>({ field: "date", sort: "desc" });
+    const [filterQuery, setFilterQuery] = useState({});
   const [dateRange, setDateRange] = useState<DateRange>();
   const dateFilter = dateRange ? formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate) : "";
   const { data } = useListPaymentsPaginatedQuery({
     page_size: paginationModel.pageSize,
     page: paginationModel.page + 1,
     ...(ordering ? { ordering: (ordering.sort === "desc" ? "-" : "") + ordering.field } : {}),
-    for_dates: dateFilter
-
+    for_dates: dateFilter,
+    ...filterQuery
   }, { refetchOnMountOrArgChange: 20 });
   const [updatePayment] = useUpdatePaymentMutation();
   const [deletePayment] = useDeletePaymentMutation();
+    const { data: lodgings } = useListLodgingsQuery();
   const [rowCountState, setRowCountState] = React.useState(data?.count ?? 0);
   const confirm = useConfirm();
   const { showError, showSuccess } = useAlert();
@@ -181,8 +189,11 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
         // valueFormatter: (params: GridValueFormatterParams<Date>) => formatDate(params.value, "PPP")
       },
       {
-        field: "lodging", headerName: t("Lodging"), width: 110,
-        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value ? params.value.name ?? "" : ""
+        field: "lodging", headerName: t("Lodging"), width: 110, type: "singleSelect",
+        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value ? params.value.name ?? "" : "",
+        valueOptions: lodgings && [...lodgings.map((l) => {
+          return { value: l.id, label: l.name };
+        })]
       },
       { field: "guest_name", headerName: t("Guest"), width: 200 },
       { field: "description", headerName: t("Description"), width: 130, editable: true },
@@ -239,7 +250,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
         }
       }
     ],
-    [handleCancelClick, handleDeleteClick, handleEditClick, handleSaveClick, onValidatePayment, paymentLabels, paymentLabelsArray, rowModesModel, t]);
+    [handleCancelClick, handleDeleteClick, handleEditClick, handleSaveClick, lodgings, onValidatePayment, paymentLabels, paymentLabelsArray, rowModesModel, t]);
 
   const onDateRangeChange = useCallback((range: DateRange) => {
     setDateRange(range);
@@ -259,6 +270,16 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     }
     setOrdering(undefined);
   }, []);
+
+    const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
+      // console.log(filterModel)
+      setFilterQuery(filterModel.items.reduce<{ [key: string]: number | string }>((qs, i) => {
+        // if(i.field === 'lodging')
+        //   return {...qs, lodging: i.value}
+        qs[i.field] = i.value;
+        return qs;
+      }, {}));
+    }, []);
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
@@ -289,8 +310,8 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
             onPaginationModelChange={setPaginationModel}
             sortingMode="server"
             onSortModelChange={onChangeOrdering}
-            // pageSize={20}
-            // rowsPerPageOptions={[5, 10, 20, 50]}
+            filterMode="server"
+            onFilterModelChange={onFilterChange}
             // onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar

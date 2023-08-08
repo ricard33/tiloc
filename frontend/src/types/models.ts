@@ -41,7 +41,7 @@ export interface Lodging {
   shown: boolean;
   name: string;
   property_id: number;
-  property: Extract<Property, "id" | "name">;
+  property: Pick<Property, "id" | "name">;
   rank: number;
   address: string;
   daily_rate: number;

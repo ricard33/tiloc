@@ -10,7 +10,6 @@ from django.db.models import F, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from knox.auth import TokenAuthentication
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
@@ -21,7 +20,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from location import __date__, __version__
-
 from . import models
 from .filters import BookingFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
@@ -356,7 +354,6 @@ class BookingChannelSyncViewSet(viewsets.ModelViewSet):
 
 
 class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
-    authentication_classes = [TokenAuthentication]  # , SessionAuthentication]
     queryset = models.Lodging.objects.all()  # .order_by("name")
     serializer_class = LodgingSerializer
     filterset_fields = ["shown", "active"]

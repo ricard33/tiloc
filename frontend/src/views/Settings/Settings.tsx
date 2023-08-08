@@ -18,9 +18,9 @@ const Settings = () => {
   const pages = [
     {
       title: t("General parameters"),
-      href: "general",
+      href: "",
       icon: <SettingsIcon />,
-      disabled: true
+      disabled: false
     },
     {
       title: t("Users"),
@@ -69,7 +69,7 @@ const Settings = () => {
   const relativeLocationPathname = location.pathname.startsWith("/settings/")
     ? location.pathname.slice(10)
     : location.pathname;
-  const pageIndex = pages.findIndex((p) => p.href === relativeLocationPathname);
+  const pageIndex = pages.findLastIndex((p) => relativeLocationPathname.startsWith(p.href));
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>

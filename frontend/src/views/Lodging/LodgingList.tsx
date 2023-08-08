@@ -1,9 +1,21 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useListLodgingsQuery, useMoveDownLodgingMutation, useMoveUpLodgingMutation } from "../../services/api";
+import {
+  useListLodgingsQuery,
+  useListPropertiesQuery,
+  useMoveDownLodgingMutation,
+  useMoveUpLodgingMutation
+} from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Lodging, Property, User } from "../../types";
-import { DataGrid, GridActionsCellItem, GridColDef, GridRowParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridColDef,
+  GridRowParams,
+  GridValueFormatterParams,
+  GridValueGetterParams
+} from "@mui/x-data-grid";
 import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
 import { Card, CardContent } from "@mui/material";
@@ -20,9 +32,9 @@ type Props = {};
 const LodgingsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data, refetch } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
+  const { data: properties } = useListPropertiesQuery();
   const [moveUp] = useMoveUpLodgingMutation();
   const [moveDown] = useMoveDownLodgingMutation();
-  // const { data: properties } = useListPropertiesQuery();
   const navigate = useNavigate();
   const { showError, showSuccess } = useAlert();
   const user = useSelector<RootState>(store => store.auth.user) as User;
@@ -49,8 +61,16 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
       { field: "name", headerName: t("Name"), width: 130 },
       {
         field: "property", headerName: t("Property"), width: 130,
-        valueFormatter: (params: GridValueFormatterParams<Partial<Property>>) => params.value.name ?? ""
-        // valueFormatter: (params: GridValueFormatterParams<number>) => getPropertyName(params.value) ?? ""
+        type: "singleSelect",
+        valueGetter: (params: GridValueGetterParams<Partial<Property>>) => {
+          return { ...params.value, value: params.value.id };
+        },
+        valueFormatter: (params: GridValueFormatterParams<Partial<Property>>) => {
+          return params.value.name;
+        },
+        valueOptions: properties && [...properties.map((p) => {
+          return { value: p.id, label: p.name };
+        })]
       },
       { field: "active", headerName: t("Active"), type: "boolean", width: 70 },
       { field: "shown", headerName: t("Shown"), type: "boolean", width: 70 },
@@ -79,14 +99,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
           />
         ]
       }
-    ], [canChange, onRankUpDown, t]);
-
-  // const getPropertyName = (propertyId: number) => {
-  //   if (properties) {
-  //     const property = properties.find(o => o.id === propertyId);
-  //     return property ? property.name : "";
-  //   }
-  // };
+    ], [canChange, onRankUpDown, properties, t]);
 
   const onClick = (lodging: Lodging) => {
     navigate(lodging.id.toString());
@@ -108,8 +121,6 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
             rows={data || []}
             columns={columns}
             autoPageSize
-            // pageSize={20}
-            // pageSizeOptions={[5, 10, 20, 50]}
             onRowClick={(params) => onClick(params.row)}
             slots={{
               toolbar: GridToolbar

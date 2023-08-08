@@ -1,9 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useListCalendarSyncsQuery } from "../../services/api";
+import { useListBookingChannelsQuery, useListCalendarSyncsQuery, useListLodgingsQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { BookingChannel, CalendarSync, Lodging, User } from "../../types";
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridValueFormatterParams,
+  GridValueGetterParams
+} from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
 import { Card, CardContent, Tooltip } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -16,6 +22,8 @@ type Props = {};
 const CalendarSyncsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data } = useListCalendarSyncsQuery({}, { refetchOnMountOrArgChange: 20 });
+  const { data: lodgings } = useListLodgingsQuery();
+  const { data: channels } = useListBookingChannelsQuery();
   const navigate = useNavigate();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canAdd = user.permissions.includes("core.add_bookingchannelsync");
@@ -32,12 +40,24 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
     () => [
       { field: "id", headerName: "ID", width: 70 },
       {
-        field: "lodging", headerName: t("Lodging"), width: 200,
-        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value.name ?? ""
+        field: "lodging", headerName: t("Lodging"), width: 200, type: "singleSelect",
+        valueGetter: (params: GridValueGetterParams<Partial<Lodging>>) => {
+          return { ...params.value, value: params.value.id };
+        },
+        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value.name ?? "",
+        valueOptions: lodgings && lodgings.map((l) => {
+          return { value: l.id, label: l.name };
+        })
       },
       {
-        field: "channel", headerName: t("Booking channel"), width: 200,
-        valueFormatter: (params: GridValueFormatterParams<BookingChannel>) => params.value.name ?? ""
+        field: "channel", headerName: t("Booking channel"), width: 200, type: "singleSelect",
+        valueGetter: (params: GridValueGetterParams<Partial<BookingChannel>>) => {
+          return { ...params.value, value: params.value.id };
+        },
+        valueFormatter: (params: GridValueFormatterParams<BookingChannel>) => params.value.name ?? "",
+        valueOptions: channels && [...channels.map((c) => {
+          return { value: c.id, label: c.name };
+        })]
       },
       { field: "active", headerName: t("Active ?"), type: "boolean", width: 70 },
       { field: "last_import", headerName: t("Last import"), width: 200, valueFormatter: distanceFormatter,
@@ -46,7 +66,7 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
       { field: "last_export", headerName: t("Last export"), width: 200, valueFormatter: distanceFormatter,
         renderCell: renderDateCell
       },
-    ], [t]);
+    ], [channels, lodgings, t]);
 
   const onClick = (calendarSync: CalendarSync) => {
     navigate(calendarSync.id.toString());

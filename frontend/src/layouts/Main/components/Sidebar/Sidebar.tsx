@@ -88,7 +88,7 @@ const Sidebar: React.FC<Props> = props => {
       url: "/settings",
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
-        { title: t("General parameters"), href: "/settings/general", icon: <SettingsIcon />, disabled: true },
+        { title: t("General parameters"), href: "/settings", icon: <SettingsIcon />, disabled: false },
         { title: t("Users"), href: "/settings/users", icon: <PeopleAltIcon />, disabled: true },
         { title: t("Properties"), href: "/settings/properties", icon: <HolidayVillage /> },
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HotelIcon /> },
