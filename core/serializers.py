@@ -12,6 +12,12 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = "__all__"
+
+
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -34,25 +40,37 @@ class LoginUserSerializer(serializers.Serializer):
     #     raise serializers.ValidationError("Unable to log in with provided credentials.")
 
 
-class AccountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Account
-        fields = "__all__"
-
-
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
+    groups = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
 
     class Meta:
         model = User
         # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
         exclude = ["account"]
+        extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
         if 'account' not in validated_data:
             validated_data['account'] = self.context['request'].user.account
-        instance = super().create(validated_data)
+        # Need to call create() function to hash the password
+        email = validated_data.pop("email")
+        password = validated_data.pop("password")
+        instance = User.objects.create_user(email, password, **validated_data)
+        return instance
+
+    def update(self, instance, validated_data):
+        password = None
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+        instance = super().update(instance, validated_data)
+        instance.set_password(password)
+        instance.save()
         return instance
 
     def get_full_name(self, user):

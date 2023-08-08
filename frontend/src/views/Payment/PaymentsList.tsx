@@ -47,7 +47,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const [paginationModel, setPaginationModel] = React.useState({ pageSize: 20, page: 0 });
   const [ordering, setOrdering] = useState<GridSortItem | undefined>({ field: "date", sort: "desc" });
-    const [filterQuery, setFilterQuery] = useState({});
+  const [filterQuery, setFilterQuery] = useState({});
   const [dateRange, setDateRange] = useState<DateRange>();
   const dateFilter = dateRange ? formatISO(dateRange.startDate) + ":" + formatISO(dateRange.endDate) : "";
   const { data } = useListPaymentsPaginatedQuery({
@@ -59,7 +59,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
   }, { refetchOnMountOrArgChange: 20 });
   const [updatePayment] = useUpdatePaymentMutation();
   const [deletePayment] = useDeletePaymentMutation();
-    const { data: lodgings } = useListLodgingsQuery();
+  const { data: lodgings } = useListLodgingsQuery();
   const [rowCountState, setRowCountState] = React.useState(data?.count ?? 0);
   const confirm = useConfirm();
   const { showError, showSuccess } = useAlert();
@@ -271,15 +271,17 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     setOrdering(undefined);
   }, []);
 
-    const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
-      // console.log(filterModel)
-      setFilterQuery(filterModel.items.reduce<{ [key: string]: number | string }>((qs, i) => {
-        // if(i.field === 'lodging')
-        //   return {...qs, lodging: i.value}
-        qs[i.field] = i.value;
-        return qs;
-      }, {}));
-    }, []);
+  const onFilterChange = React.useCallback((filterModel: GridFilterModel) => {
+    // console.log(filterModel)
+    setFilterQuery(filterModel.items.reduce<{
+      [key: string]: number | string
+    }>((qs, i) => {
+      // if(i.field === 'lodging')
+      //   return {...qs, lodging: i.value}
+      qs[i.field] = i.value;
+      return qs;
+    }, {}));
+  }, []);
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
@@ -331,7 +333,6 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
       </Card>
     </Page>
   );
-}
-;
+};
 
 export default PaymentsList;

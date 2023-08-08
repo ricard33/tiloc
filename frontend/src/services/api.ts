@@ -244,6 +244,7 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment, payment2Api);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
+const userApi = makeApi<User>("user/", "User");
 const propertyApi = makeApi<Property>("property/", "Property", api2Property, property2api);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
@@ -258,13 +259,15 @@ export const api = createApi({
   baseQuery: axiosBaseQuery({ baseUrl: serviceURL }),
   tagTypes: [
     "Payment",
+    "Property",
     "Lodging",
     "Booking",
     "BookingStatus",
     "BookingChannel",
     "Contract",
     "ContractTemplate",
-    "Service"
+    "Service",
+    "User"
   ],
   endpoints: (builder) => ({
     // Sign in
@@ -312,6 +315,13 @@ export const api = createApi({
     createBookingChannel: bookingChannelApi.create(builder),
     updateBookingChannel: bookingChannelApi.update(builder),
     deleteBookingChannel: bookingChannelApi.delete(builder),
+
+    // user
+    listUsers: userApi.list(builder),
+    getUser: userApi.get(builder),
+    createUser: userApi.create(builder),
+    updateUser: userApi.update(builder),
+    deleteUser: userApi.delete(builder),
 
     // property
     listProperties: propertyApi.list(builder),
@@ -431,6 +441,12 @@ export const {
   useCreateBookingChannelMutation,
   useUpdateBookingChannelMutation,
   useDeleteBookingChannelMutation,
+
+  useListUsersQuery,
+  useGetUserQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
 
   useListPropertiesQuery,
   useGetPropertyQuery,

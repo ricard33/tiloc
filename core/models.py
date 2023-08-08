@@ -151,25 +151,7 @@ class Account(models.Model):
             pass
 
 
-# TODO try to remove UserQuerySet and MyUserManager
-class UserQuerySet(models.QuerySet):
-    def for_user(self, user):
-        """
-        Filter queryset to user instances visible by the given user, depending on its status (manager or not)
-        and its services.
-
-        :param user:
-        :return:
-        """
-        if user.is_superuser:
-            return self
-        qs = self.filter(account=user.account, account__is_active=True)
-        if not user.has_perm("core.administrator"):
-            qs = qs.filter(id=user.id)
-        return qs
-
-
-class MyUserManager(UserManager.from_queryset(UserQuerySet)):
+class MyUserManager(UserManager.from_queryset(ForUserQuerySet)):
     # Inheritance needed to be able to use Manager.from_queryset() and Manager.use_in_migrations jointly
     use_in_migrations = True
 

@@ -30,6 +30,8 @@ import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 import PaymentsList from "./views/Payment/PaymentsList";
 import GeneralSettings from "./views/Settings/GeneralSettings";
+import UsersList from "./views/Users/UsersList";
+import { UserPage } from "./views/Users/UserPage";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -70,6 +72,9 @@ const MyRoutes = () => {
           />
           <Route path="/settings/" element={<Settings />}>
             <Route index element={<GeneralSettings />} />
+            <Route path="users" element={<UsersList />} />
+            <Route path="users/new" element={<UserPage />} />
+            <Route path="users/:userId" element={<UserPage />} />
             <Route path="properties" element={<PropertiesList />} />
             <Route path="properties/new" element={<PropertyPage />} />
             <Route path="properties/:propertyId" element={<PropertyPage />} />

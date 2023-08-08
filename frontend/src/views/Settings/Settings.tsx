@@ -26,7 +26,7 @@ const Settings = () => {
       title: t("Users"),
       href: "users",
       icon: <PeopleAltIcon />,
-      disabled: true
+      disabled: false
     },
     {
       title: t("Properties"),
