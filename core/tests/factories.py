@@ -60,7 +60,7 @@ class AdminUserFactory(_UserFactory):
 
     @factory.post_generation
     def add_to_group(self, create, extracted, **kwargs):
-        self.groups.add(Group.objects.get(name__iexact="Admins"))
+        self.groups.add(Group.objects.get(name__iexact="administrator"))
 
 
 class StandardUserFactory(_UserFactory):
@@ -68,7 +68,7 @@ class StandardUserFactory(_UserFactory):
 
     @factory.post_generation
     def add_to_group(self, create, extracted, **kwargs):
-        self.groups.add(Group.objects.get(name__iexact="Standards"))
+        self.groups.add(Group.objects.get(name__iexact="standard"))
 
 
 class PropertyFactory(factory.django.DjangoModelFactory):

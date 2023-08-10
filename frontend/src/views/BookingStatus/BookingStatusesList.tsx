@@ -78,7 +78,7 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
-      { field: "id", headerName: "ID", width: 70, sortable: false },
+      // { field: "id", headerName: "ID", width: 70, sortable: false },
       { field: "name", headerName: t("Name"), width: 150, sortable: false },
       {
         field: "color", headerName: t("Color"), width: 100, sortable: false,

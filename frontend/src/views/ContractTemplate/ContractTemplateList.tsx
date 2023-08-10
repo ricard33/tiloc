@@ -28,7 +28,7 @@ const ContractTemplateList: React.FunctionComponent<Props> = () => {
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
-      { field: "id", headerName: "ID", width: 50 },
+      // { field: "id", headerName: "ID", width: 50 },
       { field: "name", headerName: t("Name"), flex: 1, minWidth: 100 },
       { field: "created", headerName: t("Created"), flex: 0.5, minWidth: 100, renderCell: dateRenderer },
       { field: "modified", headerName: t("Modified"), flex: 0.5, minWidth: 100, renderCell: dateRenderer }

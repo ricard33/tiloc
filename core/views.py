@@ -87,7 +87,7 @@ def export_full_planning(request, property_id=None):
     if property and property_id != request.user.id and not request.user.is_superuser:
         raise Http404("No property matches the given query.")
 
-    qs = models.Booking.objects.filter(cancelled=False, deleted=False)
+    qs = models.Booking.objects.for_user(request.user).filter(cancelled=False, deleted=False)
     if property:
         qs = qs.filter(lodging__property=property)
         logger.info("Full planning requested for property [%s]", property.name)

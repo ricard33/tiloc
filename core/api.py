@@ -244,13 +244,16 @@ class BookingViewSet(viewsets.ModelViewSet):
     *,
     ROW_NUMBER() OVER(PARTITION BY guest_name ORDER BY begin_date DESC) AS row_number
   FROM core_booking
-  WHERE deleted = false
+  LEFT JOIN core_lodging ON core_booking.lodging_id = core_lodging.id
+  LEFT JOIN core_property ON core_lodging.property_id = core_property.id
+  WHERE deleted = false AND core_property.account_id = %s
 )
 SELECT
-  id, guest_name as name, guest_contact as contact, guest_address as address
+  added_row_number.id, guest_name as name, guest_contact as contact, guest_address as address
 FROM added_row_number
 WHERE row_number = 1
-ORDER BY guest_name"""
+ORDER BY guest_name""",
+                [request.user.account.id]
             ),
             many=True,
         )

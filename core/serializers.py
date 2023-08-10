@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.db.models import Max
 from rest_framework import serializers
 
@@ -45,14 +46,14 @@ class UserSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField()
     groups = serializers.SlugRelatedField(
         many=True,
-        read_only=True,
+        queryset=Group.objects.all(),
         slug_field='name'
     )
 
     class Meta:
         model = User
         # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
-        exclude = ["account"]
+        exclude = ["account", "user_permissions"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
@@ -61,7 +62,13 @@ class UserSerializer(serializers.ModelSerializer):
         # Need to call create() function to hash the password
         email = validated_data.pop("email")
         password = validated_data.pop("password")
+        properties = validated_data.pop('properties', [])
+        groups = validated_data.pop('groups', [])
         instance = User.objects.create_user(email, password, **validated_data)
+        if groups:
+            instance.groups.set(Group.objects.filter(name__in=groups))
+        if properties:
+            instance.properties.set(properties)
         return instance
 
     def update(self, instance, validated_data):
@@ -69,8 +76,9 @@ class UserSerializer(serializers.ModelSerializer):
         if 'password' in validated_data:
             password = validated_data.pop('password')
         instance = super().update(instance, validated_data)
-        instance.set_password(password)
-        instance.save()
+        if password:
+            instance.set_password(password)
+            instance.save()
         return instance
 
     def get_full_name(self, user):

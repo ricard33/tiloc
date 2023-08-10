@@ -20,10 +20,12 @@ const UsersList: React.FunctionComponent<Props> = () => {
   const canAdd = user.permissions.includes("core.add_user");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
+    // { field: "id", headerName: "ID", width: 70 },
     { field: "first_name", headerName: t("First name"), width: 150 },
     { field: "last_name", headerName: t("Last name"), width: 150 },
     { field: "email", headerName: t("Email"), width: 200 },
+    { field: "groups", headerName: t("User type"), width: 200,
+      valueFormatter: (params) => t(params.value) },
     { field: "is_active", headerName: t("Active"), type: "boolean", width: 70 }
   ];
 

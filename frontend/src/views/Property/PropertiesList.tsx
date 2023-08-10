@@ -20,7 +20,7 @@ const PropertiesList: React.FunctionComponent<Props> = () => {
   const canAdd = user.permissions.includes("core.add_property");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
+    // { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: t("Name"), width: 150 },
     { field: "email", headerName: t("Email"), width: 200 },
     { field: "phone", headerName: t("Phone"), width: 150 },

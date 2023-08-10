@@ -20,7 +20,7 @@ const BookingChannelList: React.FunctionComponent<Props> = () => {
   const canAdd = user.permissions.includes("core.add_bookingchannel");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
+    // { field: "id", headerName: "ID", width: 70 },
     { field: "name", headerName: t("Name"), width: 400 },
     {
       field: "default_booking_status", headerName: t("Default booking status"), width: 170, filterable: false,

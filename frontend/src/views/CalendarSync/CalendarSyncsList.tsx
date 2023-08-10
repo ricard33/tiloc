@@ -38,7 +38,7 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
 
   const columns = React.useMemo<GridColDef<CalendarSync>[]>(
     () => [
-      { field: "id", headerName: "ID", width: 70 },
+      // { field: "id", headerName: "ID", width: 70 },
       {
         field: "lodging", headerName: t("Lodging"), width: 200, type: "singleSelect",
         valueGetter: (params: GridValueGetterParams<Partial<Lodging>>) => {

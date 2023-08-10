@@ -57,7 +57,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
 
   const columns = React.useMemo<GridColDef[]>(
     () => [
-      { field: "id", headerName: "ID", width: 70 },
+      // { field: "id", headerName: "ID", width: 70 },
       { field: "name", headerName: t("Name"), width: 130 },
       {
         field: "property", headerName: t("Property"), width: 130,

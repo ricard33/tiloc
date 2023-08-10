@@ -70,7 +70,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             source=channel,
             source_uid=event.uid,
             guest_name=event.summary,
-            status=channel.default_booking_status or models.BookingStatus.objects.first(),
+            status=channel.default_booking_status or models.BookingStatus.objects.filter(account=lodging.property.account).first(),
             begin_date=event.begin.date(),
             end_date=event.end.date(),
             duration=(event.end.date() - event.begin.date()).days,

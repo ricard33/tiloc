@@ -63,7 +63,7 @@ const BookingList = () => {
   const dateFormatter = (params: GridValueFormatterParams<Date>) => formatDate(params.value, "dd/MM/yyyy");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
+    // { field: "id", headerName: "ID", width: 70 },
     { field: "begin_date", headerName: t("From"), width: 130, valueFormatter: dateFormatter, filterable: false },
     { field: "end_date", headerName: t("To"), width: 130, valueFormatter: dateFormatter, filterable: false },
     { field: "guest_name", headerName: t("Guest"), minWidth: 130, flex: 1, filterable: false },

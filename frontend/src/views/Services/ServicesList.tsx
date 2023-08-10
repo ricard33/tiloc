@@ -21,7 +21,7 @@ const ServicesList: React.FunctionComponent<Props> = () => {
   const canAdd = user.permissions.includes("core.add_service");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
+    // { field: "id", headerName: "ID", width: 70 },
     { field: "designation", headerName: t("Designation"), width: 400 },
     {
       field: "unit_price", headerName: t("Unit price"), type: "number", width: 90,

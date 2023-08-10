@@ -27,6 +27,9 @@ import axios from "axios";
 import { formatDate } from "../../../../common/dateUtils";
 import { useLocation } from "react-router-dom";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store";
+import { User } from "../../../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -74,6 +77,8 @@ const Sidebar: React.FC<Props> = props => {
   const [version, setVersion] = useState({ version: "?", build_date: "-" });
   const location = useLocation();
   const locationPathname = location.pathname;
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canViewUsers = user.permissions.includes("core.view_user");
 
   const menus = [
     {
@@ -89,7 +94,7 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
         { title: t("General parameters"), href: "/settings", icon: <SettingsIcon />, disabled: false },
-        { title: t("Users"), href: "/settings/users", icon: <PeopleAltIcon /> },
+        ...(canViewUsers ? [{ title: t("Users"), href: "/settings/users", icon: <PeopleAltIcon /> }] : []),
         { title: t("Properties"), href: "/settings/properties", icon: <HolidayVillage /> },
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HotelIcon /> },
         { title: t("Booking statuses"), href: "/settings/booking-status", icon: <GradingIcon /> },

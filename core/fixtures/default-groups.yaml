@@ -1,6 +1,6 @@
 -   model: auth.group
     fields:
-        name: Admins
+        name: administrator
         permissions:
             - [ "administrator", "core", "account" ]
             #            - [ "view_account", "core", "account" ]
@@ -88,7 +88,7 @@
             - [ "view_user", "core", "user" ]
 -   model: auth.group
     fields:
-        name: Standards
+        name: standard
         permissions:
             - [ "view_account", "core", "account" ]
             - [ "add_bookedservice", "core", "bookedservice" ]
@@ -125,7 +125,7 @@
             - [ "view_service", "core", "service" ]
 -   model: auth.group
     fields:
-        name: Lecture seule
+        name: readonly
         permissions:
             - [ "view_bookedservice", "core", "bookedservice" ]
             - [ "view_booking", "core", "booking" ]
@@ -149,7 +149,7 @@
             - [ "view_service", "core", "service" ]
 -   model: auth.group
     fields:
-        name: Externes
+        name: external
         permissions:
             - [ "view_bookedservice", "core", "bookedservice" ]
             - [ "view_booking", "core", "booking" ]

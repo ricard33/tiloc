@@ -3,6 +3,7 @@ import { Button, Card, CardActions, CardContent, CardHeader, Stack, Unstable_Gri
 import { useTranslation } from "react-i18next";
 import {
   FormContainer,
+  MultiSelectElement,
   PasswordElement,
   PasswordRepeatElement,
   SwitchElement,
@@ -66,7 +67,10 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
               <TextFieldElement name={"last_name"} label={t("Last name")} fullWidth required />
             </Grid2>
             <Grid2 xs={12}>
-              <TextFieldElement name={"email"} type={"email"} label={t("Email")} fullWidth required />
+              <TextFieldElement
+                name={"email"} type={"email"} label={t("Email")}
+                fullWidth required autoComplete="email"
+              />
             </Grid2>
             {changePassword
               ? (
@@ -74,6 +78,7 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
                   <Grid2 sm={6} xs={12}>
                     <PasswordElement
                       name={"password"} label={t("Password")} fullWidth
+                      autoComplete="new-password"
                       required
                       validation={{
                         minLength: {
@@ -86,6 +91,7 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
                   <Grid2 sm={6} xs={12}>
                     <PasswordRepeatElement
                       passwordFieldName={"password"} name={"password-repeat"}
+                      autoComplete="new-password"
                       label={t("Re-type the password")} fullWidth required
                     />
                   </Grid2>
@@ -95,6 +101,19 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
             }
             <Grid2 sm={6} xs={12}>
               <SwitchElement name={"is_active"} label={t("Active ?")} />
+            </Grid2>
+            <Grid2 xs={12}>
+              <MultiSelectElement
+                label={t("User type")}
+                name="groups"
+                options={[
+                  { id: "administrator", label: t("administrator") },
+                  { id: "standard", label: t("standard") },
+                  { id: "external", label: t("external") },
+                  { id: "readonly", label: t("readonly") },
+                ]}
+                showChips
+              />
             </Grid2>
           </Grid2>
         </CardContent>

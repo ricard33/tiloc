@@ -12,9 +12,15 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking-sources.svg";
 import Page from "../../layouts/Main/Page";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { User } from "../../types";
 
 const Settings = () => {
   const { t } = useTranslation();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canViewUsers = user.permissions.includes("core.view_user");
+
   const pages = [
     {
       title: t("General parameters"),
@@ -22,12 +28,12 @@ const Settings = () => {
       icon: <SettingsIcon />,
       disabled: false
     },
-    {
+    ...(canViewUsers ? [{
       title: t("Users"),
       href: "users",
       icon: <PeopleAltIcon />,
       disabled: false
-    },
+    }] : []),
     {
       title: t("Properties"),
       href: "properties",

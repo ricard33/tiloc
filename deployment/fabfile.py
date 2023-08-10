@@ -321,6 +321,7 @@ def deploy_location(c):
             c.run("python manage.py mediabackup --clean --noinput")
 
             c.run("python manage.py migrate --noinput")
+            c.run("python manage.py loaddata default-groups")
             c.run("python manage.py collectstatic --clear --noinput -v 0")
 
 
