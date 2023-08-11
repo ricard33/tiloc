@@ -1,18 +1,30 @@
 import * as reducers from "./reducers";
 import createSagaMiddleware from "redux-saga";
-import { configureStore, isPlain } from "@reduxjs/toolkit";
+import { combineReducers, configureStore, isPlain } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { api } from "./services/api";
 import { isDate } from "date-fns";
+import { LOGOUT_SUCCESSFUL } from "./actions/actionTypes";
 // import { rtkQueryErrorLogger } from "./services/middlewares";
 
 export const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
-  reducer: {
-    alert: reducers.alert,
-    auth: reducers.auth,
-    [api.reducerPath]: api.reducer
+  reducer: (state, action) => {
+    // Clear all data in redux store to initial.
+    if (action.type === LOGOUT_SUCCESSFUL)
+      state = undefined;
+
+    return combineReducers({
+      alert: reducers.alert,
+      auth: reducers.auth,
+      [api.reducerPath]: api.reducer
+    })(state, action);
   },
+  // reducer: {
+  //   alert: reducers.alert,
+  //   auth: reducers.auth,
+  //   [api.reducerPath]: api.reducer
+  // },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware(
       {

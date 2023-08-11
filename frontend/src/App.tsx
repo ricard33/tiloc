@@ -33,7 +33,7 @@ function App(props: Props) {
 
   useEffect(() => {
     // console.log("useEffect token", token);
-    dispatch(auth.userLoading());
+    // dispatch(auth.userLoading());
     refetchUser();
   }, [dispatch, refetchUser, token]);
 

@@ -79,6 +79,12 @@ class AccountQuerySet(models.QuerySet):
             return self
         return self.filter(pk=user.account.pk)
 
+    def get_or_create_demo(self):
+        return self.get_or_create(name="__demo__")
+
+    def get_template(self):
+        return self.get(name="__template__")
+
 
 class Account(models.Model):
     name = models.CharField(_("name"), max_length=200, unique=True, help_text=_("Internal name, should be unique"))
@@ -107,6 +113,10 @@ class Account(models.Model):
             self.fill_account_with_default_ressources()
 
     def delete(self, using=None, keep_parents=False):
+        self.cleanup_account()
+        super().delete(using, keep_parents)
+
+    def cleanup_account(self, using=None, keep_parents=False):
 
         Payment.objects.filter(booking__lodging__property__account=self).delete()
         Contract.objects.filter(booking__lodging__property__account=self).delete()
@@ -122,12 +132,10 @@ class Account(models.Model):
         Holidays.objects.filter(account=self).delete()
         User.objects.filter(account=self).delete()
 
-        super().delete(using, keep_parents)
-
     def fill_account_with_default_ressources(self, template=None):
         try:
             if template is None:
-                template = Account.objects.get(name="__template__")
+                template = Account.objects.get_template()
             if template.pk == self.pk:
                 # don't apply for the template creation itself
                 return self

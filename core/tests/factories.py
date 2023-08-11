@@ -45,8 +45,12 @@ def get_or_create_group(name):
 class _UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
+        django_get_or_create = ("email",)
 
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
     email = factory.Faker("email")
+    password = factory.django.Password("P@55w0rd")
     account = factory.SubFactory(AccountFactory)
 
 
@@ -74,6 +78,7 @@ class StandardUserFactory(_UserFactory):
 class PropertyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Property
+        django_get_or_create = ("name",)
 
     account = factory.SubFactory(AccountFactory)
     name = factory.Faker("name")
@@ -85,6 +90,7 @@ class PropertyFactory(factory.django.DjangoModelFactory):
 class LodgingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Lodging
+        django_get_or_create = ("property", "name",)
 
     name = factory.Faker("name")
     property = factory.SubFactory(PropertyFactory)
