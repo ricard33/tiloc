@@ -241,7 +241,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             models.Booking.objects.raw(
                 """WITH added_row_number AS (
   SELECT
-    *,
+    core_booking.id, guest_name, guest_contact, guest_address,
     ROW_NUMBER() OVER(PARTITION BY guest_name ORDER BY begin_date DESC) AS row_number
   FROM core_booking
   LEFT JOIN core_lodging ON core_booking.lodging_id = core_lodging.id
@@ -249,7 +249,7 @@ class BookingViewSet(viewsets.ModelViewSet):
   WHERE deleted = false AND core_property.account_id = %s
 )
 SELECT
-  added_row_number.id, guest_name as name, guest_contact as contact, guest_address as address
+  id, guest_name as name, guest_contact as contact, guest_address as address
 FROM added_row_number
 WHERE row_number = 1
 ORDER BY guest_name""",
