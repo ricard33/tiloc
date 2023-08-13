@@ -665,6 +665,7 @@ class BookedService(models.Model):
 
     class Meta:
         verbose_name = _("Booking service")
+    _account_qs_path = "service__account"
 
     def __str__(self):
         return "%s -> %s" % (self.service.designation, self.booking)

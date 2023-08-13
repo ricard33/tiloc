@@ -65,6 +65,7 @@ requests = "^2.28.1"
 smartconfigparser = "^1.0.0"
 whitenoise = { version = "^6.2.0", extras = ["brotli"] }
 psycopg2-binary = "==2.9.6"
+faker = "^19.3.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.5.0"

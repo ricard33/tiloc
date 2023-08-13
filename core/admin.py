@@ -573,6 +573,16 @@ class ContractAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_filter = ("booking__lodging", "created", "modified")
 
 
+class BookedServiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    list_display = (
+        "booking",
+        "service",
+        "unit_price",
+        "is_flat_rate"
+    )
+    list_filter = ("service", "unit_price", "is_flat_rate")
+
+
 site.register(models.Booking, BookingAdmin)
 site.register(models.Service, ServiceAdmin)
 site.register(models.Lodging, LodgingAdmin)
@@ -580,7 +590,7 @@ site.register(models.Property, PropertyAdmin)
 site.register(models.BookingChannel, BookingChannelAdmin)
 site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
 site.register(models.BookingStatus, BookingStatusAdmin)
-site.register(models.BookedService)
+site.register(models.BookedService, BookedServiceAdmin)
 site.register(models.Holidays, HolidaysAdmin)
 site.register(models.Pricing, PricingAdmin)
 site.register(models.SeasonalVariation, SeasonalVariationAdmin)
