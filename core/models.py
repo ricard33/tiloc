@@ -51,7 +51,7 @@ class ForUserQuerySet(models.QuerySet):
                 **{account_path + "__isnull": True}
             )
 
-        if property_path:
+        if property_path and not user.has_perm('core.administrator'):
             property_query |= Q(**{property_path + "__in": user.properties.all()})
         if user_path:
             user_query = Q(**{user_path: user})
@@ -281,6 +281,7 @@ class Property(models.Model):
     objects = ForUserQuerySet.as_manager()
 
     _account_qs_path = "account"
+    _property_qs_path = "pk"
 
     def __str__(self):
         return self.name
@@ -323,6 +324,7 @@ class Lodging(models.Model):
 
     objects = ForUserQuerySet.as_manager()
     _account_qs_path = "property__account"
+    _property_qs_path = "property"
 
     def __str__(self):
         return self.name
@@ -435,6 +437,7 @@ class BookingChannelSync(models.Model):
     last_import_error = models.TextField(null=True, blank=True)
 
     _account_qs_path = "channel__account"
+    _property_qs_path = "lodging__property"
     objects = ForUserQuerySet.as_manager()
 
     def url_for_remote(self, request):
@@ -506,6 +509,7 @@ class Booking(models.Model):
 
     objects = ForUserQuerySet.as_manager()
     _account_qs_path = "lodging__property__account"
+    _property_qs_path = "lodging__property"
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
@@ -605,6 +609,7 @@ class Contract(models.Model):
         verbose_name = _("Contract")
 
     _account_qs_path = "booking__lodging__property__account"
+    _property_qs_path = "booking__lodging__property"
     objects = ForUserQuerySet.as_manager()
 
     def __str__(self):
@@ -754,4 +759,5 @@ class Payment(models.Model):
         ]
 
     _account_qs_path = "booking__lodging__property__account"
+    _property_qs_path = "booking__lodging__property"
     objects = ForUserQuerySet.as_manager()

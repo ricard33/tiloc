@@ -13,23 +13,24 @@ class PaymentTestCase(APITestCase):
         factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
+        self.user.properties.add(self.lodging.property)
         self.header = force_login(self.user)
 
     def test_need_authentication(self):
-        payment = factories.PaymentFactory.create()
+        payment = factories.PaymentFactory.create(booking__lodging=self.lodging)
         response = self.client.get("/api/payment/%d/" % payment.id)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_payment(self):
-        payment = factories.PaymentFactory.create()
+        payment = factories.PaymentFactory.create(booking__lodging=self.lodging)
         response = self.client.get("/api/payment/%d/" % payment.id, **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(obj["id"], payment.id)
 
     def test_get_payments_for_booking(self):
-        factories.PaymentFactory.create()
-        booking = factories.BookingFactory.create()
+        factories.PaymentFactory.create(booking__lodging=self.lodging)
+        booking = factories.BookingFactory.create(lodging=self.lodging)
         payment = factories.PaymentFactory.create(booking=booking)
         payment2 = factories.PaymentFactory.create(booking=booking)
         response = self.client.get("/api/payment/?booking_id=%d" % payment.booking.id, **self.header)
@@ -40,7 +41,7 @@ class PaymentTestCase(APITestCase):
         self.assertIn(payment2.id, map(lambda x: x["id"], results))
 
     def test_create_payment(self):
-        booking = factories.BookingFactory.create()
+        booking = factories.BookingFactory.create(lodging=self.lodging)
         response = self.client.post(
             "/api/payment/",
             {

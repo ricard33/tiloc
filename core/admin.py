@@ -179,6 +179,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
                     "is_staff",
                     "is_superuser",
                     "groups",
+                    "properties",
                     "user_permissions",
                 ),
             },
@@ -203,6 +204,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     ordering = ("email",)
     filter_horizontal = (
         "groups",
+        "properties",
         "user_permissions",
     )
 

@@ -52,9 +52,9 @@ def fill_rate_and_turnover(
 
 
 def get_filling_rate_and_turnover(
-    account: models.Account, begin: arrow.Arrow, end: arrow.Arrow, with_turnover: bool = True
+    user: models.User, begin: arrow.Arrow, end: arrow.Arrow, with_turnover: bool = True
 ):
-    lodging_ids = list(models.Lodging.objects.filter(active=True, property__account=account).values_list(flat=True))
+    lodging_ids = list(models.Lodging.objects.for_user(user).filter(active=True).values_list(flat=True))
     lodging_count = len(lodging_ids)
 
     def aggregate(month: str, days_in_month: int, booking: models.Booking, booked_days: int, value: dict):

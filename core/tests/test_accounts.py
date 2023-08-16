@@ -31,8 +31,9 @@ class AccountDeleteTestCase(APITestCase):
         self.assertEqual(1, models.Account.objects.all().count())
         self.assertFalse(models.Account.objects.first().is_active)
 
-    def test_inactive_companies_return_401_for_their_users(self):
-        user = factories.AdminUserFactory(account=factories.AccountFactory(name="deleted-account", is_active=False))
+    def test_inactive_accounts_return_401_for_their_users(self):
+        deleted_account = factories.InactiveAccount()
+        user = factories.AdminUserFactory.create(account=deleted_account)
         headers = force_login(user)
         response = self.client.get("/api/user/", **headers)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -110,8 +111,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         factories.AdminUserFactory.create(account=account)
 
         users = []
-        lodgings = []
-        bookings = []
 
         for i in range(5):
             users.append(factories.StandardUserFactory.create(account=account))
@@ -120,16 +119,24 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         pricing = factories.PricingFactory.create(account=account)
         factories.SeasonalVariationFactory.create(pricing=pricing)
         factories.HolidaysFactory.create(account=account)
-        for i in range(5):
-            lodgings.append(factories.LodgingFactory.create(property=property))
         for i in range(4):
             factories.BookingStatusFactory.create(account=account)
         for i in range(6):
             factories.ServiceFactory.create(account=account)
+
+        cls.fill_property(property)
+
         for i in range(8):
             channel = factories.BookingChannelFactory.create(account=account)
-            for lodging in lodgings:
+            for lodging in models.Lodging.objects.filter(property__account=account):
                 factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
+
+    @classmethod
+    def fill_property(cls, property):
+        lodgings = []
+        bookings = []
+        for i in range(5):
+            lodgings.append(factories.LodgingFactory.create(property=property))
         for i in range(50):
             b = factories.BookingFactory.create(lodging=random.choice(lodgings))
             bookings.append(b)
@@ -173,3 +180,42 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         assertItemsCount("/api/booking/", 1)
         assertItemsCount("/api/contract/", 1)
         assertItemsCount("/api/payment/", 1)
+
+    def test_property_separation(self):
+        account = models.Account.objects.get(name="Account")
+        user = factories.StandardUserFactory.create(account=account)
+        property = factories.PropertyFactory.create(account=account)
+        self.assertEqual(2, models.Property.objects.filter(account=account).count())
+        user.properties.add(property)
+        channel = models.BookingChannel.objects.filter(account=account).first()
+        lodging = factories.LodgingFactory.create(property=property)
+        booking = factories.BookingFactory.create(lodging=lodging)
+        factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
+        factories.PaymentFactory.create(booking=booking)
+        factories.ContractFactory.create(booking=booking)
+
+        def assertItemsCount(endpoint, count):
+            response = self.client.get(endpoint, **headers)
+            self.assertEqual(status.HTTP_200_OK, response.status_code)
+            self.assertEqual(count, response.data["count"], response.data)
+
+        def assertItemsCountNoPaginated(endpoint, count):
+            response = self.client.get(endpoint, **headers)
+            self.assertEqual(status.HTTP_200_OK, response.status_code)
+            self.assertEqual(count, len(response.data), response.data)
+
+        headers = force_login(user)
+        assertItemsCount("/api/property/", 1)
+        assertItemsCount("/api/pricing/", 1)
+        assertItemsCount("/api/holidays/", 1)
+        assertItemsCount("/api/seasonal_variation/", 1)
+        assertItemsCount("/api/contract_template/", 1)
+        assertItemsCount("/api/booking_status/", 4)
+        assertItemsCount("/api/booking_channel/", 8)
+        assertItemsCount("/api/booking_channel_sync/", 1)
+        assertItemsCount("/api/service/", 6)
+        assertItemsCount("/api/lodging/", 1)
+        assertItemsCount("/api/booking/", 1)
+        assertItemsCount("/api/contract/", 1)
+        assertItemsCount("/api/payment/", 1)
+        assertItemsCountNoPaginated("/api/booking/all_guests/", 1)

@@ -6,7 +6,7 @@ import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
-from django.db.models import F, Value
+from django.db.models import F, Min, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -237,24 +237,19 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def all_guests(self, request, pk=None):
+        names = set()
+        results = []
+        for booking in self.get_queryset().values(
+            name=Min("guest_name"),
+            contact=Min("guest_contact"),
+            address=Min("guest_address"),
+        ):
+            if booking["name"] not in names:
+                names.add(booking["name"])
+                results.append(booking)
+
         serializer = GuestSerializer(
-            models.Booking.objects.raw(
-                """WITH added_row_number AS (
-  SELECT
-    core_booking.id, guest_name, guest_contact, guest_address,
-    ROW_NUMBER() OVER(PARTITION BY guest_name ORDER BY begin_date DESC) AS row_number
-  FROM core_booking
-  LEFT JOIN core_lodging ON core_booking.lodging_id = core_lodging.id
-  LEFT JOIN core_property ON core_lodging.property_id = core_property.id
-  WHERE deleted = false AND core_property.account_id = %s
-)
-SELECT
-  id, guest_name as name, guest_contact as contact, guest_address as address
-FROM added_row_number
-WHERE row_number = 1
-ORDER BY guest_name""",
-                [request.user.account.id]
-            ),
+            results,
             many=True,
         )
         return Response(serializer.data)

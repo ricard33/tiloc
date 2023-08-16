@@ -122,7 +122,7 @@ def filling_rate(request, begin=None, end=arrow.utcnow()):
     if begin is None:
         begin = arrow.utcnow().shift(months=-11).replace(day=1)
     sorted_data = get_filling_rate_and_turnover(
-        request.user.account, begin, end, with_turnover=request.user.has_perm("core.view_prices")
+        request.user, begin, end, with_turnover=request.user.has_perm("core.view_prices")
     )
     return Response(sorted_data)
 
@@ -138,9 +138,14 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     end = arrow.get(end).ceil("month")
     data = []
     dates_range = [begin.date(), end.date()]
+    filter = Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range)
+    filter &= Q(booking__lodging__property__account=request.user.account)
+    if not request.user.has_perm('core.administrator'):
+        filter &= Q(booking__lodging__property__in=request.user.properties.all())
+
     booking_count = Count(
         "booking",
-        filter=(Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range))
+        filter=filter
         & Q(booking__cancelled=False)
         & Q(booking__deleted=False)
         & Q(booking__status__no_stats=False),
@@ -151,8 +156,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     data.append(
         {
             "channel": None,
-            "count": models.Booking.objects.filter(
-                lodging__property__account=request.user.account,
+            "count": models.Booking.objects.for_user(request.user).filter(
                 cancelled=False,
                 deleted=False,
                 status__no_stats=False,

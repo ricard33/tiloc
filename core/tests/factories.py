@@ -106,9 +106,13 @@ class LodgingFactory(factory.django.DjangoModelFactory):
 class BookingChannelFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.BookingChannel
+        django_get_or_create = (
+            "account",
+            "name",
+        )
 
     account = factory.SubFactory(AccountFactory)
-    name = factory.Faker("name")
+    name = factory.Iterator(["web site", "booking.com", "airbnb", "abritel", "facebook", "instagram", "already come", "tripadvisor"])
 
 
 class BookingChannelSyncFactory(factory.django.DjangoModelFactory):

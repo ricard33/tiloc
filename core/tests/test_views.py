@@ -1,6 +1,7 @@
 import calendar
 import unittest
 from datetime import date
+from functools import reduce
 
 import arrow
 from django.test import TestCase
@@ -134,6 +135,7 @@ class FillingRateTestCase(APITestCase):
 
     def test_default_dates_to_last_12_months(self):
         lodging = factories.LodgingFactory()
+        self.user.properties.add(lodging.property)
         now = arrow.now()
         for i in range(24):
             date = now.shift(months=-i).replace(day=5)
@@ -156,6 +158,7 @@ class FillingRateTestCase(APITestCase):
 
     def test_empty_months_are_included(self):
         lodging = factories.LodgingFactory()
+        self.user.properties.add(lodging.property)
         now = arrow.now()
         date = now.shift(months=-10).replace(day=5)
         factories.BookingFactory(lodging=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
@@ -169,6 +172,7 @@ class FillingRateTestCase(APITestCase):
 
     def test_with_dates(self):
         lodging = factories.LodgingFactory()
+        self.user.properties.add(lodging.property)
         factories.BookingFactory(
             lodging=lodging,
             begin_date=arrow.get("2020-08-02").date(),
@@ -181,7 +185,7 @@ class FillingRateTestCase(APITestCase):
         self.assertEqual("2020-01", obj[0]["date"], obj[0])
         self.assertEqual("2020-09", obj[8]["date"], obj[8])
 
-    def test_multiple_account_are_filtered(self):
+    def test_multiple_accounts_are_filtered(self):
         account = factories.AccountFactory(name="another")
         lodging = factories.LodgingFactory(property__account=account)
         factories.BookingFactory(
@@ -193,3 +197,61 @@ class FillingRateTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(0, len(obj), obj)
+
+    def test_multiple_properties_are_filtered(self):
+        property = factories.PropertyFactory()
+        lodging = factories.LodgingFactory(property=property)
+        factories.BookingFactory(
+            lodging=lodging,
+            begin_date=arrow.get("2020-08-02").date(),
+            end_date=arrow.get("2020-08-18").date(),
+        )
+        response = self.client.get("/stats/filling_rate/2020-01-01/2020-09-30/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = response.data
+        self.assertEqual(0, len(obj), obj)
+
+
+class ChannelsDistributionTestCase(APITestCase):
+    fixtures = ["default-groups"]
+
+    def setUp(self) -> None:
+        factories.BookingStatusFactory.create_batch(4)
+        factories.BookingChannelFactory.create_batch(8)
+        self.user = factories.StandardUserFactory.create()
+        self.header = force_login(self.user)
+
+    def count_channels(self, results, channel_name):
+        return reduce(lambda acc, item: item["channel"] == channel_name and item["count"] + acc or acc, results, 0)
+
+    def test_channel_distribution(self):
+        property = factories.PropertyFactory()
+        self.user.properties.add(property)
+        lodging = factories.LodgingFactory(property=property)
+        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date())
+        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-07-02").date(), end_date=arrow.get("2020-07-18").date(),
+                                 source=models.BookingChannel.objects.get(name="airbnb"))
+        channels_count = models.BookingChannel.objects.for_user(self.user).count()
+        response = self.client.get("/stats/channel_distribution/2020-01-01/2020-09-30/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = response.data
+        self.assertEqual(channels_count + 1, len(obj), obj)
+        self.assertEqual(1, self.count_channels(obj, None))
+        self.assertEqual(1, self.count_channels(obj, "airbnb"))
+
+    def test_multiple_properties_are_filtered(self):
+        property = factories.PropertyFactory()
+        lodging = factories.LodgingFactory(property=property)
+        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date())
+        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-07-02").date(), end_date=arrow.get("2020-07-18").date(),
+                                 source=models.BookingChannel.objects.get(name="airbnb"))
+        channels_count = models.BookingChannel.objects.for_user(self.user).count()
+        response = self.client.get("/stats/channel_distribution/2020-01-01/2020-09-30/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = response.data
+        self.assertEqual(channels_count + 1, len(obj), obj)
+        self.assertEqual(0, self.count_channels(obj, "airbnb"))
+        self.assertEqual(0, self.count_channels(obj, None))
+
+
+# TODO ChannelsDistributionTestCase
