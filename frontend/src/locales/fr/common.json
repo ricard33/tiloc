@@ -357,6 +357,7 @@
   "standard": "standard",
   "external": "externe",
   "readonly": "lecture seule",
+  "Owned properties": "Propriétés possédées",
   "Delete user: {{ name }}": "Supprimer l'utilisateur : {{ name }}",
   "Do you really want to permanently delete this user?": "Voulez-vous vraiment supprimer  définitivement cet utilisateur?",
   "Impossible to delete the user: ": "Impossible de supprimer l'utilisateur : ",

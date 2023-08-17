@@ -6,7 +6,7 @@ from django.db.models import Max
 from rest_framework import serializers
 
 from core import models
-from core.models import Account
+from core.models import Account, Property
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,11 @@ class UserSerializer(serializers.ModelSerializer):
     groups = serializers.SlugRelatedField(
         many=True,
         queryset=Group.objects.all(),
+        slug_field='name'
+    )
+    properties = serializers.SlugRelatedField(
+        many=True,
+        queryset=Property.objects.all(),
         slug_field='name'
     )
 

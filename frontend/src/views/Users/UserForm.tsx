@@ -15,6 +15,7 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
+import { useListPropertiesQuery } from "../../services/api";
 
 
 type Props = {
@@ -28,6 +29,7 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const [changePassword, setChangePassword] = useState(!(user && user.id));
+  const { data: properties } = useListPropertiesQuery();
   const formContext = useForm<User>({
     defaultValues: user ?? {
       is_active: true
@@ -112,6 +114,16 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
                   { id: "external", label: t("external") },
                   { id: "readonly", label: t("readonly") },
                 ]}
+                showChips
+              />
+            </Grid2>
+            <Grid2 xs={12}>
+              <MultiSelectElement
+                label={t("Owned properties")}
+                name="properties"
+                options={properties ? properties.map(p => {
+                  return {id: p.name, label: p.name}
+                }) : []}
                 showChips
               />
             </Grid2>

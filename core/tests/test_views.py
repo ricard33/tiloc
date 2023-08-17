@@ -253,5 +253,3 @@ class ChannelsDistributionTestCase(APITestCase):
         self.assertEqual(0, self.count_channels(obj, "airbnb"))
         self.assertEqual(0, self.count_channels(obj, None))
 
-
-# TODO ChannelsDistributionTestCase

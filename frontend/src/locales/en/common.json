@@ -355,6 +355,7 @@
   "standard": "standard",
   "external": "external",
   "readonly": "readonly",
+  "Owned properties": "Owned properties",
   "Delete user: {{ name }}": "Delete user: {{ name }}",
   "Do you really want to permanently delete this user?": "Do you really want to permanently delete this user?",
   "Impossible to delete the user: ": "Impossible to delete the user: ",
