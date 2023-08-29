@@ -259,7 +259,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     def next_events(self, request, pk=None):
         qs1 = (
             self.get_queryset().filter(
-                begin_date__gte=timezone.now(), lodging__isnull=False, cancelled=False, deleted=False
+                begin_date__gte=timezone.now(), cancelled=False, deleted=False
             )
             .order_by()
             .annotate(date=F("begin_date"), event_type=Value("CHECKIN"))
@@ -274,7 +274,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
         )
         qs2 = (
-            self.get_queryset().filter(end_date__gte=timezone.now(), lodging__isnull=False)
+            self.get_queryset().filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
             .annotate(date=F("end_date"), event_type=Value("CHECKOUT"))
             .values(

@@ -21,6 +21,7 @@ class BookingFilter(filters.FilterSet):
             "begin_date": ["lte", "gte"],
             "end_date": ["lte", "gte"],
             "guest_name": ["exact", "icontains"],
+            "cancelled": ["exact"],
         }
 
     def for_dates_filter(self, queryset, name, value):

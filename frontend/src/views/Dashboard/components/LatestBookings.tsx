@@ -52,7 +52,7 @@ const LatestBookings: React.FC<Props> = props => {
   const { t } = useTranslation();
   const count = 3;
   const { data: bookings } = useListBookingsQuery({
-    lodging__isnull: false,
+    cancelled: false,
     ordering: "-created",
     page_size: count
   });
