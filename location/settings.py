@@ -70,7 +70,6 @@ ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
 
 INSTALLED_APPS = [
     "constance",
-    "constance.backends.database",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -270,14 +269,6 @@ APP_NAME = _("Ti Loc")
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
     "DEBUG": (False, "Turn on DEBUG information on Django"),
-}
-
-WEBPACK_LOADER = {
-    "DEFAULT": {
-        "CACHE": not DEBUG,
-        "BUNDLE_DIR_NAME": "bundles/",
-        "STATS_FILE": os.path.join(BASE_DIR, "frontend", "webpack-stats.%s.json" % ENV),
-    }
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
