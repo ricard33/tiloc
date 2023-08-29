@@ -81,7 +81,8 @@ class PropertyFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("name",)
 
     account = factory.SubFactory(AccountFactory)
-    name = factory.Faker("name")
+    name = factory.Faker("company")
+    contractual_name = factory.Faker("name")
     email = factory.Faker("email")
     no_vat = False
     signature = factory.django.ImageField()

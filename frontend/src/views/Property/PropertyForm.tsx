@@ -62,6 +62,9 @@ export const PropertyForm: React.FC<Props> = ({ property, onSubmit, onCancel, on
             <Grid2 xs={12}>
               <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
             </Grid2>
+            <Grid2 xs={12}>
+              <TextFieldElement name={"contractual_name"} label={t("Name in contracts")} fullWidth required />
+            </Grid2>
             <Grid2 sm={6} xs={12}>
               <TextFieldElement name={"email"} type={'email'} label={t("Email")} fullWidth required />
             </Grid2>

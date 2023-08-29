@@ -241,7 +241,8 @@ class Property(models.Model):
 
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     active = models.BooleanField(_("active"), default=True)
-    name = models.CharField(_("name"), max_length=200, unique=True)
+    name = models.CharField(_("name"), max_length=200)
+    contractual_name = models.CharField(_("name"), max_length=200)
     email = models.EmailField(_("email"))
     phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
     contact = models.TextField(

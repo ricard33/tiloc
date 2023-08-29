@@ -1,13 +1,11 @@
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import XHR from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
 
 import commonEn from "./locales/en/common.json";
 import commonFr from "./locales/fr/common.json";
 
 i18n
-  .use(XHR)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({

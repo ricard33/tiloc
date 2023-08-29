@@ -8,7 +8,7 @@ module.exports = {
   defaultNamespace: 'common',
   // Default namespace used in your i18next config
 
-  defaultValue: '',
+  // defaultValue: '',
   // Default value to give to empty keys
 
   indentation: 2,
@@ -67,10 +67,10 @@ module.exports = {
   sort: false,
   // Whether or not to sort the catalog
 
-  useKeysAsDefaultValue: true,
+  useKeysAsDefaultValue: false,
   // Whether to use the keys as the default value; ex. "Hello": "Hello", "World": "World"
   // The option `defaultValue` will not work if this is set to true
 
-  verbose: false
+  verbose: true
   // Display info about the parsing including some stats
 }
