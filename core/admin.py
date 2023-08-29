@@ -125,6 +125,12 @@ class RestrictedModelAdminMixIn(object):
         return initial
 
 
+# noinspection PyUnresolvedReferences
+class RestrictedInlineModelAdminMixIn(object):
+    def has_add_permission(self, request, obj=None):
+        return super().has_add_permission(request, obj) or request.user.is_superuser
+
+
 class TiLocAdminSite(admin.AdminSite):
     # Text to put at the end of each page's <title>.
     site_title = _('TiLoc site admin')
@@ -353,7 +359,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
         return super().response_add(request, obj, post_url_continue)
 
 
-class PaymentInlineAdmin(RestrictedModelAdminMixIn, TabularInline):
+class PaymentInlineAdmin(RestrictedInlineModelAdminMixIn, TabularInline):
     model = models.Payment
     ordering = ("-date",)
 
