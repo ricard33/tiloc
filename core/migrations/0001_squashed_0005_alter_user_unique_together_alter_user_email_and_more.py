@@ -13,8 +13,6 @@ import core.models
 
 class Migration(migrations.Migration):
 
-    replaces = [('core', '0001_squashed_0018_rename_user_table'), ('core', '0002_account_alter_user_options_alter_user_managers_and_more'), ('core', '0003_remove_category'), ('core', '0004_account_is_active'), ('core', '0005_alter_user_unique_together_alter_user_email_and_more')]
-
     initial = True
 
     dependencies = [
