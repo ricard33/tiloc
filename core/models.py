@@ -80,7 +80,7 @@ class AccountQuerySet(models.QuerySet):
         return self.filter(pk=user.account.pk)
 
     def get_or_create_demo(self):
-        return self.get_or_create(name="__demo__")
+        return self.get_or_create(name=settings.DEMO_ACCOUNT_NAME)
 
     def get_template(self):
         return self.get(name="__template__")
