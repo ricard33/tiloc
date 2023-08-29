@@ -33,7 +33,7 @@ class UserTestCase(APITestCase):
     def test_create_with_properties(self):
         property = factories.PropertyFactory.create()
         data = {"first_name": "John", "last_name": "DOE", "email": "none@nowhere.com", "groups": ['standard'],
-                'password': 'PasSw0rd', 'properties': [property.id]}
+                'password': 'PasSw0rd', 'properties': [property.name]}
         response = self.client.post("/api/user/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         obj = response.data

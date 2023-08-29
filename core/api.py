@@ -20,6 +20,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from location import __date__, __version__
+
 from . import models
 from .filters import BookingFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination

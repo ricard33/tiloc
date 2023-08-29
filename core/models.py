@@ -277,6 +277,7 @@ class Property(models.Model):
     class Meta:
         verbose_name = _("Property")
         verbose_name_plural = _("Properties")
+        unique_together = ["account", "name"]
 
     objects = ForUserQuerySet.as_manager()
 

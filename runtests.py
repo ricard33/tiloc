@@ -81,6 +81,13 @@ if __name__ == "__main__":
         run_tests = False
 
     try:
+        sys.argv.remove("--fix")
+    except ValueError:
+        pass
+    else:
+        ISORT_ARGS.remove("--check-only")
+
+    try:
         sys.argv.remove("--fast")
     except ValueError:
         style = "default"
