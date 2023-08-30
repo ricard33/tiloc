@@ -5,6 +5,7 @@ import {
   BookingChannel,
   BookingStatus,
   CalendarSync,
+  Comment,
   Contract,
   ContractTemplate,
   Guest,
@@ -20,14 +21,14 @@ import {
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
   api2Booking,
-  api2CalendarSync,
+  api2CalendarSync, api2Comment,
   api2Contract,
   api2ContractTemplate,
   api2Lodging,
   api2Payment,
   api2Property,
   api2Service,
-  booking2api,
+  booking2api, comment2Api,
   payment2Api,
   property2api
 } from "../types/models-convertion";
@@ -242,6 +243,7 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
 }
 
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment, payment2Api);
+const commentApi = makeApi<Comment>("comment/", "Comment", api2Comment, comment2Api);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
 const userApi = makeApi<User>("user/", "User");
@@ -382,6 +384,10 @@ export const api = createApi({
     updatePayment: paymentApi.update(builder),
     deletePayment: paymentApi.delete(builder),
 
+    createComment: commentApi.create(builder),
+    updateComment: commentApi.update(builder),
+    deleteComment: commentApi.delete(builder),
+
     // Contract
     getOrGenerateContract: builder.mutation<Contract, { bookingId: number; regenerate?: boolean }>({
       query({ bookingId, regenerate }) {
@@ -481,6 +487,10 @@ export const {
   useCreatePaymentMutation,
   useUpdatePaymentMutation,
   useDeletePaymentMutation,
+
+  useCreateCommentMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
 
   useGetOrGenerateContractMutation,
   useGetContractQuery,

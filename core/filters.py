@@ -4,7 +4,7 @@ import arrow
 import django_filters
 from django_filters import rest_framework as filters
 
-from core.models import Booking, Payment
+from core.models import Booking, Comment, Payment
 
 logger = logging.getLogger("core.filters")
 
@@ -61,3 +61,13 @@ class PaymentFilter(filters.FilterSet):
             return queryset.filter(date__lte=end.date(), date__gte=begin.date())
         except Exception:
             logger.warning("Badly formatted filter 'for_dates' for 'lodging' request: %s", value)
+
+
+class CommentFilter(filters.FilterSet):
+
+    class Meta:
+        model = Comment
+        fields = {
+            "id": ["exact"],
+            "booking_id": ["exact", "in"],
+        }

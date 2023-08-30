@@ -79,6 +79,16 @@ export interface BookingChannel {
   default_booking_status?: BookingStatus;
 }
 
+export interface Comment {
+  id: number;
+  content: string;
+  booking_id: number;
+  created_by: Pick<User, "id" | "full_name" | "email">;
+  created_on: Date;
+  modified: Date;
+
+}
+
 export interface Booking {
   id?: number;
   lodging_id: number;
@@ -109,6 +119,7 @@ export interface Booking {
   total_payments: number;
   left_to_pay: number;
   price_with_options: number;
+  comments: Comment[];
   cancelled: boolean;
   deleted: boolean;
   created: Date;

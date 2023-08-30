@@ -763,3 +763,18 @@ class Payment(models.Model):
     _account_qs_path = "booking__lodging__property__account"
     _property_qs_path = "booking__lodging__property"
     objects = ForUserQuerySet.as_manager()
+
+
+class Comment(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="comments")
+    content = models.TextField(blank=True, default='')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["created_on"]
+
+    _account_qs_path = "booking__lodging__property__account"
+    _property_qs_path = "booking__lodging__property"
+    objects = ForUserQuerySet.as_manager()

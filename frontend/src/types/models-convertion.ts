@@ -1,7 +1,9 @@
-import { Booking, CalendarSync, Contract, ContractTemplate, Lodging, Property, Payment, Service } from "./models";
+import { Booking, CalendarSync, Comment, Contract, ContractTemplate, Lodging, Property, Payment, Service } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
+
+// ----- PAYMENT -----
 
 export function api2Payment(p: Record<string, any>): Payment {
   return {
@@ -17,6 +19,24 @@ export function payment2Api(p: Partial<Payment>): Record<string, any> {
     ...p,
     ...(p.date && { date: formatISO(p.date) }),
     amount: p.amount!.toFixed(2)
+  };
+}
+
+// ----- COMMENT -----
+
+export function api2Comment(p: Record<string, any>): Comment {
+  return {
+    ...p as Comment,
+    created_on: parseISO(p.created_on),
+    modified: parseISO(p.modified),
+  };
+}
+
+export function comment2Api(c: Partial<Comment>): Record<string, any> {
+  return {
+    ...c,
+    ...(c.created_on && { created_on: formatISO(c.created_on) }),
+    ...(c.modified && { modified: formatISO(c.modified) }),
   };
 }
 
@@ -65,6 +85,7 @@ export function api2Booking(booking: Record<string, any>): Booking {
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
     options: booking.options ? booking.options.map(api2Service) : [],
+    comments: booking.comments.map(api2Comment),
     created: parseISO(booking.created),
     modified: parseISO(booking.modified),
   };

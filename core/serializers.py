@@ -93,6 +93,13 @@ class UserSerializer(serializers.ModelSerializer):
         return user.get_all_permissions()
 
 
+class UserSubSerializer(UserSerializer):
+
+    class Meta:
+        model = User
+        fields = ["id", "full_name", "email"]
+
+
 class PropertySerializer(serializers.ModelSerializer):
     logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
@@ -292,6 +299,23 @@ class PaymentSubSerializer(serializers.ModelSerializer):
         exclude = ["booking"]
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    booking_id = serializers.PrimaryKeyRelatedField(source="booking", queryset=models.Booking.objects.all())
+    created_by = UserSubSerializer(default=serializers.CurrentUserDefault(), read_only=True)
+
+    class Meta:
+        model = models.Comment
+        exclude = ["booking"]
+
+
+class CommentSubSerializer(serializers.ModelSerializer):
+    created_by = UserSubSerializer()
+
+    class Meta:
+        model = models.Comment
+        exclude = ["booking"]
+
+
 class BookingSerializer(serializers.ModelSerializer):
     status = BookingStatusSerializer(read_only=True)
     status_id = serializers.PrimaryKeyRelatedField(source="status", queryset=models.BookingStatus.objects.all())
@@ -303,6 +327,7 @@ class BookingSerializer(serializers.ModelSerializer):
     )
     options = BookedServiceSerializer(source="bookedservice_set", many=True, required=False)
     payments = PaymentSubSerializer(source="payment_set", many=True, required=False, read_only=True)
+    comments = CommentSubSerializer(many=True, read_only=True)
     total_payments = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     left_to_pay = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     price_with_options = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)

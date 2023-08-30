@@ -394,7 +394,7 @@ const BookingScheduler: React.FC<Props> = props => {
 
     if (showTooltips)
       return (
-        <HtmlTooltip title={<BookingQuickView booking={item.booking} />} enterDelay={1000} arrow disableInteractive>
+        <HtmlTooltip title={<BookingQuickView booking={item.booking} readonly />} enterDelay={1000} arrow disableInteractive>
           {getItem()}
         </HtmlTooltip>
       );

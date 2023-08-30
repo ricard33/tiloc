@@ -364,6 +364,11 @@ class PaymentInlineAdmin(RestrictedInlineModelAdminMixIn, TabularInline):
     ordering = ("-date",)
 
 
+class CommentInlineAdmin(RestrictedInlineModelAdminMixIn, TabularInline):
+    model = models.Comment
+    ordering = ("created_on",)
+
+
 class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "id",
@@ -402,7 +407,7 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
     )
     ordering = ("-begin_date",)
     resource_class = BookingResource
-    inlines = [PaymentInlineAdmin]
+    inlines = [PaymentInlineAdmin, CommentInlineAdmin]
 
     def source_uid_(self, obj: models.Booking):
         return obj.source_uid and "%s..." % obj.source_uid[0:5]

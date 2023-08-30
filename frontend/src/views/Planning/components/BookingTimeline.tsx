@@ -363,7 +363,7 @@ const BookingTimeline: React.FC<Props> = props => {
           </HtmlTooltip>
           :
           <HtmlTooltip
-            title={<BookingQuickView booking={item.booking} />} enterDelay={500}
+            title={<BookingQuickView booking={item.booking} readonly />} enterDelay={500}
             arrow
           >
             {getItem()}

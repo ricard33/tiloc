@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from location import __date__, __version__
 
 from . import models
-from .filters import BookingFilter, PaymentFilter
+from .filters import BookingFilter, CommentFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
 from .permissions import IsSuperUserPermission
@@ -33,6 +33,7 @@ from .serializers import (
     BookingNoPriceSerializer,
     BookingSerializer,
     BookingStatusSerializer,
+    CommentSerializer,
     ContractSerializer,
     ContractTemplateSerializer,
     CreateUserSerializer,
@@ -456,6 +457,18 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = models.Comment.objects.all().order_by("created_on")
+    serializer_class = CommentSerializer
+    filterset_class = CommentFilter
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
 class ServiceViewSet(viewsets.ModelViewSet):

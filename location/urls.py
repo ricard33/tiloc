@@ -40,6 +40,7 @@ router.register(r"seasonal_variation", api.SeasonalVariationViewSet, "seasonal_v
 router.register(r"contract_template", api.ContractTemplateViewSet, "contract_template")
 router.register(r"contract", api.ContractViewSet, "contract")
 router.register(r"payment", api.PaymentViewSet, "payment")
+router.register(r"comment", api.CommentViewSet, "comment")
 router.register(r"user", api.UserViewSet, "user")
 
 urlpatterns = [
