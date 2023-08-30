@@ -64,7 +64,8 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       onClose={onClose}
       aria-labelledby="simple-dialog-title"
       open={!!booking}
-      maxWidth={width < 1280 ? "sm" : "lg"}
+      maxWidth={false}
+      fullWidth
       fullScreen={width < 600}
     >
       <DialogTitle id="simple-dialog-title">
@@ -79,7 +80,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
           </Grid>
         </Grid>
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ fontSize: "smaller" }}>
         <BookingQuickView booking={booking} />
       </DialogContent>
       <DialogActions>
