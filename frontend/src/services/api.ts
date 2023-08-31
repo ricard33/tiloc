@@ -240,7 +240,7 @@ function makeDeleteApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
       };
     },
     invalidatesTags: (result, error, obj) => [
-      { type: modelName, id: obj.id },
+      // { type: modelName, id: obj.id },
       { type: modelName, id: "LIST" },
       ...invalidatesDependentTags(modelName, obj)
     ]
