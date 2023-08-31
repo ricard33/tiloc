@@ -100,7 +100,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
       description: t("Do you really want to permanently delete this payment?")
     })
       .then(() => {
-        deletePayment(payment.id ?? 0).then((result) => {
+        deletePayment(payment).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting payment", error);

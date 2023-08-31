@@ -51,7 +51,7 @@ export default function CalendarSyncPage() {
       description: t("Do you really want to permanently delete this calendar synchronization?")
     })
       .then(() => {
-        return deleteCalendarSync(calendarSync.id).then((result) => {
+        return deleteCalendarSync(calendarSync).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting calendarSync", error);

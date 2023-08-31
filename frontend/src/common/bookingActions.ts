@@ -54,7 +54,7 @@ export const useBookingActions = () => {
       description: t("Do you really want to permanently delete this booking?")
     })
       .then(() => {
-        return deleteBooking(booking.id as number).then((result) => {
+        return deleteBooking(booking).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting booking", error);

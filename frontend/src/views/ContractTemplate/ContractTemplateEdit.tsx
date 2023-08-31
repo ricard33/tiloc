@@ -98,7 +98,7 @@ const ContractTemplateEdit = (/*props*/) => {
         description: t("Do you really want to permanently delete this contract template?")
       })
         .then(() => {
-          deleteContractTemplate(template.id).then((result) => {
+          deleteContractTemplate(template).then((result) => {
             if ((result as any).error) {
               const error = (result as any).error;
               console.error("Error deleting contract template", error);

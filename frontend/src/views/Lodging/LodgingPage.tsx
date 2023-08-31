@@ -49,7 +49,7 @@ export function LodgingPage() {
       description: t("Do you really want to permanently delete this lodging?")
     })
       .then(() => {
-        return deleteLodging(lodging.id).then((result) => {
+        return deleteLodging(lodging).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting lodging", error);

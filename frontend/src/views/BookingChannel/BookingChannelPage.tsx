@@ -48,7 +48,7 @@ export function BookingChannelPage() {
       description: t("Do you really want to permanently delete this booking channel?")
     })
       .then(() => {
-        return deleteBookingChannel(bookingChannel.id).then((result) => {
+        return deleteBookingChannel(bookingChannel).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting booking channel", error);

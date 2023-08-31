@@ -85,7 +85,7 @@ export function api2Booking(booking: Record<string, any>): Booking {
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
     options: booking.options ? booking.options.map(api2Service) : [],
-    comments: booking.comments.map(api2Comment),
+    comments: booking.comments ? booking.comments.map(api2Comment) : [],
     created: parseISO(booking.created),
     modified: parseISO(booking.modified),
   };

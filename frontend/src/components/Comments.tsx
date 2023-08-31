@@ -20,6 +20,9 @@ import { differenceInSeconds } from "date-fns";
 type Props = {
   booking: Booking;
   readonly?: boolean;
+  onCommentAdded?: (comment: Comment) => void;
+  onCommentModified?: (comment: Comment) => void;
+  onCommentDeleted?: (comment: Comment) => void;
 }
 
 type EditComment = Pick<Comment, "id" | "content">;
@@ -53,6 +56,7 @@ function Comments(props: Props) {
           showSuccess(t("Comment added"));
           const newComment = (result as any).data as Comment;
           setComments([...comments, newComment]);
+          if(props.onCommentAdded) props.onCommentAdded(newComment);
         }
       });
     } else {
@@ -66,6 +70,7 @@ function Comments(props: Props) {
           showSuccess(t("Comment changed"));
           const newComment = (result as any).data as Comment;
           setComments(comments.map((c) => c.id === comment.id ? newComment : c));
+          if(props.onCommentModified) props.onCommentModified(newComment);
         }
       });
     }
@@ -79,7 +84,7 @@ function Comments(props: Props) {
       description: t("Do you really want to permanently delete this comment?")
     })
       .then(() => {
-        deleteComment(comment.id ?? 0).then((result) => {
+        deleteComment(comment).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting comment", error);
@@ -87,6 +92,7 @@ function Comments(props: Props) {
           } else {
             showSuccess(t("Comment deleted"));
             setComments(comments.filter((c) => c.id !== comment.id));
+            if(props.onCommentDeleted) props.onCommentDeleted(comment);
           }
         });
       });

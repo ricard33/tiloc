@@ -22,18 +22,23 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const lodging_id = query.lodging_id ? Number(query.lodging_id) : undefined;
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const newBooking = bookingId === "new" ? {
-    lodging_id : lodging_id,
+    lodging_id: lodging_id,
     lodging: lodging_id && lodgings ? lodgings.filter(l => l.id === lodging_id)[0] : undefined,
     begin_date: parseISO(query.begin_date as string)
   } : undefined;
-  const { data: loadedBooking } = useGetBookingQuery(Number(bookingId), { skip: bookingId === "new" });
+  const { data: loadedBooking, isLoading } = useGetBookingQuery(Number(bookingId), {
+    skip: bookingId === "new",
+    // pollingInterval: 1000,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true
+  });
   const booking = (loadedBooking ?? newBooking) as Booking;
   const { data: allOptions, isSuccess: optionsLoaded } = useListServicesQuery();
   const { data: allGuests } = useAllGuestsQuery();
   const [isEditMode, setIsEditMode] = useState(bookingId === "new");
   const { onCancelBooking, onUncancelBooking, onDeleteBooking } = useBookingActions();
 
-  if (booking && lodgings && allGuests && optionsLoaded) {
+  if (booking && !isLoading && lodgings && allGuests && optionsLoaded) {
     if (isEditMode)
       return (
         <BookingDialog

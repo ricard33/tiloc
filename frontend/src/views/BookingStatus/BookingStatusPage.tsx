@@ -49,7 +49,7 @@ export function BookingStatusPage() {
       description: t("Do you really want to permanently delete this booking status?")
     })
       .then(() => {
-        return deleteBookingStatus(bookingStatus.id).then((result) => {
+        return deleteBookingStatus(bookingStatus).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting booking status", error);

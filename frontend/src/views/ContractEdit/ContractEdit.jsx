@@ -105,7 +105,7 @@ const ContractEdit = () => {
 
   function onDelete() {
     if (contract.id)
-      deleteContract(contract.id).then((result) => {
+      deleteContract(contract).then((result) => {
         const {error} = result;
         if (error) {
           console.error("Error deleting contract", error);

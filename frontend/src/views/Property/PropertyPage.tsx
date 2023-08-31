@@ -47,7 +47,7 @@ export function PropertyPage() {
       description: t("Do you really want to permanently delete this property?")
     })
       .then(() => {
-        return deleteProperty(property.id).then((result) => {
+        return deleteProperty(property).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting property", error);

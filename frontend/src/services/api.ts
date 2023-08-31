@@ -131,6 +131,12 @@ interface BaseModel {
 type ApiModel = Record<string, any>;
 type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unknown, QueryError, {}, AxiosQueryMeta>, string, "api">;
 
+function invalidatesDependentTags<T extends BaseModel>(modelName: string, obj: T) {
+  if(modelName === "Comment")
+    return [{ type: "Booking", id: (obj as any as Comment).booking_id }, { type: "Booking", id: "LIST" }]
+  return []
+}
+
 function makeListApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
   return builder.query<T[], Record<string, any> | void>({
     query: (params?) => {
@@ -194,7 +200,10 @@ function makeCreateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
         data: convertToApi ? convertToApi(body) : body
       };
     },
-    invalidatesTags: [{ type: modelName, id: "LIST" }],
+    invalidatesTags: (result, error, obj) => [
+      { type: modelName, id: "LIST" },
+      ...invalidatesDependentTags(modelName, obj)
+    ],
     ...(convertFromApi && {transformResponse: (response) => {
       return convertFromApi(response as ApiModel);
     }})
@@ -211,22 +220,30 @@ function makeUpdateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
         data: convertToApi ? convertToApi(body) : body
       };
     },
-    invalidatesTags: (result, error, obj) => [{ type: modelName, id: obj.id }, { type: modelName, id: "LIST" }],
+    invalidatesTags: (result, error, obj) => [
+      { type: modelName, id: obj.id },
+      { type: modelName, id: "LIST" },
+      ...invalidatesDependentTags(modelName, obj)
+    ],
     ...(convertFromApi && {transformResponse: (response) => {
       return convertFromApi(response as ApiModel);
     }})
   });
 }
 
-function makeDeleteApi(builder: AxiosEndpointBuilder, url: string, modelName: string) {
-  return builder.mutation<{ success: boolean; id: number }, number>({
-    query(id) {
+function makeDeleteApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string) {
+  return builder.mutation<{ success: boolean; id: number }, Partial<T>>({
+    query(body) {
       return {
-        url: `${url}${id}/`,
+        url: `${url}${body.id}/`,
         method: "DELETE"
       };
     },
-    invalidatesTags: (result, error, id) => [{ type: modelName, id }, { type: modelName, id: "LIST" }]
+    invalidatesTags: (result, error, obj) => [
+      { type: modelName, id: obj.id },
+      { type: modelName, id: "LIST" },
+      ...invalidatesDependentTags(modelName, obj)
+    ]
   });
 }
 
@@ -263,14 +280,17 @@ export const api = createApi({
     "Payment",
     "Property",
     "Lodging",
+    "Comment",
     "Booking",
     "BookingStatus",
     "BookingChannel",
+    "CalendarSync",
     "Contract",
     "ContractTemplate",
     "Service",
     "User"
   ],
+  // keepUnusedDataFor: 5,
   endpoints: (builder) => ({
     // Sign in
     currentUser: builder.query<User, void>({
@@ -410,7 +430,7 @@ export const api = createApi({
     updateContractTemplate: contractTemplateApi.update(builder),
     deleteContractTemplate: contractTemplateApi.delete(builder),
 
-    // Contract template
+    // Services
     listServices: serviceApi.list(builder),
     getService: serviceApi.get(builder),
     createService: serviceApi.create(builder),

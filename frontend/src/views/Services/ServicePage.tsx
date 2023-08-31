@@ -47,7 +47,7 @@ export function ServicePage() {
       description: t("Do you really want to permanently delete this service?")
     })
       .then(() => {
-        return deleteService(service.id).then((result) => {
+        return deleteService(service).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting service", error);

@@ -50,7 +50,7 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
     () => {
       if(canDelete)
       {
-        Promise.all(selected.map(statusId => deleteBookingStatus(statusId))).then((results) => {
+        Promise.all(data!.filter(status => selected.includes(status.id)).map(status => deleteBookingStatus(status))).then((results) => {
           if (selected.length > 1)
             showSuccess(t("Booking statuses were successfully deleted"));
           else
@@ -59,7 +59,7 @@ const BookingStatusesList: React.FunctionComponent<Props> = () => {
         });
       }
     },
-    [canDelete, deleteBookingStatus, refetchStatuses, selected, showSuccess, t]
+    [canDelete, data, deleteBookingStatus, refetchStatuses, selected, showSuccess, t]
   );
 
   const onRankUpDown = React.useCallback((status: BookingStatus, direction: "up" | "down") => {

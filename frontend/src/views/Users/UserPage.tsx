@@ -48,7 +48,7 @@ export function UserPage() {
       description: t("Do you really want to permanently delete this user?")
     })
       .then(() => {
-        return deleteUser(user.id).then((result) => {
+        return deleteUser(user).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting user", error);
