@@ -439,6 +439,7 @@ class ContractViewSet(viewsets.ModelViewSet):
         rel_path = contract.make_pdf_path()
         full_path = os.path.join(settings.MEDIA_ROOT, rel_path)
         if contract.pdf_created is None or contract.modified > contract.pdf_created or not os.path.exists(full_path):
+            os.makedirs(os.path.split(full_path)[0], exist_ok=True)
             generate_pdf(contract.content, full_path)
             models.Contract.objects.filter(id=pk).update(pdf=rel_path, pdf_created=arrow.utcnow().isoformat(sep=" "))
 

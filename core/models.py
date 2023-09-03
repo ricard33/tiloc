@@ -594,10 +594,6 @@ class Booking(models.Model):
         return self.contract
 
 
-def contracts_path():
-    return os.path.join(settings.MEDIA_ROOT, "contracts")
-
-
 class Contract(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
     content = models.TextField(_("Contract"))

@@ -38,7 +38,7 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ENV = os.environ.get("APP_ENV", DEBUG and "dev" or "prod")
-UNITTEST = "test" in sys.argv
+UNITTEST = "test" in sys.argv or "pytest" in sys.modules
 
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
@@ -192,11 +192,20 @@ USE_TZ = True
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
+STORAGES = {
+    "default": {
+        "BACKEND": UNITTEST
+                   and "django.core.files.storage.InMemoryStorage"
+                   or "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 # Media files (uploaded, generated PDF, etc...)
-MEDIA_ROOT = os.path.join(BASE_DIR, "files")
+MEDIA_ROOT = os.path.join(BASE_DIR, UNITTEST and "files-unittest" or "files")
 MEDIA_URL = "/files/"
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-os.makedirs(os.path.join(MEDIA_ROOT, "contracts"), exist_ok=True)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -215,8 +224,6 @@ DJANGO_VITE_DEV_MODE = ENV == "dev"  # default to DEBUG
 
 if os.path.exists(DJANGO_VITE_ASSETS_PATH):
     STATICFILES_DIRS.append(DJANGO_VITE_ASSETS_PATH)
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # admin user
 ADMINS = (("Support", config.get("APP", "EMAIL_ADMIN", "support@tiloc.fr")),)
