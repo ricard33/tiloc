@@ -194,9 +194,10 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
 STORAGES = {
     "default": {
-        "BACKEND": UNITTEST
-                   and "django.core.files.storage.InMemoryStorage"
-                   or "django.core.files.storage.FileSystemStorage",
+        "BACKEND":
+            UNITTEST
+            and "django.core.files.storage.InMemoryStorage"
+            or "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
