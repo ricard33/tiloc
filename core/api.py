@@ -59,7 +59,7 @@ class OrderedModelMixin:
     def move_down(self, request, pk):
         obj = self.get_object()
         current_rank = obj.rank
-        next_obj = self.queryset.filter(rank__gte=current_rank).exclude(id=obj.id).order_by("rank").first()
+        next_obj = self.get_queryset().filter(rank__gte=current_rank).exclude(id=obj.id).order_by("rank").first()
         if next_obj:
             obj.rank = next_obj.rank
             obj.save(update_fields=["rank"])
@@ -73,7 +73,7 @@ class OrderedModelMixin:
     def move_up(self, request, pk):
         obj = self.get_object()
         current_rank = obj.rank
-        next_obj = self.queryset.filter(rank__lte=current_rank).exclude(id=obj.id).order_by("-rank").first()
+        next_obj = self.get_queryset().filter(rank__lte=current_rank).exclude(id=obj.id).order_by("-rank").first()
         if next_obj:
             obj.rank = next_obj.rank
             obj.save(update_fields=["rank"])
