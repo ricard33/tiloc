@@ -237,7 +237,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = config.get("EMAIL", "SMTP_USER", "")
 EMAIL_HOST_PASSWORD = config.get("EMAIL", "SMTP_PASSWORD", "")
 EMAIL_USE_TLS = True
-EMAIL_SUBJECT_PREFIX = config.get("EMAIL", "SUBJECT_PREFIX", "[TiLoc]") + " "
+EMAIL_SUBJECT_PREFIX = config.get("EMAIL", "SUBJECT_PREFIX", "[Tiloc]") + " "
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -247,7 +247,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.SessionAuthentication'
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "core.permissions.TiLocPermissions",
+        "core.permissions.TilocPermissions",
     ],
     "DEFAULT_PAGINATION_CLASS": "core.pagination.StandardResultsSetPagination",
     "PAGE_SIZE": 100,
@@ -272,7 +272,7 @@ REST_KNOX = {
     "USER_SERIALIZER": "core.serializers.UserSerializer",
 }
 
-APP_NAME = _("Ti Loc")
+APP_NAME = _("Tiloc")
 
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {

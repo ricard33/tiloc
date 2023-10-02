@@ -20,7 +20,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import InputIcon from "@mui/icons-material/Input";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import LogoTiLoc from "../../../assets/images/logos/logo-tiloc.png";
+import LogoTiloc from "../../../assets/images/logos/logo-tiloc.png";
 import { useDispatch, useSelector } from "react-redux";
 import { getGravatarUrl } from "../../../components/Gravatar";
 import { useTranslation } from "react-i18next";
@@ -122,10 +122,10 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           <img
             className={classes.appLogo}
             alt="Logo"
-            src={LogoTiLoc}
+            src={LogoTiloc}
             width="32"
           />
-          <span className={classes.appName}>Ti Loc</span>
+          <span className={classes.appName}>Tiloc</span>
         </RouterLink>
         <div className={classes.flexGrow} />
         <IconButton color="inherit" size="large">

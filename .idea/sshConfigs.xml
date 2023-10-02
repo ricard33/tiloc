@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SshConfigs">
-    <configs>
-      <sshConfig host="ssh-crd.alwaysdata.net" id="63ed8bb4-7707-407a-8eaa-fe2cab88a6b3" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="crd" useOpenSSHConfig="true" />
-    </configs>
-  </component>
-</project>

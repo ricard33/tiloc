@@ -125,7 +125,7 @@ const axiosBaseQuery =
       }
     };
 
-interface BaseModel {
+export interface BaseModel {
   id?: number;
 }
 type ApiModel = Record<string, any>;

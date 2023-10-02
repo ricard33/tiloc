@@ -4,7 +4,7 @@ import clsx from "clsx";
 import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
 import { AppBar, Toolbar } from "@mui/material";
-import LogoTiLoc from "../../../../assets/images/logos/logo-tiloc.png";
+import LogoTiloc from "../../../../assets/images/logos/logo-tiloc.png";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -36,10 +36,10 @@ const Topbar = props => {
           <img
             className={classes.appLogo}
             alt="Logo"
-            src={LogoTiLoc}
+            src={LogoTiloc}
             width="32"
           />
-          <span className={classes.appName}>Ti Loc</span>
+          <span className={classes.appName}>Tiloc</span>
         </RouterLink>
       </Toolbar>
     </AppBar>

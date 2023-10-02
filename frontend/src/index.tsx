@@ -58,14 +58,15 @@ axios.interceptors.response.use(
       if (error.response.status === 401) {
         if (["/login", "/logged-out"].indexOf(browserHistory.location.pathname) < 0) {
           const location = { ...browserHistory.location };
-          dispatchError(error.response.data.detail);
+          // dispatchError(error.response.data.detail);
           store.dispatch(authActions.tokenExpired());
-          console.warn("Push to /login from", location);
-          browserHistory.push("/login", { from: location });
+          // console.warn("Push to /login from", location);
+          // browserHistory.push("/login", { from: location });
         } else return Promise.reject(error);
+      } else {
+        if (error.response.data.detail) dispatchError(error.response.data.detail);
+        else dispatchError("Server error");
       }
-      if (error.response.data.detail) dispatchError(error.response.data.detail);
-      else dispatchError("Server error");
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of

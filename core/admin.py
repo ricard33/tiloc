@@ -131,17 +131,17 @@ class RestrictedInlineModelAdminMixIn(object):
         return super().has_add_permission(request, obj) or request.user.is_superuser
 
 
-class TiLocAdminSite(admin.AdminSite):
+class TilocAdminSite(admin.AdminSite):
     # Text to put at the end of each page's <title>.
-    site_title = _('TiLoc site admin')
+    site_title = _('Tiloc site admin')
 
     # Text to put in each page's <h1>.
-    site_header = _('TiLoc administration')
+    site_header = _('Tiloc administration')
 
     # Text to put at the top of the admin index page.
     index_title = _('Site administration')
 
-    # login_form = forms.TiLocAuthenticationForm
+    # login_form = forms.TilocAuthenticationForm
 
     def get_urls(self):
         urlpatterns = [
@@ -160,7 +160,7 @@ class TiLocAdminSite(admin.AdminSite):
         return redirect(request.POST['current_location'])
 
 
-site = TiLocAdminSite('tiloc-admin')
+site = TilocAdminSite('tiloc-admin')
 
 FieldListFilter.register(lambda f: f.remote_field, RelatedOnlyFieldListFilter, take_priority=True)
 
@@ -400,6 +400,7 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "cancelled",
         "deleted",
     )
+    search_fields = ('guest_name',)
     history_list_display = (
         "status",
         "cancelled",

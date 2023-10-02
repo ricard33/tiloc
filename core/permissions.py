@@ -3,7 +3,7 @@ from rest_framework.exceptions import NotAuthenticated
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 
-class TiLocPermissions(DjangoModelPermissions):
+class TilocPermissions(DjangoModelPermissions):
     perms_map = {
         "GET": ["%(app_label)s.view_%(model_name)s"],
         "OPTIONS": [],

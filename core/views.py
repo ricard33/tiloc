@@ -52,7 +52,7 @@ def export_calendar(request, uid):
         sync.save()
     else:
         logger.info("Full calendar requested for lodging [%s]", lodging.name)
-    c = Calendar(creator="-//Ti'Gecko//Ti Loc//EN")
+    c = Calendar(creator="-//Ti'Gecko//Tiloc//EN")
     c.extra.extend([ContentLine(name="CALSCALE", value="GREGORIAN")])
     c.extra_params["PRODID"] = {"X-RICAL-TZSOURCE": ["TZINFO"]}
     for booking in qs.order_by("begin_date"):

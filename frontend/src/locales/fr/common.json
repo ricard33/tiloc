@@ -224,7 +224,7 @@
   "Booking channel": "Origine de la réservation",
   "Active ?": "Actif ?",
   "Source URL": "Source URL",
-  "TiLoc URL": "TiLoc URL",
+  "Tiloc URL": "Tiloc URL",
   "Delete calendar synchronization for {{ lodging }} on {{ channel }}": "Supprimer la synchronisation de calendrier pour {{ lodging }} sur {{ channel }}",
   "Do you really want to permanently delete this calendar synchronization?": "Voulez-vous vraiment supprimer définitivement cette synchronisation de calendrier ?",
   "Impossible to delete the calendar synchronization: ": "Impossible de supprimer la synchronisation de calendrier : ",

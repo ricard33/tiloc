@@ -19,12 +19,12 @@ msgstr ""
 "X-Generator: Poedit 3.3.2\n"
 
 #: core/admin.py:130
-msgid "TiLoc site admin"
-msgstr "Administrateur du site TiLoc"
+msgid "Tiloc site admin"
+msgstr "Administrateur du site Tiloc"
 
 #: core/admin.py:133
-msgid "TiLoc administration"
-msgstr "Administration TiLoc"
+msgid "Tiloc administration"
+msgstr "Administration Tiloc"
 
 #: core/admin.py:136
 msgid "Site administration"
@@ -594,8 +594,8 @@ msgid "French"
 msgstr "Français"
 
 #: location/settings.py:268
-msgid "Ti Loc"
-msgstr "Ti Loc"
+msgid "Tiloc"
+msgstr "Tiloc"
 
 #: templates/admin/base_site.html:5
 msgid "Django site admin"

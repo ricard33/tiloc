@@ -1,0 +1,133 @@
+import React, { useEffect } from "react";
+import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, Container, Link, Paper, Stack, Typography } from "@mui/material";
+
+import { auth } from "../../actions";
+import { useTranslation } from "react-i18next";
+import { QueryError, useLoginMutation } from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
+import { RootState } from "../../store";
+import { useForm, useFormState } from "react-hook-form";
+import { LoginInfo } from "../../types";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { SerializedError } from "@reduxjs/toolkit";
+
+
+type LoginData = {
+  email: string,
+  password: string,
+}
+
+function SignIn() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector<RootState>(store => store.auth.isAuthenticated);
+  const [doLogin] = useLoginMutation();
+  // const classes = useStyles();
+  let location = useLocation();
+  let { from } = location.state || { from: { pathname: "/" } };
+
+  const formContext = useForm<LoginData>();
+  const { control } = formContext;
+  const { isDirty, errors } = useFormState({ control });
+
+  const { t } = useTranslation();
+  const { showError } = useAlert();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.debug("Redirect to", from);
+      navigate(from, { replace: true });
+    }
+  }, [from, navigate, isAuthenticated]);
+
+  const handleSignIn = (formData: LoginData) => {
+    doLogin({ email: formData.email, password: formData.password }).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
+      const { data, error } = result as any;
+      if (error) {
+        showError(t("Login error: ") + fetchErrorDecode(error));
+        console.log(result);
+        dispatch(auth.loginFailed(data));
+      } else {
+        dispatch(auth.loginSuccessful(data));
+      }
+    });
+  };
+
+  if (isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+
+  return (
+    <Container maxWidth="sm" sx={{ display: "flex", height: "100%", alignItems: "center", width: "fit-content" }}>
+      <FormContainer
+        onSuccess={handleSignIn}
+        formContext={formContext}
+      >
+        <Paper sx={{padding: "1em"}}>
+          <Stack direction="column" spacing={2} style={{ width: "100%" }}>
+            <Typography
+              variant="h2"
+            >
+              {t("Sign in")}
+            </Typography>
+            <Typography
+              color="textSecondary"
+              gutterBottom
+            >
+              {t("Sign in with email address")}
+            </Typography>
+            <TextFieldElement
+              control={control}
+              name="email"
+              required
+              fullWidth
+              error={!!errors.email}
+              label={t("Email address")}
+              type="email"
+              variant="outlined"
+            />
+            <TextFieldElement
+              control={control}
+              name="password"
+              required
+              error={!!errors.password}
+              fullWidth
+              label={t("Password")}
+              type="password"
+              variant="outlined"
+            />
+            <Button
+              color="primary"
+              disabled={!isDirty}
+              fullWidth
+              size="large"
+              type="submit"
+              // variant="contained"
+            >
+              {t("Sign in now")}
+            </Button>
+            <hr />
+            <Typography
+              color="textSecondary"
+              variant="body1"
+            >
+              {t("Don't have an account?")}{" "}
+              <Link
+                component={RouterLink}
+                to="/signup"
+                variant="h6"
+              >
+                {t("Sign up")}
+              </Link>
+            </Typography>
+          </Stack>
+        </Paper>
+      </FormContainer>
+    </Container>
+  );
+}
+
+export default SignIn;

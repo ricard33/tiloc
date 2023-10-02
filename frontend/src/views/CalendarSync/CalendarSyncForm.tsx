@@ -100,7 +100,7 @@ export const CalendarSyncForm: React.FC<Props> = ({
               <TextFieldElement name={"source_url"} label={t("Source URL")} fullWidth />
             </Grid2>
             <Grid2 xs={12}>
-              <TextFieldElement name={"url_for_remote"} label={t("TiLoc URL")} disabled fullWidth />
+              <TextFieldElement name={"url_for_remote"} label={t("Tiloc URL")} disabled fullWidth />
             </Grid2>
           </Grid2>
         </CardContent>
