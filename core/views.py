@@ -10,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
+from django_email_verification import send_email
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
 from rest_framework.decorators import api_view, permission_classes
@@ -29,6 +31,15 @@ class IndexPage(TemplateView):
         if not accept or "text/html" not in accept:
             raise Http404(_('"%(path)s" does not exist') % {"path": request.path})
         return super().get(request, *args, **kwargs)
+
+
+class CreateAccountClassView(FormView):
+
+    def form_valid(self, form):
+        user = form.save()
+        return_val = super(CreateAccountClassView, self).form_valid(form)
+        send_email(user)
+        return return_val
 
 
 @csrf_exempt

@@ -1,3 +1,4 @@
+import arrow
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
@@ -8,7 +9,18 @@ class EmailBackend(ModelBackend):
         # auth.forms.AuthenticationForm expect signature `(request, username, password)`
         UserModel = get_user_model()
         try:
-            user = UserModel.objects.get(Q(account__isnull=True) | Q(account__is_active=True), email=username)
+            user = UserModel.objects.get(
+                Q(account__isnull=True)
+                | (
+                    Q(account__is_active=True)
+                    & (
+                        Q(account__is_active=True)
+                        | Q(account__validity__isnull=True)
+                        | Q(account__validity__gte=arrow.utcnow().datetime)
+                    )
+                ),
+                email=username,
+            )
         except UserModel.DoesNotExist:
             return None
         else:

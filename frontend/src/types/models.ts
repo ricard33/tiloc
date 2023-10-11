@@ -2,6 +2,11 @@ export interface LoginInfo {
   expiry: string;
   token: string;
   user: User;
+  account: Account;
+}
+
+export interface Account {
+  is_active: boolean;
 }
 
 export interface User {
@@ -11,6 +16,7 @@ export interface User {
   last_name: string;
   full_name: string;
   email: string;
+  verified: boolean;
   permissions: string[];
 }
 

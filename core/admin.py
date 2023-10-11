@@ -176,7 +176,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     change_user_password_template = None
     fieldsets = (
         (None, {"fields": ("account", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "verified")}),
         (
             _("Permissions"),
             {
@@ -204,8 +204,8 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
-    list_display = ("email", "first_name", "last_name", "is_staff", "account")
-    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
+    list_display = ("email", "first_name", "last_name", "is_staff", "verified", "account")
+    list_filter = ("is_staff", "is_superuser", "is_active", "verified", "groups")
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
     filter_horizontal = (

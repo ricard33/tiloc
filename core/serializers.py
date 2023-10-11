@@ -16,7 +16,7 @@ User = get_user_model()
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = "__all__"
+        fields = ["is_active", ]
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -41,8 +41,16 @@ class LoginUserSerializer(serializers.Serializer):
     #     raise serializers.ValidationError("Unable to log in with provided credentials.")
 
 
+class SignUpSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.CharField()
+    password = serializers.CharField()
+
+
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    account = AccountSerializer(read_only=True)
     permissions = serializers.SerializerMethodField()
     groups = serializers.SlugRelatedField(
         many=True,
@@ -58,7 +66,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
-        exclude = ["account", "user_permissions"]
+        exclude = ["user_permissions"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):

@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "knox",
     "simple_history",
     "django_cron",
+    "django_email_verification",
     "core",
     # 'frontend',
 
@@ -299,3 +300,43 @@ DBBACKUP_STORAGE_OPTIONS = {"location": os.path.join(BASE_DIR, "backups")}
 DBBACKUP_FILENAME_TEMPLATE = get_backup_filename
 
 DEMO_ACCOUNT_NAME = "__demo__"
+
+
+def email_verified_callback(user):
+    user.verified = True
+    user.save(update_fields=("verified",))
+
+
+def password_change_callback(user, password):
+    user.set_password(password)
+    user.save(update_fields=("password",))
+
+
+# Global Package Settings
+EMAIL_FROM_ADDRESS = 'noreply@tiloc.fr'  # mandatory
+EMAIL_PAGE_DOMAIN = 'https://tiloc.fr/'  # mandatory (unless you use a custom link)
+EMAIL_MULTI_USER = False  # optional (defaults to False)
+
+# Email Verification Settings (mandatory for email sending)
+EMAIL_MAIL_SUBJECT = 'Confirm your email {{ user.firstname }}'
+EMAIL_MAIL_HTML = 'signup/mail_body.html'
+EMAIL_MAIL_PLAIN = 'signup/mail_body.txt'
+EMAIL_MAIL_TOKEN_LIFE = 60 * 60  # one hour
+
+# Email Verification Settings (mandatory for builtin view)
+EMAIL_MAIL_PAGE_TEMPLATE = 'signup/email_success_template.html'
+EMAIL_MAIL_CALLBACK = email_verified_callback
+
+# Password Recovery Settings (mandatory for email sending)
+EMAIL_PASSWORD_SUBJECT = 'Change your password {{ user.firstname }}'
+EMAIL_PASSWORD_HTML = 'signup/password_body.html'
+EMAIL_PASSWORD_PLAIN = 'signup/password_body.txt'
+EMAIL_PASSWORD_TOKEN_LIFE = 60 * 10  # 10 minutes
+
+# Password Recovery Settings (mandatory for builtin view)
+EMAIL_PASSWORD_PAGE_TEMPLATE = 'signup/password_changed_template.html'
+EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = 'signup/password_change_template.html'
+EMAIL_PASSWORD_CALLBACK = password_change_callback
+
+# For Django Email Backend
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

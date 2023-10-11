@@ -313,6 +313,15 @@ export const api = createApi({
         };
       }
     }),
+    signup: builder.mutation<LoginInfo, { first_name: string, last_name: string, email: string; password: string }>({
+      query(args) {
+        return {
+          url: `signup/`,
+          method: "POST",
+          data: args
+        };
+      }
+    }),
 
     // BookingStatus
     listBookingStatuses: bookingStatusApi.list(builder),
@@ -453,6 +462,7 @@ export const {
   useCurrentUserQuery,
   useLoginMutation,
   useLogoutMutation,
+  useSignupMutation,
 
   useListBookingStatusesQuery,
   useGetBookingStatusQuery,

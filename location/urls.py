@@ -20,6 +20,7 @@ from django.conf.urls import include
 from django.conf.urls.static import static
 from django.urls import path, re_path
 from django.views.decorators.cache import never_cache
+from django_email_verification import urls as email_urls  # include the urls
 from rest_framework import routers
 
 from core import admin, api, views
@@ -45,6 +46,8 @@ router.register(r"user", api.UserViewSet, "user")
 
 urlpatterns = [
     path("api/", include((router.urls, "drf"), namespace="api")),
+    path("email/", include(email_urls)),  # connect them to an arbitrary path
+
     re_path(r"^api/info/", api.version_view, name="version"),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # re_path("^api/auth/register/$", api.RegistrationAPI.as_view()),
@@ -52,6 +55,8 @@ urlpatterns = [
     re_path("^api/auth/logout/$", api.LogoutAPI.as_view()),
     re_path("^api/auth/user/$", api.CurrentUserAPI.as_view()),
     re_path(r"^api/auth/", include("knox.urls")),
+
+    re_path("^api/signup/$", api.SignUpAPI.as_view()),
 
     re_path(r'^api/my-account/$', api.CurrentAccountViewSet.as_view(), name='my-account'),
 

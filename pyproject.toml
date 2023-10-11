@@ -65,6 +65,7 @@ smartconfigparser = "^1.0.0"
 whitenoise = { version = "^6.2.0", extras = ["brotli"] }
 psycopg2-binary = "^2.9.7"
 faker = "^19.3.0"
+django-email-verification = "^0.3.3"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.5.0"

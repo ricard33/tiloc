@@ -33,6 +33,7 @@ import GeneralSettings from "./views/Settings/GeneralSettings";
 import UsersList from "./views/Users/UsersList";
 import { UserPage } from "./views/Users/UserPage";
 import { SignUp } from "./views/SignUp/SignUp";
+import NewAccountWizard from "./views/Wizards/NewAccountWizard";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -48,6 +49,9 @@ const MyRoutes = () => {
         {/*<Route path="*" element={<NotFoundView />} />*/}
       </Route>
       <Route element={<RequireAuth />}>
+        <Route element={<MinimalLayout />}>
+          <Route path="/setup" element={<NewAccountWizard />} />
+        </Route>
         <Route element={<MainLayout />}>
           {/*<Route path="/" element={<Navigate to={"/dashboard"} replace />} />*/}
           {/*<Route path="/dashboard" element={<DashboardView />} />*/}

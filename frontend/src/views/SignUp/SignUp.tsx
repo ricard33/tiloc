@@ -1,14 +1,25 @@
 import React from "react";
 
-import { Link as RouterLink, useParams } from "react-router-dom";
-import { useGetUserQuery } from "../../services/api";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { QueryError, useGetUserQuery, useSignupMutation } from "../../services/api";
 import { Trans, useTranslation } from "react-i18next";
 import { useAlert } from "../../common/alertUtils";
-import { User } from "../../types";
+import { LoginInfo, User } from "../../types";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { FormContainer, PasswordElement, PasswordRepeatElement, TextFieldElement } from "react-hook-form-mui";
 import { Button, Container, Link, Paper, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { SerializedError } from "@reduxjs/toolkit";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { auth } from "../../actions";
+import { useDispatch } from "react-redux";
+
+type SignUpData = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}
 
 export function SignUp() {
   const { t } = useTranslation();
@@ -19,16 +30,25 @@ export function SignUp() {
   } = useGetUserQuery(Number(userId), { skip: typeof userId === "undefined" });
   const { showError, showSuccess } = useAlert();
   const confirm = useConfirm();
-  const formContext = useForm<User>({
-    defaultValues: user ?? {
-      is_active: true
-    }
+  const formContext = useForm<SignUpData>({
   });
   const { formState } = formContext;
   const { isDirty } = formState;
+  const [doSignup] = useSignupMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const onSubmit = (data: User) => {
-    console.log(data);
+  const onSubmit = (formData: SignUpData) => {
+    doSignup(formData).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
+      const { data, error } = result as any;
+      if (error) {
+        showError(t("SignUp error: ") + fetchErrorDecode(error));
+        console.log(result);
+      } else {
+        dispatch(auth.loginSuccessful(data));
+        navigate("/setup");
+      }
+    });
   };
 
   // console.log(error)

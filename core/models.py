@@ -89,6 +89,8 @@ class AccountQuerySet(models.QuerySet):
 class Account(models.Model):
     name = models.CharField(_("name"), max_length=200, unique=True, help_text=_("Internal name, should be unique"))
     is_active = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True)
+    validity = models.DateTimeField(null=True)
 
     class Meta:
         permissions = (("administrator", "Can administer all account data"),)
@@ -202,6 +204,7 @@ class User(auth_models.AbstractUser):
     account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
     username = None
     email = models.EmailField(_("email address"), unique=True)
+    verified = models.BooleanField(_("verified"), default=False, help_text=_('Define if email user has been verified or not'))
     properties = models.ManyToManyField(
         "Property",
         verbose_name=_("properties"),

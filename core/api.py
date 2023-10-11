@@ -5,11 +5,13 @@ import arrow
 import jinja2
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import Group
 from django.db import transaction
 from django.db.models import F, Min, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from django_email_verification import send_email
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
@@ -47,6 +49,7 @@ from .serializers import (
     PropertySerializer,
     SeasonalVariationSerializer,
     ServiceSerializer,
+    SignUpSerializer,
     UserSerializer,
 )
 
@@ -107,20 +110,6 @@ class RegistrationAPI(generics.GenericAPIView):
         return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token})
 
 
-class LoginAPI_(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny]
-    serializer_class = LoginUserSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = authenticate(**serializer.validated_data)
-        if not user or not user.is_active:
-            raise AuthenticationFailed()
-        auth_token, token = AuthToken.objects.create(user)
-        return Response({"user": UserSerializer(user, context=self.get_serializer_context()).data, "token": token})
-
-
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
@@ -148,6 +137,36 @@ class LogoutAPI(KnoxLogoutView):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
+class SignUpAPI(KnoxLoginView):
+    """
+    Create a new user and login it in restricted (or creation) mode
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = SignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        if models.User.objects.filter(email=email):
+            return Response({"error": "This email is already in use."}, status=status.HTTP_409_CONFLICT)
+
+        account = models.Account.objects.create(
+            name=serializer.validated_data["email"], validity=arrow.utcnow().shift(days=14).datetime
+        )
+        user = models.User.objects.create_user(
+            serializer.validated_data["email"],
+            serializer.validated_data["password"],
+            first_name=serializer.validated_data["first_name"],
+            last_name=serializer.validated_data["last_name"],
+            account=account,
+        )
+        user.groups.set(Group.objects.filter(name="administrator"))
+        send_email(user)
+        login(request, user)
+        return super(SignUpAPI, self).post(request, format=None)
+
+
 class AccountViewSet(viewsets.ModelViewSet):
     permission_classes = [IsSuperUserPermission]
     queryset = models.Account.objects.all()
@@ -161,6 +180,7 @@ class CurrentAccountViewSet(generics.RetrieveUpdateDestroyAPIView):
     """
     API endpoint that allows current account to be viewed, edited or deleted.
     """
+
     queryset = models.Account.objects.all()
     serializer_class = AccountSerializer
 
@@ -179,8 +199,9 @@ class CurrentAccountViewSet(generics.RetrieveUpdateDestroyAPIView):
         request.user.account.is_active = False
         request.user.account.save()
 
-        return Response(data={"result": _("Request of deletion of all your account's data successfully sent.")},
-                        status=200)
+        return Response(
+            data={"result": _("Request of deletion of all your account's data successfully sent.")}, status=200
+        )
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -191,7 +212,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects.all()
     # filter_class = filters.UserFilter
     serializer_class = UserSerializer
-    ordering_fields = '__all__'
+    ordering_fields = "__all__"
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
@@ -259,9 +280,8 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def next_events(self, request, pk=None):
         qs1 = (
-            self.get_queryset().filter(
-                begin_date__gte=timezone.now(), cancelled=False, deleted=False
-            )
+            self.get_queryset()
+            .filter(begin_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
             .annotate(date=F("begin_date"), event_type=Value("CHECKIN"))
             .values(
@@ -275,7 +295,8 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
         )
         qs2 = (
-            self.get_queryset().filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
+            self.get_queryset()
+            .filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
             .annotate(date=F("end_date"), event_type=Value("CHECKOUT"))
             .values(
