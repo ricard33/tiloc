@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { FormContainer, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
-import { Lodging, Property } from "../../types";
+import { Lodging, User } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
@@ -22,13 +22,13 @@ import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 type Props = {
   lodging?: Lodging;
-  properties: Property[];
+  users: User[];
   onSubmit?: (lodging: Lodging) => void;
   onCancel: () => void;
   onDelete?: (lodging: Lodging) => void;
 };
 
-export const LodgingForm: React.FC<Props> = ({ lodging, properties, onSubmit, onCancel, onDelete }) => {
+export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<Lodging>({ defaultValues: lodging ?? {description: ""}});
@@ -36,8 +36,8 @@ export const LodgingForm: React.FC<Props> = ({ lodging, properties, onSubmit, on
   const {isDirty} = useFormState({ control });
   usePageUnloadAlert(isDirty);
 
-  const propertiesOptions: { label: string, id: number }[] = properties ? properties.map((property) => {
-    return { label: property.name, id: property.id };
+  const usersOptions: { label: string, id: number }[] = users ? users.map((user) => {
+    return { label: user.full_name, id: user.id };
   }) : [];
 
 
@@ -69,9 +69,9 @@ export const LodgingForm: React.FC<Props> = ({ lodging, properties, onSubmit, on
             </Grid2>
             <Grid2 sm={6} xs={12}>
               <SelectElement
-                name={"property_id"}
-                label={t("Property")}
-                options={propertiesOptions}
+                name={"owner_id"}
+                label={t("Owner")}
+                options={usersOptions}
                 fullWidth
               />
               <SwitchElement name={"active"} label={t("Active ?")} />

@@ -81,7 +81,7 @@ def export_calendar(request, uid):
 
 @never_cache
 @transaction.atomic
-def export_full_planning(request, property_id=None):
+def export_full_planning(request):
     # user = None
     # if not request.user.is_authenticated:
     #     auth_header = request.META.get('HTTP_AUTHORIZATION', '')
@@ -94,16 +94,8 @@ def export_full_planning(request, property_id=None):
     #         r = HttpResponse(status=401)
     #         r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
     #         return r
-    property = property_id and get_object_or_404(models.Property, id=property_id) or None
-    if property and property_id != request.user.id and not request.user.is_superuser:
-        raise Http404("No property matches the given query.")
-
     qs = models.Booking.objects.for_user(request.user).filter(cancelled=False, deleted=False)
-    if property:
-        qs = qs.filter(lodging__property=property)
-        logger.info("Full planning requested for property [%s]", property.name)
-    else:
-        logger.info("Full planning requested")
+    logger.info("Full planning requested")
 
     c = Calendar(creator="-//Ti'Gecko//Location")
     for booking in qs.order_by("begin_date", "lodging__rank"):
@@ -150,9 +142,9 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     data = []
     dates_range = [begin.date(), end.date()]
     filter = Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range)
-    filter &= Q(booking__lodging__property__account=request.user.account)
+    filter &= Q(booking__lodging__account=request.user.account)
     if not request.user.has_perm('core.administrator'):
-        filter &= Q(booking__lodging__property__in=request.user.properties.all())
+        filter &= Q(booking__lodging__in=request.user.lodgings.all())
 
     booking_count = Count(
         "booking",

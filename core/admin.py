@@ -52,20 +52,21 @@ class RestrictedModelAdminMixIn(object):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if request.user.is_superuser or not hasattr(qs, 'for_user'):
+        if request.user.is_superuser or not hasattr(qs, "for_user"):
             return self.filter_by_account(qs, request)
         return qs.for_user(request.user)
 
     def filter_by_account(self, qs, request):
-        if request.session.get('account_goggles') and hasattr(qs.model, '_account_qs_path'):
-            account = request.session['account_goggles']
+        if request.session.get("account_goggles") and hasattr(qs.model, "_account_qs_path"):
+            account = request.session["account_goggles"]
             # field account_field should be set by child classes to the queryset path to reach the account
-            account_field = getattr(qs.model, '_account_qs_path', 'account')
+            account_field = getattr(qs.model, "_account_qs_path", "account")
             if isinstance(account_field, list):
                 import operator
-                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + '__id': account['id']}), account_field)))
 
-            return qs.filter(**{account_field + '__id': account['id']})
+                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field)))
+
+            return qs.filter(**{account_field + "__id": account["id"]})
         return qs
 
     def get_field_queryset(self, db, db_field, request):
@@ -80,7 +81,7 @@ class RestrictedModelAdminMixIn(object):
         qs = self.filter_by_account(qs, request)
         if request.user.is_superuser:
             return qs
-        if hasattr(qs, 'for_user'):
+        if hasattr(qs, "for_user"):
             qs = qs.for_user(request.user).distinct()
         elif db_field.remote_field.model is models.Account:
             qs = qs.filter(pk=request.user.account.pk)
@@ -101,18 +102,18 @@ class RestrictedModelAdminMixIn(object):
         Return a sequence containing the fields to be displayed on the
         changelist.
         """
-        if request.user.is_superuser and not request.session.get('account_goggles'):
+        if request.user.is_superuser and not request.session.get("account_goggles"):
             return self.list_display
-        return [field for field in self.list_display if field != 'account']
+        return [field for field in self.list_display if field != "account"]
 
     def get_list_filter(self, request):
         """
         Returns a sequence containing the fields to be displayed as filters in
         the right sidebar of the changelist page.
         """
-        if request.user.is_superuser and not hasattr(request.session, 'account_goggles'):
+        if request.user.is_superuser and not hasattr(request.session, "account_goggles"):
             return self.list_filter
-        return [field for field in self.list_filter if field != 'account' and not field.endswith('__account')]
+        return [field for field in self.list_filter if field != "account" and not field.endswith("__account")]
 
     def get_changeform_initial_data(self, request):
         """
@@ -133,34 +134,34 @@ class RestrictedInlineModelAdminMixIn(object):
 
 class TilocAdminSite(admin.AdminSite):
     # Text to put at the end of each page's <title>.
-    site_title = _('Tiloc site admin')
+    site_title = _("Tiloc site admin")
 
     # Text to put in each page's <h1>.
-    site_header = _('Tiloc administration')
+    site_header = _("Tiloc administration")
 
     # Text to put at the top of the admin index page.
-    index_title = _('Site administration')
+    index_title = _("Site administration")
 
     # login_form = forms.TilocAuthenticationForm
 
     def get_urls(self):
         urlpatterns = [
-            path("set_active_account/", self.set_active_account, name='set_active_account'),
+            path("set_active_account/", self.set_active_account, name="set_active_account"),
         ]
         urlpatterns += super().get_urls()
         return urlpatterns
 
     def set_active_account(self, request):
-        account_id = request.POST['select_account']
+        account_id = request.POST["select_account"]
         if account_id:
             account = get_object_or_404(models.Account, id=account_id)
-            request.session['account_goggles'] = {'id': account.id, 'name': account.name}
+            request.session["account_goggles"] = {"id": account.id, "name": account.name}
         else:
-            del request.session['account_goggles']
-        return redirect(request.POST['current_location'])
+            del request.session["account_goggles"]
+        return redirect(request.POST["current_location"])
 
 
-site = TilocAdminSite('tiloc-admin')
+site = TilocAdminSite("tiloc-admin")
 
 FieldListFilter.register(lambda f: f.remote_field, RelatedOnlyFieldListFilter, take_priority=True)
 
@@ -176,7 +177,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     change_user_password_template = None
     fieldsets = (
         (None, {"fields": ("account", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "verified")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "phone", "address", "verified")}),
         (
             _("Permissions"),
             {
@@ -185,10 +186,14 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
                     "is_staff",
                     "is_superuser",
                     "groups",
-                    "properties",
+                    "lodgings",
                     "user_permissions",
                 ),
             },
+        ),
+        (
+            _("Contracts and billing details"),
+            {"fields": ("legal", "payment", "billing", "no_vat", "vat_rate", "logo", "signature")},
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
@@ -210,7 +215,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     ordering = ("email",)
     filter_horizontal = (
         "groups",
-        "properties",
+        "lodgings",
         "user_permissions",
     )
 
@@ -400,7 +405,7 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "cancelled",
         "deleted",
     )
-    search_fields = ('guest_name',)
+    search_fields = ("guest_name",)
     history_list_display = (
         "status",
         "cancelled",
@@ -441,7 +446,7 @@ class BookingChannelSyncAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin)
         "last_import_error",
     )
     list_display_links = ("channel", "lodging")
-    list_filter = ("lodging", "lodging__property", "channel", "active")
+    list_filter = ("lodging", "lodging__owner", "channel", "active")
     list_editable = ("active",)
     actions = ["synchronize"]
 
@@ -476,7 +481,7 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "__str__",
         "id",
         "name",
-        "property",
+        "owner",
         "rank",
         "active",
         "shown",
@@ -489,6 +494,7 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
     list_editable = (
         "name",
         "rank",
+        "owner",
         "active",
         "shown",
         "capacity",
@@ -497,12 +503,7 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "tourist_tax",
         "contract_template",
     )
-    list_filter = ("property", "active", "shown")
-
-
-class PropertyAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
-    list_display = ("id", "name", "email", "phone", "active", "account")
-    list_display_links = ("name",)
+    list_filter = ("owner", "active", "shown")
 
 
 class HolidaysAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
@@ -578,29 +579,18 @@ class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
 
 
 class ContractAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = (
-        "booking",
-        "created",
-        "modified",
-        "pdf_created"
-    )
+    list_display = ("booking", "created", "modified", "pdf_created")
     list_filter = ("booking__lodging", "created", "modified")
 
 
 class BookedServiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = (
-        "booking",
-        "service",
-        "unit_price",
-        "is_flat_rate"
-    )
+    list_display = ("booking", "service", "unit_price", "is_flat_rate")
     list_filter = ("service", "unit_price", "is_flat_rate")
 
 
 site.register(models.Booking, BookingAdmin)
 site.register(models.Service, ServiceAdmin)
 site.register(models.Lodging, LodgingAdmin)
-site.register(models.Property, PropertyAdmin)
 site.register(models.BookingChannel, BookingChannelAdmin)
 site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
 site.register(models.BookingStatus, BookingStatusAdmin)

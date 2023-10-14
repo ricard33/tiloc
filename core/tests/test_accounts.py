@@ -114,7 +114,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
 
         for i in range(5):
             users.append(factories.StandardUserFactory.create(account=account))
-        property = factories.PropertyFactory.create(account=account)
         factories.ContractTemplateFactory.create(account=account)
         pricing = factories.PricingFactory.create(account=account)
         factories.SeasonalVariationFactory.create(pricing=pricing)
@@ -124,19 +123,19 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         for i in range(6):
             factories.ServiceFactory.create(account=account)
 
-        cls.fill_property(property)
+        cls.make_lodgings(account)
 
         for i in range(8):
             channel = factories.BookingChannelFactory.create(account=account)
-            for lodging in models.Lodging.objects.filter(property__account=account):
+            for lodging in models.Lodging.objects.filter(account=account):
                 factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
 
     @classmethod
-    def fill_property(cls, property):
+    def make_lodgings(cls, account):
         lodgings = []
         bookings = []
         for i in range(5):
-            lodgings.append(factories.LodgingFactory.create(property=property))
+            lodgings.append(factories.LodgingFactory.create(account=account))
         for i in range(50):
             b = factories.BookingFactory.create(lodging=random.choice(lodgings))
             bookings.append(b)
@@ -147,10 +146,9 @@ class MultipleAccountsSeparationTestCase(APITestCase):
     def test_account_separation(self):
         account = factories.AccountFactory.create(name="another account")
         user = factories.AdminUserFactory.create(account=account)
-        property = factories.PropertyFactory.create(account=account)
         factories.ServiceFactory.create(account=account)
         channel = factories.BookingChannelFactory.create(account=account)
-        lodging = factories.LodgingFactory.create(property=property)
+        lodging = factories.LodgingFactory.create(account=account)
         booking = factories.BookingFactory.create(lodging=lodging)
         factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
         factories.ContractTemplateFactory.create(account=account)
@@ -166,7 +164,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
             self.assertEqual(count, response.data["count"])
 
         headers = force_login(user)
-        assertItemsCount("/api/property/", 1)
         assertItemsCount("/api/pricing/", 1)
         assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)
@@ -181,14 +178,12 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         assertItemsCount("/api/contract/", 1)
         assertItemsCount("/api/payment/", 1)
 
-    def test_property_separation(self):
+    def test_lodging_separation(self):
         account = models.Account.objects.get(name="Account")
         user = factories.StandardUserFactory.create(account=account)
-        property = factories.PropertyFactory.create(account=account)
-        self.assertEqual(2, models.Property.objects.filter(account=account).count())
-        user.properties.add(property)
         channel = models.BookingChannel.objects.filter(account=account).first()
-        lodging = factories.LodgingFactory.create(property=property)
+        lodging = factories.LodgingFactory.create(account=account)
+        user.lodgings.add(lodging)
         booking = factories.BookingFactory.create(lodging=lodging)
         factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
         factories.PaymentFactory.create(booking=booking)
@@ -205,7 +200,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
             self.assertEqual(count, len(response.data), response.data)
 
         headers = force_login(user)
-        assertItemsCount("/api/property/", 1)
         assertItemsCount("/api/pricing/", 1)
         assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)

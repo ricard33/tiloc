@@ -13,7 +13,7 @@ class PaymentTestCase(APITestCase):
         factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
-        self.user.properties.add(self.lodging.property)
+        self.user.lodgings.add(self.lodging)
         self.header = force_login(self.user)
 
     def test_need_authentication(self):

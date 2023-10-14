@@ -46,7 +46,6 @@ from .serializers import (
     NextEventSerializer,
     PaymentSerializer,
     PricingSerializer,
-    PropertySerializer,
     SeasonalVariationSerializer,
     ServiceSerializer,
     SignUpSerializer,
@@ -404,14 +403,6 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
                 response["Content-Disposition"] = "inline; filename=" + os.path.basename(full_path)
                 return response
         raise Http404
-
-
-class PropertyViewSet(viewsets.ModelViewSet):
-    queryset = models.Property.objects.all().order_by("name")
-    serializer_class = PropertySerializer
-
-    def get_queryset(self):
-        return self.queryset.for_user(self.request.user)
 
 
 class HolidaysViewSet(viewsets.ModelViewSet):

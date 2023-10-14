@@ -54,5 +54,12 @@
   "1 month": "1 mois",
   "User users": "User users",
   "nights": "nuits",
-  "Change our comment": "Modifier notre commentaire"
+  "Change our comment": "Modifier notre commentaire",
+  "Sort": "Trier",
+  "Properties": "Propriétés",
+  "Property": "Propriété",
+  "Billing information": "Informations de facturation",
+  "No VAT ?": "Sans TVA ?",
+  "VAT rate": "Taux de TVA",
+  "Owned properties": "Propriétés possédées"
 }

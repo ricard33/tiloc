@@ -17,7 +17,7 @@ class BookingTestCase(APITestCase):
         factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
-        self.user.properties.add(self.lodging.property)
+        self.user.lodgings.add(self.lodging)
         self.header = force_login(self.user)
 
     def test_need_authentication(self):
@@ -180,7 +180,7 @@ class BookingQueriesTestCase(APITestCase):
         factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
-        self.user.properties.add(self.lodging.property)
+        self.user.lodgings.add(self.lodging)
         self.header = force_login(self.user)
 
     def testAllGuests(self):
@@ -220,10 +220,10 @@ class BookingQueriesTestCase(APITestCase):
         self.assertEqual(1, len(guests), json.dumps(guests))
         self.assertEqual("666 road Z", guests[0]["address"], json.dumps(guests))
 
-    def testAllGuestsOnlyForOwnedProperties(self):
+    def testAllGuestsOnlyForOwnedLodgings(self):
         for name in ["Alain DELON", "Franck HERBERT", "Pablo PICASSO"]:
             factories.BookingFactory.create(guest_name=name, lodging=self.lodging)
-        factories.BookingFactory.create()  # for another property
+        factories.BookingFactory.create()  # for another lodging
 
         response = self.client.get("/api/booking/all_guests/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
@@ -231,7 +231,7 @@ class BookingQueriesTestCase(APITestCase):
         self.assertEqual(len(guests), 3, guests)
 
     def testAllGuestsWithAdminUser(self):
-        factories.BookingFactory.create_batch(3)  # on different properties
+        factories.BookingFactory.create_batch(3)  # on different lodgings
         admin = factories.AdminUserFactory.create()
         header = force_login(admin)
 
@@ -273,6 +273,8 @@ class BookingQueriesTestCase(APITestCase):
 
 
 class BookingModelTestCase(TestCase):
+    fixtures = ["default-groups"]
+
     def setUp(self) -> None:
         factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()

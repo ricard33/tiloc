@@ -99,6 +99,8 @@ END:VCALENDAR
 
 
 class SyncBookingsTestCase(TestCase):
+    fixtures = ["default-groups"]
+
     def setUp(self) -> None:
         for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory(name=name)

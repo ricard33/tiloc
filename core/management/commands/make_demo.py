@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from faker import Faker
 
-from core.models import Account, Booking, BookingStatus, Lodging, Payment, Property, User
+from core.models import Account, Booking, BookingStatus, Lodging, Payment, User
 
 
 class Command(BaseCommand):
@@ -38,12 +38,11 @@ class Command(BaseCommand):
         admin.set_password("admin")
         admin.save()
 
-        property = Property.objects.create(account=demo_account, name="Eden Village", email=fake.email(), no_vat=False)
         lodgings = []
         for rank, name in enumerate(["Hibiscus", "Frangipanier", "Orchidée", "Anthurium", "Heliconia"]):
             lodgings.append(
                 Lodging.objects.create(
-                    property=property,
+                    account=demo_account,
                     name=name,
                     rank=rank,
                     address=fake.address(),

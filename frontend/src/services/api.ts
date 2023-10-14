@@ -14,7 +14,6 @@ import {
   NextEvent,
   Pagination,
   Payment,
-  Property,
   Service,
   User
 } from "../types";
@@ -26,11 +25,9 @@ import {
   api2ContractTemplate,
   api2Lodging,
   api2Payment,
-  api2Property,
-  api2Service,
+  api2Service, api2User,
   booking2api, comment2Api,
-  payment2Api,
-  property2api
+  payment2Api, user2api
 } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
@@ -71,7 +68,7 @@ const axiosBaseQuery =
       if(method.toLowerCase() === "put" || method.toLowerCase() === "patch" || method.toLowerCase() === "post") {
         let form_data = new FormData();
         let fileUpload = false;
-        for (var propertyName in data) {
+        for (const propertyName in data) {
           // propertyName is what you want
           // you can get the value like this: myObject[propertyName]
           if (data.hasOwnProperty(propertyName)) {
@@ -84,7 +81,7 @@ const axiosBaseQuery =
                 form_data.append(propertyName, value[0], value[0].name);
             }
             else
-              form_data.append(propertyName, value)
+              form_data.append(propertyName, value !== null ? value : "")  // null not supported by multipart encoding
           }
         }
         if(fileUpload) {
@@ -263,8 +260,7 @@ const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment, payment2
 const commentApi = makeApi<Comment>("comment/", "Comment", api2Comment, comment2Api);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
-const userApi = makeApi<User>("user/", "User");
-const propertyApi = makeApi<Property>("property/", "Property", api2Property, property2api);
+const userApi = makeApi<User>("user/", "User", api2User, user2api);
 const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate", api2ContractTemplate);
@@ -278,7 +274,6 @@ export const api = createApi({
   baseQuery: axiosBaseQuery({ baseUrl: serviceURL }),
   tagTypes: [
     "Payment",
-    "Property",
     "Lodging",
     "Comment",
     "Booking",
@@ -353,13 +348,6 @@ export const api = createApi({
     createUser: userApi.create(builder),
     updateUser: userApi.update(builder),
     deleteUser: userApi.delete(builder),
-
-    // property
-    listProperties: propertyApi.list(builder),
-    getProperty: propertyApi.get(builder),
-    createProperty: propertyApi.create(builder),
-    updateProperty: propertyApi.update(builder),
-    deleteProperty: propertyApi.delete(builder),
 
     // Lodging
     listLodgings: lodgingApi.list(builder),
@@ -483,12 +471,6 @@ export const {
   useCreateUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
-
-  useListPropertiesQuery,
-  useGetPropertyQuery,
-  useCreatePropertyMutation,
-  useUpdatePropertyMutation,
-  useDeletePropertyMutation,
 
   useListLodgingsQuery,
   useGetLodgingQuery,

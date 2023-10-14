@@ -7,38 +7,31 @@ export interface LoginInfo {
 
 export interface Account {
   is_active: boolean;
+  is_initialized: boolean;
+  invoice_label: string;
+  deposit_label: string;
 }
 
 export interface User {
   id: number;
+  account: Account;
   is_active: boolean;
   first_name: string;
   last_name: string;
   full_name: string;
   email: string;
-  verified: boolean;
-  permissions: string[];
-}
-
-export interface Property {
-  id: number;
-  active: boolean;
-  name: string;
-  email: string;
   phone: string;
-  contact: string;
   address: string;
   legal: string;
   payment: string;
   billing: string;
   no_vat: boolean;
   vat_rate: number;
-  note: string;
-  invoice_label: string;
-  deposit_label: string;
   logo: string|null;
   signature: string|null;
-  display_week: boolean;
+  lodgings: Lodging[];
+  verified: boolean;
+  permissions: string[];
 }
 
 export interface Lodging {
@@ -46,8 +39,8 @@ export interface Lodging {
   active: boolean;
   shown: boolean;
   name: string;
-  property_id: number;
-  property: Pick<Property, "id" | "name">;
+  owner_id: number;
+  owner: Pick<User, "id" | "full_name" | "email">;
   rank: number;
   address: string;
   daily_rate: number;

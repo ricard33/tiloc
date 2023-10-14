@@ -2,12 +2,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   useListLodgingsQuery,
-  useListPropertiesQuery,
+  useListUsersQuery,
   useMoveDownLodgingMutation,
   useMoveUpLodgingMutation
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Lodging, Property, User } from "../../types";
+import { Lodging, User } from "../../types";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -32,7 +32,7 @@ type Props = {};
 const LodgingsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data, refetch } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
-  const { data: properties } = useListPropertiesQuery();
+  const { data: users } = useListUsersQuery();
   const [moveUp] = useMoveUpLodgingMutation();
   const [moveDown] = useMoveDownLodgingMutation();
   const navigate = useNavigate();
@@ -60,16 +60,16 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
       // { field: "id", headerName: "ID", width: 70 },
       { field: "name", headerName: t("Name"), width: 130 },
       {
-        field: "property", headerName: t("Property"), width: 130,
+        field: "owner", headerName: t("Owner"), width: 130,
         type: "singleSelect",
-        valueGetter: (params: GridValueGetterParams<Partial<Property>>) => {
+        valueGetter: (params: GridValueGetterParams<Partial<User>>) => {
           return { ...params.value, value: params.value.id };
         },
-        valueFormatter: (params: GridValueFormatterParams<Partial<Property>>) => {
-          return params.value.name;
+        valueFormatter: (params: GridValueFormatterParams<Partial<User>>) => {
+          return params.value.full_name;
         },
-        valueOptions: properties && [...properties.map((p) => {
-          return { value: p.id, label: p.name };
+        valueOptions: users && [...users.map((u) => {
+          return { value: u.id, label: u.full_name };
         })]
       },
       { field: "active", headerName: t("Active"), type: "boolean", width: 70 },
@@ -99,7 +99,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
           />
         ]
       }
-    ], [canChange, onRankUpDown, properties, t]);
+    ], [canChange, onRankUpDown, users, t]);
 
   const onClick = (lodging: Lodging) => {
     navigate(lodging.id.toString());

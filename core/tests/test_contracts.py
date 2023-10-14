@@ -35,7 +35,7 @@ class ContractTestCase(APITestCase):
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
         )
         booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
-        user.properties.add(booking.lodging.property)
+        user.lodgings.add(booking.lodging)
         header = force_login(user)
         response = self.client.post("/api/booking/%d/generate_contract/" % booking.id, **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -49,6 +49,8 @@ class ContractTestCase(APITestCase):
 
 
 class ContractTemplateTestCase(APITestCase):
+    fixtures = ["default-groups"]
+
     def setUp(self) -> None:
         for name in ["option", "contract sent", "deposit paid", "paid"]:
             factories.BookingStatusFactory.create(name=name)

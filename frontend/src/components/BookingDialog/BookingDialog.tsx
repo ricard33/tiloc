@@ -28,7 +28,6 @@ import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
 import {
   useCreateBookingMutation,
-  useGetPropertyQuery,
   useListBookingChannelsQuery,
   useListBookingStatusesQuery,
   useUpdateBookingMutation
@@ -37,7 +36,7 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import "./BookingDialog.scss";
 import BookingActions from "../BookingActions";
-import { Booking, Lodging, Service } from "../../types";
+import { Booking, Lodging, Service, User } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import {
@@ -47,6 +46,8 @@ import {
   SelectElement,
   TextFieldElement
 } from "react-hook-form-mui";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 
 type BookingDialogProps = {
@@ -67,12 +68,10 @@ type BookingDialogProps = {
 
 const BookingDialog: React.FC<BookingDialogProps> = props => {
   const { booking, lodgings, allOptions, guests: allGuests, onClose, onDelete, onOpenContract } = props;
+  const user = useSelector<RootState>(store => store.auth.user) as User;
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
-  const {
-    data: property
-  } = useGetPropertyQuery(booking?.lodging ? booking!.lodging.property_id : -1, { skip: typeof booking === "undefined" || typeof booking.lodging === "undefined" });
   const { data: bookingStatuses } = useListBookingStatusesQuery();
   const { data: bookingChannels } = useListBookingChannelsQuery();
   const [createBooking] = useCreateBookingMutation();
@@ -80,7 +79,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const variant = "outlined";
   const margin = "none";
-  const depositPercent = 30; // TODO load this from property or lodging preferences
+  const depositPercent = 30; // TODO load this from lodging preferences
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -121,7 +120,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const leftToPay = fullPrice - totalPayment - (commissionFees ?? 0);
   // console.log("options", options, fullPrice);
 
-  const depositLabel = property ? getDepositLabel(t, property.deposit_label) : t("Deposit");
+  const depositLabel = user ? getDepositLabel(t, user.account.deposit_label) : t("Deposit");
 
   useEffect(() => {
     if (formValues.status_id === undefined && bookingStatuses) {

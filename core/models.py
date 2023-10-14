@@ -42,26 +42,27 @@ class ForUserQuerySet(models.QuerySet):
         account_path = getattr(self.model, "_account_qs_path", "account") or (
             user_path and user_path + "__account" or None
         )
-        property_path = getattr(self.model, "_property_qs_path", None)
+        lodging_path = getattr(self.model, "_lodging_qs_path", None)
 
-        account_query = property_query = user_query = Q(**{})
+        account_query = lodging_query = user_query = Q(**{})
         # account_path = self.account_path or (self.user_path and self.user_path + "__account" or None)
         if account_path and hasattr(user, "account"):
             account_query = Q(**{account_path: user.account, account_path + "__is_active": True}) | Q(
                 **{account_path + "__isnull": True}
             )
 
-        if property_path and not user.has_perm('core.administrator'):
-            property_query |= Q(**{property_path + "__in": user.properties.all()})
+        if lodging_path and not user.has_perm('core.administrator'):
+            lodging_query |= Q(**{lodging_path + "__in": user.owned_lodgings.all()})  # lodging is owned by user
+            lodging_query |= Q(**{lodging_path + "__in": user.lodgings.all()})  # lodging can be accessed by user
         if user_path:
             user_query = Q(**{user_path: user})
 
-        return self.filter(account_query & (property_query | user_query)).distinct()
+        return self.filter(account_query & (lodging_query | user_query)).distinct()
 
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT / user_<id>/<filename>
-    return "property_{0}/{1}".format(instance.id, filename)
+    return "owner_{0}/{1}".format(instance.id, filename)
 
 
 class AccountQuerySet(models.QuerySet):
@@ -87,7 +88,26 @@ class AccountQuerySet(models.QuerySet):
 
 
 class Account(models.Model):
+    class DepositOrDownPayment(models.TextChoices):
+        DEPOSIT = "deposit", _("Deposit")
+        DOWN_PAYMENT = "down_payment", _("Down payment")
+
+    class InvoiceLabel(models.TextChoices):
+        INVOICE = "invoice", _("Invoice")
+        NOTE = "note", _("Note")
+        RECEIPT = "receipt", _("Receipt")
+        QUITTANCE = "quittance", _("Quittance")
+
     name = models.CharField(_("name"), max_length=200, unique=True, help_text=_("Internal name, should be unique"))
+    invoice_label = models.CharField(
+        _("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT
+    )
+    deposit_label = models.CharField(
+        _("deposit or down payment"),
+        max_length=30,
+        choices=DepositOrDownPayment.choices,
+        default=DepositOrDownPayment.DEPOSIT,
+    )
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     validity = models.DateTimeField(null=True)
@@ -120,13 +140,12 @@ class Account(models.Model):
 
     def cleanup_account(self, using=None, keep_parents=False):
 
-        Payment.objects.filter(booking__lodging__property__account=self).delete()
-        Contract.objects.filter(booking__lodging__property__account=self).delete()
-        BookedService.objects.filter(booking__lodging__property__account=self).delete()
-        Booking.objects.filter(lodging__property__account=self).delete()
-        BookingChannelSync.objects.filter(lodging__property__account=self).delete()
-        Lodging.objects.filter(property__account=self).delete()
-        Property.objects.filter(account=self).delete()
+        Payment.objects.filter(booking__lodging__account=self).delete()
+        Contract.objects.filter(booking__lodging__account=self).delete()
+        BookedService.objects.filter(booking__lodging__account=self).delete()
+        Booking.objects.filter(lodging__account=self).delete()
+        BookingChannelSync.objects.filter(lodging__account=self).delete()
+        Lodging.objects.filter(account=self).delete()
         ContractTemplate.objects.filter(account=self).delete()
         Service.objects.filter(account=self).delete()
         BookingStatus.objects.filter(account=self).delete()
@@ -204,15 +223,27 @@ class User(auth_models.AbstractUser):
     account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
     username = None
     email = models.EmailField(_("email address"), unique=True)
-    verified = models.BooleanField(_("verified"), default=False, help_text=_('Define if email user has been verified or not'))
-    properties = models.ManyToManyField(
-        "Property",
-        verbose_name=_("properties"),
+    phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
+    address = models.TextField(_("address"), blank=True, null=True)
+    lodgings = models.ManyToManyField(
+        "Lodging",
+        verbose_name=_("lodgings"),
         blank=True,
-        help_text=_("The properties this user has access."),
+        help_text=_("The lodgings this user has access."),
         related_name="users",
         related_query_name="user",
     )
+
+    # Contracts and billing details
+    legal = models.TextField(_("legal mention"), blank=True, null=True, help_text=_("Legal mention on bills"))
+    payment = models.TextField(_("payment"), blank=True, null=True, help_text=_("Payment information"))
+    billing = models.TextField(_("billing"), blank=True, null=True, help_text=_("Billing conditions"))
+    no_vat = models.BooleanField(_("no vat"), default=True)
+    vat_rate = models.DecimalField(_("vat rate"), max_digits=20, decimal_places=2, blank=True, null=True)
+    logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True, null=True)
+    signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True, null=True)
+    
+    verified = models.BooleanField(_("verified"), default=False, help_text=_('Define if email user has been verified or not'))
 
     _account_qs_path = "account"
 
@@ -231,78 +262,13 @@ class User(auth_models.AbstractUser):
     natural_key.dependencies = ["core.account"]
 
 
-class Property(models.Model):
-    class DepositOrDownPayment(models.TextChoices):
-        DEPOSIT = "deposit", _("Deposit")
-        DOWN_PAYMENT = "down_payment", _("Down payment")
-
-    class InvoiceLabel(models.TextChoices):
-        INVOICE = "invoice", _("Invoice")
-        NOTE = "note", _("Note")
-        RECEIPT = "receipt", _("Receipt")
-        QUITTANCE = "quittance", _("Quittance")
-
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
-    active = models.BooleanField(_("active"), default=True)
-    name = models.CharField(_("name"), max_length=200)
-    contractual_name = models.CharField(_("name"), max_length=200)
-    email = models.EmailField(_("email"))
-    phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
-    contact = models.TextField(
-        _("contact"),
-        blank=True,
-        null=True,
-        help_text=_("Phone number and email as displayed in contracts, invoices, etc..."),
-    )
-    address = models.TextField(_("address"), blank=True, null=True)
-    legal = models.TextField(_("legal mention"), blank=True, null=True, help_text=_("Legal mention on bills"))
-    payment = models.TextField(_("payment"), blank=True, null=True, help_text=_("Payment information"))
-    billing = models.TextField(_("billing"), blank=True, null=True, help_text=_("Billing conditions"))
-    no_vat = models.BooleanField(
-        _("no vat"),
-    )
-    vat_rate = models.DecimalField(_("vat rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    note = models.TextField(_("note"), blank=True)
-    invoice_label = models.CharField(
-        _("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT
-    )
-    deposit_label = models.CharField(
-        _("deposit or down payment"),
-        max_length=30,
-        choices=DepositOrDownPayment.choices,
-        default=DepositOrDownPayment.DEPOSIT,
-    )
-    logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True, null=True)
-    signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True, null=True)
-    display_week = models.BooleanField(_("display week number"), default=False)
-
-    history = HistoricalRecords()
-
-    class Meta:
-        verbose_name = _("Property")
-        verbose_name_plural = _("Properties")
-        unique_together = ["account", "name"]
-
-    objects = ForUserQuerySet.as_manager()
-
-    _account_qs_path = "account"
-    _property_qs_path = "pk"
-
-    def __str__(self):
-        return self.name
-
-    def natural_key(self):
-        return (self.name,) + self.account.natural_key()
-
-    natural_key.dependencies = ["core.account"]
-
-
 class Lodging(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("owner"), related_name="owned_lodgings", related_query_name="owned_lodging")
     active = models.BooleanField(_("active"), default=True)
     shown = models.BooleanField(_("shown"), default=True)
-    name = models.CharField(_("name"), max_length=200, unique=True)
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    name = models.CharField(_("name"), max_length=200)
     rank = models.IntegerField(
         _("rank"),
     )
@@ -326,13 +292,19 @@ class Lodging(models.Model):
     class Meta:
         verbose_name = _("Lodging")
         ordering = ["rank"]
+        unique_together = ["account", "name"]
 
     objects = ForUserQuerySet.as_manager()
-    _account_qs_path = "property__account"
-    _property_qs_path = "property"
+    _account_qs_path = "account"
+    _lodging_qs_path = "pk"
 
     def __str__(self):
         return self.name
+
+    def natural_key(self):
+        return (self.name,) + self.account.natural_key()
+
+    natural_key.dependencies = ["core.account"]
 
     def generate_empty_contract(self, url_server="http://127.0.0.1:8000"):
         booking = Booking(
@@ -442,7 +414,7 @@ class BookingChannelSync(models.Model):
     last_import_error = models.TextField(null=True, blank=True)
 
     _account_qs_path = "channel__account"
-    _property_qs_path = "lodging__property"
+    _lodging_qs_path = "lodging"
     objects = ForUserQuerySet.as_manager()
 
     def url_for_remote(self, request):
@@ -513,8 +485,8 @@ class Booking(models.Model):
         ]
 
     objects = ForUserQuerySet.as_manager()
-    _account_qs_path = "lodging__property__account"
-    _property_qs_path = "lodging__property"
+    _account_qs_path = "lodging__account"
+    _lodging_qs_path = "lodging"
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
@@ -557,10 +529,10 @@ class Booking(models.Model):
             from core.jinja2_tools import render_template
 
             signature_img = (
-                self.lodging.property.signature
+                self.lodging.owner.signature
                 and (
                     '<img style="max-width: 200px; max-height: 100px" '
-                    'src="%s" alt="Signature"' % (url_server + self.lodging.property.signature.url)
+                    'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
                 )
                 or ""
             )
@@ -571,7 +543,7 @@ class Booking(models.Model):
                 {
                     "booking": self,
                     "lodging": self.lodging,
-                    "property": self.lodging.property,
+                    "owner": self.lodging.owner,
                     "options": self.id and list(self.bookedservice_set.all()) or [],
                     "included_options": self.id
                     and self.bookedservice_set.filter(service__not_included_in_price=False)
@@ -609,8 +581,8 @@ class Contract(models.Model):
     class Meta:
         verbose_name = _("Contract")
 
-    _account_qs_path = "booking__lodging__property__account"
-    _property_qs_path = "booking__lodging__property"
+    _account_qs_path = "booking__lodging__account"
+    _lodging_qs_path = "booking__lodging"
     objects = ForUserQuerySet.as_manager()
 
     def __str__(self):
@@ -677,7 +649,7 @@ class BookedService(models.Model):
         return "%s -> %s" % (self.service.designation, self.booking)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.booking.lodging.property.account.id != self.service.account.id:
+        if self.booking.lodging.account.id != self.service.account.id:
             raise ValidationError("BookingService: booking and service aren't from same account")
         super().save(force_insert, force_update, using, update_fields)
 
@@ -759,8 +731,8 @@ class Payment(models.Model):
             ("reconciliation", "Can do account reconciliation"),
         ]
 
-    _account_qs_path = "booking__lodging__property__account"
-    _property_qs_path = "booking__lodging__property"
+    _account_qs_path = "booking__lodging__account"
+    _lodging_qs_path = "booking__lodging"
     objects = ForUserQuerySet.as_manager()
 
 
@@ -774,6 +746,6 @@ class Comment(models.Model):
     class Meta:
         ordering = ["created_on"]
 
-    _account_qs_path = "booking__lodging__property__account"
-    _property_qs_path = "booking__lodging__property"
+    _account_qs_path = "booking__lodging__account"
+    _lodging_qs_path = "booking__lodging"
     objects = ForUserQuerySet.as_manager()

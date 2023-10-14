@@ -260,12 +260,12 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
   //   navigate(payment.id!.toString());
   // };
 
-  const onChangeOrdering = useCallback((properties: GridSortModel) => {
-    if (properties.length > 0) {
-      const property = properties[0];
+  const onChangeOrdering = useCallback((items: GridSortModel) => {
+    if (items.length > 0) {
+      const item = items[0];
 
-      if (property.sort === "asc" || property.sort === "desc")
-        setOrdering(property);
+      if (item.sort === "asc" || item.sort === "desc")
+        setOrdering(item);
       return;
     }
     setOrdering(undefined);

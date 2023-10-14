@@ -6,7 +6,7 @@ from django.db.models import Max
 from rest_framework import serializers
 
 from core import models
-from core.models import Account, Property
+from core.models import Account, Lodging
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +14,19 @@ User = get_user_model()
 
 
 class AccountSerializer(serializers.ModelSerializer):
+    is_initialized = serializers.SerializerMethodField()
+
     class Meta:
         model = Account
-        fields = ["is_active", ]
+        fields = [
+            "is_active",
+            "is_initialized",
+            "invoice_label",
+            "deposit_label",
+        ]
+
+    def get_is_initialized(self, account):
+        return account.lodging_set.count() > 0
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -51,43 +61,40 @@ class SignUpSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     account = AccountSerializer(read_only=True)
-    permissions = serializers.SerializerMethodField()
-    groups = serializers.SlugRelatedField(
-        many=True,
-        queryset=Group.objects.all(),
-        slug_field='name'
-    )
-    properties = serializers.SlugRelatedField(
-        many=True,
-        queryset=Property.objects.all(),
-        slug_field='name'
+    logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
+    signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
+    permissions = serializers.SerializerMethodField(read_only=True)
+    groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
+    lodgings = serializers.SlugRelatedField(
+        many=True, queryset=Lodging.objects.all(), slug_field="name", required=False
     )
 
     class Meta:
         model = User
         # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
-        exclude = ["user_permissions"]
+        read_only_fields = ("id", "first_name", "verified")
+        exclude = ["user_permissions", "is_superuser", "is_staff"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
-        if 'account' not in validated_data:
-            validated_data['account'] = self.context['request'].user.account
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         # Need to call create() function to hash the password
         email = validated_data.pop("email")
         password = validated_data.pop("password")
-        properties = validated_data.pop('properties', [])
-        groups = validated_data.pop('groups', [])
+        lodgings = validated_data.pop("lodgings", [])
+        groups = validated_data.pop("groups", [])
         instance = User.objects.create_user(email, password, **validated_data)
         if groups:
             instance.groups.set(Group.objects.filter(name__in=groups))
-        if properties:
-            instance.properties.set(properties)
+        if lodgings:
+            instance.lodgings.set(lodgings)
         return instance
 
     def update(self, instance, validated_data):
         password = None
-        if 'password' in validated_data:
-            password = validated_data.pop('password')
+        if "password" in validated_data:
+            password = validated_data.pop("password")
         instance = super().update(instance, validated_data)
         if password:
             instance.set_password(password)
@@ -100,48 +107,37 @@ class UserSerializer(serializers.ModelSerializer):
     def get_permissions(self, user):
         return user.get_all_permissions()
 
+    # def validate_lodgings(self, value):
+    #     if not value:
+    #         return []
+    #     account = self.context["request"].user.account
+    #     lodgings = []
+    #     values = isinstance(value, list) and value or value.split(",")
+    #     for name in values:
+    #         lodging = models.Lodging.objects.get(account=account, name=name+"test")
+    #         # raise serializers.ValidationError("Blog post is not about Django")
+    #         lodgings.append(lodging)
+    #     return lodgings
+
 
 class UserSubSerializer(UserSerializer):
-
     class Meta:
         model = User
         fields = ["id", "full_name", "email"]
 
 
-class PropertySerializer(serializers.ModelSerializer):
-    logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
-    signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
-
-    class Meta:
-        model = models.Property
-        exclude = ["account"]
-
-    def create(self, validated_data: dict):
-        if 'account' not in validated_data:
-            validated_data['account'] = self.context['request'].user.account
-        instance = super().create(validated_data)
-        return instance
-
-
-class PropertySubSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Property
-        fields = [
-            "id",
-            "name",
-        ]
-
-
 class LodgingSerializer(serializers.ModelSerializer):
-    property = PropertySubSerializer(read_only=True)
-    property_id = serializers.PrimaryKeyRelatedField(source="property", queryset=models.Property.objects.all())
+    owner = UserSubSerializer(read_only=True)
+    owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.User.objects.all())
     rank = serializers.IntegerField(required=False)
 
     class Meta:
         model = models.Lodging
-        fields = "__all__"
+        exclude = ["account"]
 
     def create(self, validated_data: dict):
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         rank = validated_data.pop("rank", -1)
         if rank < 0:
             rank = (models.Lodging.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
@@ -151,7 +147,7 @@ class LodgingSerializer(serializers.ModelSerializer):
 
 
 class LodgingSubSerializer(serializers.ModelSerializer):
-    property = PropertySubSerializer(read_only=True)
+    owner = UserSubSerializer(read_only=True)
 
     class Meta:
         model = models.Lodging
@@ -161,8 +157,8 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "active",
             "shown",
             "name",
-            "property_id",
-            "property",
+            "owner_id",
+            "owner",
             "rank",
             "daily_rate",
             "guaranty",
@@ -180,7 +176,7 @@ class BookingStatusSerializer(serializers.ModelSerializer):
         exclude = ["account"]
 
     def create(self, validated_data: dict):
-        validated_data['account'] = self.context['request'].user.account
+        validated_data["account"] = self.context["request"].user.account
         rank = validated_data.pop("rank", -1)
         if rank < 0:
             rank = (models.BookingStatus.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
@@ -192,8 +188,7 @@ class BookingStatusSerializer(serializers.ModelSerializer):
 class BookingChannelSerializer(serializers.ModelSerializer):
     default_booking_status = BookingStatusSerializer(read_only=True)
     default_booking_status_id = serializers.PrimaryKeyRelatedField(
-        source="default_booking_status", queryset=models.BookingStatus.objects.all(),
-        required=False, allow_null=True
+        source="default_booking_status", queryset=models.BookingStatus.objects.all(), required=False, allow_null=True
     )
 
     class Meta:
@@ -201,8 +196,8 @@ class BookingChannelSerializer(serializers.ModelSerializer):
         exclude = ["account"]
 
     def create(self, validated_data: dict):
-        if 'account' not in validated_data:
-            validated_data['account'] = self.context['request'].user.account
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         instance = super().create(validated_data)
         return instance
 
@@ -240,7 +235,7 @@ class BookingChannelSyncSerializer(serializers.ModelSerializer):
         ]
 
     def get_url_for_remote(self, obj: models.BookingChannelSync):
-        return obj.url_for_remote(self.context['request'])
+        return obj.url_for_remote(self.context["request"])
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -249,7 +244,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         exclude = ["account"]
 
     def create(self, validated_data: dict):
-        validated_data['account'] = self.context['request'].user.account
+        validated_data["account"] = self.context["request"].user.account
         return super().create(validated_data)
 
 
@@ -287,9 +282,26 @@ class BookingSubSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Booking
-        fields = ["id", "status", "status_id", "lodging", "lodging_id", "guest_name", "source", "source_id",
-                  "begin_date", "end_date", "duration", "price",
-                  "deposit", "guaranty", "commission_fees", "commission_fees", "cancelled", "deleted"]
+        fields = [
+            "id",
+            "status",
+            "status_id",
+            "lodging",
+            "lodging_id",
+            "guest_name",
+            "source",
+            "source_id",
+            "begin_date",
+            "end_date",
+            "duration",
+            "price",
+            "deposit",
+            "guaranty",
+            "commission_fees",
+            "commission_fees",
+            "cancelled",
+            "deleted",
+        ]
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -397,8 +409,8 @@ class HolidaysSerializer(serializers.ModelSerializer):
         exclude = ["account"]
 
     def create(self, validated_data: dict):
-        if 'account' not in validated_data:
-            validated_data['account'] = self.context['request'].user.account
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         instance = super().create(validated_data)
         return instance
 
@@ -409,8 +421,8 @@ class PricingSerializer(serializers.ModelSerializer):
         exclude = ["account"]
 
     def create(self, validated_data: dict):
-        if 'account' not in validated_data:
-            validated_data['account'] = self.context['request'].user.account
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         instance = super().create(validated_data)
         return instance
 
@@ -427,8 +439,8 @@ class ContractTemplateSerializer(serializers.ModelSerializer):
         exclude = ["account"]
 
     def create(self, validated_data: dict):
-        if 'account' not in validated_data:
-            validated_data['account'] = self.context['request'].user.account
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         instance = super().create(validated_data)
         return instance
 

@@ -1,4 +1,4 @@
-import { Booking, CalendarSync, Comment, Contract, ContractTemplate, Lodging, Property, Payment, Service } from "./models";
+import { Booking, CalendarSync, Comment, Contract, ContractTemplate, Lodging, Payment, Service, User } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
@@ -40,22 +40,31 @@ export function comment2Api(c: Partial<Comment>): Record<string, any> {
   };
 }
 
-// ----- PROPERTY -----
+// ----- USER -----
 
-export function api2Property(property: Record<string, any>): Property {
+export function api2User(user: Record<string, any>): User {
   return {
-    ...property as Property,
-    vat_rate: Number(property.vat_rate)
+    ...user as User,
+    vat_rate: Number(user.vat_rate)
   };
 }
 
-export function property2api(property: Partial<Property>): Record<string, any> {
-  const {logo, signature, ...rest} = property;
-  return {
+export function user2api(user: Partial<User>): Record<string, any> {
+  const {
+    logo, signature,
+    lodgings,
+    account, permissions,
+    ...rest
+  } = user;
+  console.log("REST", rest);
+  const r = {
     ...rest,
+    ...(lodgings && lodgings.length > 0 ? { lodgings } : {}),
     ...(typeof signature === "string" ? { } : { signature }),
     ...(typeof logo === "string" ? { } : { logo }),
   };
+  console.log("POST", r);
+  return r;
 }
 // ----- LODGING -----
 

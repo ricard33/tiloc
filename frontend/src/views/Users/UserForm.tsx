@@ -15,7 +15,7 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
-import { useListPropertiesQuery } from "../../services/api";
+import { useListLodgingsQuery } from "../../services/api";
 
 
 type Props = {
@@ -29,7 +29,7 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const [changePassword, setChangePassword] = useState(!(user && user.id));
-  const { data: properties } = useListPropertiesQuery();
+  const { data: lodgings } = useListLodgingsQuery();
   const formContext = useForm<User>({
     defaultValues: user ?? {
       is_active: true
@@ -119,12 +119,18 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
             </Grid2>
             <Grid2 xs={12}>
               <MultiSelectElement
-                label={t("Owned properties")}
-                name="properties"
-                options={properties ? properties.map(p => {
-                  return {id: p.name, label: p.name}
+                label={t("Owned lodgings")}
+                name="lodgings"
+                options={lodgings ? lodgings.map(l => {
+                  return {id: l.name, label: l.name}
                 }) : []}
                 showChips
+              />
+            </Grid2>
+            <Grid2 xs={12}>
+              <TextFieldElement
+                name={"payment"} label={t("Payment information")} multiline
+                fullWidth
               />
             </Grid2>
           </Grid2>

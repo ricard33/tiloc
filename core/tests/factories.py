@@ -52,6 +52,8 @@ class _UserFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email")
     password = factory.django.Password("P@55w0rd")
     account = factory.SubFactory(AccountFactory)
+    no_vat = False
+    signature = factory.django.ImageField()
 
 
 class SuperUserFactory(_UserFactory):
@@ -75,26 +77,14 @@ class StandardUserFactory(_UserFactory):
         self.groups.add(Group.objects.get(name__iexact="standard"))
 
 
-class PropertyFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Property
-        django_get_or_create = ("name",)
-
-    account = factory.SubFactory(AccountFactory)
-    name = factory.Faker("company")
-    contractual_name = factory.Faker("name")
-    email = factory.Faker("email")
-    no_vat = False
-    signature = factory.django.ImageField()
-
-
 class LodgingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Lodging
-        django_get_or_create = ("property", "name",)
+        django_get_or_create = ("account", "name",)
 
     name = factory.Faker("name")
-    property = factory.SubFactory(PropertyFactory)
+    account = factory.SubFactory(AccountFactory)
+    owner = factory.SubFactory(StandardUserFactory)
     rank = factory.Sequence(lambda n: n)
     address = factory.Faker("address")
     daily_rate = 50
@@ -148,7 +138,7 @@ class BookingFactory(factory.django.DjangoModelFactory):
     guest_contact = factory.Faker("email")
     guest_address = factory.Faker("address")
     status = factory.SubFactory(
-        BookingStatusFactory, name="option", account=factory.SelfAttribute("..lodging.property.account")
+        BookingStatusFactory, name="option", account=factory.SelfAttribute("..lodging.account")
     )
     begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
     duration = factory.LazyAttribute(lambda b: random.randint(7, 21))

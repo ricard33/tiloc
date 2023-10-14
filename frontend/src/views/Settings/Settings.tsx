@@ -35,11 +35,6 @@ const Settings = () => {
       disabled: false
     }] : []),
     {
-      title: t("Properties"),
-      href: "properties",
-      icon: <HolidayVillageIcon />
-    },
-    {
       title: t("Lodgings"),
       href: "lodgings",
       icon: <HotelIcon />

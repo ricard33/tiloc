@@ -5,12 +5,13 @@ import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import Paper from "@mui/material/Paper";
 import { MyProfile } from "./MyProfile";
 import { WizardContext } from "./WizardContext";
 import { WizardFooter } from "./WizardFooter";
-import { FirstPropertyForm } from "./FirstPropertyForm";
+import { FirstLodgingForm } from "./FirstLodgingForm";
+import { Link } from "react-router-dom";
 
 
 export default function NewAccountWizard() {
@@ -20,9 +21,7 @@ export default function NewAccountWizard() {
 
   const steps = [
     t("Complete your profile"),
-    t("Create your property"),
     t("Create your first lodging"),
-    t("Done")
   ];
 
   const isStepOptional = (step: number) => {
@@ -72,7 +71,7 @@ export default function NewAccountWizard() {
     if (activeStep === 0)
       return <MyProfile onNext={() => handleNext()} onBack={handleBack} canChangeEmail={false} canChangePassword={false} />;
     else if (activeStep === 1)
-      return <FirstPropertyForm onNext={() => handleNext()} onBack={handleBack} />;
+      return <FirstLodgingForm onNext={() => handleNext()} onBack={handleBack} />;
     else
       return (
         <>
@@ -110,8 +109,19 @@ export default function NewAccountWizard() {
           {activeStep === steps.length ? (
             <React.Fragment>
               <Typography sx={{ mt: 2, mb: 1 }}>
-                All steps completed - you&apos;re finished
+                {t("All steps completed - you're finished")}
               </Typography>
+              <Typography sx={{ mt: 2, mb: 1 }}>
+                <Trans
+                  i18nKey="Now, you can have a look to your <link1>planning</link1>
+                  or go to your <link2>dashboard</link2>"
+                  components={{
+                    link1: <Link to="/planning" title={t("Planning")}> </Link>,
+                    link2: <Link to="/" title={t("Dashboard")}> </Link>
+                  }}
+                />
+              </Typography>
+
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                 <Box sx={{ flex: "1 1 auto" }} />
                 <Button onClick={handleReset}>Reset</Button>

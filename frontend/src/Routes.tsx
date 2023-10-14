@@ -16,11 +16,9 @@ import {
 } from "./views";
 import { RequireAuth } from "./components/RequireAuth";
 import LodgingsList from "./views/Lodging/LodgingList";
-import PropertiesList from "./views/Property/PropertiesList";
 import BookingStatusesList from "./views/BookingStatus/BookingStatusesList";
 import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
-import { PropertyPage } from "./views/Property/PropertyPage";
 import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
 import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
@@ -81,9 +79,6 @@ const MyRoutes = () => {
             <Route path="users" element={<UsersList />} />
             <Route path="users/new" element={<UserPage />} />
             <Route path="users/:userId" element={<UserPage />} />
-            <Route path="properties" element={<PropertiesList />} />
-            <Route path="properties/new" element={<PropertyPage />} />
-            <Route path="properties/:propertyId" element={<PropertyPage />} />
             <Route path="lodgings" element={<LodgingsList />} />
             <Route path="lodgings/new" element={<LodgingPage />} />
             <Route path="lodgings/:lodgingId" element={<LodgingPage />} />

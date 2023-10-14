@@ -53,7 +53,6 @@ const Main = () => {
     "contract": t("Contract"),
     "lodgings": t("Lodgings"),
     "reports": t("Reports"),
-    "properties": t("Properties"),
     "services": t("Services"),
     "booking-status": t("Booking statuses"),
     "booking-channels": t("Booking channels"),

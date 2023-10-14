@@ -11,7 +11,7 @@ export const initialState: Partial<RootState> = {
     queries: {},
     mutations: {},
     provided: {
-      Payment: {}, User: {}, Property: {}, Booking: {}, Contract: {}, ContractTemplate: {}, Lodging: {},
+      Payment: {}, User: {}, Booking: {}, Contract: {}, ContractTemplate: {}, Lodging: {},
       BookingStatus: {}, BookingChannel: {}, Service: {}
     },
     subscriptions: {},
