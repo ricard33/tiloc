@@ -65,6 +65,13 @@ axios.interceptors.response.use(
         } else return Promise.reject(error);
       } else {
         if (error.response.data.detail) dispatchError(error.response.data.detail);
+        else if(error.response.data instanceof Blob) {
+          error.response.data.text().then((content: string) => {
+            const data = JSON.parse(content);
+            if (data.detail) dispatchError(data.detail);
+            else dispatchError(data);
+          })
+        }
         else dispatchError("Server error");
       }
     } else if (error.request) {

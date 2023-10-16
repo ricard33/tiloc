@@ -48,7 +48,7 @@
     "@mui/x-date-pickers": "^6.9.1",
     "@reduxjs/toolkit": "^1.8.6",
     "@ti-gecko/react-calendar-timeline": "^0.30.4",
-    "@ti-gecko/tiloc-ckeditor5": "^0.0.5",
+    "@ti-gecko/tiloc-ckeditor5": "file:./ckeditor5",
     "axios": "^0.25.0",
     "chart.js": "^4.1.1",
     "classnames": "^2.3.2",

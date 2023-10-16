@@ -187,6 +187,7 @@ const ContractTemplateEdit = (/*props*/) => {
                 content={content}
                 onChange={onChange}
                 readOnly={!canChange}
+                withPlaceholders
               />}
           </Suspense>
         </Box>

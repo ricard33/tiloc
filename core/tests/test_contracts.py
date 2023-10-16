@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from core.contracts import generate_contract, generate_empty_contract
 from core.tests import factories
 from core.tests.helpers import force_login
 
@@ -17,14 +18,14 @@ class ContractTestCase(APITestCase):
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
         )
         booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
-        booking.generate_contract()
+        generate_contract(booking)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
         self.assertIn(booking.lodging.name, booking.contract.content)
 
     def test_generate_contract_without_template(self):
         booking = factories.BookingFactory.create(lodging__contract_template=None)
-        booking.generate_contract()
+        generate_contract(booking)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
         self.assertEqual("", booking.contract.content)
@@ -60,6 +61,6 @@ class ContractTemplateTestCase(APITestCase):
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date|format_date('full') }} to {{ booking.end_date|format_date('full') }}..."
         )
         lodging = factories.LodgingFactory.create(contract_template=contract_template)
-        content = lodging.generate_empty_contract()
+        content = generate_empty_contract(lodging)
         self.assertIn(lodging.name, content)
         self.assertIn("......../......../................", content)

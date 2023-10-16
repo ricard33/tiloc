@@ -12,6 +12,7 @@ from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django_email_verification import send_email
+from jinja2 import TemplateError, UndefinedError
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
@@ -24,6 +25,7 @@ from rest_framework.response import Response
 from location import __date__, __version__
 
 from . import models
+from .contracts import generate_contract, generate_empty_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
@@ -321,8 +323,8 @@ class BookingViewSet(viewsets.ModelViewSet):
             contract = booking.contract
         else:
             try:
-                contract = booking.generate_contract(
-                    request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
+                contract = generate_contract(
+                    booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
                 )
             except jinja2.exceptions.TemplateError as ex:
                 logger.exception("Template generation error")
@@ -338,7 +340,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     def generate_contract(self, request, pk=None):
         booking = self.get_object()
         try:
-            contract = booking.generate_contract(request.scheme + "://" + request.META.get("HTTP_HOST", "localhost"))
+            contract = generate_contract(booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost"))
         except jinja2.exceptions.TemplateError as ex:
             logger.exception("Template generation error")
             raise APIException(detail="Template error: " + ex.message)
@@ -391,10 +393,18 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
         sid = transaction.savepoint()
         if request.GET.get("template_id"):
             lodging.contract_template_id = request.GET.get("template_id")
-        generate_pdf(
-            lodging.generate_empty_contract(request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
-            full_path,
-        )
+        try:
+            generate_pdf(
+                generate_empty_contract(lodging, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
+                full_path,
+            )
+        except jinja2.exceptions.TemplateError as ex:
+            logger.exception("Template generation error")
+            raise APIException(detail="Template error: " + ex.message)
+        except Exception as ex:
+            logger.exception("Unknown error during template generation")
+            raise APIException(detail=str(ex))
+
         transaction.savepoint_rollback(sid)
 
         if os.path.exists(full_path):

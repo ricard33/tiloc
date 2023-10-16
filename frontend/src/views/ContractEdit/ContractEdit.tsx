@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,7 +8,7 @@ import {
   Refresh as RefreshIcon,
   Save as SaveIcon
 } from "@mui/icons-material";
-import { Grid, Button, Typography, Alert, Backdrop, CircularProgress } from "@mui/material";
+import { Alert, Backdrop, Button, CircularProgress, Grid, Theme, Typography } from "@mui/material";
 import {
   useDeleteContractMutation,
   useGetOrGenerateContractMutation,
@@ -17,14 +17,14 @@ import {
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatDistanceToNow } from "../../common/dateUtils";
-import { parseISO } from "date-fns";
 import Page from "../../layouts/Main/Page";
 import { makePDF } from "../../common/pdf-tools";
+import { Contract } from "../../types";
 
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   content: {
     marginTop: theme.spacing(2)
   },
@@ -77,9 +77,13 @@ const ContractEdit = () => {
   const { showError, showSuccess } = useAlert();
 
   console.assert(!!bookingId, "Booking not initialized");
+  // if (typeof bookingId === "undefined") {
+  //   navigate(-1);
+  //   return <div>No booking</div>;
+  // }
 
   useEffect(() => {
-    getOrGenerateContract({bookingId});
+    if (bookingId) getOrGenerateContract({bookingId: Number(bookingId)});
   }, [bookingId, getOrGenerateContract]);
 
   useEffect(() => {
@@ -87,12 +91,12 @@ const ContractEdit = () => {
       setContent(contract.content);
   }, [contract]);
 
-  function onChange(newContent) {
+  function onChange(newContent: string) {
     setContent(newContent);
   }
 
   function regenerateContract() {
-    getOrGenerateContract({ bookingId, regenerate: true });
+    getOrGenerateContract({ bookingId: Number(bookingId), regenerate: true });
   }
 
   function onClose() {
@@ -104,9 +108,9 @@ const ContractEdit = () => {
   }
 
   function onDelete() {
-    if (contract.id)
+    if (contract && contract.id)
       deleteContract(contract).then((result) => {
-        const {error} = result;
+        const {error} = result as any;
         if (error) {
           console.error("Error deleting contract", error);
           showError(t("Impossible to delete contract: ") + fetchErrorDecode(error));
@@ -122,22 +126,23 @@ const ContractEdit = () => {
   }
 
   function onSaveAndMakePDF() {
-    _onSave((contract) => makePDF("/api/contract/" + contract.id + "/pdf/", "contract.pdf"));
+    _onSave((contract: Contract) => makePDF("/api/contract/" + contract.id + "/pdf/", "contract.pdf"));
   }
 
-  function _onSave(callback/*: (contract) => void*/) {
+  function _onSave(callback: (contract: Contract) => void) {
     const submittedContract = {
-      id: contract.id,
+      id: contract?.id,
       content: content
     };
     updateContract(submittedContract).then((result) => {
-      const {error} = result;
+      const {error} = result as any;
       if (error) {
         console.error("Error during contract saving", error);
         showError(t("Impossible to save contract: ") + fetchErrorDecode(error));
       } else {
         showSuccess(t("Contract saved"));
-        if(callback) callback(submittedContract);
+        const data = (result as any).data as Contract;
+        if(callback) callback(data);
       }
     });
   }
@@ -164,13 +169,13 @@ const ContractEdit = () => {
           {contract &&
           <Typography variant="caption" display="block" gutterBottom>
             {t("Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
-              { modified_date: formatDistanceToNow(parseISO(contract.modified)) })}
+              { modified_date: formatDistanceToNow(contract.modified) })}
           </Typography>
           }
         </Grid>
         <Grid item xs={12}>
           <Suspense fallback={<div>{t("Loading...")}</div>}>
-            {content &&
+            {typeof content !== "undefined" &&
             <RichTextEditor
               content={content}
               onChange={onChange}
@@ -199,7 +204,7 @@ const ContractEdit = () => {
               type="button"
               className={classes.button}
               startIcon={<PdfIcon />}
-              onClick={() => makePDF("/api/contract/" + contract.id + "/pdf/", "contract.pdf")}
+              onClick={() => makePDF("/api/contract/" + contract!.id + "/pdf/", "contract.pdf")}
               title={t("PDF")}
             >{t("PDF")}</Button>
             <Button
@@ -225,7 +230,5 @@ const ContractEdit = () => {
     </Page>
   );
 };
-
-ContractEdit.propTypes = {};
 
 export default ContractEdit;

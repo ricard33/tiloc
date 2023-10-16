@@ -12,10 +12,11 @@ type Props = {
   content: string;
   onChange: (content: string) => void;
   readOnly?: boolean;
+  withPlaceholders?: boolean,
 };
 
 const Editor: React.FunctionComponent<Props> = (props) => {
-  const { content, onChange, readOnly } = props;
+  const { content, onChange, readOnly, withPlaceholders} = props;
   let editorInstance: any = null;
 
   useEffect(() => {
@@ -45,15 +46,17 @@ const Editor: React.FunctionComponent<Props> = (props) => {
           }}
           readOnly={readOnly}
           onChange={_onChange}
-          // eslint-disable-next-line no-undef
           editor={CustomEditor}
           data={content}
           config={{
             // extraPlugins: [CustomFigureAttributes,],
             // extraPlugins: [AllowImageWidth],
-            // removePlugins: ["ImageResize"],
+            ...(withPlaceholders ? {} : {removePlugins: ["Placeholder", "PlaceholderEditing", "PlaceholderUI"]}),
+            // removePlugins: ["Placeholder", "PlaceholderEditing", "PlaceholderUI"],
+            // removePlugins: "Placeholder",
             toolbar: {
               items: [
+                ...(withPlaceholders ? ["placeholder", "|"] : []),
                 "heading",
                 "|",
                 "bold",
@@ -152,6 +155,52 @@ const Editor: React.FunctionComponent<Props> = (props) => {
                 "mergeTableCells",
                 "tableCellProperties",
                 "tableProperties"
+              ]
+            },
+            placeholderConfig: {
+              types: [
+                "DATE",
+                "Propriétaire_NOM",
+                "Propriétaire_PRENOM",
+                "Propriétaire_ADRESSE_POSTALE",
+                "Propriétaire_TELEPHONE",
+                "Propriétaire_EMAIL",
+                "Voyageur_NOM_COMPLET",
+                "Voyageur_ADRESSE_POSTALE",
+                "Voyageur_CONTACT",
+                "Logement_NOM",
+                // "Logement_PAGE_WEB_ANNONCE",
+                "Logement_ADRESSE_POSTALE",
+                // "Logement_GPS",
+                // "Logement_TYPE",
+                // "Logement_NBS_CHAMBRES",
+                // "Logement_SURFACE",
+                // "Logement_CLASSEMENT",
+                "Logement_CAPACITE",
+                // "Logement_DESCRIPTIF",
+                "Logement_DEPOT_GARANTIE",
+                // "Logement_HORAIRE_ARRIVEE",
+                // "Logement_HORAIRE_DEPART",
+                "Logement_MODALITE_PAIEMENT",
+                // "Logement_METHODE_PAIEMENT",
+                // "Logement_DEPOT_G_MONTANT",
+                // "Logement_DEPOT_G_DELAI",
+                "Réservation_DATE_ARRIVEE",
+                "Réservation_DATE_DEPART",
+                "Réservation_NB_NUITS",
+                "Réservation_MONTANT",
+                "Réservation_MONTANT_AVEC_OPTIONS",
+                "Réservation_ARRHES",
+                "Réservation_SOLDE_APRES_ARRHES",
+                "Réservation_NB_VOYAGEURS",
+                "Réservation_NB_ADULTES",
+                "Réservation_NB_ENFANTS",
+                "Réservation_NB_BEBES",
+                "Réservation_DATE",
+                "Réservation_SERVICES_INCLUS",
+                "Réservation_SERVICES_ADDITIONELS",
+                // "Signature_LOCATAIRE",
+                "Signature_BAILLEUR"
               ]
             }
           }}

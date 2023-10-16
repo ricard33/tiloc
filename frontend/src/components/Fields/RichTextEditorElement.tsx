@@ -10,6 +10,7 @@ type RichTextEditorElementProps<T extends FieldValues = FieldValues> = {
   readOnly?: boolean,
   placeholder?: string;
   onChange?: (content: string) => void,
+  withPlaceholders?: boolean,
 };
 
 const RichTextEditorElement: React.FC<RichTextEditorElementProps> = <TFieldValues extends FieldValues = FieldValues>({

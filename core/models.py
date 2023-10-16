@@ -2,7 +2,6 @@ import logging
 import os
 import re
 import uuid
-from datetime import date
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
@@ -16,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse as drf_reverse
 from simple_history.models import HistoricalRecords
 
-logger = logging.getLogger("api")
+logger = logging.getLogger("models")
 
 # -------------------------------------------------------------------------------------------------
 # Note: for all models that depends on an account, a field is mandatory in model: _account_qs_path
@@ -306,19 +305,6 @@ class Lodging(models.Model):
 
     natural_key.dependencies = ["core.account"]
 
-    def generate_empty_contract(self, url_server="http://127.0.0.1:8000"):
-        booking = Booking(
-            lodging=self,
-            guest_name="........................................",
-            guest_contact="email: .................................@.................... - tel: ...................................",
-            guest_address="........................................\n........................................\n........................................",
-            guaranty=self.guaranty,
-            duration=0,
-            adults=0,
-            price=0,
-        )
-        return booking.generate_contract(url_server=url_server, save=False).content
-
 
 class Service(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
@@ -518,55 +504,6 @@ class Booking(models.Model):
 
     def get_absolute_url(self):
         return reverse("booking-detail", kwargs={"pk": self.pk})
-
-    def generate_contract(self, url_server="http://127.0.0.1:8000", save=True):
-        if not self.lodging:
-            logger.warning("Lodging not set, can't generate a contract")
-            return None
-        if not Contract.objects.filter(booking=self).exists():
-            self.contract = Contract(booking=self)
-        if self.lodging.contract_template:
-            from core.jinja2_tools import render_template
-
-            signature_img = (
-                self.lodging.owner.signature
-                and (
-                    '<img style="max-width: 200px; max-height: 100px" '
-                    'src="%s" alt="Signature"' % (url_server + self.lodging.owner.signature.url)
-                )
-                or ""
-            )
-
-            page_break = '<div style="display: block; page-break-before: always;"></div>'
-            content = render_template(
-                self.lodging.contract_template.content,
-                {
-                    "booking": self,
-                    "lodging": self.lodging,
-                    "owner": self.lodging.owner,
-                    "options": self.id and list(self.bookedservice_set.all()) or [],
-                    "included_options": self.id
-                    and self.bookedservice_set.filter(service__not_included_in_price=False)
-                    or [],
-                    "third_party_options": self.id
-                    and self.bookedservice_set.filter(service__not_included_in_price=True)
-                    or [],
-                    "url_server": url_server,
-                    "date": date.today(),
-                    "signature": signature_img,
-                    "page_break": page_break,
-                },
-            )
-            page_break = '<div style="display: block; page-break-before: always;"></div>'
-            if self.lodging.description:
-                content += page_break + self.lodging.description
-            self.contract.content = content
-        else:
-            logger.warning("Contract template not set for lodging '%s', can't generate a contract", self.lodging)
-            self.contract.content = ""
-        if save:
-            self.contract.save()
-        return self.contract
 
 
 class Contract(models.Model):

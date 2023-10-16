@@ -11,5 +11,11 @@ export function makePDF(url: string, defaultFilename: string) {
       const fileName = contentDisposition ? contentDisposition.split("filename=")[1] : defaultFilename;
 
       fileDownload(response.data, fileName);
+    })
+    .catch((error)=> {
+      if(error.response.data instanceof Blob)
+        error.response.data.text().then((content: string) => {
+          console.error(JSON.parse(content).detail);
+        })
     });
 }
