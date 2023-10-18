@@ -38,19 +38,20 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
 
     def test_create_with_lodgings(self):
-        lodging = factories.LodgingFactory.create()
+        lodging1 = factories.LodgingFactory.create()
+        lodging2 = factories.LodgingFactory.create()
         data = {
             "first_name": "John",
             "last_name": "DOE",
             "email": "none@nowhere.com",
             "groups": ["standard"],
             "password": "PasSw0rd",
-            "lodgings": [lodging.name],
+            "lodgings": [lodging1.name, lodging2.name],
         }
         response = self.client.post("/api/user/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         obj = response.data
-        self.assertEqual(1, len(obj["lodgings"]), obj)
+        self.assertEqual(2, len(obj["lodgings"]), obj)
 
     def test_create_with_signature(self):
         image_data = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x07tIME\x07\xdb\x0c\x17\x020;\xd1\xda\xcf\xd2\x00\x00\x00\x0cIDAT\x08\xd7c\xf8\xff\xff?\x00\x05\xfe\x02\xfe\xdc\xccY\xe7\x00\x00\x00\x00IEND\xaeB`\x82"

@@ -88,7 +88,8 @@ class UserSerializer(serializers.ModelSerializer):
         if groups:
             instance.groups.set(Group.objects.filter(name__in=groups))
         if lodgings:
-            instance.lodgings.set(lodgings)
+            # instance.lodgings.set(lodgings)
+            instance.lodgings.set(Lodging.objects.filter(account=instance.account, name__in=lodgings))
         return instance
 
     def update(self, instance, validated_data):

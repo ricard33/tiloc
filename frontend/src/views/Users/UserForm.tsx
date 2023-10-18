@@ -1,21 +1,14 @@
-import React, { useState } from "react";
-import { Button, Card, CardActions, CardContent, CardHeader, Stack, Unstable_Grid2 as Grid2 } from "@mui/material";
+import React from "react";
+import { Button, Card, CardActions, CardContent, CardHeader, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import {
-  FormContainer,
-  MultiSelectElement,
-  PasswordElement,
-  PasswordRepeatElement,
-  SwitchElement,
-  TextFieldElement
-} from "react-hook-form-mui";
+import { FormContainer } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
 import { User } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
-import { useListLodgingsQuery } from "../../services/api";
+import { UserFormContent } from "./UserFormContent";
 
 
 type Props = {
@@ -28,8 +21,6 @@ type Props = {
 export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-  const [changePassword, setChangePassword] = useState(!(user && user.id));
-  const { data: lodgings } = useListLodgingsQuery();
   const formContext = useForm<User>({
     defaultValues: user ?? {
       is_active: true
@@ -47,10 +38,6 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
       });
   };
 
-  function onChangePasswordClick() {
-    setChangePassword(true);
-  }
-
   return (
     <FormContainer
       defaultValues={user}
@@ -61,79 +48,7 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
         <CardHeader title={t("User")} />
         <CardContent sx={{}}>
           <input type="hidden" name={"id"} value={user ? user.id : 0} />
-          <Grid2 container spacing={2}>
-            <Grid2 sm={6} xs={12}>
-              <TextFieldElement name={"first_name"} label={t("First name")} fullWidth required />
-            </Grid2>
-            <Grid2 sm={6} xs={12}>
-              <TextFieldElement name={"last_name"} label={t("Last name")} fullWidth required />
-            </Grid2>
-            <Grid2 xs={12}>
-              <TextFieldElement
-                name={"email"} type={"email"} label={t("Email")}
-                fullWidth required autoComplete="email"
-              />
-            </Grid2>
-            {changePassword
-              ? (
-                <>
-                  <Grid2 sm={6} xs={12}>
-                    <PasswordElement
-                      name={"password"} label={t("Password")} fullWidth
-                      autoComplete="new-password"
-                      required
-                      validation={{
-                        minLength: {
-                          value: 8,
-                          message: t("Password must have at least 8 characters")
-                        }
-                      }}
-                    />
-                  </Grid2>
-                  <Grid2 sm={6} xs={12}>
-                    <PasswordRepeatElement
-                      passwordFieldName={"password"} name={"password-repeat"}
-                      autoComplete="new-password"
-                      label={t("Re-type the password")} fullWidth required
-                    />
-                  </Grid2>
-                </>)
-              :
-              <Button onClick={() => onChangePasswordClick()}>{t("Change password")}</Button>
-            }
-            <Grid2 sm={6} xs={12}>
-              <SwitchElement name={"is_active"} label={t("Active ?")} />
-            </Grid2>
-            <Grid2 xs={12}>
-              <MultiSelectElement
-                label={t("User type")}
-                name="groups"
-                options={[
-                  { id: "administrator", label: t("administrator") },
-                  { id: "standard", label: t("standard") },
-                  { id: "external", label: t("external") },
-                  { id: "readonly", label: t("readonly") },
-                ]}
-                showChips
-              />
-            </Grid2>
-            <Grid2 xs={12}>
-              <MultiSelectElement
-                label={t("Owned lodgings")}
-                name="lodgings"
-                options={lodgings ? lodgings.map(l => {
-                  return {id: l.name, label: l.name}
-                }) : []}
-                showChips
-              />
-            </Grid2>
-            <Grid2 xs={12}>
-              <TextFieldElement
-                name={"payment"} label={t("Payment information")} multiline
-                fullWidth
-              />
-            </Grid2>
-          </Grid2>
+          <UserFormContent canChangeEmail canChangePassword myProfileOnly={false}/>
         </CardContent>
         <CardActions>
           <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>

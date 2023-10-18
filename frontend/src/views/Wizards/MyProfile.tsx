@@ -11,7 +11,7 @@ import { useAlert } from "../../common/alertUtils";
 import { auth } from "../../actions";
 import setDefaults from "../../common/set.defaults";
 import { WizardFooter } from "./WizardFooter";
-import { MyProfileFormContent } from "./MyProfileFormContent";
+import { UserFormContent } from "../Users/UserFormContent";
 
 
 type Props = {
@@ -60,7 +60,7 @@ export const MyProfile: React.FC<Props> = (props) => {
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("User")} />
         <CardContent sx={{}}>
-          <MyProfileFormContent  canChangeEmail={canChangeEmail} canChangePassword={canChangePassword} />
+          <UserFormContent canChangeEmail={canChangeEmail} canChangePassword={canChangePassword} myProfileOnly />
         </CardContent>
       </Card>
       <WizardFooter onBack={onBack} onNext={() => null /*handleSubmit(onSubmitHandler)*/} onSkip={() => null} />

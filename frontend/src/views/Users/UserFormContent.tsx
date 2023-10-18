@@ -1,46 +1,33 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  InputAdornment, Stack, Typography,
-  Unstable_Grid2 as Grid2
-} from "@mui/material";
+import { Button, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
-  FormContainer,
+  MultiSelectElement,
   PasswordElement,
   PasswordRepeatElement,
-  SelectElement,
   SwitchElement,
   TextFieldElement
 } from "react-hook-form-mui";
-import { useForm, useFormContext, useFormState } from "react-hook-form";
-import { User } from "../../types";
-import { useUnsavedChangesConfirm } from "../../common/dialogs";
-import { usePageUnloadAlert } from "../../common/formUtils";
-import { Save as SaveIcon } from "@mui/icons-material";
+import { useFormContext } from "react-hook-form";
 import ImageUploadElement from "../../components/Fields/ImageUploadElement";
-import DeleteIcon from "@mui/icons-material/DeleteForever";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { useListLodgingsQuery } from "../../services/api";
 
 
 type Props = {
   canChangeEmail: boolean;
   canChangePassword: boolean;
+  myProfileOnly: boolean;
 };
 
-export const MyProfileFormContent: React.FC<Props> = ({canChangeEmail, canChangePassword}) => {
+export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePassword, myProfileOnly }) => {
   const { t } = useTranslation();
-  const currentUser = useSelector<RootState>(store => store.auth.user) as User;
   const formContext = useFormContext();
+  const { data: lodgings } = useListLodgingsQuery();
   const { watch, getValues } = formContext;
   // const no_vat = watch("no_vat", property ? property.no_vat : true);
-  const no_vat = watch("no_vat", getValues("no_vat"));
-  const [changePassword, setChangePassword] = useState(!(currentUser.id));
+  const userId = watch("id", getValues("id"));
+  // const no_vat = watch("no_vat", getValues("no_vat"));
+  const [changePassword, setChangePassword] = useState(!(userId));
 
   function onChangePasswordClick() {
     setChangePassword(true);
@@ -48,7 +35,7 @@ export const MyProfileFormContent: React.FC<Props> = ({canChangeEmail, canChange
 
   return (
     <>
-      <input type="hidden" name={"id"} value={currentUser.id} />
+      <input type="hidden" name={"id"} value={userId} />
       <Grid2 container spacing={2}>
         <Grid2 sm={6} xs={12}>
           <TextFieldElement name={"first_name"} label={t("First name")} fullWidth required />
@@ -89,7 +76,9 @@ export const MyProfileFormContent: React.FC<Props> = ({canChangeEmail, canChange
                 </Grid2>
               </>)
             :
-            <Button onClick={() => onChangePasswordClick()}>{t("Change password")}</Button>
+            <Grid2 xs={12}>
+              <Button onClick={() => onChangePasswordClick()}>{t("Change password")}</Button>
+            </Grid2>
         )}
         <Grid2 sm={6} xs={12}>
           <TextFieldElement name={"phone"} label={t("Phone")} fullWidth required />
@@ -97,6 +86,40 @@ export const MyProfileFormContent: React.FC<Props> = ({canChangeEmail, canChange
         <Grid2 sm={6} xs={12}>
           <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth required />
         </Grid2>
+
+        {!myProfileOnly && (
+          <>
+            <Grid2 xs={12}>
+              <Typography variant="h6">{t("Permissions")}</Typography>
+            </Grid2>
+            <Grid2 sm={6} xs={12}>
+              <SwitchElement name={"is_active"} label={t("Active ?")} />
+            </Grid2>
+            <Grid2 xs={12}>
+              <MultiSelectElement
+                label={t("User type")}
+                name="groups"
+                options={[
+                  { id: "administrator", label: t("administrator") },
+                  { id: "standard", label: t("standard") },
+                  { id: "external", label: t("external") },
+                  { id: "readonly", label: t("readonly") }
+                ]}
+                showChips
+              />
+            </Grid2>
+            <Grid2 xs={12}>
+              <MultiSelectElement
+                label={t("Owned lodgings")}
+                name="lodgings"
+                options={lodgings ? lodgings.map(l => {
+                  return { id: l.name, label: l.name };
+                }) : []}
+                showChips
+              />
+            </Grid2>
+          </>
+        )}
         <Grid2 xs={12}>
           <Typography variant="h6">{t("Contracts")}</Typography>
         </Grid2>

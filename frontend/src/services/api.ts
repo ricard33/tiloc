@@ -20,14 +20,18 @@ import {
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
   api2Booking,
-  api2CalendarSync, api2Comment,
+  api2CalendarSync,
+  api2Comment,
   api2Contract,
   api2ContractTemplate,
   api2Lodging,
   api2Payment,
-  api2Service, api2User,
-  booking2api, comment2Api,
-  payment2Api, user2api
+  api2Service,
+  api2User,
+  booking2api,
+  comment2Api,
+  payment2Api,
+  user2api
 } from "../types/models-convertion";
 import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
 
@@ -77,11 +81,16 @@ const axiosBaseQuery =
             if (FileList && value instanceof FileList) {
               // Safari, Firefox, IE land here
               fileUpload = true;
-              if(value.length > 0)
-                form_data.append(propertyName, value[0], value[0].name);
+              for(let i = 0; i < value.length; i++)
+                form_data.append(propertyName, value[i], value[i].name);
             }
-            else
-              form_data.append(propertyName, value !== null ? value : "")  // null not supported by multipart encoding
+            else{
+              if (Array.isArray(value)){
+                form_data.append(propertyName, JSON.stringify(value));
+              }
+              else
+                form_data.append(propertyName, value !== null ? value : "");  // null not supported by multipart encoding
+            }
           }
         }
         if(fileUpload) {
