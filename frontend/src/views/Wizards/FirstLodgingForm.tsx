@@ -61,19 +61,6 @@ export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
       });
     }
   };
-  const onSubmitHandler_ = (data: Lodging) => {
-    // console.log(data);
-    createLodging(data).then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        console.error("Error during lodging creation", error);
-        showError(t("Impossible to create lodging: ") + fetchErrorDecode(error));
-      } else {
-        showSuccess(t("Lodging added"));
-        onNext();
-      }
-    });
-  };
 
   if(isLoading || isLoadingUsers) return <div>{t("Loading...")}</div>
   console.log(lodgings);

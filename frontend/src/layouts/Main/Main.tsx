@@ -54,7 +54,6 @@ const Main = () => {
     "lodgings": t("Lodgings"),
     "reports": t("Reports"),
     "services": t("Services"),
-    "booking-status": t("Booking statuses"),
     "booking-channels": t("Booking channels"),
     "calendar-syncs": t("Calendars synchronization"),
   };

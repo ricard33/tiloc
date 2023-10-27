@@ -19,6 +19,7 @@ import { Booking, Lodging } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import BookingTooltip from "./BookingTooltip";
 import { ZoomNavBar } from "./NavBar";
+import { getBookingStatus } from "../../../common/statusUtils";
 
 const timeSteps = {
   second: 0,
@@ -202,7 +203,7 @@ const BookingTimeline: React.FC<Props> = props => {
       //   console.log("You clicked double!");
       // },
       style: {
-        background: booking.status.color,
+        background: getBookingStatus(booking.status).color,
         color: "black",
         opacity: booking.lodging_id > 0 && !booking.cancelled ? undefined : "50%"
       }

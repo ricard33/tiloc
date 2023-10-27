@@ -3,16 +3,15 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { WizardContext } from "./WizardContext";
 import { useTranslation } from "react-i18next";
-import { SubmitHandler, useFormContext } from "react-hook-form";
-import { FieldValues } from "react-hook-form/dist/types/fields";
+import { useFormContext } from "react-hook-form";
 
-type Props<T extends FieldValues = FieldValues> = {
+type Props = {
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
 };
 
-export const WizardFooter: React.FC<Props> = <T extends FieldValues = FieldValues>({ onBack, onNext, onSkip }: Props<T>) => {
+export const WizardFooter: React.FC<Props> = ({ onBack, onNext, onSkip }: Props) => {
   const wizardContext = useContext(WizardContext);
   const { t } = useTranslation();
   const { activeStep, steps, isStepOptional } = wizardContext;

@@ -16,6 +16,7 @@ import reactStringReplace from "../common/reactStringReplace";
 import { green } from "@mui/material/colors";
 import { Typography } from "@mui/material";
 import Comments from "./Comments";
+import { getBookingStatus } from "../common/statusUtils";
 
 type BookingQuickViewProps = {
   booking: Booking;
@@ -89,7 +90,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             (booking.children ? t(" and {{count}} children", { count: booking.children }) : "") +
             (booking.babies ? t(" and {{count}} babies", { count: booking.babies }) : "")
           )}
-          {displayField(true, t("Status:"), booking.status.name)}
+          {displayField(true, t("Status:"), getBookingStatus(booking.status).getLabel(t))}
           {displayField(showPayments, t("Lodging:"), booking.lodging ? booking.lodging.name : t("Cancellation / Waiting"), true)}
           {displayField(showPayments, t("Price:"), formatCurrency(booking.price_with_options), true)}
         </Grid>

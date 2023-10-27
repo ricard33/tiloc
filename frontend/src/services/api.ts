@@ -3,7 +3,6 @@ import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import {
   Booking,
   BookingChannel,
-  BookingStatus,
   CalendarSync,
   Comment,
   Contract,
@@ -270,7 +269,6 @@ const commentApi = makeApi<Comment>("comment/", "Comment", api2Comment, comment2
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
 const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
 const userApi = makeApi<User>("user/", "User", api2User, user2api);
-const bookingStatusApi = makeApi<BookingStatus>("booking_status/", "BookingStatus");
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate", api2ContractTemplate);
 const contractApi = makeApi<Contract>("contract/", "Contract", api2Contract);
@@ -286,7 +284,6 @@ export const api = createApi({
     "Lodging",
     "Comment",
     "Booking",
-    "BookingStatus",
     "BookingChannel",
     "CalendarSync",
     "Contract",
@@ -324,23 +321,6 @@ export const api = createApi({
           method: "POST",
           data: args
         };
-      }
-    }),
-
-    // BookingStatus
-    listBookingStatuses: bookingStatusApi.list(builder),
-    getBookingStatus: bookingStatusApi.get(builder),
-    createBookingStatus: bookingStatusApi.create(builder),
-    updateBookingStatus: bookingStatusApi.update(builder),
-    deleteBookingStatus: bookingStatusApi.delete(builder),
-    moveUpBookingStatus: builder.mutation<BookingStatus, { statusId: number }>({
-      query: ({ statusId }) => {
-        return { url: `booking_status/${statusId}/move_up/`, method: "POST" };
-      }
-    }),
-    moveDownBookingStatus: builder.mutation<BookingStatus, { statusId: number }>({
-      query: ({ statusId }) => {
-        return { url: `booking_status/${statusId}/move_down/`, method: "POST" };
       }
     }),
 
@@ -460,14 +440,6 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useSignupMutation,
-
-  useListBookingStatusesQuery,
-  useGetBookingStatusQuery,
-  useCreateBookingStatusMutation,
-  useUpdateBookingStatusMutation,
-  useDeleteBookingStatusMutation,
-  useMoveUpBookingStatusMutation,
-  useMoveDownBookingStatusMutation,
 
   useListBookingChannelsQuery,
   useGetBookingChannelQuery,

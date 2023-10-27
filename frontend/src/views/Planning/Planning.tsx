@@ -12,7 +12,6 @@ import { useLocalStorage } from "../../common/useLocalStorage";
 import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningSettingsDialog";
 import {
   useListBookingsQuery,
-  useListBookingStatusesQuery,
   useListLodgingsQuery
 } from "../../services/api";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
@@ -23,6 +22,7 @@ import { RootState } from "../../store";
 import { Booking, Lodging, User } from "../../types";
 import { useDeviceDetector } from "../../common/useDeviceDetector";
 import useWindowDimensions from "../../common/windowDimensions";
+import { getBookingStatuses } from "../../common/statusUtils";
 
 
 const Planning = () => {
@@ -65,7 +65,7 @@ const Planning = () => {
     refetchOnReconnect: true
   });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
-  const { data: bookingStatuses } = useListBookingStatusesQuery();
+  const bookingStatuses = getBookingStatuses();
   const navigate = useNavigate();
 
   const user = useSelector<RootState>(store => store.auth.user) as User;
@@ -120,13 +120,6 @@ const Planning = () => {
       setScrollingTimeline(newSettings.scrollingTimeline);
     }
   }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus, setShowTooltips, setSmallTooltips]);
-
-  // const bookings2 = bookings.map(booking => ({
-  //   ...booking,
-  //   status: bookingStatuses.filter(s => s.id === booking.status_id)[0],
-  //   lodging: lodgings.filter(l => l.id === booking.lodging_id)[0],
-  //   source: booking.source_id ? bookingChannels.filter(c => c.id === booking.source_id)[0] : undefined
-  // }));
 
   return (
     <Page className="planning">
@@ -195,13 +188,13 @@ const Planning = () => {
           <Typography variant="h5" component="h2">
             {t("Legend")}
           </Typography>
-          {bookingStatuses && bookingStatuses.map(status => {
+          {bookingStatuses.map(status => {
             return (
-              <span key={status.id}>
+              <span key={status.name}>
                 <span
                   className="status-legend"
                   style={{ background: status.color }}
-                >{status.name}</span> </span>);
+                >{status.getLabel(t)}</span> </span>);
           })}
         </CardContent>
       </Card>

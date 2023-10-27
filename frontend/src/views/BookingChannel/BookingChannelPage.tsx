@@ -2,8 +2,9 @@ import React from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  useCreateBookingChannelMutation, useDeleteBookingChannelMutation,
-  useGetBookingChannelQuery, useListBookingStatusesQuery,
+  useCreateBookingChannelMutation,
+  useDeleteBookingChannelMutation,
+  useGetBookingChannelQuery,
   useUpdateBookingChannelMutation
 } from "../../services/api";
 import Page from "../../layouts/Main/Page";
@@ -26,7 +27,6 @@ export function BookingChannelPage() {
   const [createBookingChannel] = useCreateBookingChannelMutation();
   const [updateBookingChannel] = useUpdateBookingChannelMutation();
   const [deleteBookingChannel] = useDeleteBookingChannelMutation();
-  const { data: bookingStatuses, isLoading: isStatusLoading } = useListBookingStatusesQuery();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canChange = user.permissions.includes("core.change_bookingchannel");
   const canDelete = user.permissions.includes("core.delete_bookingchannel");
@@ -91,12 +91,11 @@ export function BookingChannelPage() {
     }
   };
 
-  if (isLoading || isStatusLoading) return <div>{t("Loading...")}</div>;
+  if (isLoading) return <div>{t("Loading...")}</div>;
   return (
     <Page>
       <BookingChannelForm
         bookingChannel={bookingChannel}
-        bookingStatuses={bookingStatuses!}
         onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
         onDelete={canDelete ? onDelete : undefined}
       />

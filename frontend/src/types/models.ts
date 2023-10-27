@@ -64,18 +64,9 @@ export interface Service {
   auto_add_invoice: boolean;
 }
 
-export interface BookingStatus {
-  id: number;
-  name: string;
-  color: string;
-  rank: number;
-}
-
 export interface BookingChannel {
   id: number;
   name: string;
-  default_booking_status_id?: number | null;
-  default_booking_status?: BookingStatus;
 }
 
 export interface Comment {
@@ -95,8 +86,7 @@ export interface Booking {
   guest_name?: string;
   guest_contact?: string;
   guest_address?: string;
-  status_id: number;
-  status: BookingStatus;
+  status: string;
   source_id?: number;
   source?: BookingChannel;
   begin_date: Date;

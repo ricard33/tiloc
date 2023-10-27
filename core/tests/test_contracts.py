@@ -10,8 +10,7 @@ class ContractTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        for name in ["option", "contract sent", "deposit paid", "paid"]:
-            factories.BookingStatusFactory.create(name=name)
+        pass
 
     def test_generate_contract(self):
         contract_template = factories.ContractTemplateFactory.create(
@@ -53,8 +52,7 @@ class ContractTemplateTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        for name in ["option", "contract sent", "deposit paid", "paid"]:
-            factories.BookingStatusFactory.create(name=name)
+        pass
 
     def test_generate_contract(self):
         contract_template = factories.ContractTemplateFactory.create(

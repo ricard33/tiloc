@@ -66,6 +66,13 @@ logging.info("Starting django application (%s) %s %s", ENV, sys.argv[1:], DEBUG 
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
 
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://app.tiloc.fr",
+#     "https://*.tiloc.fr",
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+# ]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -87,7 +94,6 @@ INSTALLED_APPS = [
     "django_email_verification",
     "core",
     # 'frontend',
-
     "django.contrib.admin",  # after to allow templates override
 ]
 
@@ -195,10 +201,9 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 
 STORAGES = {
     "default": {
-        "BACKEND":
-            UNITTEST
-            and "django.core.files.storage.InMemoryStorage"
-            or "django.core.files.storage.FileSystemStorage",
+        "BACKEND": UNITTEST
+        and "django.core.files.storage.InMemoryStorage"
+        or "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -255,6 +260,12 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        # "rest_framework.parsers.MultiPartParser",
+        "core.parsers.MultiPartJSONParser",
     ],
 }
 
@@ -313,29 +324,29 @@ def password_change_callback(user, password):
 
 
 # Global Package Settings
-EMAIL_FROM_ADDRESS = 'noreply@tiloc.fr'  # mandatory
-EMAIL_PAGE_DOMAIN = 'https://tiloc.fr/'  # mandatory (unless you use a custom link)
+EMAIL_FROM_ADDRESS = "noreply@tiloc.fr"  # mandatory
+EMAIL_PAGE_DOMAIN = "https://tiloc.fr/"  # mandatory (unless you use a custom link)
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)
-EMAIL_MAIL_SUBJECT = 'Confirm your email {{ user.firstname }}'
-EMAIL_MAIL_HTML = 'signup/mail_body.html'
-EMAIL_MAIL_PLAIN = 'signup/mail_body.txt'
+EMAIL_MAIL_SUBJECT = "Confirm your email {{ user.firstname }}"
+EMAIL_MAIL_HTML = "signup/mail_body.html"
+EMAIL_MAIL_PLAIN = "signup/mail_body.txt"
 EMAIL_MAIL_TOKEN_LIFE = 60 * 60  # one hour
 
 # Email Verification Settings (mandatory for builtin view)
-EMAIL_MAIL_PAGE_TEMPLATE = 'signup/email_success_template.html'
+EMAIL_MAIL_PAGE_TEMPLATE = "signup/email_success_template.html"
 EMAIL_MAIL_CALLBACK = email_verified_callback
 
 # Password Recovery Settings (mandatory for email sending)
-EMAIL_PASSWORD_SUBJECT = 'Change your password {{ user.firstname }}'
-EMAIL_PASSWORD_HTML = 'signup/password_body.html'
-EMAIL_PASSWORD_PLAIN = 'signup/password_body.txt'
+EMAIL_PASSWORD_SUBJECT = "Change your password {{ user.firstname }}"
+EMAIL_PASSWORD_HTML = "signup/password_body.html"
+EMAIL_PASSWORD_PLAIN = "signup/password_body.txt"
 EMAIL_PASSWORD_TOKEN_LIFE = 60 * 10  # 10 minutes
 
 # Password Recovery Settings (mandatory for builtin view)
-EMAIL_PASSWORD_PAGE_TEMPLATE = 'signup/password_changed_template.html'
-EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = 'signup/password_change_template.html'
+EMAIL_PASSWORD_PAGE_TEMPLATE = "signup/password_changed_template.html"
+EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = "signup/password_change_template.html"
 EMAIL_PASSWORD_CALLBACK = password_change_callback
 
 # For Django Email Backend

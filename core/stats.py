@@ -4,6 +4,7 @@ import arrow
 from django.db.models import Q
 
 from core import models
+from core.models import status_no_stats
 
 
 def aggregate_month_for_range(
@@ -21,9 +22,7 @@ def aggregate_month_for_range(
         lodging_id__in=lodging_ids,
         cancelled=False,
         deleted=False,
-        status__no_stats=False,
-        # status__finalized=True,
-    )
+    ).exclude(status__in=status_no_stats)
     for booking in bookings:
         for d1, d2 in arrow.Arrow.interval("month", begin.floor("month").datetime, end.ceil("month").datetime):
             days_in_month = d2.day

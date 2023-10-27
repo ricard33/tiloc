@@ -102,7 +102,7 @@ class BookingChannelFactory(factory.django.DjangoModelFactory):
             "name",
         )
 
-    account = factory.SubFactory(AccountFactory)
+    account = None  # factory.SubFactory(AccountFactory)
     name = factory.Iterator(["web site", "booking.com", "airbnb", "abritel", "facebook", "instagram", "already come", "tripadvisor"])
 
 
@@ -115,20 +115,6 @@ class BookingChannelSyncFactory(factory.django.DjangoModelFactory):
     source_url = factory.Faker("uri")
 
 
-class BookingStatusFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.BookingStatus
-        django_get_or_create = (
-            "account",
-            "name",
-        )
-
-    account = factory.SubFactory(AccountFactory)
-    name = factory.Iterator(["option", "contract sent", "deposit paid", "paid"])
-    color = factory.Faker("color")
-    rank = factory.Sequence(lambda n: n)
-
-
 class BookingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Booking
@@ -137,9 +123,7 @@ class BookingFactory(factory.django.DjangoModelFactory):
     guest_name = factory.Faker("name")
     guest_contact = factory.Faker("email")
     guest_address = factory.Faker("address")
-    status = factory.SubFactory(
-        BookingStatusFactory, name="option", account=factory.SelfAttribute("..lodging.account")
-    )
+    status = "option"
     begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
     duration = factory.LazyAttribute(lambda b: random.randint(7, 21))
     end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=b.duration).date())

@@ -6,6 +6,7 @@ from django.db import transaction
 from ics import Calendar
 
 from core import models
+from core.models import BookingStatus
 from location import __date__, __version__
 
 logger = logging.getLogger("sync")
@@ -70,7 +71,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             source=channel,
             source_uid=event.uid,
             guest_name=event.summary,
-            status=channel.default_booking_status or models.BookingStatus.objects.filter(account=lodging.account).first(),
+            status=BookingStatus.External.value,
             begin_date=event.begin.date(),
             end_date=event.end.date(),
             duration=(event.end.date() - event.begin.date()).days,

@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import uuid
+from enum import Enum
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
@@ -11,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, Sum
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework.reverse import reverse as drf_reverse
 from simple_history.models import HistoricalRecords
 
@@ -147,7 +148,6 @@ class Account(models.Model):
         Lodging.objects.filter(account=self).delete()
         ContractTemplate.objects.filter(account=self).delete()
         Service.objects.filter(account=self).delete()
-        BookingStatus.objects.filter(account=self).delete()
         Pricing.objects.filter(account=self).delete()
         Holidays.objects.filter(account=self).delete()
         User.objects.filter(account=self).delete()
@@ -166,7 +166,6 @@ class Account(models.Model):
                 return obj
 
             Service.objects.bulk_create(map(_set_account, template.service_set.all()))
-            BookingStatus.objects.bulk_create(map(_set_account, template.bookingstatus_set.all()))
             BookingChannel.objects.bulk_create(map(_set_account, template.bookingchannel_set.all()))
             ContractTemplate.objects.bulk_create(map(_set_account, template.contracttemplate_set.all()))
 
@@ -342,39 +341,31 @@ class Service(models.Model):
         return self.designation
 
 
-class BookingStatus(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
-    name = models.CharField(_("name"), max_length=100)
-    color = models.CharField(_("color"), max_length=20)
-    rank = models.PositiveSmallIntegerField(_("rank"))
-    no_stats = models.BooleanField(
-        default=False, help_text=_("Check to ignore from statistics bookings with this status")
-    )
-    finalized = models.BooleanField(
-        default=True, help_text=_("If true, the booking is finalized and considered as real")
-    )
+class BookingStatus(models.TextChoices):
+    NotAvailable = "not available", _("Not available")
+    Option = "option", _("Option")
+    ContractSent = "contract sent", _("Contract sent")
+    DepositPaid = "deposit paid", _("Deposit paid")
+    PaymentOnArrival = "payment on arrival", _("Payment on arrival")
+    Paid = "paid", _("Paid")
+    External = "external", _("External")
 
-    class Meta:
-        verbose_name = _("Booking status")
-        verbose_name_plural = _("Booking statuses")
-        ordering = ["rank"]
 
-    _account_qs_path = "account"
-    objects = ForUserQuerySet.as_manager()
-
-    def __str__(self):
-        return self.name
+# ignored from statistics
+status_no_stats = map(lambda x: x.value, [BookingStatus.NotAvailable])
+# booking is finalized and considered as real
+status_finalized = map(lambda x: x.value, [BookingStatus.Paid, BookingStatus.External])
 
 
 class BookingChannel(models.Model):
     """Where does the booking come from, for reports"""
 
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"), null=True, blank=True)
     name = models.CharField(_("name"), max_length=100)
-    default_booking_status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Booking channel")
+        verbose_name_plural = _("Booking channels")
         ordering = ["name"]
 
     _account_qs_path = "account"
@@ -419,7 +410,7 @@ class Booking(models.Model):
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
-    status = models.ForeignKey(BookingStatus, on_delete=models.PROTECT)
+    status = models.TextField(_("status"), choices=BookingStatus.choices, default=BookingStatus.NotAvailable, max_length=20)
     source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT, blank=True, null=True)
     source_uid = models.CharField(
         _("channel UID"), max_length=256, null=True, blank=True, help_text=_("UID on source channel")

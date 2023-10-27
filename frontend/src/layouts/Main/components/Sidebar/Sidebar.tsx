@@ -12,9 +12,7 @@ import ListIcon from "@mui/icons-material/List";
 import MoneyIcon from "@mui/icons-material/AttachMoney";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HotelIcon from "@mui/icons-material/Hotel";
-import HolidayVillage from "@mui/icons-material/HolidayVillage";
 import RoomServiceIcon from "@mui/icons-material/RoomService";
-import GradingIcon from "@mui/icons-material/Grading";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import { ReactComponent as BookingSourcesIcon } from "../../../../assets/icones/booking-sources.svg";
@@ -96,7 +94,6 @@ const Sidebar: React.FC<Props> = props => {
         { title: t("General parameters"), href: "/settings", icon: <SettingsIcon />, disabled: false },
         ...(canViewUsers ? [{ title: t("Users"), href: "/settings/users", icon: <PeopleAltIcon /> }] : []),
         { title: t("Lodgings"), href: "/settings/lodgings", icon: <HotelIcon /> },
-        { title: t("Booking statuses"), href: "/settings/booking-status", icon: <GradingIcon /> },
         { title: t("Services"), href: "/settings/services", icon: <RoomServiceIcon /> },
         { title: t("Contract templates"), href: "/settings/contract-templates", icon: <DashboardIcon /> },
         { title: t("Booking channels"), href: "/settings/booking-channels", icon: <BookingSourcesIcon /> },

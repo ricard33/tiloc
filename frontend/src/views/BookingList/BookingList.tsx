@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useListBookingsPaginatedQuery, useListBookingStatusesQuery, useListLodgingsQuery } from "../../services/api";
+import { useListBookingsPaginatedQuery, useListLodgingsQuery } from "../../services/api";
 import { Card, CardContent, LinearProgress } from "@mui/material";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
@@ -24,6 +24,7 @@ import { DateRange } from "../../components/DateRangeSelector";
 import { GridSortItem } from "@mui/x-data-grid/models/gridSortModel";
 import { formatDate } from "../../common/dateUtils";
 import GridToolbar from "../../components/GridToolbar";
+import { getBookingStatuses } from "../../common/statusUtils";
 
 const BookingList = () => {
   const { t } = useTranslation();
@@ -54,7 +55,7 @@ const BookingList = () => {
   const showPayments = user.permissions.includes("core.view_payment");
   const [rowCountState, setRowCountState] = React.useState(bookings?.count ?? 0);
   const { data: lodgings } = useListLodgingsQuery();
-  const { data: statuses } = useListBookingStatusesQuery();
+  const statuses = getBookingStatuses();
 
   React.useEffect(() => {
     setRowCountState((prevRowCountState) => (bookings?.count !== undefined ? bookings?.count : prevRowCountState));
@@ -83,8 +84,8 @@ const BookingList = () => {
       field: "status", headerName: t("Status"), width: 170,
       type: "singleSelect",
       valueFormatter: (params) => params.value.name,
-      valueOptions: statuses && [...statuses.map((s) => {
-        return { value: s.id, label: s.name };
+      valueOptions: [...statuses.map((s) => {
+        return { value: s.name, label: s.getLabel(t) };
       })]
     },
     ...(showPayments

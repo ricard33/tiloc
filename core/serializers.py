@@ -169,28 +169,7 @@ class LodgingSubSerializer(serializers.ModelSerializer):
         ]
 
 
-class BookingStatusSerializer(serializers.ModelSerializer):
-    rank = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = models.BookingStatus
-        exclude = ["account"]
-
-    def create(self, validated_data: dict):
-        validated_data["account"] = self.context["request"].user.account
-        rank = validated_data.pop("rank", -1)
-        if rank < 0:
-            rank = (models.BookingStatus.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
-        validated_data["rank"] = rank
-        instance = super().create(validated_data)
-        return instance
-
-
 class BookingChannelSerializer(serializers.ModelSerializer):
-    default_booking_status = BookingStatusSerializer(read_only=True)
-    default_booking_status_id = serializers.PrimaryKeyRelatedField(
-        source="default_booking_status", queryset=models.BookingStatus.objects.all(), required=False, allow_null=True
-    )
 
     class Meta:
         model = models.BookingChannel
@@ -272,8 +251,6 @@ class BookedServiceSerializer(serializers.ModelSerializer):
 
 
 class BookingSubSerializer(serializers.ModelSerializer):
-    status = BookingStatusSerializer(read_only=True)
-    status_id = serializers.PrimaryKeyRelatedField(source="status", queryset=models.BookingStatus.objects.all())
     lodging = LodgingSubSerializer(read_only=True)
     lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
     source = BookingChannelSerializer(read_only=True)
@@ -286,7 +263,6 @@ class BookingSubSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "status",
-            "status_id",
             "lodging",
             "lodging_id",
             "guest_name",
@@ -338,8 +314,6 @@ class CommentSubSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    status = BookingStatusSerializer(read_only=True)
-    status_id = serializers.PrimaryKeyRelatedField(source="status", queryset=models.BookingStatus.objects.all())
     lodging = LodgingSubSerializer(read_only=True)
     lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
     source = BookingChannelSerializer(read_only=True)

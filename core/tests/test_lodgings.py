@@ -10,7 +10,6 @@ class LodgingAdminUserTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        # factories.BookingStatusFactory.create_batch(4)
         self.user = factories.AdminUserFactory.create()
         self.header = force_login(self.user)
 
@@ -22,9 +21,9 @@ class LodgingAdminUserTestCase(APITestCase):
         factories.LodgingFactory.create_batch(5)
         response = self.client.get("/api/lodging/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        obj = response.data
-        self.assertEqual(obj['count'], 5)
-        self.assertEqual(len(obj['results']), 5)
+        data = response.data
+        self.assertEqual(data['count'], 5)
+        self.assertEqual(len(data['results']), 5)
 
     def testMoveUp(self):
         factories.LodgingFactory.create_batch(4)
@@ -67,7 +66,6 @@ class LodgingStandardUserTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        # factories.BookingStatusFactory.create_batch(4)
         self.user = factories.StandardUserFactory.create()
         self.header = force_login(self.user)
 
@@ -81,9 +79,9 @@ class LodgingStandardUserTestCase(APITestCase):
         factories.LodgingFactory.create_batch(2)  # no access
         response = self.client.get("/api/lodging/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        obj = response.data
-        self.assertEqual(obj['count'], 2)
-        self.assertEqual(len(obj['results']), 2)
+        data = response.data
+        self.assertEqual(data['count'], 2)
+        self.assertEqual(len(data['results']), 2)
 
     def test_cant_create(self):
         owner = factories.StandardUserFactory()

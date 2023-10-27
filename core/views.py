@@ -19,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core import models
+from core.models import status_finalized, status_no_stats
 from core.stats import get_filling_rate_and_turnover
 
 logger = logging.getLogger("view")
@@ -34,7 +35,6 @@ class IndexPage(TemplateView):
 
 
 class CreateAccountClassView(FormView):
-
     def form_valid(self, form):
         user = form.save()
         return_val = super(CreateAccountClassView, self).form_valid(form)
@@ -143,7 +143,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     dates_range = [begin.date(), end.date()]
     filter = Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range)
     filter &= Q(booking__lodging__account=request.user.account)
-    if not request.user.has_perm('core.administrator'):
+    if not request.user.has_perm("core.administrator"):
         filter &= Q(booking__lodging__in=request.user.lodgings.all())
 
     booking_count = Count(
@@ -151,21 +151,23 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
         filter=filter
         & Q(booking__cancelled=False)
         & Q(booking__deleted=False)
-        & Q(booking__status__no_stats=False),
+        & ~Q(booking__status__in=status_no_stats),
     )  # noqa: E127
-    channels = models.BookingChannel.objects.filter(account=request.user.account).annotate(booking_count=booking_count)
+    channels = models.BookingChannel.objects.filter(Q(account=request.user.account)|Q(account__isnull=True)).annotate(booking_count=booking_count)
     for row in channels:
         data.append({"channel": row.name, "count": row.booking_count})
     data.append(
         {
             "channel": None,
-            "count": models.Booking.objects.for_user(request.user).filter(
+            "count": models.Booking.objects.for_user(request.user)
+            .filter(
                 cancelled=False,
                 deleted=False,
-                status__no_stats=False,
-                status__finalized=True,
+                # status__in=status_finalized,
                 source_id__isnull=True,
-            ).aggregate(count=Count("id"))["count"],
+            )
+            .exclude(status__in=status_no_stats)
+            .aggregate(count=Count("id"))["count"],
         }
     )
     return Response(data)

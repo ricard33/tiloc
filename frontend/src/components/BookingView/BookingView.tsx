@@ -9,6 +9,7 @@ import BookingActions from "../BookingActions";
 import { formatDate } from "../../common/dateUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatCurrency } from "../../common/intlUtils";
+import { getBookingStatus } from "../../common/statusUtils";
 
 
 type BookingViewProps = {
@@ -36,7 +37,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       booking.guest_address,
       booking.guest_contact,
       t("Lodging:") + " " + booking.lodging.name,
-      t("Status:") + " " + booking.status.name,
+      t("Status:") + " " + getBookingStatus(booking.status).getLabel(t),
       t("Price:") + " " + formatCurrency(booking.price_with_options),
       t("Check-in:") + " " + formatDate(booking.begin_date, "PPPP"),
       t("Check-out:") + " " + formatDate(booking.end_date, "PPPP"),

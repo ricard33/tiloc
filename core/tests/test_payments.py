@@ -10,7 +10,6 @@ class PaymentTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)

@@ -8,9 +8,6 @@ from core import models
 
 class BookingResource(resources.ModelResource):
     lodging = fields.Field(column_name="lodging", attribute="lodging", widget=ForeignKeyWidget(models.Lodging, "name"))
-    status = fields.Field(
-        column_name="status", attribute="status", widget=ForeignKeyWidget(models.BookingStatus, "name")
-    )
     source = fields.Field(
         column_name="source", attribute="source", widget=ForeignKeyWidget(models.BookingChannel, "name")
     )

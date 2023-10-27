@@ -1,0 +1,7 @@
+- {color: '#8f8f8f', finalized: '0', id: 1, name: not available, no_stats: '1', rank: 0}
+- {color: '#E0CB99', finalized: '0', id: 2, name: option, no_stats: '0', rank: 1}
+- {color: '#FAACEA', finalized: '0', id: 3, name: contract sent, no_stats: '0', rank: 2}
+- {color: '#D3D3F5', finalized: '0', id: 4, name: deposit paid, no_stats: '0', rank: 3}
+- {color: '#FADCE6', finalized: '0', id: 5, name: payment on arrival, no_stats: '0',  rank: 4}
+- {color: '#B6E69E', finalized: '1', id: 6, name: paid, no_stats: '0', rank: 5}
+- {color: '#DDDDDD', finalized: '1', id: 10, name: external, no_stats: '0', rank: 10}

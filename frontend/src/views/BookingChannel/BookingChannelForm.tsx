@@ -1,16 +1,9 @@
 import React from "react";
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader, Stack,
-  Unstable_Grid2 as Grid2
-} from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Stack, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { FormContainer, SelectElement, TextFieldElement } from "react-hook-form-mui";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import { useForm, useFormState } from "react-hook-form";
-import { BookingChannel, BookingStatus } from "../../types";
+import { BookingChannel } from "../../types";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
@@ -19,7 +12,6 @@ import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 type Props = {
   bookingChannel?: BookingChannel;
-  bookingStatuses: BookingStatus[];
   onSubmit?: (bookingChannel: BookingChannel) => void;
   onCancel: () => void;
   onDelete?: (bookingChannel: BookingChannel) => void;
@@ -27,7 +19,6 @@ type Props = {
 
 export const BookingChannelForm: React.FC<Props> = ({
   bookingChannel,
-  bookingStatuses,
   onSubmit,
   onCancel,
   onDelete
@@ -40,10 +31,6 @@ export const BookingChannelForm: React.FC<Props> = ({
 
   usePageUnloadAlert(isDirty);
 
-  const statusesOptions: { label: string, id: number }[] = bookingStatuses ? bookingStatuses.map((status) => {
-    return { label: status.name, id: status.id };
-  }) : [];
-
   const onCancelHandler = () => {
     unsavedChangesConfirm()
       .then(() => {
@@ -54,8 +41,7 @@ export const BookingChannelForm: React.FC<Props> = ({
   const onSubmitHandler = (bookingChannel: BookingChannel) => {
     if (onSubmit)
       return onSubmit({
-        ...bookingChannel,
-        default_booking_status_id: bookingChannel.default_booking_status_id === 0 ? null : bookingChannel.default_booking_status_id
+        ...bookingChannel
       });
   };
 
@@ -73,17 +59,6 @@ export const BookingChannelForm: React.FC<Props> = ({
           <Grid2 container spacing={2}>
             <Grid2 xs={12}>
               <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
-            </Grid2>
-            <Grid2 sm={6} xs={12}>
-              <SelectElement
-                name={"default_booking_status_id"}
-                label={t("Default booking status")}
-                options={[
-                  { label: "-", id: 0 },
-                  ...statusesOptions
-                ]}
-                fullWidth
-              />
             </Grid2>
           </Grid2>
         </CardContent>

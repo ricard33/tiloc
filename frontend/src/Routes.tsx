@@ -16,10 +16,8 @@ import {
 } from "./views";
 import { RequireAuth } from "./components/RequireAuth";
 import LodgingsList from "./views/Lodging/LodgingList";
-import BookingStatusesList from "./views/BookingStatus/BookingStatusesList";
 import ServicesList from "./views/Services/ServicesList";
 import { LodgingPage } from "./views/Lodging/LodgingPage";
-import { BookingStatusPage } from "./views/BookingStatus/BookingStatusPage";
 import { ServicePage } from "./views/Services/ServicePage";
 import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
 import CalendarSyncsList from "./views/CalendarSync/CalendarSyncsList";
@@ -82,9 +80,6 @@ const MyRoutes = () => {
             <Route path="lodgings" element={<LodgingsList />} />
             <Route path="lodgings/new" element={<LodgingPage />} />
             <Route path="lodgings/:lodgingId" element={<LodgingPage />} />
-            <Route path="booking-status" element={<BookingStatusesList />} />
-            <Route path="booking-status/new" element={<BookingStatusPage />} />
-            <Route path="booking-status/:bookingStatusId" element={<BookingStatusPage />} />
             <Route path="booking-channels" element={<BookingChannelList />} />
             <Route path="booking-channels/new" element={<BookingChannelPage />} />
             <Route path="booking-channels/:bookingChannelId" element={<BookingChannelPage />} />

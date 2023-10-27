@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Contacts as ContactsIcon, ExpandMore as ExpandMoreIcon, Forward as ForwardIcon } from "@mui/icons-material";
 import { Controller, useForm, useFormState } from "react-hook-form";
@@ -29,14 +29,13 @@ import OptionsList from "./OptionsList";
 import {
   useCreateBookingMutation,
   useListBookingChannelsQuery,
-  useListBookingStatusesQuery,
   useUpdateBookingMutation
 } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import "./BookingDialog.scss";
 import BookingActions from "../BookingActions";
-import { Booking, Lodging, Service, User } from "../../types";
+import { Booking, BookingStatus, Lodging, Service, User } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import {
@@ -48,6 +47,7 @@ import {
 } from "react-hook-form-mui";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { getBookingStatuses } from "../../common/statusUtils";
 
 
 type BookingDialogProps = {
@@ -72,7 +72,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { showError, showSuccess } = useAlert();
-  const { data: bookingStatuses } = useListBookingStatusesQuery();
   const { data: bookingChannels } = useListBookingChannelsQuery();
   const [createBooking] = useCreateBookingMutation();
   const [updateBooking] = useUpdateBookingMutation();
@@ -80,6 +79,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const variant = "outlined";
   const margin = "none";
   const depositPercent = 30; // TODO load this from lodging preferences
+  const bookingStatuses = getBookingStatuses();
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -122,28 +122,17 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   const depositLabel = user ? getDepositLabel(t, user.account.deposit_label) : t("Deposit");
 
-  useEffect(() => {
-    if (formValues.status_id === undefined && bookingStatuses) {
-      setValue("status_id", bookingStatuses[0].id);
-    }
-  }, [bookingStatuses, formValues.status_id, setValue]);
-
   function initializeDefaults(booking: Booking) {
     let initialState: Booking = {
       ...booking
-      //   status: { ...bookingStatuses.filter(x => x.id === booking.status_id)[0] },
       //   source: { ...bookingChannels.filter(x => x.id === booking.source_id)[0] }
     };
 
     lodging = booking.lodging_id ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
 
     // Provide defaults for new bookings
-    // if (initialState.status_id === undefined) {
-    //   initialState.status_id = bookingStatuses[0].id;
-    //   initialState.status = bookingStatuses[0];
-    // }
-    // @ts-ignore
-    initialState.lodging_id = booking.lodging_id || "";
+    initialState.status = booking.status || BookingStatus.NotAvailable.name;
+    initialState.lodging_id = booking.lodging_id || ("" as any);
     initialState.guest_name = booking.guest_name || "";
     initialState.guest_contact = booking.guest_contact || "";
     initialState.guest_address = booking.guest_address || "";
@@ -160,7 +149,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     initialState.adults = booking.adults || 2;
     initialState.children = booking.children || 0;
     initialState.babies = booking.babies || 0;
-    initialState.source_id = booking.source_id || ("" as any);  // FIXME remove any
+    initialState.source_id = booking.source_id || ("" as any);
     initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => o.auto_add_booking) : []);
     initialState.arrival_details = booking.arrival_details ?? "";
     initialState.notes = booking.notes ?? "";
@@ -372,30 +361,29 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               <Grid item sm={4} xs={12}>
                 <FormControl className="full-width" variant={variant}>
                   <InputLabel id="status-label">{t("Booking status")}</InputLabel>
-                  {bookingStatuses && formValues.status_id &&
-                    <Controller
-                      name="status_id"
-                      control={control}
-                      render={({ field }) =>
-                        <Select
-                          labelId="status-label"
-                          margin={margin}
-                          label={t("Booking status")}
-                          className="booking-status-select"
-                          {...field}
-                          // TODO fix type
-                          onChange={event => field.onChange(event as never)}
-                        >
-                          {bookingStatuses.map(status => (
-                            <MenuItem key={status.id} value={status.id}>
-                              <span
-                                className="booking-status-item"
-                                style={{ background: status.color }}
-                              >{status.name}</span>
-                            </MenuItem>
-                          ))}
-                        </Select>}
-                    />}
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) =>
+                      <Select
+                        labelId="status-label"
+                        margin={margin}
+                        label={t("Booking status")}
+                        className="booking-status-select"
+                        {...field}
+                        // TODO fix type
+                        onChange={event => field.onChange(event as never)}
+                      >
+                        {bookingStatuses.map(status => (
+                          <MenuItem key={status.name} value={status.name}>
+                            <span
+                              className="booking-status-item"
+                              style={{ background: status.color }}
+                            >{status.getLabel(t)}</span>
+                          </MenuItem>
+                        ))}
+                      </Select>}
+                  />
                 </FormControl>
               </Grid>
               { /* LODGING */}

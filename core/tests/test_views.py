@@ -18,8 +18,6 @@ class ExportCalendarTestCase(TestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        for name in ["option", "contract sent", "deposit paid", "paid"]:
-            factories.BookingStatusFactory(name=name)
         self.lodging = factories.LodgingFactory()
 
     def test_simple_export(self):
@@ -99,8 +97,6 @@ class ExportCalendarTestCase(TestCase):
 @unittest.skip("Security hole: Endpoint removed because not used")
 class ExportFullPlanningTestCase(TestCase):
     def setUp(self) -> None:
-        for name in ["option", "contract sent", "deposit paid", "paid"]:
-            factories.BookingStatusFactory(name=name)
         self.lodging1 = factories.LodgingFactory()
         self.lodging2 = factories.LodgingFactory()
         factories.BookingFactory(lodging=self.lodging1, guest_name="Cédric")
@@ -120,7 +116,6 @@ class FillingRateTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        factories.BookingStatusFactory.create_batch(4)
         self.user = factories.StandardUserFactory.create()
         self.header = force_login(self.user)
 
@@ -206,7 +201,6 @@ class ChannelsDistributionTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        factories.BookingStatusFactory.create_batch(4)
         factories.BookingChannelFactory.create_batch(8)
         self.user = factories.StandardUserFactory.create()
         self.header = force_login(self.user)
@@ -224,6 +218,7 @@ class ChannelsDistributionTestCase(APITestCase):
         response = self.client.get("/stats/channel_distribution/2020-01-01/2020-09-30/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
+        print(obj)
         self.assertEqual(channels_count + 1, len(obj), obj)
         self.assertEqual(1, self.count_channels(obj, None))
         self.assertEqual(1, self.count_channels(obj, "airbnb"))

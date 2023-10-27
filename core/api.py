@@ -33,7 +33,6 @@ from .serializers import (
     BookingChannelSyncSerializer,
     BookingNoPriceSerializer,
     BookingSerializer,
-    BookingStatusSerializer,
     CommentSerializer,
     ContractSerializer,
     ContractTemplateSerializer,
@@ -238,7 +237,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = (
         models.Booking.objects.filter(deleted=False)
         .order_by("-begin_date")
-        .prefetch_related("status", "lodging", "source", "options")
+        .prefetch_related("lodging", "source", "options")
     )
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
@@ -346,14 +345,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             raise APIException(detail=str(ex))
         serializer = ContractSerializer(instance=contract)
         return Response(serializer.data)
-
-
-class BookingStatusViewSet(viewsets.ModelViewSet, OrderedModelMixin):
-    queryset = models.BookingStatus.objects.all()
-    serializer_class = BookingStatusSerializer
-
-    def get_queryset(self):
-        return self.queryset.for_user(self.request.user)
 
 
 class BookingChannelViewSet(viewsets.ModelViewSet):

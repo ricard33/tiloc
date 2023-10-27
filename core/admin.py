@@ -424,13 +424,8 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         return obj.payment_set.all().aggregate(total=Sum("amount"))["total"]
 
 
-class BookingStatusAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = ("id", "name", "color", "rank", "no_stats", "finalized", "account")
-    list_editable = ("name", "color", "rank", "no_stats", "finalized")
-
-
 class BookingChannelAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = ("name", "default_booking_status", "account")
+    list_display = ("name", "account")
 
 
 class BookingChannelSyncAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
@@ -593,7 +588,6 @@ site.register(models.Service, ServiceAdmin)
 site.register(models.Lodging, LodgingAdmin)
 site.register(models.BookingChannel, BookingChannelAdmin)
 site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
-site.register(models.BookingStatus, BookingStatusAdmin)
 site.register(models.BookedService, BookedServiceAdmin)
 site.register(models.Holidays, HolidaysAdmin)
 site.register(models.Pricing, PricingAdmin)

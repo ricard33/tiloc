@@ -14,7 +14,6 @@ class BookingTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)
@@ -28,6 +27,8 @@ class BookingTestCase(APITestCase):
     def test_get_booking(self):
         booking = factories.BookingFactory.create(lodging=self.lodging)
         response = self.client.get("/api/booking/%d/" % booking.id, **self.header)
+        print(self.user.groups)
+        print(models.Booking.objects.filter(id=booking.id).values())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(obj["id"], booking.id)
@@ -50,7 +51,7 @@ class BookingTestCase(APITestCase):
     def test_create_booking(self):
         data = {
             "lodging_id": self.lodging.id,
-            "status_id": models.BookingStatus.objects.first().id,
+            "status": models.BookingStatus.Option.value,
             "guest_name": "John DOE",
             "begin_date": "2021-02-05",
             "end_date": "2021-02-25",
@@ -81,7 +82,7 @@ class BookingTestCase(APITestCase):
         service = factories.ServiceFactory.create()
         data = {
             "lodging_id": self.lodging.id,
-            "status_id": models.BookingStatus.objects.first().id,
+            "status": models.BookingStatus.Option.value,
             "guest_name": "John DOE",
             "begin_date": "2021-02-05",
             "end_date": "2021-02-25",
@@ -177,7 +178,6 @@ class BookingQueriesTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)
@@ -276,7 +276,6 @@ class BookingModelTestCase(TestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        factories.BookingStatusFactory.create_batch(4)
         self.lodging = factories.LodgingFactory.create()
 
     def test_booking_with_options_prices(self):

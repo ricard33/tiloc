@@ -5,9 +5,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HotelIcon from "@mui/icons-material/Hotel";
-import HolidayVillageIcon from "@mui/icons-material/HolidayVillage";
 import RoomServiceIcon from "@mui/icons-material/RoomService";
-import GradingIcon from "@mui/icons-material/Grading";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking-sources.svg";
 import Page from "../../layouts/Main/Page";
@@ -38,11 +36,6 @@ const Settings = () => {
       title: t("Lodgings"),
       href: "lodgings",
       icon: <HotelIcon />
-    },
-    {
-      title: t("Booking statuses"),
-      href: "booking-status",
-      icon: <GradingIcon />
     },
     {
       title: t("Services"),

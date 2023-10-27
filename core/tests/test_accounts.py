@@ -11,10 +11,14 @@ from core.tests.helpers import force_login
 class AccountTestCase(APITestCase):
     def test_account_template(self):
         template = factories.AccountFactory(name="__template__")
-        template.bookingstatus_set.create(name="custom status", rank=1)
+        template.service_set.create(designation="custom")
+        template.contracttemplate_set.create(name="custom")
+        template.bookingchannel_set.create(name="custom channel")
 
         account = factories.AccountFactory(name="new account")
-        self.assertTrue(account.bookingstatus_set.filter(name="custom status").exists())
+        self.assertTrue(account.service_set.filter(designation="custom").exists())
+        self.assertTrue(account.contracttemplate_set.filter(name="custom").exists())
+        self.assertTrue(account.bookingchannel_set.filter(name="custom channel").exists())
 
         account.save()
 
@@ -95,10 +99,9 @@ class MyAccountTestCase(APITestCase):
 
     def test_user_can_get_my_account(self):
         user = factories.StandardUserFactory()
-        self.client.force_authenticate(user=user)
-        response = self.client.get("/api/my-account/")
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        response = self.client.get("/api/my-account/")
+        # self.client.force_authenticate(user=user)
+        headers = force_login(user)
+        response = self.client.get("/api/my-account/", **headers)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
@@ -118,8 +121,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         pricing = factories.PricingFactory.create(account=account)
         factories.SeasonalVariationFactory.create(pricing=pricing)
         factories.HolidaysFactory.create(account=account)
-        for i in range(4):
-            factories.BookingStatusFactory.create(account=account)
         for i in range(6):
             factories.ServiceFactory.create(account=account)
 
@@ -169,7 +170,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         assertItemsCount("/api/seasonal_variation/", 1)
         assertItemsCount("/api/contract_template/", 1)
         assertItemsCount("/api/user/", 1)
-        assertItemsCount("/api/booking_status/", 1)
         assertItemsCount("/api/booking_channel/", 1)
         assertItemsCount("/api/booking_channel_sync/", 1)
         assertItemsCount("/api/service/", 1)
@@ -204,7 +204,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)
         assertItemsCount("/api/contract_template/", 1)
-        assertItemsCount("/api/booking_status/", 4)
         assertItemsCount("/api/booking_channel/", 8)
         assertItemsCount("/api/booking_channel_sync/", 1)
         assertItemsCount("/api/service/", 6)

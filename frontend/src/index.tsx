@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import rootSaga from "./sagas";
-import { store, sagaMiddleware } from "./store";
+import { sagaMiddleware, store } from "./store";
 import "./index.css";
 import { createBrowserHistory } from "history";
 import logger from "./common/logger";
@@ -57,7 +57,7 @@ axios.interceptors.response.use(
 
       if (error.response.status === 401) {
         if (["/login", "/logged-out"].indexOf(browserHistory.location.pathname) < 0) {
-          const location = { ...browserHistory.location };
+          // const location = { ...browserHistory.location };
           // dispatchError(error.response.data.detail);
           store.dispatch(authActions.tokenExpired());
           // console.warn("Push to /login from", location);

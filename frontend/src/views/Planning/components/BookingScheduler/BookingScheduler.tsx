@@ -21,6 +21,7 @@ import clsx from "clsx";
 import useWindowDimensions from "../../../../common/windowDimensions";
 import { Booking, Lodging } from "../../../../types";
 import { darken } from "@mui/system";
+import { getBookingStatus } from "../../../../common/statusUtils";
 
 const timeSteps = {
   second: 0,
@@ -214,8 +215,8 @@ const BookingScheduler: React.FC<Props> = props => {
     canResize: false,
     canChangeGroup: false,
     color: "black",
-    bgColor: booking.status.color,
-    selectedBgColor: darken(booking.status.color, 0.1),
+    bgColor: getBookingStatus(booking.status).color,
+    selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1),
     itemProps: {
       // these optional attributes are passed to the root <div /> of each item as <div {...itemProps} />
       // "data-custom-attribute": "Random content",

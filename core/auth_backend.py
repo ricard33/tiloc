@@ -27,3 +27,6 @@ class EmailBackend(ModelBackend):
             if user.check_password(password):
                 return user
         return None
+
+    def get_all_permissions(self, user_obj, obj=None):
+        return super().get_all_permissions(user_obj)

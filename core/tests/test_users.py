@@ -11,7 +11,6 @@ class UserTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        # factories.BookingStatusFactory.create_batch(4)
         self.user = factories.AdminUserFactory.create()
         self.header = force_login(self.user)
 
@@ -20,11 +19,11 @@ class UserTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_users(self):
-        factories.StandardUserFactory.create_batch(4)
+        factories.StandardUserFactory.create_batch(2)
         response = self.client.get("/api/user/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        obj = response.data
-        self.assertEqual(len(obj), 4)
+        results = response.data["results"]
+        self.assertEqual(len(results), 3)  # 1 admin + 2 standard users
 
     def test_create(self):
         data = {

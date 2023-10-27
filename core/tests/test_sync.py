@@ -2,6 +2,7 @@ import arrow
 from django.test import TestCase
 
 from core import models
+from core.models import BookingStatus
 from core.sync import synchronize_bookings
 from core.tests import factories
 
@@ -102,8 +103,6 @@ class SyncBookingsTestCase(TestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        for name in ["option", "contract sent", "deposit paid", "paid"]:
-            factories.BookingStatusFactory(name=name)
         self.lodging = factories.LodgingFactory()
         self.sync = factories.BookingChannelSyncFactory(lodging=self.lodging)
 
@@ -122,11 +121,10 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.all().count(), 7)
 
     def test_default_status(self):
-        status = factories.BookingStatusFactory(name="airbnb")
-        channel = factories.BookingChannelFactory(name="airbnb", default_booking_status=status)
+        channel = factories.BookingChannelFactory(name="airbnb")
         sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
         synchronize_bookings(sync, airbnb_ical)
-        self.assertEqual(models.Booking.objects.first().status.id, status.id)
+        self.assertEqual(models.Booking.objects.first().status, BookingStatus.External.value)
 
     def test_update_existing_booking_with_same_dates(self):
         factories.BookingFactory(

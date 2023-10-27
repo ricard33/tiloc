@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from faker import Faker
 
-from core.models import Account, Booking, BookingStatus, Lodging, Payment, User
+from core.models import Account, Booking, BookingChannel, BookingStatus, Lodging, Payment, User
 
 
 class Command(BaseCommand):
@@ -52,13 +52,10 @@ class Command(BaseCommand):
                     tourist_tax=1.5,
                 )
             )
-        status_option = BookingStatus.objects.get(account=demo_account, name="Option")
-        status_contract = BookingStatus.objects.get(account=demo_account, name="Contrat envoyé")
-        status_arrhes = BookingStatus.objects.get(account=demo_account, name="Arrhes payées")
-        status_payed = BookingStatus.objects.get(account=demo_account, name="Payé")
-        status_airbnb = BookingStatus.objects.get(account=demo_account, name="Airbnb")
-        status_booking = BookingStatus.objects.get(account=demo_account, name="Booking.com")
-        status_abritel = BookingStatus.objects.get(account=demo_account, name="Abritel")
+        channel_website = BookingChannel.objects.get(account=demo_account, name="Site Web")
+        channel_airbnb = BookingChannel.objects.get(account=demo_account, name="Airbnb")
+        channel_booking = BookingChannel.objects.get(account=demo_account, name="Booking.com")
+        channel_abritel = BookingChannel.objects.get(account=demo_account, name="Abritel")
         for lodging in lodgings:
             for i in range(random.randrange(60, 80)):
                 while True:
@@ -70,24 +67,34 @@ class Command(BaseCommand):
                     ).exists():
                         if begin_date < arrow.now().date():
                             status = random.choices(
-                                [status_payed, status_airbnb, status_booking, status_abritel],
-                                weights=(8, 2, 2, 1),
+                                [BookingStatus.Paid, BookingStatus.External],
+                                weights=(8, 5),
                             )[0]
                         else:
                             status = random.choices(
                                 [
-                                    status_option,
-                                    status_contract,
-                                    status_arrhes,
-                                    status_airbnb,
-                                    status_booking,
-                                    status_abritel,
+                                    BookingStatus.Option,
+                                    BookingStatus.ContractSent,
+                                    BookingStatus.DepositPaid,
+                                    BookingStatus.External,
                                 ],
-                                weights=(1, 5, 10, 2, 2, 1),
+                                weights=(1, 5, 10, 5),
                             )[0]
+                        if status == BookingStatus.External:
+                            source = random.choices(
+                                [
+                                    channel_airbnb,
+                                    channel_booking,
+                                    channel_abritel,
+                                ],
+                                weights=(2, 2, 1),
+                            )[0]
+                        else:
+                            source = channel_website
                         booking = Booking.objects.create(
                             lodging=lodging,
-                            status=status,
+                            status=status.value,
+                            source=source,
                             begin_date=begin_date,
                             end_date=end_date,
                             duration=duration,
@@ -101,13 +108,11 @@ class Command(BaseCommand):
                             price=lodging.daily_rate * duration,
                             deposit=round(lodging.daily_rate * duration * 0.3, -1),
                             commission_fees=(
-                                status in map(lambda x: x.name, [status_booking, status_abritel, status_airbnb])
-                                and lodging.daily_rate * duration * 0.15
-                                or None
+                                status == BookingStatus.External and lodging.daily_rate * duration * 0.15 or None
                             ),
                             guaranty=300,
                         )
-                        if status.name in [status_arrhes.name, status_payed.name]:
+                        if status in [BookingStatus.DepositPaid, BookingStatus.Paid]:
                             Payment.objects.create(
                                 booking=booking,
                                 description="Arrhes",
@@ -115,7 +120,7 @@ class Command(BaseCommand):
                                 amount=booking.deposit,
                                 method=Payment.PaymentMethod.TRANSFER.value,
                             )
-                        if status.name == status_payed.name:
+                        if status == BookingStatus.Paid:
                             Payment.objects.create(
                                 booking=booking,
                                 description="Solde",
@@ -123,8 +128,7 @@ class Command(BaseCommand):
                                 amount=booking.price_with_options - booking.deposit,
                                 method=Payment.PaymentMethod.TRANSFER.value,
                             )
-                        # if status in map(lambda x: x.name, [status_booking, status_abritel, status_airbnb]):
-                        if status in [status_booking, status_abritel, status_airbnb] and end_date < arrow.now().date():
+                        if status == BookingStatus.External and end_date < arrow.now().date():
                             Payment.objects.create(
                                 booking=booking,
                                 description="Totalité",

@@ -4,8 +4,7 @@ import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { QueryError, useGetUserQuery, useSignupMutation } from "../../services/api";
 import { Trans, useTranslation } from "react-i18next";
 import { useAlert } from "../../common/alertUtils";
-import { LoginInfo, User } from "../../types";
-import { useConfirm } from "../../libs/MuiConfirm";
+import { LoginInfo } from "../../types";
 import { FormContainer, PasswordElement, PasswordRepeatElement, TextFieldElement } from "react-hook-form-mui";
 import { Button, Container, Link, Paper, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useForm } from "react-hook-form";
@@ -28,8 +27,7 @@ export function SignUp() {
     data: user,
     isLoading
   } = useGetUserQuery(Number(userId), { skip: typeof userId === "undefined" });
-  const { showError, showSuccess } = useAlert();
-  const confirm = useConfirm();
+  const { showError } = useAlert();
   const formContext = useForm<SignUpData>({
   });
   const { formState } = formContext;
