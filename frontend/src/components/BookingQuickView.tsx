@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { ReactI18NextChild, useTranslation } from "react-i18next";
 import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
-import { Booking, Service, User } from "../types";
+import { Booking, BookingStatus, Service, User } from "../types";
 import "./BookingQuickView.scss";
 import PaymentList from "./PaymentList";
 import { useLazyGetPaymentsForBookingQuery } from "../services/api";
@@ -90,7 +90,10 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             (booking.children ? t(" and {{count}} children", { count: booking.children }) : "") +
             (booking.babies ? t(" and {{count}} babies", { count: booking.babies }) : "")
           )}
-          {displayField(true, t("Status:"), getBookingStatus(booking.status).getLabel(t))}
+          {displayField(true, t("Status:"), booking.status !== BookingStatus.External.name
+            ? getBookingStatus(booking.status).getLabel(t)
+            : booking.source?.name
+          )}
           {displayField(showPayments, t("Lodging:"), booking.lodging ? booking.lodging.name : t("Cancellation / Waiting"), true)}
           {displayField(showPayments, t("Price:"), formatCurrency(booking.price_with_options), true)}
         </Grid>

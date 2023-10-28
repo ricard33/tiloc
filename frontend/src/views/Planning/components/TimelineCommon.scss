@@ -1,0 +1,41 @@
+.react-calendar-timeline {
+  .rct-horizontal-lines {
+    cursor: copy;
+  }
+
+  .rct-item {
+    .rct-item-content {
+      position: static;
+      padding: 0;
+
+      .item-content {
+        width: 100%;
+      }
+
+
+      .item-title {
+        display: inline;
+        vertical-align: text-bottom;
+        margin-left: 5px;
+      }
+
+      .item-icon {
+        color: black;
+        font-size: 1em;
+        position: absolute;
+        right: 0;
+        top: 0;
+        border-left: 1px solid black;
+      }
+
+
+      .partially-paid {
+        background: orange;
+      }
+
+      .fully-paid {
+        background: rgb(182, 230, 158);
+      }
+    }
+  }
+}

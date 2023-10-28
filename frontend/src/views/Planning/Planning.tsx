@@ -121,6 +121,14 @@ const Planning = () => {
     }
   }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus, setShowTooltips, setSmallTooltips]);
 
+  const settings: PlanningSettings = {
+    showPaymentStatus,
+    monthsToDisplay,
+    showTooltips,
+    smallTooltips,
+    scrollingTimeline
+  };
+
   return (
     <Page className="planning">
       <Routes>
@@ -153,13 +161,7 @@ const Planning = () => {
             onItemSelected={onSelectBooking}
             onItemDeselected={onDeselectBooking}
             onBoundsChange={onBoundsChange}
-            settings={{
-              showPaymentStatus,
-              monthsToDisplay,
-              showTooltips,
-              smallTooltips,
-              scrollingTimeline
-            }}
+            settings={settings}
             disabled={isLoadingBookings}
           />
         </> : <>
@@ -174,9 +176,7 @@ const Planning = () => {
             onOpenBooking={onEditBooking}
             onItemSelected={onSelectBooking}
             onItemDeselected={onDeselectBooking}
-            showPaymentStatus={showPaymentStatus}
-            monthsToDisplay={monthsToDisplay}
-            showTooltips={showTooltips}
+            settings={settings}
             disabled={isLoadingBookings}
           />
         </>

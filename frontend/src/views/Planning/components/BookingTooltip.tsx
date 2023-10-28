@@ -1,10 +1,10 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Booking } from "../../../types";
+import { Booking, BookingStatus } from "../../../types";
 import { formatDate } from "../../../common/dateUtils";
 import { useTranslation } from "react-i18next";
-import { getBookingStatus } from "../../../common/statusUtils";
+import { getBookingStatus, otaBranding } from "../../../common/statusUtils";
 
 type Props = {
   booking: Booking;
@@ -15,6 +15,9 @@ export default function BookingTooltip(props: Props) {
   const { booking, onOpenBooking } = props;
   const { t } = useTranslation();
   const status = getBookingStatus(booking.status);
+  const statusDisplay = status.name === BookingStatus.External.name && booking.source && booking.source.name in otaBranding
+    ? { label: booking.source.name, ...otaBranding[booking.source.name] }
+    : { label: status.getLabel(t), bgColor: status.color };
   return (
     <>
       <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
@@ -26,8 +29,11 @@ export default function BookingTooltip(props: Props) {
       <Typography sx={{ mb: 1.5 }} color="text.secondary">
         {booking.lodging ? booking.lodging.name : t("Cancellation / Waiting")}
       </Typography>
-      <Typography variant="body2" style={{ background: status.color }}>
-        {status.getLabel(t)}
+      <Typography variant="body2" style={{ background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem" }}>
+        {statusDisplay.icon}
+        <span style={{ verticalAlign: "text-bottom" }}>
+          {statusDisplay.label}
+        </span>
       </Typography>
       {onOpenBooking &&
         <Button size="small" onClick={() => onOpenBooking(booking)}>{t("Display")}</Button>
