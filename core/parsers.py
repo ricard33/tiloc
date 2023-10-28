@@ -2,8 +2,8 @@ import json
 import logging
 
 from django.conf import settings
-from django.http import QueryDict
-from django.http.multipartparser import MultiPartParser as DjangoMultiPartParser, MultiPartParserError
+from django.http.multipartparser import MultiPartParser as DjangoMultiPartParser
+from django.http.multipartparser import MultiPartParserError
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import BaseParser, DataAndFiles
 
@@ -24,7 +24,6 @@ class MultiPartJSONParser(BaseParser):
             data, files = parser.parse()
             data = data.copy()
             for key in data:
-                l = []
                 value = data[key]
                 if value:
                     try:
@@ -33,9 +32,9 @@ class MultiPartJSONParser(BaseParser):
                             data.setlist(key, value)
                         else:
                             data[key] = value
-                    except ValueError as e:
+                    except ValueError:
                         pass
-                    except Exception as e:
+                    except Exception:
                         logging.getLogger("parsers").exception("Error in JSON decoding")
             return DataAndFiles(data, files)
         except MultiPartParserError as exc:

@@ -19,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from core import models
-from core.models import status_finalized, status_no_stats
+from core.models import status_no_stats
 from core.stats import get_filling_rate_and_turnover
 
 logger = logging.getLogger("view")
@@ -153,7 +153,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
         & Q(booking__deleted=False)
         & ~Q(booking__status__in=status_no_stats),
     )  # noqa: E127
-    channels = models.BookingChannel.objects.filter(Q(account=request.user.account)|Q(account__isnull=True)).annotate(booking_count=booking_count)
+    channels = models.BookingChannel.objects.filter(Q(account=request.user.account) | Q(account__isnull=True)).annotate(booking_count=booking_count)
     for row in channels:
         data.append({"channel": row.name, "count": row.booking_count})
     data.append(

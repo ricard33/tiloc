@@ -1,6 +1,6 @@
 from django.contrib.auth import logout
 from rest_framework.exceptions import NotAuthenticated
-from rest_framework.permissions import BasePermission, DjangoModelPermissions, DjangoObjectPermissions
+from rest_framework.permissions import BasePermission, DjangoObjectPermissions
 
 
 class TilocPermissions(DjangoObjectPermissions):

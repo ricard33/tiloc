@@ -2,7 +2,6 @@ import logging
 import os
 import re
 import uuid
-from enum import Enum
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
@@ -12,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, Sum
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _, gettext
+from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse as drf_reverse
 from simple_history.models import HistoricalRecords
 
@@ -240,7 +239,6 @@ class User(auth_models.AbstractUser):
     vat_rate = models.DecimalField(_("vat rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True, null=True)
     signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True, null=True)
-    
     verified = models.BooleanField(_("verified"), default=False, help_text=_('Define if email user has been verified or not'))
 
     _account_qs_path = "account"

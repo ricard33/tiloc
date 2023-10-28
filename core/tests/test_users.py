@@ -1,5 +1,5 @@
 from django.core.files.base import ContentFile
-from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
+from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 from rest_framework import status
 from rest_framework.test import APITestCase
 

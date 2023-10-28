@@ -85,7 +85,6 @@ class LodgingStandardUserTestCase(APITestCase):
 
     def test_cant_create(self):
         owner = factories.StandardUserFactory()
-        status_count = models.Lodging.objects.all().count()
         data = {"name": "my beautiful lodge", "owner_id": owner.id, "address": "here", "daily_rate": 30}
         response = self.client.post("/api/lodging/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.data)

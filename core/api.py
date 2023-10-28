@@ -13,7 +13,8 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django_email_verification import send_email
 from knox.models import AuthToken
-from knox.views import LoginView as KnoxLoginView, LogoutView as KnoxLogoutView
+from knox.views import LoginView as KnoxLoginView
+from knox.views import LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
@@ -21,6 +22,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from location import __date__, __version__
+
 from . import models
 from .contracts import generate_contract, generate_empty_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
