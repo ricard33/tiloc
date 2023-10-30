@@ -138,10 +138,10 @@ frontend0/
 /config/config.ini
 .DS_Store
 /backup/
+/backups/
 /location/version.properties
 /frontend/src/components/Editor/ckeditor5/node_modules/
 /.idea/codestream.xml
-!/backups/
 /TODO.md
 /test-reports/
 /requirements-prod.txt

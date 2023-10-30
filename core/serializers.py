@@ -72,7 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
-        read_only_fields = ("id", "first_name", "verified")
+        read_only_fields = ("id", "verified")
         exclude = ["user_permissions", "is_superuser", "is_staff"]
         extra_kwargs = {"password": {"write_only": True}}
 

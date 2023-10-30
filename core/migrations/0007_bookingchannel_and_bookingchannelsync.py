@@ -5,21 +5,6 @@ from django.conf import settings
 from django.db import migrations, models
 
 
-def migrate_status(apps, schema_editor):
-    default_account_id = 1
-    BookingStatus = apps.get_model("core", "BookingStatus")
-    Booking = apps.get_model("core", "Booking")
-    for status in BookingStatus.objects.exclude(account=default_account_id):
-        # print(status)
-        try:
-            default_status = BookingStatus.objects.filter(account=default_account_id).get(name=status.name)
-        except BookingStatus.DoesNotExist:
-            default_status = BookingStatus.objects.filter(account=default_account_id).first()
-        Booking.objects.filter(status=status).update(status=default_status)
-    BookingStatus.objects.exclude(account=default_account_id).delete()
-    # BookingStatus.objects.update(id0=Lower("name"))
-
-
 def migrate_channel_sync(apps, schema_editor):
     default_account_id = 1
     BookingChannel = apps.get_model("core", "BookingChannel")
@@ -65,9 +50,6 @@ class Migration(migrations.Migration):
             options={'ordering': ['name'], 'verbose_name': 'Booking channel', 'verbose_name_plural': 'Booking channels'},
         ),
         migrations.RunPython(migrate_channel_sync, migrations.RunPython.noop),
-        # BookingStatus
-        migrations.RunPython(migrate_status, migrations.RunPython.noop),
-        migrations.RemoveField("bookingstatus", "account"),
         # Old changes on Lodging
         migrations.AlterField(
             model_name="historicallodging",

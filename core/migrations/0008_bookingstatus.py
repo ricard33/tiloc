@@ -4,6 +4,21 @@ from django.db import migrations, models
 from django.db.models import F, OuterRef
 
 
+def migrate_all_statuses_to_default_account_ones(apps, schema_editor):
+    default_account_id = 1
+    BookingStatus = apps.get_model("core", "BookingStatus")
+    Booking = apps.get_model("core", "Booking")
+    for status in BookingStatus.objects.exclude(account=default_account_id):
+        # print(status)
+        try:
+            default_status = BookingStatus.objects.filter(account=default_account_id).get(name=status.name)
+        except BookingStatus.DoesNotExist:
+            default_status = BookingStatus.objects.filter(account=default_account_id).first()
+        Booking.objects.filter(status=status).update(status=default_status)
+    BookingStatus.objects.exclude(account=default_account_id).delete()
+    # BookingStatus.objects.update(id0=Lower("name"))
+
+
 def rename_status(apps, schema_editor):
     BookingStatus = apps.get_model("core", "BookingStatus")
     BookingStatus.objects.filter(name="Indisponible").update(name="not available")
@@ -13,7 +28,7 @@ def rename_status(apps, schema_editor):
     BookingStatus.objects.filter(name="Paiement à l'arrivée").update(name="payment on arrival")
     BookingStatus.objects.filter(name="Payé").update(name="paid")
     if not BookingStatus.objects.filter(name="external").exists():
-        BookingStatus.objects.create(name="external", color="#DDDDDD", finalized=True, no_stats=False, rank=10)
+        BookingStatus.objects.create(name="external", color="#DDDDDD", finalized=True, no_stats=False, rank=10, account_id=1)
 
     external = BookingStatus.objects.get(name="external")
 
@@ -37,10 +52,11 @@ def rename_status(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("core", "0007_bookingchannelsync_channel0_bookingstatus_id0_and_more"),
+        ("core", "0007_bookingchannel_and_bookingchannelsync"),
     ]
 
     operations = [
+        # BookingStatus
         migrations.AddField(
             model_name="booking",
             name="status_",
@@ -59,28 +75,6 @@ class Migration(migrations.Migration):
                 verbose_name="status",
             ),
         ),
+        migrations.RunPython(migrate_all_statuses_to_default_account_ones, migrations.RunPython.noop),
         migrations.RunPython(rename_status, migrations.RunPython.noop),
-        migrations.RemoveField(model_name="booking", name="status"),
-        migrations.RenameField(model_name="booking", old_name="status_", new_name="status"),
-        migrations.AlterField(
-            model_name="historicalbooking",
-            name="status",
-            field=models.TextField(
-                choices=[
-                    ("not available", "Not available"),
-                    ("option", "Option"),
-                    ("contract sent", "Contract sent"),
-                    ("deposit paid", "Deposit paid"),
-                    ("payment on arrival", "Payment on arrival"),
-                    ("paid", "Paid"),
-                    ("external", "External"),
-                ],
-                default="not available",
-                max_length=20,
-                verbose_name="status",
-            ),
-        ),
-        migrations.DeleteModel(
-            name="BookingStatus",
-        ),
     ]
