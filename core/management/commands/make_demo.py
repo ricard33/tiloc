@@ -1,11 +1,12 @@
 import random
+from decimal import Decimal
 
 import arrow
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from faker import Faker
 
-from core.models import Account, Booking, BookingChannel, BookingStatus, Lodging, Payment, User
+from core.models import Account, BookedService, Booking, BookingChannel, BookingStatus, Contract, Lodging, Payment, User
 
 
 class Command(BaseCommand):
@@ -27,35 +28,48 @@ class Command(BaseCommand):
 
         fake = Faker("fr_FR")
 
-        admin = User.objects.create(
+        admin, created = User.objects.get_or_create(
             account=demo_account,
             email="admin@app.tiloc.fr",
-            first_name=fake.first_name(),
-            last_name=fake.last_name(),
         )
-        admin.groups.add(Group.objects.get(name__iexact="administrator"))
+        if created:
+            admin.first_name = (fake.first_name(),)
+            admin.last_name = (fake.last_name(),)
 
-        admin.set_password("admin")
-        admin.save()
+            admin.groups.add(Group.objects.get(name__iexact="administrator"))
 
+            admin.set_password("admin")
+            admin.save()
+
+        # purge bookings
+        Payment.objects.filter(booking__lodging__account=demo_account).delete()
+        Contract.objects.filter(booking__lodging__account=demo_account).delete()
+        BookedService.objects.filter(booking__lodging__account=demo_account).delete()
+        Booking.objects.filter(lodging__account=demo_account).delete()
+
+        # create lodgings
         lodgings = []
         for rank, name in enumerate(["Hibiscus", "Frangipanier", "Orchidée", "Anthurium", "Heliconia"]):
-            lodgings.append(
-                Lodging.objects.create(
-                    account=demo_account,
-                    name=name,
-                    rank=rank,
-                    address=fake.address(),
-                    daily_rate=random.randrange(50, 120, 10),
-                    guaranty=300,
-                    capacity=random.choice([2, 3, 4]),
-                    tourist_tax=1.5,
-                )
+            lodging, created = Lodging.objects.get_or_create(
+                account=demo_account,
+                owner=admin,
+                name=name,
+                rank=rank,
+                guaranty=300,
+                tourist_tax=1.5,
             )
-        channel_website = BookingChannel.objects.get(account=demo_account, name="Site Web")
-        channel_airbnb = BookingChannel.objects.get(account=demo_account, name="Airbnb")
-        channel_booking = BookingChannel.objects.get(account=demo_account, name="Booking.com")
-        channel_abritel = BookingChannel.objects.get(account=demo_account, name="Abritel")
+            if created:
+                lodging.address = fake.address()
+                lodging.capacity = random.choice([2, 3, 4])
+                lodgings.daily_rate = random.randrange(50, 120, 10)
+                lodging.save()
+            lodgings.append(lodging)
+
+        # create bookings
+        channel_website = BookingChannel.objects.get(name="Site Web")
+        channel_airbnb = BookingChannel.objects.get(name="Airbnb")
+        channel_booking = BookingChannel.objects.get(name="Booking.com")
+        channel_abritel = BookingChannel.objects.get(name="Abritel")
         for lodging in lodgings:
             for i in range(random.randrange(60, 80)):
                 while True:
@@ -106,9 +120,9 @@ class Command(BaseCommand):
                             babies=random.choices([0, 1], weights=(10, 1))[0],
                             daily_rate=lodging.daily_rate,
                             price=lodging.daily_rate * duration,
-                            deposit=round(lodging.daily_rate * duration * 0.3, -1),
+                            deposit=round(float(lodging.daily_rate) * duration * 0.3, -1),
                             commission_fees=(
-                                status == BookingStatus.External and lodging.daily_rate * duration * 0.15 or None
+                                status == BookingStatus.External and float(lodging.daily_rate) * duration * 0.15 or None
                             ),
                             guaranty=300,
                         )
@@ -125,7 +139,7 @@ class Command(BaseCommand):
                                 booking=booking,
                                 description="Solde",
                                 date=arrow.get(begin_date).shift(days=random.randrange(-20, 0)).date(),
-                                amount=booking.price_with_options - booking.deposit,
+                                amount=booking.price_with_options - Decimal(booking.deposit),
                                 method=Payment.PaymentMethod.TRANSFER.value,
                             )
                         if status == BookingStatus.External and end_date < arrow.now().date():
