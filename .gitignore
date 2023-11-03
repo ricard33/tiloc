@@ -146,3 +146,4 @@ frontend0/
 /test-reports/
 /requirements-prod.txt
 /files-unittest/
+.pgpass
