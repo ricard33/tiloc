@@ -81,10 +81,10 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
             </Grid2>
         )}
         <Grid2 sm={6} xs={12}>
-          <TextFieldElement name={"phone"} label={t("Phone")} fullWidth required />
+          <TextFieldElement name={"phone"} label={t("Phone")} fullWidth  />
         </Grid2>
         <Grid2 sm={6} xs={12}>
-          <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth required />
+          <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth  />
         </Grid2>
 
         {!myProfileOnly && (
