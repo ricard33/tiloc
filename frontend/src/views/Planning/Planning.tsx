@@ -183,21 +183,21 @@ const Planning = () => {
       }
 
       <br />
-      <Card className="planning-legend">
-        <CardContent>
-          <Typography variant="h5" component="h2">
-            {t("Legend")}
-          </Typography>
-          {bookingStatuses.map(status => {
-            return (
-              <span key={status.name}>
-                <span
-                  className="status-legend"
-                  style={{ background: status.color }}
-                >{status.getLabel(t)}</span> </span>);
-          })}
-        </CardContent>
-      </Card>
+      {/*<Card className="planning-legend">*/}
+      <p>
+        <span className="status-legend-title">
+          {t("Legend")} :
+        </span>
+        {bookingStatuses.map(status => {
+          return (
+            <span key={status.name}>
+              <span
+                className="status-legend"
+                style={{ background: status.color }}
+              >{status.getLabel(t)}</span> </span>);
+        })}
+      </p>
+      {/*</Card>*/}
       {settingsOpened &&
         <PlanningSettingsDialog
           open={settingsOpened}

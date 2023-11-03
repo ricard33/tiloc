@@ -23,7 +23,8 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<User>({
     defaultValues: user ?? {
-      is_active: true
+      is_active: true,
+      groups: ["standard"]
     }
   });
   const { control } = formContext;

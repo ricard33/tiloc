@@ -31,6 +31,7 @@ export interface User {
   signature: string|null;
   lodgings: Lodging[];
   verified: boolean;
+  groups: string[];
   permissions: string[];
 }
 
