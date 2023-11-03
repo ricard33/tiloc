@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import date
 from typing import List
 
@@ -41,6 +42,8 @@ def make_context(booking, url_server):
         )
         or ""
     )
+    emails = re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", booking.guest_contact)
+    phones = re.findall(r"([+]?[\s./0-9]*[(]?[0-9]{1,4}[)]?[0-9][-\s./0-9]{6,12}[0-9])", booking.guest_contact)
 
     page_break = '<div style="display: block; page-break-before: always;"></div>'
     return {
@@ -61,15 +64,17 @@ def make_context(booking, url_server):
         "DATE": format_date(date.today()),
         "Propriétaire_NOM": booking.lodging.owner.last_name,
         "Propriétaire_PRENOM": booking.lodging.owner.first_name,
-        "Propriétaire_ADRESSE_POSTALE": booking.lodging.owner.address,
+        "Propriétaire_ADRESSE_POSTALE": ", ".join(booking.lodging.owner.address.splitlines()),
         "Propriétaire_TELEPHONE": booking.lodging.owner.phone,
         "Propriétaire_EMAIL": booking.lodging.owner.email,
         "Voyageur_NOM_COMPLET": booking.guest_name,
-        "Voyageur_ADRESSE_POSTALE": booking.guest_address,
-        "Voyageur_CONTACT": booking.guest_contact,
+        "Voyageur_ADRESSE_POSTALE": " - ".join(booking.guest_address.splitlines()),
+        "Voyageur_CONTACT": " - ".join(booking.guest_contact.splitlines()),
+        "Voyageur_TELEPHONE": len(phones) > 0 and phones[0] or "",
+        "Voyageur_EMAIL": len(emails) > 0 and emails[0] or "",
         "Logement_NOM": booking.lodging.name,
         # "Logement_PAGE_WEB_ANNONCE",
-        "Logement_ADRESSE_POSTALE": booking.lodging.address,
+        "Logement_ADRESSE_POSTALE": ", ".join(booking.lodging.address.splitlines()),
         # "Logement_GPS": booking.lodging.,
         # "Logement_TYPE": booking.lodging.,
         # "Logement_NBS_CHAMBRES": booking,
@@ -97,12 +102,14 @@ def make_context(booking, url_server):
         "Réservation_NB_BEBES": booking.babies,
         "Réservation_DATE": format_date(booking.created, "full"),
         "Réservation_SERVICES_INCLUS": format_services(
-            booking.id and booking.bookedservice_set.filter(service__not_included_in_price=False) or [],
-            booking
+            booking.id and booking.bookedservice_set.filter(service__not_included_in_price=False) or [], booking
         ),
         "Réservation_SERVICES_ADDITIONELS": format_services(
-            booking.id and booking.bookedservice_set.filter(service__not_included_in_price=True) or [],
-            booking
+            booking.id and booking.bookedservice_set.filter(service__not_included_in_price=True) or [], booking
+        ),
+        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.lodging.tourist_tax),
+        "Réservation_TAXE_DE_SEJOUR": format_decimal(
+            float(booking.lodging.tourist_tax) * booking.adults * booking.duration
         ),
         # "Signature_LOCATAIRE": booking,
         "Signature_BAILLEUR": signature_img,

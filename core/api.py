@@ -313,6 +313,23 @@ class BookingViewSet(viewsets.ModelViewSet):
         serializer = NextEventSerializer(qs[:count], many=True)
         return Response(serializer.data)
 
+    @staticmethod
+    def _generate_contract(booking, request):
+        try:
+            contract = generate_contract(
+                booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
+            )
+        except jinja2.exceptions.TemplateSyntaxError as ex:
+            logger.exception("Template generation error")
+            raise APIException(detail="Template error at line %d: %s" % (ex.lineno, ex.message))
+        except jinja2.exceptions.TemplateError as ex:
+            logger.exception("Template generation error")
+            raise APIException(detail="Template error: " + ex.message)
+        except Exception as ex:
+            logger.exception("Unknown error during template generation")
+            raise APIException(detail=str(ex))
+        return contract
+
     @transaction.atomic
     @action(detail=True, methods=["post"])
     def get_or_create_contract(self, request, pk=None):
@@ -320,16 +337,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         if models.Contract.objects.filter(booking=booking).exists():
             contract = booking.contract
         else:
-            try:
-                contract = generate_contract(
-                    booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
-                )
-            except jinja2.exceptions.TemplateError as ex:
-                logger.exception("Template generation error")
-                raise APIException(detail="Template error: " + ex.message)
-            except Exception as ex:
-                logger.exception("Unknown error during template generation")
-                raise APIException(detail=str(ex))
+            contract = self._generate_contract(booking, request)
         serializer = ContractSerializer(instance=contract)
         return Response(serializer.data)
 
@@ -337,14 +345,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def generate_contract(self, request, pk=None):
         booking = self.get_object()
-        try:
-            contract = generate_contract(booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost"))
-        except jinja2.exceptions.TemplateError as ex:
-            logger.exception("Template generation error")
-            raise APIException(detail="Template error: " + ex.message)
-        except Exception as ex:
-            logger.exception("Unknown error during template generation")
-            raise APIException(detail=str(ex))
+        contract = self._generate_contract(booking, request)
         serializer = ContractSerializer(instance=contract)
         return Response(serializer.data)
 

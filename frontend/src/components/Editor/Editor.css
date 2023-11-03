@@ -46,7 +46,7 @@
     /*min-height: 29cm;*/
 
     /* Keep the "page" off the boundaries of the container. */
-    padding: 1cm 2cm 2cm;
+    /*padding: 1cm 2cm 2cm;*/
 
     border: 1px hsl( 0,0%,82.7% ) solid;
     border-radius: var(--ck-border-radius);

@@ -168,6 +168,8 @@ const Editor: React.FunctionComponent<Props> = (props) => {
                 "Voyageur_NOM_COMPLET",
                 "Voyageur_ADRESSE_POSTALE",
                 "Voyageur_CONTACT",
+                "Voyageur_EMAIL",
+                "Voyageur_TELEPHONE",
                 "Logement_NOM",
                 // "Logement_PAGE_WEB_ANNONCE",
                 "Logement_ADRESSE_POSTALE",
@@ -199,6 +201,8 @@ const Editor: React.FunctionComponent<Props> = (props) => {
                 "Réservation_DATE",
                 "Réservation_SERVICES_INCLUS",
                 "Réservation_SERVICES_ADDITIONELS",
+                "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE",
+                "Réservation_TAXE_DE_SEJOUR",
                 // "Signature_LOCATAIRE",
                 "Signature_BAILLEUR"
               ]

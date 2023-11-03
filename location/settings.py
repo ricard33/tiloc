@@ -309,7 +309,7 @@ def get_backup_filename(**kwargs):
 DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
 DBBACKUP_STORAGE_OPTIONS = {"location": os.path.join(BASE_DIR, "backups")}
 DBBACKUP_FILENAME_TEMPLATE = get_backup_filename
-#DBBACKUP_CONNECTORS = {"default": {"SINGLE_TRANSACTION": False}}
+# DBBACKUP_CONNECTORS = {"default": {"SINGLE_TRANSACTION": False}}
 
 DEMO_ACCOUNT_NAME = "__demo__"
 
