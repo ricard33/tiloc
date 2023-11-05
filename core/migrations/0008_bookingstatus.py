@@ -6,6 +6,12 @@ from django.db.models import F, OuterRef
 
 def migrate_all_statuses_to_default_account_ones(apps, schema_editor):
     default_account_id = 1
+    Account = apps.get_model("core", "Account")
+    if not Account.objects.filter(id=default_account_id).exists():
+        if Account.objects.all().count() == 0:
+            # no account = empty database, so no statuses at all
+            return
+        default_account_id = Account.objects.first().id
     BookingStatus = apps.get_model("core", "BookingStatus")
     Booking = apps.get_model("core", "Booking")
     for status in BookingStatus.objects.exclude(account=default_account_id):
@@ -16,10 +22,16 @@ def migrate_all_statuses_to_default_account_ones(apps, schema_editor):
             default_status = BookingStatus.objects.filter(account=default_account_id).first()
         Booking.objects.filter(status=status).update(status=default_status)
     BookingStatus.objects.exclude(account=default_account_id).delete()
-    # BookingStatus.objects.update(id0=Lower("name"))
 
 
 def rename_status(apps, schema_editor):
+    default_account_id = 1
+    Account = apps.get_model("core", "Account")
+    if not Account.objects.filter(id=default_account_id).exists():
+        if Account.objects.all().count() == 0:
+            # no account = empty database, so no statuses at all
+            return
+        default_account_id = Account.objects.first().id
     BookingStatus = apps.get_model("core", "BookingStatus")
     BookingStatus.objects.filter(name="Indisponible").update(name="not available")
     BookingStatus.objects.filter(name="Option").update(name="option")
@@ -28,7 +40,9 @@ def rename_status(apps, schema_editor):
     BookingStatus.objects.filter(name="Paiement à l'arrivée").update(name="payment on arrival")
     BookingStatus.objects.filter(name="Payé").update(name="paid")
     if not BookingStatus.objects.filter(name="external").exists():
-        BookingStatus.objects.create(name="external", color="#DDDDDD", finalized=True, no_stats=False, rank=10, account_id=1)
+        BookingStatus.objects.create(
+            name="external", color="#DDDDDD", finalized=True, no_stats=False, rank=10, account_id=default_account_id
+        )
 
     external = BookingStatus.objects.get(name="external")
 
