@@ -50,7 +50,7 @@ class ForUserQuerySet(models.QuerySet):
                 **{account_path + "__isnull": True}
             )
 
-        if lodging_path and not user.has_perm('core.administrator'):
+        if lodging_path and not user.has_perm("core.administrator"):
             lodging_query |= Q(**{lodging_path + "__in": user.owned_lodgings.all()})  # lodging is owned by user
             lodging_query |= Q(**{lodging_path + "__in": user.lodgings.all()})  # lodging can be accessed by user
         if user_path:
@@ -239,7 +239,9 @@ class User(auth_models.AbstractUser):
     vat_rate = models.DecimalField(_("vat rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     logo = models.ImageField(_("logo"), upload_to=user_directory_path, blank=True, null=True)
     signature = models.ImageField(_("signature"), upload_to=user_directory_path, blank=True, null=True)
-    verified = models.BooleanField(_("verified"), default=False, help_text=_('Define if email user has been verified or not'))
+    verified = models.BooleanField(
+        _("verified"), default=False, help_text=_("Define if email user has been verified or not")
+    )
 
     _account_qs_path = "account"
 
@@ -261,7 +263,13 @@ class User(auth_models.AbstractUser):
 class Lodging(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("owner"), related_name="owned_lodgings", related_query_name="owned_lodging")
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_("owner"),
+        related_name="owned_lodgings",
+        related_query_name="owned_lodging",
+    )
     active = models.BooleanField(_("active"), default=True)
     shown = models.BooleanField(_("shown"), default=True)
     name = models.CharField(_("name"), max_length=200)
@@ -278,7 +286,15 @@ class Lodging(models.Model):
     guaranty = models.DecimalField(_("guaranty deposit"), max_digits=20, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
-    tourist_tax = models.DecimalField(_("tourist tax"), max_digits=20, decimal_places=2, null=True, blank=True)
+    is_flat_rate_tourist_tax = models.BooleanField(_("flat rate tourist tax"), default=True)
+    tourist_tax_included_in_payment = models.BooleanField(_("tourist tax included in payment"), default=True,
+                                                          help_text="An hidden feature for internal use only")
+    max_daily_tourist_tax = models.DecimalField(
+        _("max daily tourist tax"), max_digits=20, decimal_places=2, null=True, blank=True
+    )
+    tourist_tax_rate = models.DecimalField(
+        _("tourist tax rate"), max_digits=10, decimal_places=2, null=True, blank=True
+    )
 
     contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
@@ -408,7 +424,9 @@ class Booking(models.Model):
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
-    status = models.TextField(_("status"), choices=BookingStatus.choices, default=BookingStatus.NotAvailable, max_length=20)
+    status = models.TextField(
+        _("status"), choices=BookingStatus.choices, default=BookingStatus.NotAvailable, max_length=20
+    )
     source = models.ForeignKey(BookingChannel, on_delete=models.PROTECT, blank=True, null=True)
     source_uid = models.CharField(
         _("channel UID"), max_length=256, null=True, blank=True, help_text=_("UID on source channel")
@@ -489,7 +507,34 @@ class Booking(models.Model):
     @property
     def left_to_pay(self):
         """Returns the left to pay, with options included in price, but not excluded options."""
-        return self.price_with_options - self.total_payments - (self.commission_fees or 0)
+        return (
+            self.price_with_options
+            + (self.lodging.tourist_tax_included_in_payment and self.tourist_tax or 0)
+            - self.total_payments
+            - (self.commission_fees or 0)
+        )
+
+    @property
+    def tourist_tax(self):
+        return self.daily_tourist_tax * self.duration * self.adults
+
+    @property
+    def daily_tourist_tax(self):
+        if self.lodging.is_flat_rate_tourist_tax:
+            daily_rate = self.lodging.max_daily_tourist_tax
+        elif self.adults + self.children + self.babies > 0:
+            daily_rate = round(
+                self.price
+                / self.duration
+                / (self.adults + self.children + self.babies)
+                * self.lodging.tourist_tax_rate
+                / 100,
+                2,
+            )
+            daily_rate = min(daily_rate, self.lodging.max_daily_tourist_tax)
+        else:
+            daily_rate = 0
+        return daily_rate or 0
 
     def get_absolute_url(self):
         return reverse("booking-detail", kwargs={"pk": self.pk})
@@ -569,6 +614,7 @@ class BookedService(models.Model):
 
     class Meta:
         verbose_name = _("Booking service")
+
     _account_qs_path = "service__account"
 
     def __str__(self):
@@ -664,7 +710,7 @@ class Payment(models.Model):
 
 class Comment(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="comments")
-    content = models.TextField(blank=True, default='')
+    content = models.TextField(blank=True, default="")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

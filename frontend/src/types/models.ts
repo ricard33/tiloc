@@ -48,7 +48,10 @@ export interface Lodging {
   guaranty: number;
   capacity: number;
   information: string;
-  tourist_tax: number;
+  is_flat_rate_tourist_tax: boolean;
+  tourist_tax_included_in_payment: boolean;
+  max_daily_tourist_tax: number;
+  tourist_tax_rate: number;
   description: string;
 }
 
@@ -109,6 +112,7 @@ export interface Booking {
   total_payments: number;
   left_to_pay: number;
   price_with_options: number;
+  tourist_tax: number;
   comments: Comment[];
   cancelled: boolean;
   deleted: boolean;

@@ -3,17 +3,14 @@ import { add, parse, startOfMonth, sub } from "date-fns";
 import { BookingScheduler, BookingTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { IconButton, Card, CardContent, Typography } from "@mui/material";
+import { IconButton } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import queryString from "query-string";
 import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import { useLocalStorage } from "../../common/useLocalStorage";
 import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningSettingsDialog";
-import {
-  useListBookingsQuery,
-  useListLodgingsQuery
-} from "../../services/api";
+import { useListBookingsQuery, useListLodgingsQuery } from "../../services/api";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import "./Planning.scss";
 import { useSelector } from "react-redux";

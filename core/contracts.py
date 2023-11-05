@@ -107,10 +107,8 @@ def make_context(booking, url_server):
         "Réservation_SERVICES_ADDITIONELS": format_services(
             booking.id and booking.bookedservice_set.filter(service__not_included_in_price=True) or [], booking
         ),
-        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.lodging.tourist_tax),
-        "Réservation_TAXE_DE_SEJOUR": format_decimal(
-            float(booking.lodging.tourist_tax) * booking.adults * booking.duration
-        ),
+        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax),
+        "Réservation_TAXE_DE_SEJOUR": format_decimal(booking.tourist_tax),
         # "Signature_LOCATAIRE": booking,
         "Signature_BAILLEUR": signature_img,
     }

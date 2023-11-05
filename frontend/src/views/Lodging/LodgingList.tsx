@@ -84,7 +84,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
       },
       { field: "capacity", headerName: t("Capacity"), type: "number", width: 90 },
       {
-        field: "tourist_tax", headerName: t("Tourist tax"), type: "number", width: 90,
+        field: "max_daily_tourist_tax", headerName: t("Tourist tax"), type: "number", width: 90,
         valueFormatter: formatPrice
       },
       {

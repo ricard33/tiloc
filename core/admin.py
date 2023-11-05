@@ -483,7 +483,9 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "capacity",
         "daily_rate",
         "guaranty",
-        "tourist_tax",
+        "is_flat_rate_tourist_tax",
+        "tourist_tax_rate",
+        "max_daily_tourist_tax",
         "contract_template",
     )
     list_editable = (
@@ -495,7 +497,9 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "capacity",
         "daily_rate",
         "guaranty",
-        "tourist_tax",
+        "is_flat_rate_tourist_tax",
+        "tourist_tax_rate",
+        "max_daily_tourist_tax",
         "contract_template",
     )
     list_filter = ("owner", "active", "shown")

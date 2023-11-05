@@ -73,7 +73,8 @@ export function api2Lodging(lodging: Record<string, any>): Lodging {
     ...lodging as Lodging,
     daily_rate: Number(lodging.daily_rate),
     guaranty: Number(lodging.guaranty),
-    tourist_tax: Number(lodging.tourist_tax)
+    max_daily_tourist_tax: Number(lodging.max_daily_tourist_tax),
+    tourist_tax_rate: Number(lodging.tourist_tax_rate)
   };
 }
 
@@ -93,6 +94,7 @@ export function api2Booking(booking: Record<string, any>): Booking {
     total_payments: Number(booking.total_payments),
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
+    tourist_tax: Number(booking.tourist_tax),
     options: booking.options ? booking.options.map(api2Service) : [],
     comments: booking.comments ? booking.comments.map(api2Comment) : [],
     created: parseISO(booking.created),

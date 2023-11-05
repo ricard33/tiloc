@@ -138,9 +138,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             </Grid>
             {/* Removed because value is not reliable with the one (maybe modified) in contract */}
             <Grid xs={1}>
-              {displayField(showPayments && booking.lodging && booking.lodging.tourist_tax > 0,
+              {displayField(showPayments && booking.lodging && booking.tourist_tax > 0,
                 t("Tourist tax:"),
-                formatCurrency((booking.lodging.tourist_tax || 0) * booking.duration * booking.adults)
+                formatCurrency(booking.tourist_tax || 0)
               )}
             </Grid>
             <Grid xs={1}>

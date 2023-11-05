@@ -113,11 +113,12 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const duration = watch("duration", initialState.duration);
   const price = watch("price", initialState.price);
   const commissionFees = watch("commission_fees", initialState.commission_fees);
+  const touristTax = watch("tourist_tax", initialState.tourist_tax);
   const options = watch("options");
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
-  const leftToPay = fullPrice - totalPayment - (commissionFees ?? 0);
+  const leftToPay = fullPrice + (lodging?.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
   // console.log("options", options, fullPrice);
 
   const depositLabel = user ? getDepositLabel(t, user.account.deposit_label) : t("Deposit");
@@ -158,6 +159,28 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     return initialState;
   }
 
+  function computeTouristTax() {
+    if (typeof lodging === "undefined")
+      return 0;
+    const values = getValues();
+    let daily_rate = lodging.max_daily_tourist_tax;
+    if (!lodging.is_flat_rate_tourist_tax) {
+      if (values.adults + values.children + values.babies > 0) {
+
+        daily_rate = values.price!
+          / values.duration
+          / (values.adults + values.children + values.babies)
+          * lodging.tourist_tax_rate
+          / 100;
+
+        daily_rate = Math.min(daily_rate, lodging.max_daily_tourist_tax);
+      } else
+        daily_rate = 0;
+    }
+    // return daily_rate * values.duration * values.adults;
+    setValue("tourist_tax", daily_rate * values.duration * values.adults);
+  }
+
   /**
    * Handle values AFTER validation. This fonction can't change the type or the value, except using setValue().
    * NOTE: this is true when using rhf-mui fields only.
@@ -180,6 +203,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
           setMultipleValues(priceObj);
         }
+        computeTouristTax();
         return value;
       }
       case "existing-guest":
@@ -194,6 +218,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       case "duration": {
         const duration = Number(value);
         onDurationChange(duration);
+        computeTouristTax();
         return duration;
       }
       case "daily_rate":
@@ -201,6 +226,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         if (!isNaN(value)) {
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], depositPercent);
           setMultipleValues(priceObj);
+          computeTouristTax();
         }
         break;
       case "price":
@@ -209,6 +235,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           setValue("daily_rate", DecimalPrecision.round(value / getValues().duration));
           setValue("price", value);
           setValue("is_flat_rate", true);
+          computeTouristTax();
         }
         break;
       case "is_flat_rate":
@@ -219,8 +246,14 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date,
             formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent);
           setMultipleValues(priceObj);
+          computeTouristTax();
           return false;
         }
+      case "adults":
+      case "children":
+      case "babies":
+        computeTouristTax();
+        return value;
       default:
         console.warn("Unhandled input:", fieldName);
         return value;
@@ -256,6 +289,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       : computeBookingPrice(newBooking.begin_date, newBooking.end_date, formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent).price;
     setMultipleValues(priceObj);
     setValue("duration", duration);
+    computeTouristTax();
     return newBooking[fieldName];
   }
 
@@ -389,18 +423,18 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               { /* LODGING */}
               <Grid item sm={8} xs={12}>
                 {lodgings &&
-                <SelectElement
-                  control={control}
-                  name="lodging_id"
-                  label={t("Lodging")}
-                  className="full-width"
-                  margin={margin}
-                  variant={variant}
-                  options={lodgings.map(lodging => (
-                    {id: lodging.id, label: lodging.name}
-                  ))}
-                  onChange={(value) => handleChange("lodging_id", value)}
-                />}
+                  <SelectElement
+                    control={control}
+                    name="lodging_id"
+                    label={t("Lodging")}
+                    className="full-width"
+                    margin={margin}
+                    variant={variant}
+                    options={lodgings.map(lodging => (
+                      { id: lodging.id, label: lodging.name }
+                    ))}
+                    onChange={(value) => handleChange("lodging_id", value)}
+                  />}
               </Grid>
               { /* GUEST */}
               <Grid item lg={6} xs={12}>
@@ -421,8 +455,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             freeSolo: true,
                             onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue),
                             onInputChange: (event: React.SyntheticEvent, value: string) => {
-                              setValue("guest_name", value, {shouldDirty: true, shouldTouch: true})
-                            },
+                              setValue("guest_name", value, { shouldDirty: true, shouldTouch: true });
+                            }
                           }}
                           textFieldProps={{
                             fullWidth: true,
@@ -609,7 +643,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           {fullPrice ? t("Balance: {{amount}}", { amount: formatCurrency(fullPrice - (deposit ?? 0)) }) : ""}
                         </Typography>
                       </Grid>
-                      { /* commission fees */}
+                      { /* commission fees and taxes */}
                       <Grid item xs={12} className="flex-box-align-left">
                         <TextFieldElement
                           control={control}
@@ -626,6 +660,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           margin={margin}
                           variant={variant}
                         />
+                        <div className="spacer" />
+                        <Typography>
+                          {touristTax ? t("Tourist tax: {{amount}}", { amount: formatCurrency(touristTax) }) : ""}
+                        </Typography>
                       </Grid>
                       {/* number of persons */}
                       <Grid item xs={12} className="flex-box-align-left">
@@ -638,6 +676,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           type="number"
                           sx={{ width: "4em" }}
                           options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
+                          onChange={(value) => handleChange("adults", value)}
                         />
                         <div className="spacer" />
                         <SelectElement
@@ -649,6 +688,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           type="number"
                           sx={{ width: "4em" }}
                           options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
+                          onChange={(value) => handleChange("children", value)}
                         />
                         <div className="spacer" />
                         <SelectElement
@@ -660,6 +700,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           type="number"
                           sx={{ width: "4em" }}
                           options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}
+                          onChange={(value) => handleChange("babies", value)}
                         />
                       </Grid>
                     </Grid>

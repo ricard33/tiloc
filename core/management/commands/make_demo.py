@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 name=name,
                 rank=rank,
                 guaranty=300,
-                tourist_tax=1.5,
+                max_daily_tourist_tax=1.5,
             )
             if created:
                 lodging.address = fake.address()

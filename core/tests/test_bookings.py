@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 import arrow
 from django.test import TestCase
@@ -210,7 +211,9 @@ class BookingQueriesTestCase(APITestCase):
             ["Franck HERBERT", 60, "666 road Z"],
         ]:
             factories.BookingFactory.create(
-                guest_name=name, begin_date=arrow.utcnow().shift(days=days).date(), guest_address=address,
+                guest_name=name,
+                begin_date=arrow.utcnow().shift(days=days).date(),
+                guest_address=address,
                 lodging=self.lodging,
             )
 
@@ -252,9 +255,12 @@ class BookingQueriesTestCase(APITestCase):
                 (now.shift(days=+35), 7),
             ]
         ):
-            factories.BookingFactory.create(begin_date=date.date(), duration=duration, guest_name="guest %d" % (i + 1),
-                                            lodging=self.lodging,
-                                            )
+            factories.BookingFactory.create(
+                begin_date=date.date(),
+                duration=duration,
+                guest_name="guest %d" % (i + 1),
+                lodging=self.lodging,
+            )
 
         response = self.client.get("/api/booking/next_events/?count=5", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
@@ -275,12 +281,30 @@ class BookingQueriesTestCase(APITestCase):
 class BookingModelTestCase(TestCase):
     fixtures = ["default-groups"]
 
-    def setUp(self) -> None:
-        self.lodging = factories.LodgingFactory.create()
-
     def test_booking_with_options_prices(self):
         booking = factories.BookingFactory.create(price=500)
         service = factories.ServiceFactory.create(unit_price=30, is_flat_rate=True, included_in_booking=False)
         models.BookedService.objects.create(service=service, booking=booking, unit_price=40, is_flat_rate=False)
         self.assertEqual(booking.price, 500)
         self.assertEqual(booking.price_with_options, 500 + 40 * booking.duration)
+
+    def test_tourist_tax_flat_rate(self):
+        lodging = factories.LodgingFactory.create(
+            daily_rate=60,
+            is_flat_rate_tourist_tax=True,
+            max_daily_tourist_tax=1.5,
+        )
+        booking = factories.BookingFactory.create(lodging=lodging, duration=5, adults=2, children=2)
+        self.assertEqual(5 * 60, booking.price)
+        self.assertEqual(5 * 1.5 * 2, booking.tourist_tax)
+
+    def test_tourist_tax(self):
+        lodging = factories.LodgingFactory.create(
+            daily_rate=60,
+            is_flat_rate_tourist_tax=False,
+            max_daily_tourist_tax=1.8,
+            tourist_tax_rate=5,
+        )
+        booking = factories.BookingFactory.create(lodging=lodging, duration=4, adults=2, children=2, price=Decimal(410))
+        self.assertEqual(410, booking.price)
+        self.assertAlmostEqual(Decimal('10.24'), booking.tourist_tax, 1)

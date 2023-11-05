@@ -51,6 +51,8 @@ class _UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
     password = factory.django.Password("P@55w0rd")
+    phone = factory.Faker("phone_number")
+    address = factory.Faker("address")
     account = factory.SubFactory(AccountFactory)
     no_vat = False
     signature = factory.django.ImageField()

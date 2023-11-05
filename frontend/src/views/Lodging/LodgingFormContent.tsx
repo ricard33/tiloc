@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { Lodging, User } from "../../types";
 import RichTextEditorElement from "../../components/Fields/RichTextEditorElement";
+import { useFormContext } from "react-hook-form";
 
 
 type Props = {
@@ -14,12 +15,15 @@ type Props = {
 
 export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
   const { t } = useTranslation();
+  const formContext = useFormContext();
+  const { watch, getValues } = formContext;
+  const isFlatRateTourismTax = watch("is_flat_rate_tourist_tax", getValues("is_flat_rate_tourist_tax"));
 
   const usersOptions: { label: string, id: number }[] = users ? users.map((user) => {
     return { label: user.full_name, id: user.id };
   }) : [];
 
-
+  console.log(isFlatRateTourismTax);
   return (
     <>
       <input type="hidden" name={"id"} value={lodging ? lodging.id : undefined} />
@@ -56,11 +60,28 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
             InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
           />
         </Grid2>
-        <Grid2 sm={3} xs={6}>
-          <TextFieldElement
-            name={"tourist_tax"} label={t("Tourist tax")} type={"number"}
-            InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-          />
+        <Grid2 xs={12} container>
+          <Grid2 xs={4}>
+            <SwitchElement name={"is_flat_rate_tourist_tax"} label={t("Is the tourist tax flat rate?")} />
+          </Grid2>
+          {/*<Grid2 xs={6}>*/}
+          {/*  <SwitchElement name={"tourist_tax_included_in_payment"} label={t("Should include tourist tax in payment?")} />*/}
+          {/*</Grid2>*/}
+          <Grid2 xs={4}>
+            <TextFieldElement
+              name={"max_daily_tourist_tax"}
+              label={isFlatRateTourismTax ? t("Daily tourist tax") : t("Ceiling of your daily tax")}
+              type={"number"}
+              InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+            />
+          </Grid2>
+          <Grid2 xs={4}>
+            {!isFlatRateTourismTax &&
+              <TextFieldElement
+                name={"tourist_tax_rate"} label={t("Rate of your daily tax")} type={"number"}
+                InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+              />}
+          </Grid2>
         </Grid2>
         <Grid2 xs={12}>
           <TextFieldElement

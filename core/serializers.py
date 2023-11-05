@@ -165,12 +165,14 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "guaranty",
             "capacity",
             "information",
-            "tourist_tax",
+            "is_flat_rate_tourist_tax",
+            "tourist_tax_included_in_payment",
+            "tourist_tax_rate",
+            "max_daily_tourist_tax",
         ]
 
 
 class BookingChannelSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.BookingChannel
         exclude = ["account"]
@@ -257,6 +259,7 @@ class BookingSubSerializer(serializers.ModelSerializer):
     source_id = serializers.PrimaryKeyRelatedField(
         source="source", queryset=models.BookingChannel.objects.all(), required=False, allow_null=True
     )
+    tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = models.Booking
@@ -275,7 +278,7 @@ class BookingSubSerializer(serializers.ModelSerializer):
             "deposit",
             "guaranty",
             "commission_fees",
-            "commission_fees",
+            "tourist_tax",
             "cancelled",
             "deleted",
         ]
@@ -326,6 +329,7 @@ class BookingSerializer(serializers.ModelSerializer):
     total_payments = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     left_to_pay = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     price_with_options = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = models.Booking

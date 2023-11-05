@@ -1,7 +1,7 @@
 __all__ = ["BookingResource"]
 
 from import_export import fields, resources
-from import_export.widgets import ForeignKeyWidget
+from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 
 from core import models
 
@@ -11,8 +11,11 @@ class BookingResource(resources.ModelResource):
     source = fields.Field(
         column_name="source", attribute="source", widget=ForeignKeyWidget(models.BookingChannel, "name")
     )
-    # options = fields.Field(column_name='options', attribute='options',
-    #                        widget=ManyToManyWidget(models.BookingChannel, ','))
+    options = fields.Field(
+        column_name="options",
+        attribute="options",
+        widget=ManyToManyWidget(models.Service, field="reference", separator=","),
+    )
 
     class Meta:
         model = models.Booking
@@ -41,7 +44,7 @@ class BookingResource(resources.ModelResource):
             "commission_fees",
             "arrival_details",
             "notes",
-            # 'options',
+            'options',
             "cancelled",
             "deleted",
             "created",
@@ -72,7 +75,7 @@ class BookingResource(resources.ModelResource):
             "commission_fees",
             "arrival_details",
             "notes",
-            # 'options',
+            'options',
             "cancelled",
             "deleted",
             "created",
