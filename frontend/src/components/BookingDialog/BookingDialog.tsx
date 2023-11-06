@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Contacts as ContactsIcon, ExpandMore as ExpandMoreIcon, Forward as ForwardIcon } from "@mui/icons-material";
+import {
+  Contacts as ContactsIcon,
+  Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon,
+  Forward as ForwardIcon
+} from "@mui/icons-material";
+import BackspaceIcon from "@mui/icons-material/Backspace";
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
@@ -15,7 +21,7 @@ import {
   DialogTitle,
   FormControl,
   Grid,
-  Hidden,
+  Hidden, IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -80,6 +86,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const margin = "none";
   const depositPercent = 30; // TODO load this from lodging preferences
   const bookingStatuses = getBookingStatuses();
+  const [customizeTouristTax, setCustomizeTouristTax] = useState(typeof booking.custom_tourist_tax !== "undefined");
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -349,6 +356,15 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     } else onClose();
   }
 
+  function onCustomizeTouristTaxHandler() {
+    console.log("onCustomizeTouristTaxHandler");
+    setCustomizeTouristTax(!customizeTouristTax);
+    if(customizeTouristTax) {
+      console.log("set custom_tourist_tax to undefined");
+      setValue("custom_tourist_tax", undefined, {shouldDirty: true});
+      setValue("tourist_tax", getValues()["computed_tourist_tax"] );
+    }
+  }
   return (
     <Dialog
       className="booking-dialog"
@@ -661,9 +677,44 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           variant={variant}
                         />
                         <div className="spacer" />
-                        <Typography>
-                          {touristTax ? t("Tourist tax: {{amount}}", { amount: formatCurrency(touristTax) }) : ""}
-                        </Typography>
+                        {customizeTouristTax ?
+                          <>
+                            <TextFieldElement
+                              control={control}
+                              name={"custom_tourist_tax"}
+                              label={t("Tourist tax")}
+                              sx={{ width: "10em;" }}
+                              type={"number"}
+                              validation={{
+                                min: { value: 0, message: t("Tourist tax can't be negative") },
+                                validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                              }}
+                              InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                              margin={margin}
+                              variant={variant}
+                            />
+                            <IconButton
+                              type="button"
+                              className="custom_tourist_tax-button"
+                              color="error"
+                              onClick={() => onCustomizeTouristTaxHandler()}
+                              title={t("Reset")}
+                            ><BackspaceIcon /></IconButton>
+                          </>
+                          :
+                          <>
+                            <Typography>
+                              {touristTax ? t("Tourist tax: {{amount}}", { amount: formatCurrency(touristTax) }) : ""}
+                            </Typography>
+                            <IconButton
+                              type="button"
+                              className="custom_tourist_tax-button"
+                              color="info"
+                              onClick={() => onCustomizeTouristTaxHandler()}
+                              title={t("Customize")}
+                            ><EditIcon /></IconButton>
+                          </>
+                        }
                       </Grid>
                       {/* number of persons */}
                       <Grid item xs={12} className="flex-box-align-left">
@@ -806,9 +857,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Payments
-                        bookingId={booking.id} onPaymentsUpdate={(total) => {
-                          setTotalPayment(total);
-                        }}
+                        bookingId={booking.id} onPaymentsUpdate={(total) => setTotalPayment(total)}
                       />
                     </AccordionDetails>
                   </Accordion>

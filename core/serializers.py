@@ -252,47 +252,6 @@ class BookedServiceSerializer(serializers.ModelSerializer):
         )
 
 
-class BookingSubSerializer(serializers.ModelSerializer):
-    lodging = LodgingSubSerializer(read_only=True)
-    lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
-    source = BookingChannelSerializer(read_only=True)
-    source_id = serializers.PrimaryKeyRelatedField(
-        source="source", queryset=models.BookingChannel.objects.all(), required=False, allow_null=True
-    )
-    tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
-
-    class Meta:
-        model = models.Booking
-        fields = [
-            "id",
-            "status",
-            "lodging",
-            "lodging_id",
-            "guest_name",
-            "source",
-            "source_id",
-            "begin_date",
-            "end_date",
-            "duration",
-            "price",
-            "deposit",
-            "guaranty",
-            "commission_fees",
-            "tourist_tax",
-            "cancelled",
-            "deleted",
-        ]
-
-
-class PaymentSerializer(serializers.ModelSerializer):
-    booking = BookingSubSerializer(read_only=True)
-    booking_id = serializers.PrimaryKeyRelatedField(source="booking", queryset=models.Booking.objects.all())
-
-    class Meta:
-        model = models.Payment
-        fields = "__all__"
-
-
 class PaymentSubSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Payment
@@ -330,6 +289,7 @@ class BookingSerializer(serializers.ModelSerializer):
     left_to_pay = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     price_with_options = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    computed_tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = models.Booking
@@ -370,6 +330,40 @@ class BookingSerializer(serializers.ModelSerializer):
         to_remove_service_ids = instance.options.exclude(id__in=all_service_ids).values_list("id", flat=True)
         instance.options.remove(*to_remove_service_ids)
         return instance
+
+
+class BookingSubSerializer(BookingSerializer):
+    class Meta:
+        model = models.Booking
+        fields = [
+            "id",
+            "status",
+            "lodging",
+            "lodging_id",
+            "guest_name",
+            "source",
+            "source_id",
+            "begin_date",
+            "end_date",
+            "duration",
+            "price",
+            "deposit",
+            "guaranty",
+            "commission_fees",
+            "tourist_tax",
+            "custom_tourist_tax",
+            "cancelled",
+            "deleted",
+        ]
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    booking = BookingSubSerializer(read_only=True)
+    booking_id = serializers.PrimaryKeyRelatedField(source="booking", queryset=models.Booking.objects.all())
+
+    class Meta:
+        model = models.Payment
+        fields = "__all__"
 
 
 class BookingNoPriceSerializer(BookingSerializer):

@@ -113,6 +113,8 @@ export interface Booking {
   left_to_pay: number;
   price_with_options: number;
   tourist_tax: number;
+  computed_tourist_tax: number;
+  custom_tourist_tax?: number;
   comments: Comment[];
   cancelled: boolean;
   deleted: boolean;

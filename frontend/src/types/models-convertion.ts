@@ -28,7 +28,7 @@ export function api2Comment(p: Record<string, any>): Comment {
   return {
     ...p as Comment,
     created_on: parseISO(p.created_on),
-    modified: parseISO(p.modified),
+    modified: parseISO(p.modified)
   };
 }
 
@@ -36,7 +36,7 @@ export function comment2Api(c: Partial<Comment>): Record<string, any> {
   return {
     ...c,
     ...(c.created_on && { created_on: formatISO(c.created_on) }),
-    ...(c.modified && { modified: formatISO(c.modified) }),
+    ...(c.modified && { modified: formatISO(c.modified) })
   };
 }
 
@@ -60,12 +60,13 @@ export function user2api(user: Partial<User>): Record<string, any> {
   const r = {
     ...rest,
     ...(lodgings && lodgings.length > 0 ? { lodgings } : {}),
-    ...(typeof signature === "string" ? { } : { signature }),
-    ...(typeof logo === "string" ? { } : { logo }),
+    ...(typeof signature === "string" ? {} : { signature }),
+    ...(typeof logo === "string" ? {} : { logo })
   };
   console.log("POST", r);
   return r;
 }
+
 // ----- LODGING -----
 
 export function api2Lodging(lodging: Record<string, any>): Lodging {
@@ -95,15 +96,17 @@ export function api2Booking(booking: Record<string, any>): Booking {
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
     tourist_tax: Number(booking.tourist_tax),
+    custom_tourist_tax: booking.custom_tourist_tax ? Number(booking.custom_tourist_tax) : undefined,
     options: booking.options ? booking.options.map(api2Service) : [],
     comments: booking.comments ? booking.comments.map(api2Comment) : [],
     created: parseISO(booking.created),
-    modified: parseISO(booking.modified),
+    modified: parseISO(booking.modified)
   };
 }
 
 export function booking2api(booking: Partial<Booking>): Record<string, any> {
-  return {
+  console.log("booking2api: booking.custom_tourist_tax = " + booking.custom_tourist_tax);
+  const newVar = {
     ...booking,
     ...(booking.begin_date && { begin_date: formatISO(booking.begin_date) }),
     ...(booking.end_date && { end_date: formatISO(booking.end_date) }),
@@ -111,8 +114,12 @@ export function booking2api(booking: Partial<Booking>): Record<string, any> {
     price: booking.price!.toFixed(2),
     deposit: booking.deposit!.toFixed(2),
     guaranty: booking.guaranty!.toFixed(2),
-    commission_fees: booking.commission_fees!.toFixed(2)
+    commission_fees: booking.commission_fees!.toFixed(2),
+    custom_tourist_tax: typeof booking.custom_tourist_tax === "undefined" ?
+      null : booking.custom_tourist_tax.toFixed(2)
   };
+  console.log("booking2api:  ", newVar);
+  return newVar;
 
 }
 
@@ -132,7 +139,7 @@ export function api2ContractTemplate(contractTemplate: Record<string, any>): Con
   return {
     ...contractTemplate as ContractTemplate,
     created: parseISO(contractTemplate.created),
-    modified: parseISO(contractTemplate.modified),
+    modified: parseISO(contractTemplate.modified)
   };
 }
 
@@ -142,7 +149,7 @@ export function api2Contract(contract: Record<string, any>): Contract {
   return {
     ...contract as Contract,
     created: parseISO(contract.created),
-    modified: parseISO(contract.modified),
+    modified: parseISO(contract.modified)
   };
 }
 
@@ -152,6 +159,6 @@ export function api2CalendarSync(calendarSync: Record<string, any>): CalendarSyn
   return {
     ...calendarSync as CalendarSync,
     last_import: parseISO(calendarSync.last_import),
-    last_export: parseISO(calendarSync.last_export),
+    last_export: parseISO(calendarSync.last_export)
   };
 }

@@ -78,6 +78,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             notes=event.description,
             price=0,
             deposit=0,
+            custom_tourist_tax=0,  # OTA should collect tax for us
         )
 
     # try to detect booking that were cancelled by OTA

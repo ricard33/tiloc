@@ -287,8 +287,9 @@ class Lodging(models.Model):
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
     is_flat_rate_tourist_tax = models.BooleanField(_("flat rate tourist tax"), default=True)
-    tourist_tax_included_in_payment = models.BooleanField(_("tourist tax included in payment"), default=True,
-                                                          help_text="An hidden feature for internal use only")
+    tourist_tax_included_in_payment = models.BooleanField(
+        _("tourist tax included in payment"), default=True, help_text="An hidden feature for internal use only"
+    )
     max_daily_tourist_tax = models.DecimalField(
         _("max daily tourist tax"), max_digits=20, decimal_places=2, null=True, blank=True
     )
@@ -457,6 +458,14 @@ class Booking(models.Model):
     deposit = models.DecimalField(_("deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("guaranty"), max_digits=20, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
+    custom_tourist_tax = models.DecimalField(
+        _("custom tourist tax"),
+        max_digits=20,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="overwrite automated tourist tax",
+    )
 
     arrival_details = models.CharField(
         _("arrival details"), max_length=100, blank=True, null=True, help_text=_("Arrival time, flight number, etc...")
@@ -516,12 +525,19 @@ class Booking(models.Model):
 
     @property
     def tourist_tax(self):
-        return self.daily_tourist_tax * self.duration * self.adults
+        if self.custom_tourist_tax is not None:
+            return self.custom_tourist_tax
+        return self.computed_tourist_tax()
 
     @property
     def daily_tourist_tax(self):
+        if self.adults > 0:
+            return self.tourist_tax / self.duration / self.adults
+        return 0
+
+    def computed_tourist_tax(self):
         if self.lodging.is_flat_rate_tourist_tax:
-            daily_rate = self.lodging.max_daily_tourist_tax
+            daily_rate = self.lodging.max_daily_tourist_tax or 0
         elif self.adults + self.children + self.babies > 0:
             daily_rate = round(
                 self.price
@@ -534,7 +550,7 @@ class Booking(models.Model):
             daily_rate = min(daily_rate, self.lodging.max_daily_tourist_tax)
         else:
             daily_rate = 0
-        return daily_rate or 0
+        return daily_rate * self.duration * self.adults
 
     def get_absolute_url(self):
         return reverse("booking-detail", kwargs={"pk": self.pk})
