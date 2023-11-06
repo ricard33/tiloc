@@ -564,17 +564,14 @@ class PaymentAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     ordering = ("-date",)
 
 
-class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
+class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = (
         "reference",
         "designation",
         "unit_price",
         "vat",
         "is_flat_rate",
-        "included_in_booking",
         "not_included_in_price",
-        "auto_add_booking",
-        "auto_add_invoice",
         "account",
     )
 

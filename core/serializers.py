@@ -13,6 +13,13 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+class FilteredSlugRelatedField(serializers.SlugRelatedField):
+    def get_queryset(self):
+        user = self.context["request"].user
+        queryset = self.queryset.filter(account=user.account)
+        return queryset
+
+
 class AccountSerializer(serializers.ModelSerializer):
     is_initialized = serializers.SerializerMethodField()
 
@@ -65,7 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     permissions = serializers.SerializerMethodField(read_only=True)
     groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
-    lodgings = serializers.SlugRelatedField(
+    lodgings = FilteredSlugRelatedField(
         many=True, queryset=Lodging.objects.all(), slug_field="name", required=False
     )
 
@@ -127,10 +134,23 @@ class UserSubSerializer(UserSerializer):
         fields = ["id", "full_name", "email"]
 
 
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Service
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        validated_data["account"] = self.context["request"].user.account
+        return super().create(validated_data)
+
+
 class LodgingSerializer(serializers.ModelSerializer):
     owner = UserSubSerializer(read_only=True)
     owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.User.objects.all())
     rank = serializers.IntegerField(required=False)
+    default_services = FilteredSlugRelatedField(
+        slug_field="reference", many=True, required=False, queryset=models.Service.objects.all()
+    )
 
     class Meta:
         model = models.Lodging
@@ -220,22 +240,11 @@ class BookingChannelSyncSerializer(serializers.ModelSerializer):
         return obj.url_for_remote(self.context["request"])
 
 
-class ServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Service
-        exclude = ["account"]
-
-    def create(self, validated_data: dict):
-        validated_data["account"] = self.context["request"].user.account
-        return super().create(validated_data)
-
-
 class BookedServiceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source="service.id")
     reference = serializers.ReadOnlyField(source="service.reference")
     designation = serializers.ReadOnlyField(source="service.designation")
     vat = serializers.ReadOnlyField(source="service.vat")
-    # included_in_booking = serializers.ReadOnlyField(source="service.included_in_booking")
     not_included_in_price = serializers.ReadOnlyField(source="service.not_included_in_price")
 
     class Meta:
@@ -246,7 +255,6 @@ class BookedServiceSerializer(serializers.ModelSerializer):
             "designation",
             "unit_price",
             "vat",
-            # "included_in_booking",
             "not_included_in_price",
             "is_flat_rate",
         )

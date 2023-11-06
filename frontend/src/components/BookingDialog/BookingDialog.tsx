@@ -158,7 +158,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     initialState.children = booking.children || 0;
     initialState.babies = booking.babies || 0;
     initialState.source_id = booking.source_id || ("" as any);
-    initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => o.auto_add_booking) : []);
+    initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging?.default_services.includes(o.reference)) : []);
     initialState.arrival_details = booking.arrival_details ?? "";
     initialState.notes = booking.notes ?? "";
 

@@ -66,7 +66,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
   const options = watch("options");
 
   function getDesignation(option: Service) {
-    return option.designation + (
+    return `[${option.reference}] ` + option.designation + (
       option.unit_price ? " - " + option.unit_price + "€" + (
         !option.is_flat_rate ? " / j" : ""
       ) : ""

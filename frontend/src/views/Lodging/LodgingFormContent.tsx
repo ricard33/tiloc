@@ -2,10 +2,11 @@ import React from "react";
 
 import { InputAdornment, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
+import { MultiSelectElement, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
 import { Lodging, User } from "../../types";
 import RichTextEditorElement from "../../components/Fields/RichTextEditorElement";
 import { useFormContext } from "react-hook-form";
+import { useListServicesQuery } from "../../services/api";
 
 
 type Props = {
@@ -18,6 +19,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
   const formContext = useFormContext();
   const { watch, getValues } = formContext;
   const isFlatRateTourismTax = watch("is_flat_rate_tourist_tax", getValues("is_flat_rate_tourist_tax"));
+  const { data: services } = useListServicesQuery();
 
   const usersOptions: { label: string, id: number }[] = users ? users.map((user) => {
     return { label: user.full_name, id: user.id };
@@ -88,6 +90,16 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
             name={"information"} label={t("Information")} multiline
             helperText={t("Private notes about this lodging")}
             fullWidth
+          />
+        </Grid2>
+        <Grid2 xs={12}>
+          <MultiSelectElement
+            label={t("Default services")}
+            name="default_services"
+            options={services ? services.map(l => {
+              return { id: l.reference, label: `[${l.reference}] ${l.designation}` };
+            }) : []}
+            showChips
           />
         </Grid2>
         <Grid2 xs={12}>

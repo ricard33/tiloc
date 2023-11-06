@@ -47,7 +47,6 @@ class BookingTestCase(APITestCase):
         self.assertIn("designation", obj["options"][0])
         self.assertIn("is_flat_rate", obj["options"][0])
         self.assertIn("unit_price", obj["options"][0])
-        # self.assertIn("included_in_booking", obj["options"][0])
 
     def test_create_booking(self):
         data = {
@@ -96,7 +95,6 @@ class BookingTestCase(APITestCase):
                     "designation": service.designation,
                     "is_flat_rate": service.is_flat_rate,
                     "unit_price": service.unit_price,
-                    # "included_in_booking": service.included_in_booking,
                 }
             ],
         }
@@ -125,7 +123,6 @@ class BookingTestCase(APITestCase):
                     "designation": service.designation,
                     "is_flat_rate": service.is_flat_rate,
                     "unit_price": service.unit_price,
-                    # "included_in_booking": service.included_in_booking,
                 }
             ],
         }
@@ -156,7 +153,6 @@ class BookingTestCase(APITestCase):
                     "designation": service.designation,
                     "is_flat_rate": not service.is_flat_rate,
                     "unit_price": 123,
-                    # "included_in_booking": service.included_in_booking,
                 }
             ],
         }
@@ -283,7 +279,7 @@ class BookingModelTestCase(TestCase):
 
     def test_booking_with_options_prices(self):
         booking = factories.BookingFactory.create(price=500)
-        service = factories.ServiceFactory.create(unit_price=30, is_flat_rate=True, included_in_booking=False)
+        service = factories.ServiceFactory.create(unit_price=30, is_flat_rate=True)
         models.BookedService.objects.create(service=service, booking=booking, unit_price=40, is_flat_rate=False)
         self.assertEqual(booking.price, 500)
         self.assertEqual(booking.price_with_options, 500 + 40 * booking.duration)

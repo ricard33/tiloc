@@ -5,15 +5,13 @@ from django.db import migrations
 
 def remove_tourist_tax(apps, schema_editor):
     Booking = apps.get_model("core", "Booking")
-    Booking.objects.filter(status = "external").update(custom_tourist_tax=0)
+    Booking.objects.filter(status="external").update(custom_tourist_tax=0)
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0010_booking_custom_tourist_tax'),
+        ("core", "0010_booking_custom_tourist_tax"),
     ]
 
-    operations = [
-        migrations.RunPython(remove_tourist_tax, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(remove_tourist_tax, migrations.RunPython.noop)]

@@ -299,6 +299,9 @@ class Lodging(models.Model):
 
     contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
+    default_services = models.ManyToManyField(
+        "Service", blank=True, help_text=_("Services added by default on new bookings")
+    )
 
     history = HistoricalRecords()
 
@@ -322,38 +325,32 @@ class Lodging(models.Model):
 
 class Service(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
-    reference = models.CharField(_("reference"), blank=True, null=True, max_length=20)
+    reference = models.CharField(_("reference"), max_length=20)
     designation = models.CharField(_("designation"), max_length=256)
     unit_price = models.DecimalField(_("unit price VAT incl."), max_digits=20, decimal_places=2, blank=True, null=True)
     vat = models.DecimalField(_("VAT %"), max_digits=20, decimal_places=2, blank=True, null=True)
     is_flat_rate = models.BooleanField(
         _("flat rate?"), default=False, help_text=_("Use flat rate price instead of daily price computation")
     )
-    included_in_booking = models.BooleanField(
-        _("included in booking"),
-        default=False,
-        help_text=_("If true, the price of this option is included in booking price and not displayed separately"),
-    )
     not_included_in_price = models.BooleanField(
         _("not included in price"),
         default=False,
         help_text=_("Service not included in current booking price. Maybe provided by external partner..."),
     )
-    auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
-    auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
-
-    history = HistoricalRecords()
+    # auto_add_booking = models.BooleanField(_("auto add booking"), default=False)
+    # auto_add_invoice = models.BooleanField(_("auto add invoice"), default=False)
 
     class Meta:
         verbose_name = _("Service")
         ordering = ("reference",)
+        unique_together = ("account", "reference")
 
     _account_qs_path = "account"
 
     objects = ForUserQuerySet.as_manager()
 
     def __str__(self):
-        return self.designation
+        return "[%s] %s" % (self.reference, self.designation)
 
 
 class BookingStatus(models.TextChoices):

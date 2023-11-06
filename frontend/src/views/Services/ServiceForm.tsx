@@ -77,18 +77,9 @@ export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDe
             <Grid2 sm={6} xs={12}>
               <SwitchElement name={"is_flat_rate"} label={t("Is flat rate?")} />
             </Grid2>
-            {/*<Grid2 sm={6} xs={12}>*/}
-            {/*  <SwitchElement name={"included_in_booking"} label={t("Included in booking")} />*/}
-            {/*</Grid2>*/}
             <Grid2 sm={6} xs={12}>
               <SwitchElement name={"not_included_in_price"} label={t("Not included in price")} />
             </Grid2>
-            <Grid2 sm={6} xs={12}>
-              <SwitchElement name={"auto_add_booking"} label={t("Automatically added to new bookings")} />
-            </Grid2>
-            {/*<Grid2 sm={6} xs={12}>*/}
-            {/*  <SwitchElement name={"auto_add_invoice"} label={t("Automatically added to invoices")} />*/}
-            {/*</Grid2>*/}
           </Grid2>
         </CardContent>
         <CardActions>

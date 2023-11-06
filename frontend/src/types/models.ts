@@ -53,6 +53,7 @@ export interface Lodging {
   max_daily_tourist_tax: number;
   tourist_tax_rate: number;
   description: string;
+  default_services: string[];  // list of refs
 }
 
 export interface Service {
@@ -62,10 +63,7 @@ export interface Service {
   unit_price: number;
   vat: number;
   is_flat_rate: boolean;
-  // included_in_booking: boolean;
   not_included_in_price: boolean;
-  auto_add_booking: boolean;
-  auto_add_invoice: boolean;
 }
 
 export interface BookingChannel {

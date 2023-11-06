@@ -22,8 +22,8 @@ class LodgingAdminUserTestCase(APITestCase):
         response = self.client.get("/api/lodging/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.data
-        self.assertEqual(data['count'], 5)
-        self.assertEqual(len(data['results']), 5)
+        self.assertEqual(data["count"], 5)
+        self.assertEqual(len(data["results"]), 5)
 
     def testMoveUp(self):
         factories.LodgingFactory.create_batch(4)
@@ -55,11 +55,63 @@ class LodgingAdminUserTestCase(APITestCase):
 
     def test_create(self):
         owner = factories.StandardUserFactory()
-        status_count = models.Lodging.objects.all().count()
+        self.assertEqual(0, models.Lodging.objects.all().count())
         data = {"name": "my beautiful lodge", "owner_id": owner.id, "address": "here", "daily_rate": 30}
         response = self.client.post("/api/lodging/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
-        self.assertEqual(status_count + 1, models.Lodging.objects.all().count())
+        self.assertEqual(1, models.Lodging.objects.all().count())
+
+    def test_create_with_default_services(self):
+        owner = factories.StandardUserFactory()
+        service = factories.ServiceFactory()
+        data = {
+            "name": "my beautiful lodge",
+            "owner_id": owner.id,
+            "address": "here",
+            "daily_rate": 30,
+            "default_services": [service.reference],
+        }
+        response = self.client.post("/api/lodging/", data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+        lodging = models.Lodging.objects.first()
+        self.assertEqual(1, lodging.default_services.count())
+
+    def test_create_with_default_services_and_multiple_account(self):
+        # create a service on other account with a conflicting name
+        account2 = factories.AccountFactory.create(name="other")
+        factories.ServiceFactory.create(account=account2, reference="REF1")
+        owner = factories.StandardUserFactory.create()
+        service = factories.ServiceFactory.create(reference="REF1")
+        self.assertEqual(2, models.Service.objects.all().count())
+        self.assertEqual(owner.account, service.account)
+
+        data = {
+            "name": "my beautiful lodge",
+            "owner_id": owner.id,
+            "address": "here",
+            "daily_rate": 30,
+            "default_services": ["REF1"],
+        }
+        response = self.client.post("/api/lodging/", data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+        lodging = models.Lodging.objects.first()
+        self.assertEqual(service.id, lodging.default_services.first().id)
+
+    def test_update_default_services(self):
+        owner = factories.StandardUserFactory.create()
+        service = factories.ServiceFactory.create()
+        lodging = factories.LodgingFactory.create()
+        self.assertEqual(0, lodging.default_services.count())
+        data = {
+            "name": "my beautiful lodge",
+            "owner_id": owner.id,
+            "address": "here",
+            "daily_rate": 30,
+            "default_services": [service.reference],
+        }
+        response = self.client.patch("/api/lodging/%d/" % lodging.id, data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        self.assertEqual(1, lodging.default_services.count())
 
 
 class LodgingStandardUserTestCase(APITestCase):
@@ -80,8 +132,8 @@ class LodgingStandardUserTestCase(APITestCase):
         response = self.client.get("/api/lodging/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.data
-        self.assertEqual(data['count'], 2)
-        self.assertEqual(len(data['results']), 2)
+        self.assertEqual(data["count"], 2)
+        self.assertEqual(len(data["results"]), 2)
 
     def test_cant_create(self):
         owner = factories.StandardUserFactory()

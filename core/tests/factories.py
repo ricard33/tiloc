@@ -45,7 +45,7 @@ def get_or_create_group(name):
 class _UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
-        django_get_or_create = ("email",)
+        django_get_or_create = ("account", "email",)
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
@@ -153,7 +153,7 @@ class ContractFactory(factory.django.DjangoModelFactory):
 class ServiceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Service
-        django_get_or_create = ["reference"]
+        django_get_or_create = ["account", "reference"]
 
     account = factory.SubFactory(AccountFactory)
     reference = factory.Sequence(lambda n: "REF%d" % n)
