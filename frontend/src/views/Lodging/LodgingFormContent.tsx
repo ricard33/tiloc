@@ -63,22 +63,27 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
           />
         </Grid2>
         <Grid2 sm={3} xs={6}>
-          <TextFieldElement
+          <SelectElement
             name={"balance_due_date"}
             label={t("Due date for balance")}
-            type={"number"}
-            required
-            helperText={"When the balance should be paid (in days before arrival)?"}
+            options={[
+              {id: 0, label: t("At the arrival")},
+              {id: 7, label: t("7 days before arrival")},
+              {id: 14, label: t("14 days before arrival")},
+              {id: 30, label: t("1 month before arrival")},
+            ]}
+            fullWidth
+            helperText={t("When the balance should be paid?")}
           />
         </Grid2>
         <Grid2 xs={12} container>
-          <Grid2 xs={4}>
+          <Grid2 sm={4} xs={12}>
             <SwitchElement name={"is_flat_rate_tourist_tax"} label={t("Is the tourist tax flat rate?")} />
           </Grid2>
           {/*<Grid2 xs={6}>*/}
           {/*  <SwitchElement name={"tourist_tax_included_in_payment"} label={t("Should include tourist tax in payment?")} />*/}
           {/*</Grid2>*/}
-          <Grid2 xs={4}>
+          <Grid2 sm={4} xs={6}>
             <TextFieldElement
               name={"max_daily_tourist_tax"}
               label={isFlatRateTourismTax ? t("Daily tourist tax") : t("Ceiling of your daily tax")}
@@ -86,7 +91,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
               InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
             />
           </Grid2>
-          <Grid2 xs={4}>
+          <Grid2 sm={4} xs={6}>
             {!isFlatRateTourismTax &&
               <TextFieldElement
                 name={"tourist_tax_rate"} label={t("Rate of your daily tax")} type={"number"}
