@@ -203,6 +203,7 @@ const Editor: React.FunctionComponent<Props> = (props) => {
                 "Réservation_SERVICES_ADDITIONELS",
                 "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE",
                 "Réservation_TAXE_DE_SEJOUR",
+                "Réservation_ECHEANCE_DU_SOLDE",
                 // "Signature_LOCATAIRE",
                 "Signature_BAILLEUR"
               ]

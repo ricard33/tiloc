@@ -283,6 +283,11 @@ class Lodging(models.Model):
         _("daily rate"), max_digits=20, decimal_places=2, help_text=_("Default price for one night")
     )
     # weekly_rate = models.DecimalField(_("weekly price"), max_digits=20, decimal_places=2, null=True, blank=True)
+    balance_due_date = models.IntegerField(
+        _("due date for balance (in days)"),
+        default=0,
+        help_text=_("When the balance should be paid (in days before arrival)"),
+    )
     guaranty = models.DecimalField(_("guaranty deposit"), max_digits=20, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)

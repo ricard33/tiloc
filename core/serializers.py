@@ -182,6 +182,7 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "owner",
             "rank",
             "daily_rate",
+            "balance_due_date",
             "guaranty",
             "capacity",
             "information",

@@ -45,6 +45,7 @@ export interface Lodging {
   rank: number;
   address: string;
   daily_rate: number;
+  balance_due_date: number;
   guaranty: number;
   capacity: number;
   information: string;

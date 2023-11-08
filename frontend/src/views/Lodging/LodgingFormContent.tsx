@@ -62,6 +62,15 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
             InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
           />
         </Grid2>
+        <Grid2 sm={3} xs={6}>
+          <TextFieldElement
+            name={"balance_due_date"}
+            label={t("Due date for balance")}
+            type={"number"}
+            required
+            helperText={"When the balance should be paid (in days before arrival)?"}
+          />
+        </Grid2>
         <Grid2 xs={12} container>
           <Grid2 xs={4}>
             <SwitchElement name={"is_flat_rate_tourist_tax"} label={t("Is the tourist tax flat rate?")} />

@@ -3,6 +3,7 @@ import re
 from datetime import date
 from typing import List
 
+import arrow
 from babel.dates import format_date as babel_format_date
 from babel.numbers import format_decimal as babel_format_decimal
 from django.conf import settings
@@ -109,6 +110,10 @@ def make_context(booking, url_server):
         ),
         "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax),
         "Réservation_TAXE_DE_SEJOUR": format_decimal(booking.tourist_tax),
+        "Réservation_ECHEANCE_DU_SOLDE": format_date(
+            arrow.get(booking.begin_date).shift(days=-booking.lodging.balance_due_date).date(),
+            "short"
+        ),
         # "Signature_LOCATAIRE": booking,
         "Signature_BAILLEUR": signature_img,
     }
@@ -126,7 +131,9 @@ def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True):
         content = render_template(
             booking.lodging.contract_template.content,
             make_context(booking, url_server),
-        ).replace('"placeholder"', '"variable"')  # To avoid problems with CKEditor Placeholder plugin
+        ).replace(
+            '"placeholder"', '"variable"'
+        )  # To avoid problems with CKEditor Placeholder plugin
         page_break = '<div style="display: block; page-break-before: always;"></div>'
         if booking.lodging.description:
             content += page_break + booking.lodging.description
