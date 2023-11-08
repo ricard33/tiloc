@@ -11,11 +11,12 @@ import {
   GridValueGetterParams
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import { Card, CardContent, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { formatDate, formatDistanceToNow } from "../../common/dateUtils";
 import GridToolbar from "../../components/GridToolbar";
+import Paper from "@mui/material/Paper";
 
 type Props = {};
 
@@ -60,12 +61,14 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
         })]
       },
       { field: "active", headerName: t("Active ?"), type: "boolean", width: 70 },
-      { field: "last_import", headerName: t("Last import"), width: 200, valueFormatter: distanceFormatter,
+      {
+        field: "last_import", headerName: t("Last import"), width: 200, valueFormatter: distanceFormatter,
         renderCell: renderDateCell
       },
-      { field: "last_export", headerName: t("Last export"), width: 200, valueFormatter: distanceFormatter,
+      {
+        field: "last_export", headerName: t("Last export"), width: 200, valueFormatter: distanceFormatter,
         renderCell: renderDateCell
-      },
+      }
     ], [channels, lodgings, t]);
 
   const onClick = (calendarSync: CalendarSync) => {
@@ -78,33 +81,31 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
-        <CardContent sx={{ padding: 0, height: "100%" }}>
-          <DataGrid
-            sx={{
-              flex: "1 1 auto",
-              minHeight: "300px"
-            }}
-            rows={data || []}
-            columns={columns}
-            autoPageSize
-            // pageSize={20}
-            // pageSizeOptions={[5, 10, 20, 50]}
-            onRowClick={(params) => onClick(params.row)}
-            slots={{
-              toolbar: GridToolbar
-            }}
-            slotProps={{
-              toolbar: {
-                showColumnsButton: true,
-                showDensitySelector: true,
-                showFilterButton: true,
-                tools: [{ label: t("Create"), onClick: onCreateCalendarSync, disabled: !canAdd }]
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
+      <Paper sx={{ padding: 0, height: "100%" }}>
+        <DataGrid
+          sx={{
+            flex: "1 1 auto",
+            minHeight: "300px"
+          }}
+          rows={data || []}
+          columns={columns}
+          autoPageSize
+          // pageSize={20}
+          // pageSizeOptions={[5, 10, 20, 50]}
+          onRowClick={(params) => onClick(params.row)}
+          slots={{
+            toolbar: GridToolbar
+          }}
+          slotProps={{
+            toolbar: {
+              showColumnsButton: true,
+              showDensitySelector: true,
+              showFilterButton: true,
+              tools: [{ label: t("Create"), onClick: onCreateCalendarSync, disabled: !canAdd }]
+            }
+          }}
+        />
+      </Paper>
     </Page>
   );
 };

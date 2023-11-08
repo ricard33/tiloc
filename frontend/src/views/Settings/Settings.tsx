@@ -4,9 +4,9 @@ import { Outlet } from "react-router-dom";
 
 const Settings = () => {
   return (
-    <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Outlet />
-    </Page>
+    // <Page sx={{ display: "flex", flexFlow: "column" }}>
+    <Outlet />
+    // </Page>
   );
 };
 

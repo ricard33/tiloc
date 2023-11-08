@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useListContractTemplatesQuery } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 
-import { Card, CardContent, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { useTranslation } from "react-i18next";
 import { ContractTemplate, User } from "../../types";
@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { formatDistanceToNow } from "../../common/dateUtils";
 import GridToolbar from "../../components/GridToolbar";
+import Paper from "@mui/material/Paper";
 
 type Props = {};
 
@@ -49,33 +50,31 @@ const ContractTemplateList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
-        <CardContent sx={{ padding: 0, height: "100%" }}>
-          <DataGrid
-            sx={{
-              // flex: "1 1 auto",
-              minHeight: "300px"
-            }}
-            rows={data || []}
-            columns={columns}
-            autoPageSize
-            // pageSize={20}
-            // pageSizeOptions={[5, 10, 20, 50]}
-            onRowClick={(params) => onClick(params.row)}
-            slots={{
-              toolbar: GridToolbar
-            }}
-            slotProps={{
-              toolbar: {
-                showColumnsButton: true,
-                showDensitySelector: true,
-                showFilterButton: true,
-                tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
+      <Paper sx={{ padding: 0, height: "100%" }}>
+        <DataGrid
+          sx={{
+            // flex: "1 1 auto",
+            minHeight: "300px"
+          }}
+          rows={data || []}
+          columns={columns}
+          autoPageSize
+          // pageSize={20}
+          // pageSizeOptions={[5, 10, 20, 50]}
+          onRowClick={(params) => onClick(params.row)}
+          slots={{
+            toolbar: GridToolbar
+          }}
+          slotProps={{
+            toolbar: {
+              showColumnsButton: true,
+              showDensitySelector: true,
+              showFilterButton: true,
+              tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
+            }
+          }}
+        />
+      </Paper>
     </Page>
   );
 };

@@ -6,10 +6,10 @@ import { Service, User } from "../../types";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { formatPercent, formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
-import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import GridToolbar from "../../components/GridToolbar";
+import Paper from "@mui/material/Paper";
 
 type Props = {};
 
@@ -44,33 +44,31 @@ const ServicesList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
-        <CardContent sx={{ padding: 0, height: "100%" }}>
-          <DataGrid
-            sx={{
-              flex: "1 1 auto",
-              minHeight: "300px"
-            }}
-            rows={data || []}
-            columns={columns}
-            autoPageSize
-            // pageSize={20}
-            // pageSizeOptions={[5, 10, 20, 50]}
-            onRowClick={(params) => onClick(params.row)}
-            slots={{
-              toolbar: GridToolbar
-            }}
-            slotProps={{
-              toolbar: {
-                showColumnsButton: true,
-                showDensitySelector: true,
-                showFilterButton: true,
-                tools: [{ label: t("Create"), onClick: onCreateService, disabled: !canAdd }]
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
+      <Paper sx={{ padding: 0, height: "100%" }}>
+        <DataGrid
+          sx={{
+            flex: "1 1 auto",
+            minHeight: "300px"
+          }}
+          rows={data || []}
+          columns={columns}
+          autoPageSize
+          // pageSize={20}
+          // pageSizeOptions={[5, 10, 20, 50]}
+          onRowClick={(params) => onClick(params.row)}
+          slots={{
+            toolbar: GridToolbar
+          }}
+          slotProps={{
+            toolbar: {
+              showColumnsButton: true,
+              showDensitySelector: true,
+              showFilterButton: true,
+              tools: [{ label: t("Create"), onClick: onCreateService, disabled: !canAdd }]
+            }
+          }}
+        />
+      </Paper>
     </Page>
   );
 };

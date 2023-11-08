@@ -22,7 +22,6 @@ import {
   GridValueFormatterParams
 } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import { Card, CardContent } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { useSelector } from "react-redux";
@@ -40,6 +39,7 @@ import CancelIcon from "@mui/icons-material/Close";
 import { formatDate } from "../../common/dateUtils";
 import { useConfirm } from "../../libs/MuiConfirm";
 import GridToolbar from "../../components/GridToolbar";
+import Paper from "@mui/material/Paper";
 
 type Props = {};
 
@@ -97,7 +97,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
     };
   }) : [];
 
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = useCallback((params, event) => {
+  const handleRowEditStop: GridEventListener<"rowEditStop"> = useCallback((params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
@@ -137,7 +137,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
   const handleCancelClick = useCallback((payment: Payment) => () => {
     setRowModesModel({
       ...rowModesModel,
-      [payment.id!]: { mode: GridRowModes.View, ignoreModifications: true },
+      [payment.id!]: { mode: GridRowModes.View, ignoreModifications: true }
     });
 
     // const editedRow = rows.find((row) => row.id === payment.id);
@@ -185,7 +185,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
         ]
       },
       {
-        field: "date", headerName: t("Date"), width: 140, type: 'date', editable: true,
+        field: "date", headerName: t("Date"), width: 140, type: "date", editable: true
         // valueFormatter: (params: GridValueFormatterParams<Date>) => formatDate(params.value, "PPP")
       },
       {
@@ -285,52 +285,50 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
-        <CardContent sx={{ padding: 0, height: "100%" }}>
-          <DataGrid
-            sx={{
-              flex: "1 1 auto",
-              minHeight: "300px"
-            }}
-            initialState={{
-              sorting: {
-                sortModel: [ordering as GridSortItem]
-              }
-            }}
-            rows={payments || []}
-            rowCount={rowCountState}
-            columns={columns}
-            editMode="row"
-            rowModesModel={rowModesModel}
-            onRowModesModelChange={handleRowModesModelChange}
-            onRowEditStop={handleRowEditStop}
-            processRowUpdate={processRowUpdate}
-            pagination
-            paginationMode="server"
-            autoPageSize
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            sortingMode="server"
-            onSortModelChange={onChangeOrdering}
-            filterMode="server"
-            onFilterModelChange={onFilterChange}
-            // onRowClick={(params) => onClick(params.row)}
-            slots={{
-              toolbar: GridToolbar
-            }}
-            slotProps={{
-              toolbar: {
-                showColumnsButton: true,
-                showDensitySelector: true,
-                showFilterButton: true,
-                dateRange: dateRange,
-                onDateRangeChange: onDateRangeChange
-                // tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
+      <Paper sx={{ padding: 0, height: "100%" }}>
+        <DataGrid
+          sx={{
+            flex: "1 1 auto",
+            minHeight: "300px"
+          }}
+          initialState={{
+            sorting: {
+              sortModel: [ordering as GridSortItem]
+            }
+          }}
+          rows={payments || []}
+          rowCount={rowCountState}
+          columns={columns}
+          editMode="row"
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={handleRowModesModelChange}
+          onRowEditStop={handleRowEditStop}
+          processRowUpdate={processRowUpdate}
+          pagination
+          paginationMode="server"
+          autoPageSize
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          sortingMode="server"
+          onSortModelChange={onChangeOrdering}
+          filterMode="server"
+          onFilterModelChange={onFilterChange}
+          // onRowClick={(params) => onClick(params.row)}
+          slots={{
+            toolbar: GridToolbar
+          }}
+          slotProps={{
+            toolbar: {
+              showColumnsButton: true,
+              showDensitySelector: true,
+              showFilterButton: true,
+              dateRange: dateRange,
+              onDateRangeChange: onDateRangeChange
+              // tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
+            }
+          }}
+        />
+      </Paper>
     </Page>
   );
 };

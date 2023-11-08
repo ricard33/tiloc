@@ -18,7 +18,6 @@ import {
 } from "@mui/x-data-grid";
 import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
-import { Card, CardContent } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
@@ -26,12 +25,13 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import GridToolbar from "../../components/GridToolbar";
+import Paper from "@mui/material/Paper";
 
 type Props = {};
 
 const LodgingsList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
-  const { data, refetch } = useListLodgingsQuery({}, {refetchOnMountOrArgChange: 20});
+  const { data, refetch } = useListLodgingsQuery({}, { refetchOnMountOrArgChange: 20 });
   const { data: users } = useListUsersQuery();
   const [moveUp] = useMoveUpLodgingMutation();
   const [moveDown] = useMoveDownLodgingMutation();
@@ -91,7 +91,9 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
         field: "actions",
         type: "actions",
         getActions: (params: GridRowParams) => [
-          <GridActionsCellItem disabled={!canChange} icon={<ArrowUpwardIcon />} onClick={() => onRankUpDown(params.row, "up")} label="up" />,
+          <GridActionsCellItem disabled={!canChange} icon={<ArrowUpwardIcon />}
+                               onClick={() => onRankUpDown(params.row, "up")} label="up"
+          />,
           <GridActionsCellItem
             disabled={!canChange}
             icon={<ArrowDownwardIcon />} onClick={() => onRankUpDown(params.row, "down")} label="down"
@@ -111,31 +113,29 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "column" }}>
-      <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
-        <CardContent sx={{ padding: 0, height: "100%" }}>
-          <DataGrid
-            sx={{
-              flex: "1 1 auto",
-              minHeight: "300px"
-            }}
-            rows={data || []}
-            columns={columns}
-            autoPageSize
-            onRowClick={(params) => onClick(params.row)}
-            slots={{
-              toolbar: GridToolbar
-            }}
-            slotProps={{
-              toolbar: {
-                showColumnsButton: true,
-                showDensitySelector: true,
-                showFilterButton: true,
-                tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
+      <Paper sx={{ padding: 0, height: "100%" }}>
+        <DataGrid
+          sx={{
+            flex: "1 1 auto",
+            minHeight: "300px"
+          }}
+          rows={data || []}
+          columns={columns}
+          autoPageSize
+          onRowClick={(params) => onClick(params.row)}
+          slots={{
+            toolbar: GridToolbar
+          }}
+          slotProps={{
+            toolbar: {
+              showColumnsButton: true,
+              showDensitySelector: true,
+              showFilterButton: true,
+              tools: [{ label: t("Create"), onClick: onCreate, disabled: !canAdd }]
+            }
+          }}
+        />
+      </Paper>
     </Page>
   );
 };

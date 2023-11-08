@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useListBookingsPaginatedQuery, useListLodgingsQuery } from "../../services/api";
-import { Card, CardContent, LinearProgress } from "@mui/material";
+import { LinearProgress } from "@mui/material";
 import { formatISO } from "../../common/tzUtils";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import { Route, Routes, useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ import { GridSortItem } from "@mui/x-data-grid/models/gridSortModel";
 import { formatDate } from "../../common/dateUtils";
 import GridToolbar from "../../components/GridToolbar";
 import { getBookingStatuses } from "../../common/statusUtils";
+import Paper from "@mui/material/Paper";
 
 const BookingList = () => {
   const { t } = useTranslation();
@@ -154,62 +155,60 @@ const BookingList = () => {
           element={<BookingDialogLoader onClose={handleCloseEdit} onOpenContract={onEditContract} />}
         />
       </Routes>
-      <Card sx={{ flex: "1 1 auto", marginTop: "16px" }}>
-        <CardContent sx={{ padding: 0, height: "100%" }}>
-          <DataGrid
-            sx={{
-              flex: "1 1 auto",
-              minHeight: "300px"
-            }}
-            initialState={{
-              sorting: {
-                sortModel: [ordering as GridSortItem]
-              },
-              pagination: { paginationModel: { page: 1, pageSize: 10 } }
-            }}
-            rows={bookings?.results || []}
-            rowCount={rowCountState}
-            columns={columns}
-            pagination
-            paginationMode="server"
-            autoPageSize
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            sortingMode="server"
-            onSortModelChange={onChangeOrdering}
-            // disableColumnFilter
-            filterMode="server"
-            onFilterModelChange={onFilterChange}
+      <Paper sx={{ padding: 0, height: "100%" }}>
+        <DataGrid
+          sx={{
+            flex: "1 1 auto",
+            minHeight: "300px"
+          }}
+          initialState={{
+            sorting: {
+              sortModel: [ordering as GridSortItem]
+            },
+            pagination: { paginationModel: { page: 1, pageSize: 10 } }
+          }}
+          rows={bookings?.results || []}
+          rowCount={rowCountState}
+          columns={columns}
+          pagination
+          paginationMode="server"
+          autoPageSize
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          sortingMode="server"
+          onSortModelChange={onChangeOrdering}
+          // disableColumnFilter
+          filterMode="server"
+          onFilterModelChange={onFilterChange}
 
-            loading={isFetching}
-            checkboxSelection
-            disableRowSelectionOnClick
-            onRowClick={(params) => onEditBooking(params.row)}
-            onRowSelectionModelChange={onSelectionChange}
-            slots={{
-              toolbar: GridToolbar,
-              loadingOverlay: LinearProgress
-            }}
-            slotProps={{
-              toolbar: {
-                showColumnsButton: true,
-                showFilterButton: true,
-                numSelected: numSelected,
-                dateRange: dateRange,
-                onDateRangeChange: onDateRangeChange,
-                onSearch: onSearch,
-                onSearchLabel: t("Search booking"),
-                tools: [
-                  // { label: t("Import"), onClick: handleClickOpen, disabled: !canAdd },
-                  // { label: t("Export"), onClick: () => undefined, disabled: true },
-                  { label: t("Add booking"), onClick: onCreateBooking, disabled: !canAdd }
-                ]
-              }
-            }}
-          />
+          loading={isFetching}
+          checkboxSelection
+          disableRowSelectionOnClick
+          onRowClick={(params) => onEditBooking(params.row)}
+          onRowSelectionModelChange={onSelectionChange}
+          slots={{
+            toolbar: GridToolbar,
+            loadingOverlay: LinearProgress
+          }}
+          slotProps={{
+            toolbar: {
+              showColumnsButton: true,
+              showFilterButton: true,
+              numSelected: numSelected,
+              dateRange: dateRange,
+              onDateRangeChange: onDateRangeChange,
+              onSearch: onSearch,
+              onSearchLabel: t("Search booking"),
+              tools: [
+                // { label: t("Import"), onClick: handleClickOpen, disabled: !canAdd },
+                // { label: t("Export"), onClick: () => undefined, disabled: true },
+                { label: t("Add booking"), onClick: onCreateBooking, disabled: !canAdd }
+              ]
+            }
+          }}
+        />
 
-        </CardContent>
-      </Card>
+      </Paper>
       <BookingsImportDialog url="something" open={openImport} onClose={handleCloseImport} />
     </Page>
   );
