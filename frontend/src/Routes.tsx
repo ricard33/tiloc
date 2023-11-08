@@ -25,11 +25,11 @@ import CalendarSyncPage from "./views/CalendarSync/CalendarSyncPage";
 import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 import PaymentsList from "./views/Payment/PaymentsList";
-import GeneralSettings from "./views/Settings/GeneralSettings";
 import UsersList from "./views/Users/UsersList";
 import { UserPage } from "./views/Users/UserPage";
 import { SignUp } from "./views/SignUp/SignUp";
 import NewAccountWizard from "./views/Wizards/NewAccountWizard";
+import SettingsIndex from "./views/Settings/SettingsIndex";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -73,7 +73,7 @@ const MyRoutes = () => {
             }
           />
           <Route path="/settings/" element={<Settings />}>
-            <Route index element={<GeneralSettings />} />
+            <Route index element={<SettingsIndex />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/new" element={<UserPage />} />
             <Route path="users/:userId" element={<UserPage />} />
