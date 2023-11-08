@@ -72,13 +72,17 @@ const ButtonBackdrop = styled("span")(({ theme }) => ({
   transition: theme.transitions.create("opacity")
 }));
 
-const ButtonIcon = styled("span")(() => ({
+const ButtonIcon = styled("span")(({ theme }) => ({
   position: "absolute",
   top: 20,
   left: "30%",
   right: "30%",
   fontSize: 60,
-  color: "white"
+  color: "white",
+  [theme.breakpoints.down("sm")]: {
+    top: 10,
+    opacity: 0.3,
+  },
 }));
 
 const ImageMarked = styled("span")(({ theme }) => ({
@@ -138,7 +142,7 @@ function SettingsIndex() {
   ];
 
   return (
-    <Page sx={{ display: "flex", flexFlow: "row", flexWrap: "wrap" }}>
+    <Page sx={{ display: "flex", flexFlow: "row", flexWrap: "wrap", flex: "0 1 auto", justifyContent: "space-evenly" }}>
       {pages.map((page) => {
         const Icon = page.icon;
         return (
@@ -150,7 +154,7 @@ function SettingsIndex() {
             style={{
               width: "30%",
               flex: "0 0 200px",
-              margin: "0px 10px"
+              margin: "5px 10px"
             }}
           >
             <ImageSrc />
