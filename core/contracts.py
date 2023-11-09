@@ -110,10 +110,9 @@ def make_context(booking, url_server):
         ),
         "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax),
         "Réservation_TAXE_DE_SEJOUR": format_decimal(booking.tourist_tax),
-        "Réservation_ECHEANCE_DU_SOLDE": format_date(
-            arrow.get(booking.begin_date).shift(days=-booking.lodging.balance_due_date).date(),
-            "short"
-        ),
+        "Réservation_ECHEANCE_DU_SOLDE": booking.begin_date
+        and format_date(arrow.get(booking.begin_date).shift(days=-booking.lodging.balance_due_date).date(), "short")
+        or "___/___/______",
         # "Signature_LOCATAIRE": booking,
         "Signature_BAILLEUR": signature_img,
     }
