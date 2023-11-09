@@ -16,9 +16,10 @@ type Props = {
   onSubmit?: (user: User) => void;
   onCancel: () => void;
   onDelete?: (user: User) => void;
+  myProfileOnly?: boolean;
 };
 
-export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }) => {
+export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete, myProfileOnly }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<User>({
@@ -46,10 +47,10 @@ export const UserForm: React.FC<Props> = ({ user, onSubmit, onCancel, onDelete }
       formContext={formContext}
     >
       <Card sx={{ maxWidth: "800px" }}>
-        <CardHeader title={t("User")} />
+        <CardHeader title={myProfileOnly ? t("My profile") : t("User")} />
         <CardContent sx={{}}>
           <input type="hidden" name={"id"} value={user ? user.id : 0} />
-          <UserFormContent canChangeEmail canChangePassword myProfileOnly={false}/>
+          <UserFormContent canChangeEmail canChangePassword myProfileOnly={myProfileOnly ?? false}/>
         </CardContent>
         <CardActions>
           <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>

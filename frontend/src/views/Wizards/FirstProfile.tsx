@@ -21,7 +21,7 @@ type Props = {
   canChangePassword?: boolean;
 };
 
-export const MyProfile: React.FC<Props> = (props) => {
+export const FirstProfile: React.FC<Props> = (props) => {
   const args = setDefaults<Props>(props, {
     canChangeEmail: true,
     canChangePassword: true

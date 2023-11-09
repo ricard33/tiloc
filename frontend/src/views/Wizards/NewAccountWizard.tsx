@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Trans, useTranslation } from "react-i18next";
 import Paper from "@mui/material/Paper";
-import { MyProfile } from "./MyProfile";
+import { FirstProfile } from "./FirstProfile";
 import { WizardContext } from "./WizardContext";
 import { WizardFooter } from "./WizardFooter";
 import { FirstLodgingForm } from "./FirstLodgingForm";
@@ -69,7 +69,7 @@ export default function NewAccountWizard() {
 
   const renderStep = () => {
     if (activeStep === 0)
-      return <MyProfile onNext={() => handleNext()} onBack={handleBack} canChangeEmail={false} canChangePassword={false} />;
+      return <FirstProfile onNext={() => handleNext()} onBack={handleBack} canChangeEmail={false} canChangePassword={false} />;
     else if (activeStep === 1)
       return <FirstLodgingForm onNext={() => handleNext()} onBack={handleBack} />;
     else

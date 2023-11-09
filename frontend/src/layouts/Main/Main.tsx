@@ -56,6 +56,7 @@ const Main = () => {
     "services": t("Services"),
     "booking-channels": t("Booking channels"),
     "calendar-syncs": t("Calendars synchronization"),
+    "profile": t("My profile"),
   };
 
 

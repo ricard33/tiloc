@@ -152,8 +152,6 @@ const Sidebar: React.FC<Props> = props => {
       variant={variant}
     >
       <div className={classes.root}>
-        {/*<Profile />*/}
-        {/*<Divider className={classes.divider} />*/}
         <SidebarNav
           className={classes.nav}
           pages={currentMenu.pages}

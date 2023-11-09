@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import React, { /*useState*/ } from "react";
+import { Link, Link as RouterLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
 import {
   AppBar,
   AppBarProps,
   Avatar,
-  Badge,
+  // Badge,
   Hidden,
   IconButton,
   Theme,
@@ -17,7 +17,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
+// import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import InputIcon from "@mui/icons-material/Input";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoTiloc from "../../../assets/images/logos/logo-tiloc.png";
@@ -67,7 +67,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   const classes = useStyles();
 
   const { t } = useTranslation();
-  const [notifications] = useState([]);
+  // const [notifications] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null);
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const dispatch = useDispatch();
@@ -128,15 +128,15 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           <span className={classes.appName}>Tiloc</span>
         </RouterLink>
         <div className={classes.flexGrow} />
-        <IconButton color="inherit" size="large">
-          <Badge
-            badgeContent={notifications.length}
-            color="primary"
-            variant="dot"
-          >
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
+        {/*<IconButton color="inherit" size="large">*/}
+        {/*  <Badge*/}
+        {/*    badgeContent={notifications.length}*/}
+        {/*    color="primary"*/}
+        {/*    variant="dot"*/}
+        {/*  >*/}
+        {/*    <NotificationsIcon />*/}
+        {/*  </Badge>*/}
+        {/*</IconButton>*/}
         <Avatar
           alt="Person"
           className={classes.avatar}
@@ -162,7 +162,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           open={Boolean(anchorEl)}
           onClose={handleCloseUserMenu}
         >
-          <MenuItem>
+          <MenuItem component={Link} to={"/profile"} onClick={handleCloseUserMenu}>
             <ListItemIcon>
               <AccountBoxIcon fontSize="small" />
             </ListItemIcon>

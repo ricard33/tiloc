@@ -30,6 +30,7 @@ import { UserPage } from "./views/Users/UserPage";
 import { SignUp } from "./views/SignUp/SignUp";
 import NewAccountWizard from "./views/Wizards/NewAccountWizard";
 import SettingsIndex from "./views/Settings/SettingsIndex";
+import { MyProfile } from "./views/Users/MyProfile";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -64,6 +65,7 @@ const MyRoutes = () => {
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/payments" element={<PaymentsList />} />
           <Route path="/reports" element={<TestPage />} />
+          <Route path="/profile" element={<MyProfile />} />
           <Route
             path="/guests"
             element={
