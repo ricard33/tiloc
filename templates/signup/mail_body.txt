@@ -1,3 +1,19 @@
-You are almost there, {{ user.first_name }}!
-Please click the following link to confirm your account: {{ link }}
-The token expires on {{ expiry|time:"TIME_FORMAT" }}
+Bonjour {{ user.first_name }},
+
+Merci pour votre inscription sur Tiloc. Le logiciel pour Location Saisonnière, développé par des hôtes, tout comme vous.
+
+Afin d'activer votre compte, merci de cliquer sur le lien ci-dessous.
+Si le lien ci-dessus ne devait pas fonctionner, merci de copier le lien suivant dans votre navigateur :
+
+{{ link }}
+
+Cordialement,
+
+L'équipe Tiloc
+
+---
+Cet email a été envoyé à {{user.email}}
+Vous avez reçu cet email car vous êtes inscrit sur Tiloc.
+
+Cédric RICARD, 17 allée des sucriers, 97229 Les Trois Îlets, Martinique
+Email: service@tigecko.fr

@@ -325,12 +325,12 @@ def password_change_callback(user, password):
 
 
 # Global Package Settings
-EMAIL_FROM_ADDRESS = "noreply@tiloc.fr"  # mandatory
-EMAIL_PAGE_DOMAIN = "https://tiloc.fr/"  # mandatory (unless you use a custom link)
+EMAIL_FROM_ADDRESS = "Cédric de Tiloc <noreply@tiloc.fr>"  # mandatory
+EMAIL_PAGE_DOMAIN = "https://app.tiloc.fr/"  # mandatory (unless you use a custom link)
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)
-EMAIL_MAIL_SUBJECT = "Confirm your email {{ user.firstname }}"
+EMAIL_MAIL_SUBJECT = "Veuillez confirmer votre compte {{ user.first_name }}"
 EMAIL_MAIL_HTML = "signup/mail_body.html"
 EMAIL_MAIL_PLAIN = "signup/mail_body.txt"
 EMAIL_MAIL_TOKEN_LIFE = 60 * 60  # one hour

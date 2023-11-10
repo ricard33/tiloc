@@ -1,12 +1,11 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import clsx from "clsx";
-import PropTypes from "prop-types";
 import { makeStyles } from "@mui/styles";
-import { AppBar, Toolbar } from "@mui/material";
-import LogoTiloc from "../../../../assets/images/logos/logo-tiloc.png";
+import { AppBar, AppBarProps, Theme, Toolbar } from "@mui/material";
+import LogoTiloc from "../../../../assets/images/logos/logo-tiloc-with-name.png";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     boxShadow: 'none'
   },
@@ -19,7 +18,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Topbar = props => {
+export interface TopbarProps extends AppBarProps {
+  className?: string;
+}
+
+const Topbar: React.FC<TopbarProps> = (props) => {
   const { className, ...rest } = props;
 
   const classes = useStyles();
@@ -37,17 +40,13 @@ const Topbar = props => {
             className={classes.appLogo}
             alt="Logo"
             src={LogoTiloc}
-            width="32"
+            width="110"
           />
-          <span className={classes.appName}>Tiloc</span>
+          {/*<span className={classes.appName}>Tiloc</span>*/}
         </RouterLink>
       </Toolbar>
     </AppBar>
   );
-};
-
-Topbar.propTypes = {
-  className: PropTypes.string
 };
 
 export default Topbar;

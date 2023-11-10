@@ -11,7 +11,7 @@ from django.db.models import F, Min, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from django_email_verification import send_email
+from django_email_verification import send_email as send_verification_email
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
@@ -143,6 +143,7 @@ class SignUpAPI(KnoxLoginView):
 
     permission_classes = [permissions.AllowAny]
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -161,7 +162,8 @@ class SignUpAPI(KnoxLoginView):
             account=account,
         )
         user.groups.set(Group.objects.filter(name="administrator"))
-        send_email(user)
+        send_verification_email(user)
+        # raise APIException(detail="TEST")
         login(request, user)
         return super(SignUpAPI, self).post(request, format=None)
 
@@ -316,9 +318,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     @staticmethod
     def _generate_contract(booking, request):
         try:
-            contract = generate_contract(
-                booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
-            )
+            contract = generate_contract(booking, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost"))
         except jinja2.exceptions.TemplateSyntaxError as ex:
             logger.exception("Template generation error")
             raise APIException(detail="Template error at line %d: %s" % (ex.lineno, ex.message))

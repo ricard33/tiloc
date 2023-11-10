@@ -31,6 +31,7 @@ import { SignUp } from "./views/SignUp/SignUp";
 import NewAccountWizard from "./views/Wizards/NewAccountWizard";
 import SettingsIndex from "./views/Settings/SettingsIndex";
 import { MyProfile } from "./views/Users/MyProfile";
+import { EmailVerified } from "./views/SignUp/EmailVerified";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -43,6 +44,7 @@ const MyRoutes = () => {
         <Route path="/logged-out" element={<LoggedOut />} />
         <Route path="/not-found" element={<NotFoundView />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/email-verified" element={<EmailVerified />} />
         {/*<Route path="*" element={<NotFoundView />} />*/}
       </Route>
       <Route element={<RequireAuth />}>

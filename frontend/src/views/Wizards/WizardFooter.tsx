@@ -9,9 +9,10 @@ type Props = {
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
+  onReset?: () => void;
 };
 
-export const WizardFooter: React.FC<Props> = ({ onBack, onNext, onSkip }: Props) => {
+export const WizardFooter: React.FC<Props> = ({ onBack, onNext, onSkip, onReset }: Props) => {
   const wizardContext = useContext(WizardContext);
   const { t } = useTranslation();
   const { activeStep, steps, isStepOptional } = wizardContext;
@@ -33,6 +34,11 @@ export const WizardFooter: React.FC<Props> = ({ onBack, onNext, onSkip }: Props)
           {t("Skip")}
         </Button>
       )}
+      { onReset &&
+        <Button onClick={onReset}>
+          {t("Reset")}
+        </Button>
+      }
       {formContext ?
         <Button type="submit">
           {activeStep === steps.length - 1 ? t("Finish") : t("Next")}

@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Trans, useTranslation } from "react-i18next";
 import Paper from "@mui/material/Paper";
@@ -11,17 +10,20 @@ import { FirstProfile } from "./FirstProfile";
 import { WizardContext } from "./WizardContext";
 import { WizardFooter } from "./WizardFooter";
 import { FirstLodgingForm } from "./FirstLodgingForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function NewAccountWizard() {
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set<number>());
+  const navigate = useNavigate();
+
 
   const steps = [
     t("Complete your profile"),
     t("Create your first lodging"),
+    t("Finished")
   ];
 
   const isStepOptional = (step: number) => {
@@ -69,14 +71,38 @@ export default function NewAccountWizard() {
 
   const renderStep = () => {
     if (activeStep === 0)
-      return <FirstProfile onNext={() => handleNext()} onBack={handleBack} canChangeEmail={false} canChangePassword={false} />;
+      return (
+        <FirstProfile
+          onNext={() => handleNext()} onBack={handleBack} canChangeEmail={false}
+          canChangePassword={false}
+        />);
     else if (activeStep === 1)
       return <FirstLodgingForm onNext={() => handleNext()} onBack={handleBack} />;
+    else if (activeStep === steps.length - 1) // Last one ?
+      return (
+        <>
+          <Typography sx={{ mt: 2, mb: 1 }}>
+            {t("All steps completed - you're finished")}
+          </Typography>
+          <Typography sx={{ mt: 2, mb: 1 }}>
+            <Trans
+              i18nKey="Now, you can have a look to your <link1>planning</link1>
+                  or go to your <link2>dashboard</link2>"
+              components={{
+                link1: <Link to="/planning" title={t("Planning")}> </Link>,
+                link2: <Link to="/" title={t("Dashboard")}> </Link>
+              }}
+            />
+          </Typography>
+
+          <WizardFooter onBack={handleBack} onNext={() => navigate("/")} onSkip={() => null} onReset={handleReset} />
+        </>
+      );
     else
       return (
         <>
           <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-          <WizardFooter onBack={handleBack} onNext={handleNext} onSkip={handleSkip}/>
+          <WizardFooter onBack={handleBack} onNext={handleNext} onSkip={handleSkip} />
         </>
       );
   };
@@ -106,32 +132,9 @@ export default function NewAccountWizard() {
               );
             })}
           </Stepper>
-          {activeStep === steps.length ? (
-            <React.Fragment>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                {t("All steps completed - you're finished")}
-              </Typography>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                <Trans
-                  i18nKey="Now, you can have a look to your <link1>planning</link1>
-                  or go to your <link2>dashboard</link2>"
-                  components={{
-                    link1: <Link to="/planning" title={t("Planning")}> </Link>,
-                    link2: <Link to="/" title={t("Dashboard")}> </Link>
-                  }}
-                />
-              </Typography>
-
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                <Box sx={{ flex: "1 1 auto" }} />
-                <Button onClick={handleReset}>Reset</Button>
-              </Box>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              {renderStep()}
-            </React.Fragment>
-          )}
+          <React.Fragment>
+            {renderStep()}
+          </React.Fragment>
         </Box>
       </Paper>
     </WizardContext.Provider>

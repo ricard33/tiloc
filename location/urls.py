@@ -69,6 +69,9 @@ urlpatterns = [
     # path('', include('frontend.urls')),
     # re_path(r'^', IndexPage.as_view(template_name="index.html")),
     re_path("loggly/(?P<path>.*)", views.loggly_proxy),
+
+    re_path("preview/verif/", views.preview_verification_email),
+    re_path("preview/verified/", views.preview_verified),
 ]
 
 if settings.ENV == "dev":

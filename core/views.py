@@ -1,17 +1,20 @@
 import logging
 
 import arrow
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
-from django_email_verification import send_email
+from django_email_verification import default_token_generator, send_email
+from django_email_verification.errors import NotAllFieldCompiled
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
 from rest_framework.decorators import api_view, permission_classes
@@ -153,7 +156,9 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
         & Q(booking__deleted=False)
         & ~Q(booking__status__in=status_no_stats),
     )  # noqa: E127
-    channels = models.BookingChannel.objects.filter(Q(account=request.user.account) | Q(account__isnull=True)).annotate(booking_count=booking_count)
+    channels = models.BookingChannel.objects.filter(Q(account=request.user.account) | Q(account__isnull=True)).annotate(
+        booking_count=booking_count
+    )
     for row in channels:
         data.append({"channel": row.name, "count": row.booking_count})
     data.append(
@@ -171,3 +176,19 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
         }
     )
     return Response(data)
+
+
+def preview_verification_email(request):
+    user = request.user
+    exp = default_token_generator.now() + 60 * 60
+    token, expiry = default_token_generator.make_token(user, exp, kind="MAIL")
+    context = {"token": token, "expiry": expiry, "user": user, "link": settings.EMAIL_PAGE_DOMAIN}
+    return TemplateResponse(request, "signup/mail_body.html", context)
+
+
+def preview_verified(request):
+    try:
+        template = settings.EMAIL_MAIL_PAGE_TEMPLATE
+        return render(request, template, {"success": True, "user": request.user, "request": request})
+    except (AttributeError, TypeError):
+        raise NotAllFieldCompiled("EMAIL_MAIL_PAGE_TEMPLATE field not found")

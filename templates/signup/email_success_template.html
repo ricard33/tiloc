@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Confirmation</title>
+  <meta charset="UTF-8">
+  <title>Confirmation</title>
+  {% if success %}
+  <meta http-equiv="refresh" content="0;URL=/email-verified">
+  {% endif %}
 </head>
 <body>
 {% if success %}
-{{ user.first_name }}, your account is confirmed!
+  {{ user.first_name }}, your account is confirmed!
 {% else %}
-Error, invalid token!
+  Error, invalid token!
 {% endif %}
 </body>
 </html>
