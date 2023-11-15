@@ -326,7 +326,7 @@ def password_change_callback(user, password):
 
 # Global Package Settings
 EMAIL_FROM_ADDRESS = "Cédric de Tiloc <noreply@tiloc.fr>"  # mandatory
-EMAIL_PAGE_DOMAIN = "https://app.tiloc.fr/"  # mandatory (unless you use a custom link)
+EMAIL_PAGE_DOMAIN = config.get("EMAIL_VERIFICATION", "PAGE_DOMAIN", "https://app.tiloc.fr/")  # mandatory (unless you use a custom link)
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)

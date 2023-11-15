@@ -162,7 +162,7 @@ class SignUpAPI(KnoxLoginView):
             account=account,
         )
         user.groups.set(Group.objects.filter(name="administrator"))
-        send_verification_email(user)
+        send_verification_email(user, context={"request": request})
         # raise APIException(detail="TEST")
         login(request, user)
         return super(SignUpAPI, self).post(request, format=None)
