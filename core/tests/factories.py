@@ -56,6 +56,7 @@ class _UserFactory(factory.django.DjangoModelFactory):
     account = factory.SubFactory(AccountFactory)
     no_vat = False
     signature = factory.django.ImageField()
+    verified = True
 
 
 class SuperUserFactory(_UserFactory):

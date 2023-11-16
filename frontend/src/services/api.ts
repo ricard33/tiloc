@@ -68,7 +68,7 @@ const axiosBaseQuery =
       const { url, method = "get", params = undefined, data = undefined } = typeof arg == "string" ? { url: arg } : arg;
       let meta: AxiosQueryMeta;
       const requestArgs: AxiosRequestConfig = { url: baseUrl + url, method, params, data };
-      if(method.toLowerCase() === "put" || method.toLowerCase() === "patch" || method.toLowerCase() === "post") {
+      if (method.toLowerCase() === "put" || method.toLowerCase() === "patch" || method.toLowerCase() === "post") {
         let form_data = new FormData();
         let fileUpload = false;
         for (const propertyName in data) {
@@ -80,21 +80,19 @@ const axiosBaseQuery =
             if (FileList && value instanceof FileList) {
               // Safari, Firefox, IE land here
               fileUpload = true;
-              for(let i = 0; i < value.length; i++)
+              for (let i = 0; i < value.length; i++)
                 form_data.append(propertyName, value[i], value[i].name);
-            }
-            else{
-              if (Array.isArray(value)){
+            } else {
+              if (Array.isArray(value)) {
                 form_data.append(propertyName, JSON.stringify(value));
-              }
-              else
+              } else
                 form_data.append(propertyName, value !== null ? value : "");  // null not supported by multipart encoding
             }
           }
         }
-        if(fileUpload) {
+        if (fileUpload) {
           requestArgs.data = form_data;
-          requestArgs.headers = {"Content-Type": "multipart/form-data"}
+          requestArgs.headers = { "Content-Type": "multipart/form-data" };
         }
       }
       meta = { request: requestArgs };
@@ -103,13 +101,13 @@ const axiosBaseQuery =
         return { data: result.data };
       } catch (axiosError) {
         let err = axiosError as AxiosError;
-        if(err.response) {
+        if (err.response) {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
           return {
             error: {
-              message: typeof err.response?.data === 'string' ? err.response?.data
-                : typeof err.response?.data === 'object' ? JSON.stringify(err.response?.data)
+              message: typeof err.response?.data === "string" ? err.response?.data
+                : typeof err.response?.data === "object" ? JSON.stringify(err.response?.data)
                   : err.response?.statusText,
               status: err.response?.status,
               data: err.response?.data,
@@ -124,7 +122,7 @@ const axiosBaseQuery =
           return { error: { message: err.code ?? err.message, meta } };
         } else {
           // Something happened in setting up the request that triggered an Error
-          console.error('Error', err.message);
+          console.error("Error", err.message);
           return { error: { message: err.code ?? err.message, meta } };
         }
       }
@@ -133,13 +131,14 @@ const axiosBaseQuery =
 export interface BaseModel {
   id?: number;
 }
+
 type ApiModel = Record<string, any>;
 type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unknown, QueryError, {}, AxiosQueryMeta>, string, "api">;
 
 function invalidatesDependentTags<T extends BaseModel>(modelName: string, obj: T) {
-  if(modelName === "Comment")
-    return [{ type: "Booking", id: (obj as any as Comment).booking_id }, { type: "Booking", id: "LIST" }]
-  return []
+  if (modelName === "Comment")
+    return [{ type: "Booking", id: (obj as any as Comment).booking_id }, { type: "Booking", id: "LIST" }];
+  return [];
 }
 
 function makeListApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: string, modelName: string, convertFromApi?: (obj: ApiModel) => T) {
@@ -149,7 +148,7 @@ function makeListApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: st
         url,
         method: "GET",
         params
-      }
+      };
     },
     providesTags: (data) => {
       return data ? [
@@ -170,18 +169,20 @@ function makePaginatedListApi<T extends BaseModel>(builder: AxiosEndpointBuilder
         url,
         method: "GET",
         params
-      }
+      };
     },
     providesTags: (data) => data ? [
       ...(data as Pagination<T>).results.map(({ id }) => ({ type: modelName, id: id } as const)),
       { type: modelName, id: "LIST" }
     ] : [{ type: modelName, id: "LIST" }],
-    ...(convertFromApi && {transformResponse: (response) => {
-      return {
-        ...response as Pagination<T>,
-        results: (response as Pagination<ApiModel>).results.map(p => convertFromApi(p))
-      };
-    }})
+    ...(convertFromApi && {
+      transformResponse: (response) => {
+        return {
+          ...response as Pagination<T>,
+          results: (response as Pagination<ApiModel>).results.map(p => convertFromApi(p))
+        };
+      }
+    })
   });
 }
 
@@ -191,7 +192,7 @@ function makeGetApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: str
     providesTags: (data) => data ? [
       { type: modelName, id: data.id }
     ] : [],
-    ...(convertFromApi && {transformResponse: (response) => convertFromApi(response as ApiModel)})
+    ...(convertFromApi && { transformResponse: (response) => convertFromApi(response as ApiModel) })
   });
 }
 
@@ -209,9 +210,11 @@ function makeCreateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
       { type: modelName, id: "LIST" },
       ...invalidatesDependentTags(modelName, obj)
     ],
-    ...(convertFromApi && {transformResponse: (response) => {
-      return convertFromApi(response as ApiModel);
-    }})
+    ...(convertFromApi && {
+      transformResponse: (response) => {
+        return convertFromApi(response as ApiModel);
+      }
+    })
   });
 }
 
@@ -230,9 +233,11 @@ function makeUpdateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
       { type: modelName, id: "LIST" },
       ...invalidatesDependentTags(modelName, obj)
     ],
-    ...(convertFromApi && {transformResponse: (response) => {
-      return convertFromApi(response as ApiModel);
-    }})
+    ...(convertFromApi && {
+      transformResponse: (response) => {
+        return convertFromApi(response as ApiModel);
+      }
+    })
   });
 }
 
@@ -296,6 +301,22 @@ export const api = createApi({
     // Sign in
     currentUser: builder.query<User, void>({
       query: () => `auth/user/`
+    }),
+    updateCurrentUser: builder.mutation<User, Partial<User>>({
+      query(body) {
+        return {
+          url: "auth/user/",
+          method: "PATCH",
+          data: user2api(body)
+        };
+      },
+      invalidatesTags: (result, error, obj) => [
+        { type: "User", id: obj.id },
+        { type: "User", id: "LIST" },
+      ],
+      transformResponse: (response) => {
+        return api2User(response as ApiModel);
+      }
     }),
     login: builder.mutation<LoginInfo, { email: string; password: string }>({
       query(args) {
@@ -445,6 +466,7 @@ export const api = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useCurrentUserQuery,
+  useUpdateCurrentUserMutation,
   useLoginMutation,
   useLogoutMutation,
   useSignupMutation,
@@ -517,6 +539,6 @@ export const {
   useListCalendarSyncsQuery,
   useCreateCalendarSyncMutation,
   useUpdateCalendarSyncMutation,
-  useDeleteCalendarSyncMutation,
+  useDeleteCalendarSyncMutation
 
 } = api;

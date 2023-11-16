@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useNavigate } from "react-router-dom";
-import { useUpdateUserMutation } from "../../services/api";
+import { useUpdateCurrentUserMutation } from "../../services/api";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
 import { UserForm } from "./UserForm";
@@ -14,7 +14,7 @@ import { auth } from "../../actions";
 
 export function MyProfile() {
   const { t } = useTranslation();
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUser] = useUpdateCurrentUserMutation();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
   const canChange = currentUser.permissions.includes("core.change_user");
   const { showError, showSuccess } = useAlert();

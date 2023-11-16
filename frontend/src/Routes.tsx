@@ -67,7 +67,6 @@ const MyRoutes = () => {
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/payments" element={<PaymentsList />} />
           <Route path="/reports" element={<TestPage />} />
-          <Route path="/profile" element={<MyProfile />} />
           <Route
             path="/guests"
             element={
@@ -78,6 +77,7 @@ const MyRoutes = () => {
           />
           <Route path="/settings/" element={<Settings />}>
             <Route index element={<SettingsIndex />} />
+            <Route path="profile" element={<MyProfile />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/new" element={<UserPage />} />
             <Route path="users/:userId" element={<UserPage />} />

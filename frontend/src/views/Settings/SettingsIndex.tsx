@@ -10,6 +10,7 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import RoomServiceIcon from "@mui/icons-material/RoomService";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking-sources.svg";
 import { styled } from "@mui/material/styles";
 import ButtonBase from "@mui/material/ButtonBase";
@@ -102,12 +103,12 @@ function SettingsIndex() {
   const canViewUsers = user.permissions.includes("core.view_user");
 
   const pages = [
-    // {
-    //   title: t("General parameters"),
-    //   href: "",
-    //   icon: SettingsIcon,
-    //   disabled: false
-    // },
+    {
+      title: t("My account"),
+      href: "profile",
+      icon: AccountBoxIcon,
+      disabled: false
+    },
     ...(canViewUsers ? [{
       title: t("Users"),
       href: "users",

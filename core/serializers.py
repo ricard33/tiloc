@@ -99,10 +99,13 @@ class UserSerializer(serializers.ModelSerializer):
             instance.lodgings.set(Lodging.objects.filter(account=instance.account, name__in=lodgings))
         return instance
 
-    def update(self, instance, validated_data):
+    def update(self, instance: User, validated_data: dict):
         password = None
         if "password" in validated_data:
             password = validated_data.pop("password")
+        if "email" in validated_data and validated_data["email"] != instance.email:
+            logger.info("changing email from '%s' to '%s'. Invalidating user email.", instance.email, validated_data.get("email"))
+            validated_data["verified"] = False
         instance = super().update(instance, validated_data)
         if password:
             instance.set_password(password)

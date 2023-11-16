@@ -219,7 +219,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return self.queryset.for_user(self.request.user)
 
 
-class CurrentUserAPI(generics.RetrieveAPIView):
+class CurrentUserAPI(generics.RetrieveUpdateAPIView):
     # authentication_classes = (TokenAuthentication,)
     permission_classes = [
         permissions.IsAuthenticated,

@@ -69,3 +69,26 @@ class UserTestCase(APITestCase):
             "/api/user/", encode_multipart(data=data, boundary=BOUNDARY), content_type=MULTIPART_CONTENT, **self.header
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+
+
+class CurrentUserTestCase(APITestCase):
+    fixtures = ["default-groups"]
+
+    def setUp(self) -> None:
+        self.user = factories.StandardUserFactory.create()
+        self.header = force_login(self.user)
+
+    def test_get_current_user(self):
+        response = self.client.get("/api/auth/user/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user = response.data
+        self.assertEqual(user["id"], self.user.id)
+
+    def test_change_my_email(self):
+        self.assertEqual(self.user.verified, True)
+        response = self.client.patch("/api/auth/user/", {"email": "new@email.com"}, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        user = response.data
+        self.assertEqual(user["id"], self.user.id)
+        self.assertEqual(user["email"], "new@email.com")
+        self.assertEqual(user["verified"], False)
