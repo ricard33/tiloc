@@ -233,6 +233,14 @@ class CurrentUserAPI(generics.RetrieveAPIView):
         return self.request.user
 
 
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def resend_verification(request, *args, **kwargs):
+    user = request.user
+    send_verification_email(user, context={"request": request})
+    return Response("Email sent")
+
+
 class BookingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows bookings to be viewed or edited.

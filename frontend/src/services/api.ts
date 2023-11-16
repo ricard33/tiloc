@@ -323,6 +323,14 @@ export const api = createApi({
         };
       }
     }),
+    resendVerification: builder.mutation<string, void>({
+      query() {
+        return {
+          url: `auth/resend_verification/`,
+          method: "POST"
+        };
+      }
+    }),
 
     // BookingChannel
     listBookingChannels: bookingChannelApi.list(builder),
@@ -440,6 +448,7 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useSignupMutation,
+  useResendVerificationMutation,
 
   useListBookingChannelsQuery,
   useGetBookingChannelQuery,

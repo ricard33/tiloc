@@ -52,6 +52,7 @@ urlpatterns = [
     re_path("^api/auth/login/$", api.LoginAPI.as_view()),
     re_path("^api/auth/logout/$", api.LogoutAPI.as_view()),
     re_path("^api/auth/user/$", api.CurrentUserAPI.as_view()),
+    re_path(r"^api/auth/resend_verification/$", api.resend_verification),
     re_path(r"^api/auth/", include("knox.urls")),
 
     re_path("^api/signup/$", api.SignUpAPI.as_view()),

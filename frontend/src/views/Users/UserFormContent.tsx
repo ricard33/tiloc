@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
+import { Button, Tooltip, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
   MultiSelectElement,
@@ -10,8 +10,11 @@ import {
 } from "react-hook-form-mui";
 import { useFormContext } from "react-hook-form";
 import ImageUploadElement from "../../components/Fields/ImageUploadElement";
-import { useListLodgingsQuery } from "../../services/api";
-
+import { useListLodgingsQuery, useResendVerificationMutation } from "../../services/api";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import UnverifiedUserIcon from "@mui/icons-material/GppMaybe";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
 
 type Props = {
   canChangeEmail: boolean;
@@ -28,9 +31,25 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
   const userId = watch("id", getValues("id"));
   // const no_vat = watch("no_vat", getValues("no_vat"));
   const [changePassword, setChangePassword] = useState(!(userId));
+  const isVerified = getValues("verified");
+  const [resendVerification] = useResendVerificationMutation();
+  const { showError, showSuccess } = useAlert();
 
   function onChangePasswordClick() {
     setChangePassword(true);
+  }
+
+  function onResendVerification() {
+    resendVerification().then(result => {
+      if ((result as any).error) {
+        const error = (result as any).error;
+        console.error("Error while trying to resend verification", error);
+        showError(t("Impossible resend verification email: ") + fetchErrorDecode(error));
+      } else {
+        showSuccess(t("Verification email sent"));
+      }
+
+    });
   }
 
   return (
@@ -43,12 +62,26 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
         <Grid2 sm={6} xs={12}>
           <TextFieldElement name={"last_name"} label={t("Last name")} fullWidth required />
         </Grid2>
-        <Grid2 xs={12}>
+        <Grid2 sm={8} xs={12}>
           <TextFieldElement
             name={"email"} type={"email"} label={t("Email")}
             fullWidth required autoComplete="email"
             disabled={!canChangeEmail}
           />
+        </Grid2>
+        <Grid2 sm={4} xs={12}>
+          {isVerified ?
+            <Tooltip title={t("Email verified")}>
+              <VerifiedUserIcon color="success" />
+            </Tooltip>
+            :
+            <Tooltip title={t("Email not verified")}>
+              <>
+                <UnverifiedUserIcon color="warning" />
+                <Button onClick={() => onResendVerification()}>{t("Resend verification email")}</Button>
+              </>
+            </Tooltip>
+          }
         </Grid2>
         {canChangePassword && (
           changePassword
@@ -81,10 +114,10 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
             </Grid2>
         )}
         <Grid2 sm={6} xs={12}>
-          <TextFieldElement name={"phone"} label={t("Phone")} fullWidth  />
+          <TextFieldElement name={"phone"} label={t("Phone")} fullWidth />
         </Grid2>
         <Grid2 sm={6} xs={12}>
-          <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth  />
+          <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth />
         </Grid2>
 
         {!myProfileOnly && (
