@@ -32,6 +32,7 @@ import NewAccountWizard from "./views/Wizards/NewAccountWizard";
 import SettingsIndex from "./views/Settings/SettingsIndex";
 import { MyProfile } from "./views/Users/MyProfile";
 import { EmailVerified } from "./views/SignUp/EmailVerified";
+import Subscription from "./views/Subscription/Subscription";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -97,6 +98,7 @@ const MyRoutes = () => {
             <Route path="calendar-syncs/new" element={<CalendarSyncPage />} />
             <Route path="calendar-syncs/:calendarSyncId" element={<CalendarSyncPage />} />
           </Route>
+          <Route path="/upgrade-plan" element={<Subscription />} />
           <Route path="/test-page" element={<TestPage />} />
           <Route path="*" element={<NotFoundView />} />
         </Route>

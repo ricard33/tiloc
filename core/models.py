@@ -3,6 +3,7 @@ import os
 import re
 import uuid
 
+import arrow
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.hashers import make_password
@@ -110,6 +111,7 @@ class Account(models.Model):
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     validity = models.DateTimeField(null=True)
+    subscription = models.ForeignKey("Plan", null=True, blank=True, on_delete=models.PROTECT)
 
     class Meta:
         permissions = (("administrator", "Can administer all account data"),)
@@ -121,6 +123,18 @@ class Account(models.Model):
 
     def natural_key(self):
         return (self.name,)
+
+    @property
+    def trial_is_over(self):
+        return self.validity and self.validity < arrow.utcnow().datetime or self.subscription is None
+
+    @property
+    def max_lodgings(self):
+        return self.trial_is_over and 1 or self.subscription.max_lodgings
+
+    @property
+    def max_users(self):
+        return self.trial_is_over and 1 or self.subscription.max_users
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         creating = self.pk is None or force_insert
@@ -739,3 +753,11 @@ class Comment(models.Model):
     _account_qs_path = "booking__lodging__account"
     _lodging_qs_path = "booking__lodging"
     objects = ForUserQuerySet.as_manager()
+
+
+class Plan(models.Model):
+    ref = models.CharField(max_length=20, unique=True, primary_key=True)
+    name = models.CharField(max_length=100)
+    max_lodgings = models.PositiveSmallIntegerField(null=True, blank=True)
+    max_users = models.PositiveSmallIntegerField(null=True, blank=True)
+    price_per_month = models.PositiveSmallIntegerField()

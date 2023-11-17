@@ -8,6 +8,16 @@ export interface LoginInfo {
 export interface Account {
   is_active: boolean;
   is_initialized: boolean;
+  subscription: {
+    ref: string;
+    name: string;
+    max_lodgings: number;
+    max_users: number;
+    price_per_month: number;
+  }
+  created: Date;
+  validity: Date;
+  trial_is_over: boolean;
   invoice_label: string;
   deposit_label: string;
 }

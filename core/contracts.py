@@ -13,6 +13,7 @@ from core.models import BookedService, Booking, Contract
 logger = logging.getLogger("api")
 
 
+# TODO Get format like "2,60", not "2.6"
 def format_decimal(value, locale=settings.LANGUAGE_CODE):
     return babel_format_decimal(value or 0, locale=locale)
 
@@ -83,7 +84,7 @@ def make_context(booking, url_server):
         # "Logement_CLASSEMENT": booking,
         "Logement_CAPACITE": booking.lodging.capacity,
         # "Logement_DESCRIPTIF": booking,
-        "Logement_DEPOT_GARANTIE": booking.lodging.guaranty,
+        "Logement_DEPOT_GARANTIE": format_decimal(booking.lodging.guaranty),
         # "Logement_HORAIRE_ARRIVEE": booking,
         # "Logement_HORAIRE_DEPART": booking,
         "Logement_MODALITE_PAIEMENT": booking.lodging.owner.payment,

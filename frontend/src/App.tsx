@@ -17,6 +17,9 @@ import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
 import { RootState } from "./store";
 import { DateProvider } from "@ti-gecko/react-calendar-timeline";
+import { useAlert } from "./common/alertUtils";
+import { differenceInCalendarDays, formatDistanceToNow } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 validate.validators = {
   ...validate.validators,
@@ -30,6 +33,8 @@ function App(props: Props) {
   const dispatch = useDispatch();
   const token = useSelector<RootState>((store) => store.auth.token);
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
+  const { showInfo, showWarning } = useAlert();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // console.log("useEffect token", token);
@@ -39,9 +44,22 @@ function App(props: Props) {
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);
-    if(currentUser)
+    if(currentUser) {
       dispatch(auth.userLoaded(currentUser));
-  }, [dispatch, currentUser, token]);
+      console.log(currentUser.account);
+      console.log("End fo validity: ", currentUser.account.validity);
+      console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
+      const remainingDays = differenceInCalendarDays(currentUser.account.validity, new Date());
+      if(remainingDays < 0) {
+        showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
+      }
+      else if(remainingDays < 14) {
+        console.log(`Your subscription will end in ${remainingDays} days.`);
+        const showMessage = remainingDays < 5 ? showWarning : showInfo;
+        showMessage(t("Your subscription will end in {{ count }} days.", {count: remainingDays}));
+      }
+    }
+  }, [dispatch, currentUser, token, showInfo, t, showWarning]);
 
   useEffect(() => {
     if(userLoadingError)

@@ -20,20 +20,36 @@ class FilteredSlugRelatedField(serializers.SlugRelatedField):
         return queryset
 
 
+class PlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Plan
+        fields = "__all__"
+
+
 class AccountSerializer(serializers.ModelSerializer):
     is_initialized = serializers.SerializerMethodField()
+    subscription = serializers.SerializerMethodField()
 
     class Meta:
         model = Account
         fields = [
             "is_active",
             "is_initialized",
+            "subscription",
+            "trial_is_over",
+            "created",
+            "validity",
             "invoice_label",
             "deposit_label",
         ]
 
     def get_is_initialized(self, account):
         return account.lodging_set.count() > 0
+
+    def get_subscription(self, account):
+        if account.trial_is_over:
+            return PlanSerializer(models.Plan.objects.get(ref="FREE")).data
+        return PlanSerializer(account.subscription).data
 
 
 class CreateUserSerializer(serializers.ModelSerializer):

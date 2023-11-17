@@ -300,7 +300,10 @@ export const api = createApi({
   endpoints: (builder) => ({
     // Sign in
     currentUser: builder.query<User, void>({
-      query: () => `auth/user/`
+      query: () => `auth/user/`,
+      transformResponse: (response) => {
+        return api2User(response as ApiModel);
+      }
     }),
     updateCurrentUser: builder.mutation<User, Partial<User>>({
       query(body) {

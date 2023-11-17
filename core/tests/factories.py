@@ -8,12 +8,25 @@ from django.contrib.auth.models import Group, Permission
 from core import models
 
 
+class PlanFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Plan
+        django_get_or_create = ("ref",)
+
+    ref = "PLAN"
+    name = "default"
+    max_lodgings = 10
+    max_users = 10
+    price_per_month = 10
+
+
 class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
         django_get_or_create = ("name",)
 
     name = "default"
+    subscription = factory.SubFactory(PlanFactory)
 
 
 class InactiveAccount(AccountFactory):
@@ -45,7 +58,10 @@ def get_or_create_group(name):
 class _UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
-        django_get_or_create = ("account", "email",)
+        django_get_or_create = (
+            "account",
+            "email",
+        )
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
@@ -83,7 +99,10 @@ class StandardUserFactory(_UserFactory):
 class LodgingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Lodging
-        django_get_or_create = ("account", "name",)
+        django_get_or_create = (
+            "account",
+            "name",
+        )
 
     name = factory.Faker("name")
     account = factory.SubFactory(AccountFactory)
@@ -106,7 +125,9 @@ class BookingChannelFactory(factory.django.DjangoModelFactory):
         )
 
     account = None  # factory.SubFactory(AccountFactory)
-    name = factory.Iterator(["web site", "booking.com", "airbnb", "abritel", "facebook", "instagram", "already come", "tripadvisor"])
+    name = factory.Iterator(
+        ["web site", "booking.com", "airbnb", "abritel", "facebook", "instagram", "already come", "tripadvisor"]
+    )
 
 
 class BookingChannelSyncFactory(factory.django.DjangoModelFactory):

@@ -10,11 +10,14 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import RoomServiceIcon from "@mui/icons-material/RoomService";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking-sources.svg";
 import { styled } from "@mui/material/styles";
 import ButtonBase from "@mui/material/ButtonBase";
 import Typography from "@mui/material/Typography";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import HtmlTooltip from "../../components/Tooltip/HtmlTooltip";
+import { PremiumFeature } from "../../components/PremiumFeature";
 
 
 const BigButton = styled(ButtonBase)(({ theme }) => ({
@@ -24,6 +27,13 @@ const BigButton = styled(ButtonBase)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     width: "100% !important", // Overrides inline-style
     height: 100
+  },
+  "&:disabled, &.Mui-disabled": {
+    backgroundColor: "dimgrey",
+    // opacity: 0.55,
+    "& .MuiImageBackdrop-root": {
+      opacity: 0.15
+    }
   },
   "&:hover, &.Mui-focusVisible": {
     zIndex: 1,
@@ -82,8 +92,8 @@ const ButtonIcon = styled("span")(({ theme }) => ({
   color: "white",
   [theme.breakpoints.down("sm")]: {
     top: 10,
-    opacity: 0.3,
-  },
+    opacity: 0.3
+  }
 }));
 
 const ImageMarked = styled("span")(({ theme }) => ({
@@ -100,7 +110,7 @@ const ImageMarked = styled("span")(({ theme }) => ({
 function SettingsIndex() {
   const { t } = useTranslation();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canViewUsers = user.permissions.includes("core.view_user");
+  const canViewUsers = user.permissions.includes("core.view_user") && user.account.subscription.max_users > 1;
 
   const pages = [
     {
@@ -138,7 +148,8 @@ function SettingsIndex() {
     {
       title: t("Calendars sync"),
       href: "calendar-syncs",
-      icon: CalendarMonthIcon
+      icon: CalendarMonthIcon,
+      premium: user.account.trial_is_over
     }
   ];
 
@@ -147,40 +158,50 @@ function SettingsIndex() {
       {pages.map((page) => {
         const Icon = page.icon;
         return (
-          <BigButton
-            focusRipple
-            key={page.title}
-            // @ts-ignore
-            component={RouterLink} to={page.href}
-            style={{
-              width: "30%",
-              flex: "0 0 200px",
-              margin: "5px 10px"
-            }}
-          >
-            <ImageSrc />
-            <ButtonBackdrop className="MuiImageBackdrop-root" />
-            <Image>
-              <ButtonIcon>
-                <Icon sx={{ width: "100%", height: "100%", color: "white" }}/>
-              </ButtonIcon>
-              <Typography
-                component="span"
-                variant="subtitle1"
-                color="inherit"
-                sx={{
-                  position: "absolute",
-                  bottom: 20,
-                  padding: 2,
-                  // paddingTop: 4,
-                  // padding: (theme) => `calc(${theme.spacing(1)} + 6px)`
-                }}
-              >
-                {page.title}
-                <ImageMarked className="MuiImageMarked-root" />
-              </Typography>
-            </Image>
-          </BigButton>
+          <HtmlTooltip title={page.premium ? <PremiumFeature /> : page.title}>
+            <BigButton
+              focusRipple
+              key={page.title}
+              // disabled={page.premium}
+              // @ts-ignore
+              component={RouterLink} to={page.premium ? "/upgrade-plan" : page.href}
+              style={{
+                width: "30%",
+                flex: "0 0 200px",
+                margin: "5px 10px",
+                ...(page.premium && { backgroundColor: "dimgrey" })
+              }}
+            >
+              <ImageSrc />
+              <ButtonBackdrop className="MuiImageBackdrop-root" />
+              <Image>
+                <ButtonIcon>
+                  <Icon sx={{ width: "100%", height: "100%", color: "white" }} />
+                </ButtonIcon>
+                <Typography
+                  component="span"
+                  variant="subtitle1"
+                  color="inherit"
+                  sx={{
+                    position: "absolute",
+                    bottom: 20,
+                    padding: 2
+                    // paddingTop: 4,
+                    // padding: (theme) => `calc(${theme.spacing(1)} + 6px)`
+                  }}
+                >
+                  {page.title}
+                  <ImageMarked className="MuiImageMarked-root" />
+                </Typography>
+              </Image>
+              {page.premium &&
+                <WorkspacePremiumIcon
+                  color="warning" sx={{ position: "absolute", top: 0, right: 0 }}
+                  fontSize="large"
+                />
+              }
+            </BigButton>
+          </HtmlTooltip>
         );
       })}    </Page>
   );

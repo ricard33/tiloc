@@ -25,6 +25,9 @@ import axios from "axios";
 import { formatDate } from "../../../../common/dateUtils";
 import { useLocation } from "react-router-dom";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store";
+import { User } from "../../../../types";
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../../../store";
 // import { User } from "../../../../types";
@@ -75,7 +78,7 @@ const Sidebar: React.FC<Props> = props => {
   const [version, setVersion] = useState({ version: "?", build_date: "-" });
   const location = useLocation();
   const locationPathname = location.pathname;
-  // const user = useSelector<RootState>(store => store.auth.user) as User;
+  const user = useSelector<RootState>(store => store.auth.user) as User;
   // const canViewUsers = user.permissions.includes("core.view_user");
 
   const menus = [
@@ -113,11 +116,10 @@ const Sidebar: React.FC<Props> = props => {
         //   disabled: false,
         //   external: true
         // },
-        { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon /> },
-        // { title: t("Reports"), href: "/reports", icon: <MovingIcon />, disabled: true },
+        { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon />, premium: user.account.trial_is_over },
+        // { title: t("Reports"), href: "/reports", icon: <MovingIcon />, disabled: true, premium: true },
         // { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
-        { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false },
-        // { title: t("My account"), href: "/account", icon: <AccountBoxIcon />, disabled: true },
+        { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false, premium: user.account.trial_is_over },
         { title: t("Settings"), href: "/settings", icon: <SettingsIcon /> }
       ]
     }

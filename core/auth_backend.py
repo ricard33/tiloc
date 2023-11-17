@@ -1,4 +1,3 @@
-import arrow
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
@@ -15,8 +14,9 @@ class EmailBackend(ModelBackend):
                     Q(account__is_active=True)
                     & (
                         Q(account__is_active=True)
-                        | Q(account__validity__isnull=True)
-                        | Q(account__validity__gte=arrow.utcnow().datetime)
+                        # No validity check because FREE plan is always accessible
+                        # | Q(account__validity__isnull=True)
+                        # | Q(account__validity__gte=arrow.utcnow().datetime)
                     )
                 ),
                 email=username,

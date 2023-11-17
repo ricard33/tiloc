@@ -55,6 +55,12 @@ from .serializers import (
 logger = logging.getLogger("api")
 
 
+class OverLimlitError(APIException):
+    status_code = status.HTTP_403_FORBIDDEN
+    default_detail = _("This ressource has already reach his limit")
+    default_code = "over_limit"
+
+
 class OrderedModelMixin:
     @transaction.atomic
     @action(detail=True, methods=["post"])
@@ -218,6 +224,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        limit = request.user.account.max_users
+        if self.get_queryset().count() >= limit:
+            raise OverLimlitError(detail="The maximum number of users has been reached.")
+        return super().create(request, *args, **kwargs)
+
 
 class CurrentUserAPI(generics.RetrieveUpdateAPIView):
     # authentication_classes = (TokenAuthentication,)
@@ -233,7 +245,7 @@ class CurrentUserAPI(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def resend_verification(request, *args, **kwargs):
     user = request.user
@@ -381,6 +393,12 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        limit = request.user.account.max_lodgings
+        if self.get_queryset().count() >= limit:
+            raise OverLimlitError(detail="The maximum number of lodgings has been reached.")
+        return super().create(request, *args, **kwargs)
 
     @action(detail=True, methods=["get"])
     @transaction.atomic

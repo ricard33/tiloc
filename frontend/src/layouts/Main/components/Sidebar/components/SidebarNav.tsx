@@ -5,6 +5,7 @@ import { NavLink, NavLinkProps } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
 import { colors, List, ListItem, ListProps, Theme } from "@mui/material";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {},
@@ -89,6 +90,7 @@ type Page = {
   icon: React.ReactElement;
   external?: boolean;
   disabled?: boolean;
+  premium?: boolean;
 }
 
 export interface SidebarNavProps extends ListProps {
@@ -125,11 +127,17 @@ const SidebarNav: React.FunctionComponent<SidebarNavProps> = props => {
             <CustomNavLink
               className={({ isActive }) => classes.button + (isActive ? (" " + classes.active) : "") + (page.disabled ? (" " + classes.disabled) : "")}
               target={page.external ? "_blank" : ""}
-              to={page.href}
+              to={page.premium ? "/upgrade-plan" : page.href}
               disabled={page.disabled ?? false}
             >
               <div className={classes.icon}>{page.icon}</div>
               {page.title}
+              {page.premium &&
+                <WorkspacePremiumIcon
+                  color="warning" sx={{ position: "absolute", top: 0, right: 0 }}
+                  fontSize="small"
+                />
+              }
             </CustomNavLink>
           }
         </ListItem>

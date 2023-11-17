@@ -588,6 +588,11 @@ class BookedServiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_filter = ("service", "unit_price", "is_flat_rate")
 
 
+@admin.register(models.Plan, site=site)
+class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    list_display = ("ref", "name", "max_lodgings", "max_users", "price_per_month")
+
+
 site.register(models.Booking, BookingAdmin)
 site.register(models.Service, ServiceAdmin)
 site.register(models.Lodging, LodgingAdmin)

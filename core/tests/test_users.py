@@ -1,3 +1,4 @@
+import arrow
 from django.core.files.base import ContentFile
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 from rest_framework import status
@@ -92,3 +93,18 @@ class CurrentUserTestCase(APITestCase):
         self.assertEqual(user["id"], self.user.id)
         self.assertEqual(user["email"], "new@email.com")
         self.assertEqual(user["verified"], False)
+
+    def test_trial_is_over(self):
+        self.user.account.validity = arrow.utcnow().shift(days=-1).datetime
+        self.user.account.save()
+        response = self.client.get("/api/auth/user/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user = response.data
+        self.assertEqual(user["account"]["trial_is_over"], True)
+
+        self.user.account.validity = arrow.utcnow().shift(days=3).datetime
+        self.user.account.save()
+        response = self.client.get("/api/auth/user/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user = response.data
+        self.assertEqual(user["account"]["trial_is_over"], False)

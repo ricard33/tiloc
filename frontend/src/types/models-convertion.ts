@@ -1,4 +1,15 @@
-import { Booking, CalendarSync, Comment, Contract, ContractTemplate, Lodging, Payment, Service, User } from "./models";
+import {
+  Account,
+  Booking,
+  CalendarSync,
+  Comment,
+  Contract,
+  ContractTemplate,
+  Lodging,
+  Payment,
+  Service,
+  User
+} from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
@@ -45,7 +56,8 @@ export function comment2Api(c: Partial<Comment>): Record<string, any> {
 export function api2User(user: Record<string, any>): User {
   return {
     ...user as User,
-    vat_rate: Number(user.vat_rate)
+    vat_rate: Number(user.vat_rate),
+    account: api2Account(user.account),
   };
 }
 
@@ -56,15 +68,37 @@ export function user2api(user: Partial<User>): Record<string, any> {
     account, permissions,
     ...rest
   } = user;
-  console.log("REST", rest);
+  // console.log("REST", rest);
   const r = {
     ...rest,
     ...(lodgings && lodgings.length > 0 ? { lodgings } : {}),
     ...(typeof signature === "string" ? {} : { signature }),
     ...(typeof logo === "string" ? {} : { logo })
   };
-  console.log("POST", r);
+  // console.log("POST", r);
   return r;
+}
+
+// ----- ACCOUNT -----
+
+export function api2Account(account: Record<string, any>): Account {
+  return {
+    ...account as Account,
+    created: parseISO(account.created),
+    validity: parseISO(account.validity),
+    subscription: {
+      ...account.subscription,
+      price_per_month: Number(account.subscription.price_per_month),
+    }
+  };
+}
+
+export function account2Api(account: Partial<Account>): Record<string, any> {
+  const { created, validity, ...rest } = account;
+  return {
+    ...rest,
+    // ...(account.created && { begin_date: formatISO(account.created) }),
+  };
 }
 
 // ----- LODGING -----
