@@ -28,14 +28,14 @@ class PlanSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     is_initialized = serializers.SerializerMethodField()
-    subscription = serializers.SerializerMethodField()
+    current_plan = serializers.SerializerMethodField()
 
     class Meta:
         model = Account
         fields = [
             "is_active",
             "is_initialized",
-            "subscription",
+            "current_plan",
             "trial_is_over",
             "created",
             "validity",
@@ -46,10 +46,10 @@ class AccountSerializer(serializers.ModelSerializer):
     def get_is_initialized(self, account):
         return account.lodging_set.count() > 0
 
-    def get_subscription(self, account):
+    def get_current_plan(self, account):
         if account.trial_is_over:
             return PlanSerializer(models.Plan.objects.get(ref="FREE")).data
-        return PlanSerializer(account.subscription).data
+        return PlanSerializer(account.current_plan).data
 
 
 class CreateUserSerializer(serializers.ModelSerializer):

@@ -168,7 +168,8 @@ FieldListFilter.register(lambda f: f.remote_field, RelatedOnlyFieldListFilter, t
 
 @admin.register(models.Account, site=site)
 class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    pass
+    list_display = ("name", "is_active", "created", "validity", "current_plan", "stripe_customer_id")
+    list_filter = ("is_active",)
 
 
 @admin.register(models.User, site=site)
@@ -590,7 +591,13 @@ class BookedServiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 
 @admin.register(models.Plan, site=site)
 class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = ("ref", "name", "max_lodgings", "max_users", "price_per_month")
+    list_display = ("ref", "name", "lookup_key", "price", "interval", "max_lodgings", "max_users")
+    list_editable = ("name", "lookup_key", "price", "interval", "max_lodgings", "max_users")
+
+
+@admin.register(models.Subscription, site=site)
+class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    list_display = ("id", "customer", "plan", "created", "start_date", "current_period_start", "current_period_end", "status", "latest_invoice")
 
 
 site.register(models.Booking, BookingAdmin)

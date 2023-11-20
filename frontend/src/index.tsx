@@ -25,6 +25,7 @@ sagaMiddleware.run(rootSaga);
 axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    console.log("axios.interceptors.request", config)
     const token = localStorage.getItem("token");
     if (token) {
       if (typeof config.headers === "undefined") config.headers = {};

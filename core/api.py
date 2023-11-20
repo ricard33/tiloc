@@ -3,6 +3,7 @@ import os
 
 import arrow
 import jinja2
+import stripe
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
@@ -11,6 +12,7 @@ from django.db.models import F, Min, Value
 from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from django.views.decorators.csrf import csrf_exempt
 from django_email_verification import send_email as send_verification_email
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
@@ -20,6 +22,9 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from rest_framework.views import APIView
+from stripe import PaymentIntent, Subscription as StripeSubsription
 
 from location import __date__, __version__
 
@@ -28,7 +33,7 @@ from .contracts import generate_contract, generate_empty_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
 from .pagination import LargeResultsSetPagination
 from .pdf_tools import generate_pdf
-from .permissions import IsSuperUserPermission
+from .permissions import IsCompanyAdminPermissions, IsSuperUserPermission
 from .serializers import (
     AccountSerializer,
     BookingChannelSerializer,
@@ -517,3 +522,241 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
+
+
+# Billing API
+
+stripe.api_key = settings.STRIPE_PRIVATE_API_KEY
+
+
+class StripeConfig(APIView):
+    permission_classes = [IsCompanyAdminPermissions]
+
+    def get(self, request):
+        return Response(
+            data={
+                "publishableKey": settings.STRIPE_PUBLIC_API_KEY,
+            }
+        )
+
+
+class Prices(APIView):
+    permission_classes = [IsCompanyAdminPermissions]
+
+    def get(self, request):
+        prices = stripe.Price.list(
+            lookup_keys=[
+                "tiloc-owner-monthly",
+                "tiloc-owner-yearly",
+                "tiloc-pro10-monthly",
+                "tiloc-pro10-yearly",
+            ]
+        )
+
+        return Response(
+            data={
+                "publishableKey": settings.STRIPE_PUBLIC_API_KEY,
+                "prices": prices.data,
+            }
+        )
+
+
+# Doc to subscription payment process
+# https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=elements
+
+
+class Subscription(APIView):
+    permission_classes = [IsCompanyAdminPermissions]
+
+    def post(self, request):  # create_subscription
+        plan_ref = request.data["plan"]
+        user = request.user
+
+        try:
+            plan = models.Plan.objects.get(ref=plan_ref)
+            prices = stripe.Price.list(lookup_keys=[plan.lookup_key])
+        except models.Plan.DoesNotExist:
+            logger.exception("Plan with ref=%s doesn't exist", plan_ref)
+            raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist" % {"plan_ref": plan_ref}))
+        except Exception as e:
+            logger.exception("Error getting prices")
+            raise APIException(detail=str(e))
+
+        price_id = prices.data[0].id
+
+        if user.account.stripe_customer_id is None:
+            try:
+                # Create a new customer object
+                customer = stripe.Customer.create(email=user.email, name=user.get_full_name(), phone=user.phone)
+                user.account.stripe_customer_id = customer.id
+                user.account.save(update_fields=("stripe_customer_id",))
+
+            except Exception as e:
+                logger.exception("Error creating customer")
+                raise APIException(detail=str(e))
+
+        try:
+            # create subscription object
+            subscription = stripe.Subscription.create(
+                customer=user.account.stripe_customer_id,
+                items=[
+                    {
+                        "price": price_id,
+                    }
+                ],
+                payment_behavior="default_incomplete",
+                payment_settings={"save_default_payment_method": "on_subscription"},
+                expand=["latest_invoice.payment_intent", "pending_setup_intent"],
+            )
+            # print(subscription)
+        except Exception as e:
+            logger.exception("Error opening Checkout session")
+            raise APIException(detail=str(e))
+
+        models.Subscription.objects.get_or_create(
+            id=subscription.id,
+            defaults={
+                "customer": user.account,
+                "plan_id": subscription["items"].data[0].price.lookup_key,
+                "created": arrow.get(subscription.created).datetime,
+                "start_date": arrow.get(subscription.start_date).datetime,
+                "current_period_start": arrow.get(subscription.current_period_start).datetime,
+                "current_period_end": arrow.get(subscription.current_period_end).datetime,
+                "status": subscription.status,
+                "latest_invoice": subscription.latest_invoice.id,
+            },
+        )
+        if subscription.pending_setup_intent is not None:
+            return Response(
+                data={
+                    "type": 'setup',
+                    "subscriptionId": subscription.id,
+                    "clientSecret": subscription.pending_setup_intent.client_secret,
+                }
+            )
+        else:
+            return Response(
+                data={
+                    "type": 'payment',
+                    "subscriptionId": subscription.id,
+                    "clientSecret": subscription.latest_invoice.payment_intent.client_secret,
+                }
+            )
+
+    def get(self, request):
+        subscription = stripe.Subscription.retrieve(request.GET.get("subscription_id"))
+
+        return Response(data=subscription)
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+
+    sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_ENDPOINT_SECRET)
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
+
+    if event.type == "customer.subscription.created":
+        logger.info("[%s]", event.type)
+        subscription: StripeSubsription = event.data.object
+        account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+        logger.info("Subscription for customer '%s' created with status '%s'", account.name, subscription.status)
+        print(subscription)
+        models.Subscription.objects.get_or_create(
+            id=subscription.id,
+            defaults=dict(
+                customer_id=subscription.customer,
+                plan_id=subscription["items"].data[0].price.lookup_key,
+                created=arrow.get(subscription.created).datetime,
+                start_date=arrow.get(subscription.start_date).datetime,
+                current_period_start=arrow.get(subscription.current_period_start).datetime,
+                current_period_end=arrow.get(subscription.current_period_end).datetime,
+                status=subscription.status,
+                latest_invoice=subscription.latest_invoice,
+            ),
+        )
+
+    elif event.type == "customer.subscription.updated":
+        logger.info("[%s]", event.type)
+        subscription: StripeSubsription = event.data.object
+        account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+        logger.info("Subscription for customer '%s' has status '%s'", account.name, subscription.status)
+
+        models.Subscription.objects.filter(id=subscription.id).update(
+            # plan=plan,
+            # created=arrow.get(subscription.created).datetime,
+            start_date=arrow.get(subscription.start_date).datetime,
+            current_period_start=arrow.get(subscription.current_period_start).datetime,
+            current_period_end=arrow.get(subscription.current_period_end).datetime,
+            status=subscription.status,
+            latest_invoice=subscription.latest_invoice,
+        )
+
+    elif event.type == "customer.subscription.deleted":
+        # handle subscription canceled automatically based
+        # upon your subscription settings. Or if the user cancels it.
+        logger.info("[%s]", event.type)
+        logger.warning(event.data)
+        subscription: StripeSubsription = event.data.object
+        account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+        logger.info("Subscription for customer '%s' has ended", account.name)
+        models.Subscription.objects.filter(id=subscription.id).update(
+            start_date=arrow.get(subscription.start_date).datetime,
+            current_period_start=arrow.get(subscription.current_period_start).datetime,
+            current_period_end=arrow.get(subscription.current_period_end).datetime,
+            status=subscription.status,
+            latest_invoice=subscription.latest_invoice,
+        )
+        # TODO invalidate subscription
+
+    elif event.type == "payment_intent.succeeded":
+        logger.info("[%s]", event.type)
+        print(event.data)
+        payment_intent: PaymentIntent = event.data.object
+        account = models.Account.objects.get(stripe_customer_id=payment_intent.customer)
+        logger.info("PaymentIntent for customer '%s' has status '%s", account.name, payment_intent.status)
+    elif event.type == "invoice.paid":
+        # Used to provision services after the trial has ended.
+        # The status of the invoice will show up as paid. Store the status in your
+        # database to reference when a user accesses your service to avoid hitting rate
+        # limits.
+        logger.info("[%s]", event.type)
+        print(event.data)
+    elif event.type == "invoice.payment_failed":
+        # If the payment fails or the customer does not have a valid payment method,
+        # an invoice.payment_failed event is sent, the subscription becomes past_due.
+        # Use this webhook to notify your user that their payment has
+        # failed and to retrieve new card details.
+        logger.info("[%s]", event.type)
+        print(event.data)
+
+    elif event["type"] == "checkout.session.completed":
+        checkout_session = event["data"]["object"]
+        customer_id = checkout_session["customer"]
+        customer_email = checkout_session["customer_email"]
+        logger.info("[checkout.session.completed]")
+        # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+        session = stripe.checkout.Session.retrieve(
+            checkout_session["id"],
+            # expand=["line_items"],
+        )
+    elif event["type"] == "customer.created":
+        customer = event["data"]["object"]
+        logger.info("[%s]", event["type"])
+        # # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+        # session = stripe.checkout.Session.retrieve(
+        #     checkout_session["id"],
+        #     # expand=["line_items"],
+        # )
+
+    # Passed signature verification
+    return HttpResponse(status=200)

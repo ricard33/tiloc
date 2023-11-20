@@ -2049,6 +2049,22 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "stripe"
+version = "7.5.0"
+description = "Python bindings for the Stripe API"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "stripe-7.5.0-py2.py3-none-any.whl", hash = "sha256:e54160e8eaa8d3947bd9178e7a7ded07f34263a301834baa1e43a8aee9a0facf"},
+    {file = "stripe-7.5.0.tar.gz", hash = "sha256:76e0df7071da5ef39134d929b8c7facf1319aa47c222bf1272b48ac55abf3d6f"},
+]
+
+[package.dependencies]
+requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
+typing-extensions = {version = ">=4.5.0", markers = "python_version >= \"3.7\""}
+
+[[package]]
 name = "tablib"
 version = "3.5.0"
 description = "Format agnostic tabular data library (XLS, JSON, YAML, CSV, etc.)"
@@ -2354,4 +2370,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e7d1df4514212c941fd4bd9fca8c710aaa70f010d4d99eeda5cb9a4672a42481"
+content-hash = "3a27a0d79697752cb2754f5d7c8d70c0e4eaec619d0fe7dc2cf583f42ed3b44d"

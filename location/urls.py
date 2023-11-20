@@ -58,6 +58,10 @@ urlpatterns = [
     re_path("^api/signup/$", api.SignUpAPI.as_view()),
 
     re_path(r'^api/my-account/$', api.CurrentAccountViewSet.as_view(), name='my-account'),
+    re_path(r'^api/stripe_config/$', api.StripeConfig.as_view(), name='stripe_config'),
+    re_path(r'^api/prices/$', api.Prices.as_view(), name='prices'),
+    re_path(r'^api/subscription/$', api.Subscription.as_view(), name='subscription'),
+    re_path(r'^api/stripe_webhook/$', api.stripe_webhook, name='stripe_webhook'),
 
     path(r"calendar/<uuid:uid>/", views.export_calendar, name="calendar_sync"),
     path(r"calendar/<uuid:uid>.ics", views.export_calendar, name="calendar_sync"),

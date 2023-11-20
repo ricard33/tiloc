@@ -86,9 +86,9 @@ export function api2Account(account: Record<string, any>): Account {
     ...account as Account,
     created: parseISO(account.created),
     validity: parseISO(account.validity),
-    subscription: {
-      ...account.subscription,
-      price_per_month: Number(account.subscription.price_per_month),
+    current_plan: {
+      ...account.current_plan,
+      price: Number(account.current_plan.price),
     }
   };
 }

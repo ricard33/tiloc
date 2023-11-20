@@ -66,6 +66,7 @@ whitenoise = { version = "^6.2.0", extras = ["brotli"] }
 psycopg2-binary = "^2.9.7"
 faker = "^19.3.0"
 django-email-verification = "^0.3.3"
+stripe = "^7.5.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.5.0"

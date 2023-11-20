@@ -8,12 +8,13 @@ export interface LoginInfo {
 export interface Account {
   is_active: boolean;
   is_initialized: boolean;
-  subscription: {
+  current_plan: {
     ref: string;
     name: string;
     max_lodgings: number;
     max_users: number;
-    price_per_month: number;
+    price: number;
+    interval: "monthly" | "yearly"
   }
   created: Date;
   validity: Date;

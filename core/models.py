@@ -111,7 +111,8 @@ class Account(models.Model):
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     validity = models.DateTimeField(null=True)
-    subscription = models.ForeignKey("Plan", null=True, blank=True, on_delete=models.PROTECT)
+    current_plan = models.ForeignKey("Plan", null=True, blank=True, on_delete=models.PROTECT)
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True, unique=True)
 
     class Meta:
         permissions = (("administrator", "Can administer all account data"),)
@@ -126,15 +127,15 @@ class Account(models.Model):
 
     @property
     def trial_is_over(self):
-        return self.validity and self.validity < arrow.utcnow().datetime or self.subscription is None
+        return self.validity and self.validity < arrow.utcnow().datetime or self.current_plan is None
 
     @property
     def max_lodgings(self):
-        return self.trial_is_over and 1 or self.subscription.max_lodgings
+        return self.trial_is_over and 1 or self.current_plan.max_lodgings
 
     @property
     def max_users(self):
-        return self.trial_is_over and 1 or self.subscription.max_users
+        return self.trial_is_over and 1 or self.current_plan.max_users
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         creating = self.pk is None or force_insert
@@ -755,9 +756,30 @@ class Comment(models.Model):
     objects = ForUserQuerySet.as_manager()
 
 
+class Intervals(models.TextChoices):
+    Monthly = "monthly", _("Monthly")
+    Yearly = "yearly", _("Yearly")
+
+
 class Plan(models.Model):
     ref = models.CharField(max_length=20, unique=True, primary_key=True)
     name = models.CharField(max_length=100)
+    lookup_key = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    price = models.PositiveSmallIntegerField()
+    interval = models.CharField(max_length=10, choices=Intervals.choices)
     max_lodgings = models.PositiveSmallIntegerField(null=True, blank=True)
     max_users = models.PositiveSmallIntegerField(null=True, blank=True)
-    price_per_month = models.PositiveSmallIntegerField()
+
+
+class Subscription(models.Model):
+    id = models.CharField(max_length=255, primary_key=True)
+    customer = models.ForeignKey(Account, to_field="stripe_customer_id", on_delete=models.CASCADE)
+    plan = models.ForeignKey(Plan, on_delete=models.DO_NOTHING, to_field="lookup_key")
+    created = models.DateTimeField(auto_now_add=True)
+    start_date = models.DateTimeField()
+    current_period_start = models.DateTimeField()
+    current_period_end = models.DateTimeField()
+    status = models.CharField(max_length=50)
+    latest_invoice = models.CharField(max_length=255, null=True, blank=True)
+
+    _account_qs_path = "customer"

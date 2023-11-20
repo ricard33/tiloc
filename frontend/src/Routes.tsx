@@ -33,6 +33,9 @@ import SettingsIndex from "./views/Settings/SettingsIndex";
 import { MyProfile } from "./views/Users/MyProfile";
 import { EmailVerified } from "./views/SignUp/EmailVerified";
 import Subscription from "./views/Subscription/Subscription";
+import PricingTable from "./views/Subscription/PricingTable";
+import Checkout from "./views/Subscription/Checkout";
+import CheckoutDone from "./views/Subscription/CheckoutDone";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -98,7 +101,11 @@ const MyRoutes = () => {
             <Route path="calendar-syncs/new" element={<CalendarSyncPage />} />
             <Route path="calendar-syncs/:calendarSyncId" element={<CalendarSyncPage />} />
           </Route>
-          <Route path="/upgrade-plan" element={<Subscription />} />
+          <Route path="/upgrade-plan" element={<Subscription />}>
+            <Route index element={<PricingTable />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="checkout-done" element={<CheckoutDone />} />
+          </Route>
           <Route path="/test-page" element={<TestPage />} />
           <Route path="*" element={<NotFoundView />} />
         </Route>

@@ -66,12 +66,12 @@ logging.info("Starting django application (%s) %s %s", ENV, sys.argv[1:], DEBUG 
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
 
-# CSRF_TRUSTED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = [
 #     "https://app.tiloc.fr",
 #     "https://*.tiloc.fr",
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-# ]
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
 # Application definition
 
@@ -352,3 +352,7 @@ EMAIL_PASSWORD_CALLBACK = password_change_callback
 
 # For Django Email Backend
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+STRIPE_PUBLIC_API_KEY = config.get("STRIPE", "PUBLIC_API_KEY", "")
+STRIPE_PRIVATE_API_KEY = config.get("STRIPE", "PRIVATE_API_KEY", "")
+STRIPE_ENDPOINT_SECRET = config.get("STRIPE", "ENDPOINT_SECRET", "")

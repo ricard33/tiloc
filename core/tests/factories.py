@@ -17,7 +17,8 @@ class PlanFactory(factory.django.DjangoModelFactory):
     name = "default"
     max_lodgings = 10
     max_users = 10
-    price_per_month = 10
+    price = 10
+    interval = "monthly"
 
 
 class AccountFactory(factory.django.DjangoModelFactory):
@@ -26,7 +27,7 @@ class AccountFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("name",)
 
     name = "default"
-    subscription = factory.SubFactory(PlanFactory)
+    current_plan = factory.SubFactory(PlanFactory)
 
 
 class InactiveAccount(AccountFactory):

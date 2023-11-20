@@ -110,7 +110,7 @@ const ImageMarked = styled("span")(({ theme }) => ({
 function SettingsIndex() {
   const { t } = useTranslation();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canViewUsers = user.permissions.includes("core.view_user") && user.account.subscription.max_users > 1;
+  const canViewUsers = user.permissions.includes("core.view_user") && user.account.current_plan.max_users > 1;
 
   const pages = [
     {
