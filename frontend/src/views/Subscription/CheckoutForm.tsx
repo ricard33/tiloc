@@ -3,9 +3,6 @@ import { StripeError } from "@stripe/stripe-js";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import LoadingInProgress from "../../components/LoadingInProgress";
 import { Alert, AlertTitle, Button } from "@mui/material";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "react-i18next";
 import { Plan } from "./subscription_types";
@@ -22,10 +19,8 @@ const CheckoutForm = (props: Props) => {
   // Initialize an instance of stripe.
   const stripe = useStripe();
   const elements = useElements();
-  // const [paymentIntent, setPaymentIntent] = useState<PaymentIntent>();
   const [message, setMessage] = useState("");
-  const user = useSelector<RootState>(store => store.auth.user) as User;
-  const [testMode, setTestMode] = useState(true);
+  const [testMode] = useState(true);
   const [loading, setLoading] = useState(false);
 
   console.log("origin:", window.location.origin);
@@ -72,7 +67,7 @@ const CheckoutForm = (props: Props) => {
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/upgrade-plan/checkout-done?session_id={CHECKOUT_SESSION_ID}`
+        return_url: `${window.location.origin}/account/checkout-done?session_id={CHECKOUT_SESSION_ID}`
       },
       // Uncomment below if you only want redirect for redirect-based payments
       // redirect: "if_required",

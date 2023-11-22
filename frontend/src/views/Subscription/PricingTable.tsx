@@ -64,22 +64,26 @@ const PricingTable = (props: Props) => {
     {
       ref: "FREE",
       title: t("Basic"), subtitle: t("Your first rentals"), slogan: t("Always free"),
-      price: {monthly: 0, yearly: 0},
+      price: { monthly: 0, yearly: 0 },
       features: basicFeatures
     },
     {
       ref: "OWNER",
-      title: t("Essential"), subtitle: t("Everything for a tourist rental owner"), slogan: t("Few lodgings"),
-      price: {monthly: 10, yearly: 100},
+      title: t("Owner"), subtitle: t("Everything for a tourist rental owner"), slogan: t("Few lodgings"),
+      price: { monthly: 10, yearly: 100 },
       features: proFeatures
     },
     {
       ref: "PRO10",
-      title: t("Concierge service"), subtitle: t("Multi-property management"), slogan: t("More lodgings?"),
-      price: {monthly: 25, yearly: 250},
+      title: t("Professional"), subtitle: t("Multi-property management, Concierge service"), slogan: t("More lodgings?"),
+      price: { monthly: 25, yearly: 250 },
       features: conciergeFeatures
     }
   ];
+  const intervalLabel = {
+    monthly: t("month"),
+    yearly: t("year")
+  };
 
   function renderPlan(plan: Plan) {
     return (
@@ -89,16 +93,24 @@ const PricingTable = (props: Props) => {
           sx={{ background: "linear-gradient(#f9f9f9, #f9f9f9)" }}
         />
         <CardContent>
-          <Typography variant="h1">{t("{{ price }}€ / month", { price: plan.price[interval] })}</Typography>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1em" }}>
+            <Stack direction="row" style={{}}>
+              <span style={{fontSize: "3em"}}>{t("{{ price }}€", { price: plan.price[interval] })}</span>
+              <Stack style={{fontSize: "1.2em", paddingTop: "0.2em", marginLeft: "0.3em", textAlign: "left"}}>
+                <span style={{}}>{t("per")}</span>
+                <span style={{}}>{intervalLabel[interval]}</span>
+              </Stack>
+            </Stack>
+          </div>
           <Typography variant="body2">{plan.slogan}</Typography>
           <FeaturesList features={plan.features} />
         </CardContent>
         <CardActions sx={{ justifyContent: "space-around" }}>
-          {user.account.current_plan.ref === plan.ref
+          {user.account.current_plan.ref === `${plan.ref}-${interval.toUpperCase()}`
             ? <Chip label={t("Current plan")} />
             :
             <Button
-              variant="contained" component={Link} to={"checkout"}
+              variant="contained" component={Link} to={"../checkout"}
               state={{ plan: plan, interval }}
             >{t("Subscribe")}</Button>
           }

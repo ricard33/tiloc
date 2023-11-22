@@ -20,6 +20,7 @@ import { DateProvider } from "@ti-gecko/react-calendar-timeline";
 import { useAlert } from "./common/alertUtils";
 import { differenceInCalendarDays, formatDistanceToNow } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { isValidDate } from "./common/dateUtils";
 
 validate.validators = {
   ...validate.validators,
@@ -48,8 +49,11 @@ function App(props: Props) {
       dispatch(auth.userLoaded(currentUser));
       console.log(currentUser.account);
       console.log("End fo validity: ", currentUser.account.validity);
-      console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
-      const remainingDays = differenceInCalendarDays(currentUser.account.validity, new Date());
+      if(isValidDate(currentUser.account.validity)) {
+        console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
+      }
+      const remainingDays = isValidDate(currentUser.account.validity) ?
+        differenceInCalendarDays(currentUser.account.validity, new Date()) : -1;
       if(remainingDays < 0) {
         showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
       }

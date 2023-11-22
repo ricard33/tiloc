@@ -162,7 +162,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           open={Boolean(anchorEl)}
           onClose={handleCloseUserMenu}
         >
-          <MenuItem component={Link} to={"/settings/profile"} onClick={handleCloseUserMenu}>
+          <MenuItem component={Link} to={"/account"} onClick={handleCloseUserMenu}>
             <ListItemIcon>
               <AccountBoxIcon fontSize="small" />
             </ListItemIcon>

@@ -110,8 +110,6 @@ class Account(models.Model):
     )
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
-    validity = models.DateTimeField(null=True)
-    current_plan = models.ForeignKey("Plan", null=True, blank=True, on_delete=models.PROTECT)
     stripe_customer_id = models.CharField(max_length=255, null=True, blank=True, unique=True)
 
     class Meta:
@@ -124,6 +122,30 @@ class Account(models.Model):
 
     def natural_key(self):
         return (self.name,)
+
+    @property
+    def current_subscription(self):
+        return (
+            self.subscription_set.filter(
+                status=Subscription.Status.active.value, current_period_start__lte=arrow.utcnow().datetime
+            )
+            .order_by("-current_period_end")
+            .first()
+        )
+
+    @property
+    def validity(self):
+        current_subscription = self.current_subscription
+        if current_subscription:
+            return current_subscription.current_period_end
+        return None
+
+    @property
+    def current_plan(self):
+        current_subscription = self.current_subscription
+        if current_subscription:
+            return current_subscription.plan
+        return None
 
     @property
     def trial_is_over(self):
@@ -772,6 +794,16 @@ class Plan(models.Model):
 
 
 class Subscription(models.Model):
+    class Status(models.TextChoices):
+        active = "active", _("active")
+        past_due = "past_due", _("past_due")
+        unpaid = "unpaid", _("unpaid")
+        canceled = "canceled", _("canceled")
+        incomplete = "incomplete", _("incomplete")
+        incomplete_expired = "incomplete_expired", _("incomplete_expired")
+        trialing = "trialing", _("trialing")
+        paused = "paused", _("paused")
+
     id = models.CharField(max_length=255, primary_key=True)
     customer = models.ForeignKey(Account, to_field="stripe_customer_id", on_delete=models.CASCADE)
     plan = models.ForeignKey(Plan, on_delete=models.DO_NOTHING, to_field="lookup_key")
@@ -779,7 +811,8 @@ class Subscription(models.Model):
     start_date = models.DateTimeField()
     current_period_start = models.DateTimeField()
     current_period_end = models.DateTimeField()
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, choices=Status.choices)
     latest_invoice = models.CharField(max_length=255, null=True, blank=True)
+    default_payment_method = models.CharField(max_length=255, null=True, blank=True)
 
     _account_qs_path = "customer"

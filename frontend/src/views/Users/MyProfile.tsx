@@ -2,7 +2,6 @@ import React from "react";
 
 import { useNavigate } from "react-router-dom";
 import { useUpdateCurrentUserMutation } from "../../services/api";
-import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
 import { UserForm } from "./UserForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
@@ -43,12 +42,10 @@ export function MyProfile() {
   };
 
   return (
-    <Page>
-      <UserForm
-        user={currentUser}
-        onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
-        myProfileOnly
-      />
-    </Page>
+    <UserForm
+      user={currentUser}
+      onSubmit={canChange ? onSubmit : undefined} onCancel={onCancel}
+      myProfileOnly
+    />
   );
 }

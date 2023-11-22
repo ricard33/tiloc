@@ -2,6 +2,8 @@ import React from "react";
 import { makeStyles } from "@mui/styles";
 import { Button, colors, Theme, Typography } from "@mui/material";
 import ResumeFolderSvg from "../../../../../assets/images/undraw_resume_folder_2_arse.svg";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -28,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const UpgradePlan = () => {
   const classes = useStyles();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -35,7 +38,7 @@ const UpgradePlan = () => {
     >
       <div className={classes.media}>
         <img
-          alt="Upgrade to PRO"
+          alt={t("Upgrade to PRO")}
           src={ResumeFolderSvg}
         />
       </div>
@@ -45,23 +48,23 @@ const UpgradePlan = () => {
           gutterBottom
           variant="h6"
         >
-          Upgrade to PRO
+          {t("Upgrade to PRO")}
         </Typography>
         <Typography
           align="center"
           variant="body2"
         >
-          Upgrade to Devias Kit PRO and get even more components
+          {t("Upgrade your Tiloc subscription and get Premium features")}
         </Typography>
       </div>
       <div className={classes.actions}>
         <Button
           color="primary"
-          component="a"
-          href="https://devias.io/products/devias-kit-pro"
+          component={Link}
+          to="/upgrade-plan"
           variant="contained"
         >
-          Upgrade
+          {t("Upgrade")}
         </Button>
       </div>
     </div>

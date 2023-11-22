@@ -615,21 +615,22 @@ class Subscription(APIView):
 
         models.Subscription.objects.get_or_create(
             id=subscription.id,
-            defaults={
-                "customer": user.account,
-                "plan_id": subscription["items"].data[0].price.lookup_key,
-                "created": arrow.get(subscription.created).datetime,
-                "start_date": arrow.get(subscription.start_date).datetime,
-                "current_period_start": arrow.get(subscription.current_period_start).datetime,
-                "current_period_end": arrow.get(subscription.current_period_end).datetime,
-                "status": subscription.status,
-                "latest_invoice": subscription.latest_invoice.id,
-            },
+            defaults=dict(
+                customer=user.account,
+                plan_id=subscription["items"].data[0].price.lookup_key,
+                created=arrow.get(subscription.created).datetime,
+                start_date=arrow.get(subscription.start_date).datetime,
+                current_period_start=arrow.get(subscription.current_period_start).datetime,
+                current_period_end=arrow.get(subscription.current_period_end).datetime,
+                status=subscription.status,
+                latest_invoice=subscription.latest_invoice,
+                default_payment_method=subscription.default_payment_method,
+            ),
         )
         if subscription.pending_setup_intent is not None:
             return Response(
                 data={
-                    "type": 'setup',
+                    "type": "setup",
                     "subscriptionId": subscription.id,
                     "clientSecret": subscription.pending_setup_intent.client_secret,
                 }
@@ -637,14 +638,17 @@ class Subscription(APIView):
         else:
             return Response(
                 data={
-                    "type": 'payment',
+                    "type": "payment",
                     "subscriptionId": subscription.id,
                     "clientSecret": subscription.latest_invoice.payment_intent.client_secret,
                 }
             )
 
     def get(self, request):
-        subscription = stripe.Subscription.retrieve(request.GET.get("subscription_id"))
+        subscription = stripe.Subscription.retrieve(
+            request.GET.get("subscription_id"),
+            expand=["latest_invoice.payment_intent", "pending_setup_intent", "default_payment_method"],
+        )
 
         return Response(data=subscription)
 
@@ -682,6 +686,7 @@ def stripe_webhook(request):
                 current_period_end=arrow.get(subscription.current_period_end).datetime,
                 status=subscription.status,
                 latest_invoice=subscription.latest_invoice,
+                default_payment_method=subscription.default_payment_method,
             ),
         )
 
@@ -699,6 +704,7 @@ def stripe_webhook(request):
             current_period_end=arrow.get(subscription.current_period_end).datetime,
             status=subscription.status,
             latest_invoice=subscription.latest_invoice,
+            default_payment_method=subscription.default_payment_method,
         )
 
     elif event.type == "customer.subscription.deleted":

@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
@@ -36,6 +36,7 @@ import Subscription from "./views/Subscription/Subscription";
 import PricingTable from "./views/Subscription/PricingTable";
 import Checkout from "./views/Subscription/Checkout";
 import CheckoutDone from "./views/Subscription/CheckoutDone";
+import Account from "./views/Subscription/Acccount";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -79,9 +80,16 @@ const MyRoutes = () => {
               </React.Suspense>
             }
           />
+          <Route path="account" element={<Account />}>
+            <Route index element={<MyProfile />} />
+            <Route path="subscription" element={<Subscription />} />
+            <Route path="prices" element={<PricingTable />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="checkout-done" element={<CheckoutDone />} />
+
+          </Route>
           <Route path="/settings/" element={<Settings />}>
             <Route index element={<SettingsIndex />} />
-            <Route path="profile" element={<MyProfile />} />
             <Route path="users" element={<UsersList />} />
             <Route path="users/new" element={<UserPage />} />
             <Route path="users/:userId" element={<UserPage />} />
@@ -101,11 +109,7 @@ const MyRoutes = () => {
             <Route path="calendar-syncs/new" element={<CalendarSyncPage />} />
             <Route path="calendar-syncs/:calendarSyncId" element={<CalendarSyncPage />} />
           </Route>
-          <Route path="/upgrade-plan" element={<Subscription />}>
-            <Route index element={<PricingTable />} />
-            <Route path="checkout" element={<Checkout />} />
-            <Route path="checkout-done" element={<CheckoutDone />} />
-          </Route>
+          <Route path="/upgrade-plan" element={<Navigate to="/account/prices" replace />} />
           <Route path="/test-page" element={<TestPage />} />
           <Route path="*" element={<NotFoundView />} />
         </Route>

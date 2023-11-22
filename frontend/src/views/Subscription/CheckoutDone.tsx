@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-import CheckoutForm from "./CheckoutForm";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import axios from "axios";
@@ -20,10 +18,10 @@ const CheckoutDone = (props: Props) => {
   });
 
   useEffect(() => {
-    // Create a Checkout Session as soon as the page loads
+    // Get the Checkout Session
     axios.get(`/api/checkout/?session_id=${session_id}`)
       .then((response) => setCheckoutSession(response.data));
-  }, []);
+  }, [session_id]);
 
   if(checkoutSession.status === '')
     return <Alert severity="info">{t("Processing transaction...")}</Alert>;

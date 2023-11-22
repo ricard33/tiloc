@@ -7,7 +7,7 @@ import { getLanguage } from "./intlUtils";
 
 const locales: Record<string, Locale> = {enGB, fr}
 
-function isValidDate(d: any) {
+export function isValidDate(d: any) {
   return d instanceof Date && !isNaN(d as never);
 }
 

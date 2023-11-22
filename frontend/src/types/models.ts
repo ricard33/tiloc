@@ -15,6 +15,21 @@ export interface Account {
     max_users: number;
     price: number;
     interval: "monthly" | "yearly"
+  };
+  current_subscription: {
+    id: string;
+    customer: Account;
+    plan: {};
+    created: Date;
+    start_date: Date;
+    current_period_start: Date;
+    current_period_end: Date;
+    status: string;
+    latest_invoice: string;
+    default_payment_method: {
+      type: string;
+      description: string;
+    };
   }
   created: Date;
   validity: Date;

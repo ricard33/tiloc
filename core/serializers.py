@@ -1,5 +1,6 @@
 import logging
 
+import stripe
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Max
@@ -26,9 +27,40 @@ class PlanSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PaymentMethodSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    description = serializers.CharField()
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    default_payment_method = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Subscription
+        fields = "__all__"
+
+    def get_default_payment_method(self, subscription: models.Subscription):
+        if subscription.default_payment_method:
+            payment_method = stripe.PaymentMethod.retrieve(subscription.default_payment_method)
+            if payment_method.type == "card":
+                description = "%(brand)s **** %(last_digit)s" % {
+                    "brand": payment_method.card.brand.upper(),
+                    "last_digit":  payment_method.card.last4
+                }
+            else:
+                logger.error("Unknown payment method type: %s", payment_method.type)
+                description = "?"
+
+            return PaymentMethodSerializer({
+                "type": payment_method.type,
+                "description": description
+            }).data
+
+
 class AccountSerializer(serializers.ModelSerializer):
     is_initialized = serializers.SerializerMethodField()
     current_plan = serializers.SerializerMethodField()
+    current_subscription = SubscriptionSerializer()
 
     class Meta:
         model = Account
@@ -36,6 +68,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "is_active",
             "is_initialized",
             "current_plan",
+            "current_subscription",
             "trial_is_over",
             "created",
             "validity",
@@ -88,9 +121,7 @@ class UserSerializer(serializers.ModelSerializer):
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     permissions = serializers.SerializerMethodField(read_only=True)
     groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
-    lodgings = FilteredSlugRelatedField(
-        many=True, queryset=Lodging.objects.all(), slug_field="name", required=False
-    )
+    lodgings = FilteredSlugRelatedField(many=True, queryset=Lodging.objects.all(), slug_field="name", required=False)
 
     class Meta:
         model = User
@@ -120,7 +151,11 @@ class UserSerializer(serializers.ModelSerializer):
         if "password" in validated_data:
             password = validated_data.pop("password")
         if "email" in validated_data and validated_data["email"] != instance.email:
-            logger.info("changing email from '%s' to '%s'. Invalidating user email.", instance.email, validated_data.get("email"))
+            logger.info(
+                "changing email from '%s' to '%s'. Invalidating user email.",
+                instance.email,
+                validated_data.get("email"),
+            )
             validated_data["verified"] = False
         instance = super().update(instance, validated_data)
         if password:

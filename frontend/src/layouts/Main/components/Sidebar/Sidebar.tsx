@@ -19,7 +19,7 @@ import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 // import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
 import { parseISO } from "date-fns";
 
-import { SidebarNav } from "./components";
+import { SidebarNav, UpgradePlan } from "./components";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { formatDate } from "../../../../common/dateUtils";
@@ -28,13 +28,15 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
 import { User } from "../../../../types";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../../../store";
 // import { User } from "../../../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
-    width: 160,
+    width: 170,
     marginTop: 48,
     height: "calc(100% - 48px)",
     [theme.breakpoints.up("md")]: {
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: "flex",
     flexDirection: "column",
     height: "100%",
-    padding: theme.spacing(2)
+    padding: theme.spacing(1)
   },
   divider: {
     margin: theme.spacing(2, 0)
@@ -104,6 +106,15 @@ const Sidebar: React.FC<Props> = props => {
     //   ]
     // },
     {
+      url: "/account",
+      pages: [
+        { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
+        { title: t("My account"), href: "/account", icon: <AccountBoxIcon />, disabled: false },
+        { title: t("Subscription"), href: "/account/subscription", icon: <WorkspacePremiumIcon /> },
+        // { title: t("Prices"), href: "/account/prices", icon: <MoneyIcon /> },
+      ]
+    },
+    {
       url: "/",
       pages: [
         { title: t("Dashboard"), href: "/", icon: <DashboardIcon /> },
@@ -159,7 +170,7 @@ const Sidebar: React.FC<Props> = props => {
           pages={currentMenu.pages}
           onClick={onClose}
         />
-        {/*<UpgradePlan />*/}
+        {user.account.trial_is_over && <UpgradePlan />}
         <div className={classes.version}>
           <div>{t("version")} {version.version}</div>
           <div>{t("build on")} {version.build_date}</div>

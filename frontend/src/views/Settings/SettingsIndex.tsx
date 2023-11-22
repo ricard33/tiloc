@@ -115,7 +115,7 @@ function SettingsIndex() {
   const pages = [
     {
       title: t("My account"),
-      href: "profile",
+      href: "/account",
       icon: AccountBoxIcon,
       disabled: false
     },

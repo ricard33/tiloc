@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   },
   shiftContent: {
-    paddingLeft: 160
+    paddingLeft: 170
   },
   content: {
     height: "100%",
@@ -57,6 +57,8 @@ const Main = () => {
     "booking-channels": t("Booking channels"),
     "calendar-syncs": t("Calendars synchronization"),
     "profile": t("My profile"),
+    "account": t("My account"),
+    "subscription": t("Subscription"),
   };
 
 
