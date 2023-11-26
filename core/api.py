@@ -17,14 +17,16 @@ from django_email_verification import send_email as send_verification_email
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
+from notifier.models import SentNotification
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from stripe import PaymentIntent, Subscription as StripeSubsription
+from rest_framework.viewsets import ViewSet
+from stripe import PaymentIntent
+from stripe import Subscription as StripeSubsription
 
 from location import __date__, __version__
 
@@ -52,8 +54,10 @@ from .serializers import (
     PaymentSerializer,
     PricingSerializer,
     SeasonalVariationSerializer,
+    SentNotificationSerializer,
     ServiceSerializer,
     SignUpSerializer,
+    SubscriptionSerializer,
     UserSerializer,
 )
 
@@ -209,7 +213,7 @@ class CurrentAccountViewSet(generics.RetrieveUpdateDestroyAPIView):
         #     self.send_account_deletion_request_email_to_user(request.user)
 
         request.user.account.is_active = False
-        request.user.account.save()
+        request.user.account.save(update_fields=["is_active"])
 
         return Response(
             data={"result": _("Request of deletion of all your account's data successfully sent.")}, status=200
@@ -282,7 +286,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.deleted = True
-        instance.save()
+        instance.save(update_fields=["deleted"])
 
     @action(detail=False, methods=["get"])
     def all_guests(self, request, pk=None):
@@ -524,6 +528,14 @@ class ServiceViewSet(viewsets.ModelViewSet):
         return self.queryset.for_user(self.request.user)
 
 
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = SentNotification.objects.filter(backend__name="noop").order_by("-created")
+    serializer_class = SentNotificationSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+
 # Billing API
 
 stripe.api_key = settings.STRIPE_PRIVATE_API_KEY
@@ -565,10 +577,10 @@ class Prices(APIView):
 # https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=elements
 
 
-class Subscription(APIView):
+class SubscriptionViewSet(ViewSet):
     permission_classes = [IsCompanyAdminPermissions]
 
-    def post(self, request):  # create_subscription
+    def create(self, request):  # create_subscription
         plan_ref = request.data["plan"]
         user = request.user
 
@@ -577,7 +589,7 @@ class Subscription(APIView):
             prices = stripe.Price.list(lookup_keys=[plan.lookup_key])
         except models.Plan.DoesNotExist:
             logger.exception("Plan with ref=%s doesn't exist", plan_ref)
-            raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist" % {"plan_ref": plan_ref}))
+            raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist") % {"plan_ref": plan_ref})
         except Exception as e:
             logger.exception("Error getting prices")
             raise APIException(detail=str(e))
@@ -623,7 +635,7 @@ class Subscription(APIView):
                 current_period_start=arrow.get(subscription.current_period_start).datetime,
                 current_period_end=arrow.get(subscription.current_period_end).datetime,
                 status=subscription.status,
-                latest_invoice=subscription.latest_invoice,
+                latest_invoice=subscription.latest_invoice.id,
                 default_payment_method=subscription.default_payment_method,
             ),
         )
@@ -644,13 +656,31 @@ class Subscription(APIView):
                 }
             )
 
-    def get(self, request):
+    def retrieve(self, request, pk=None):
         subscription = stripe.Subscription.retrieve(
-            request.GET.get("subscription_id"),
+            pk,  # request.GET.get("subscription_id"),
             expand=["latest_invoice.payment_intent", "pending_setup_intent", "default_payment_method"],
         )
 
         return Response(data=subscription)
+
+    def _cancel_or_reactivate(self, pk, cancel):
+        stripe_subscription = stripe.Subscription.modify(
+            pk,
+            cancel_at_period_end=cancel,
+        )
+        subscription = models.Subscription.objects.get(id=pk)
+        subscription.cancel_at_period_end = stripe_subscription.cancel_at_period_end
+        subscription.save(update_fields=("cancel_at_period_end",))
+        return Response(data=SubscriptionSerializer(subscription).data)
+
+    @action(detail=True, methods=["POST"])
+    def cancel(self, request, pk):
+        return self._cancel_or_reactivate(pk, True)
+
+    @action(detail=True, methods=["POST"])
+    def reactivate(self, request, pk):
+        return self._cancel_or_reactivate(pk, False)
 
 
 @csrf_exempt
@@ -662,10 +692,10 @@ def stripe_webhook(request):
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_ENDPOINT_SECRET)
-    except ValueError as e:
+    except ValueError:
         # Invalid payload
         return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.error.SignatureVerificationError:
         # Invalid signature
         return HttpResponse(status=400)
 
@@ -705,10 +735,11 @@ def stripe_webhook(request):
             status=subscription.status,
             latest_invoice=subscription.latest_invoice,
             default_payment_method=subscription.default_payment_method,
+            cancel_at_period_end=subscription.cancel_at_period_end,
         )
 
     elif event.type == "customer.subscription.deleted":
-        # handle subscription canceled automatically based
+        # handle subscription cancelled automatically based
         # upon your subscription settings. Or if the user cancels it.
         logger.info("[%s]", event.type)
         logger.warning(event.data)
@@ -746,17 +777,17 @@ def stripe_webhook(request):
         print(event.data)
 
     elif event["type"] == "checkout.session.completed":
-        checkout_session = event["data"]["object"]
-        customer_id = checkout_session["customer"]
-        customer_email = checkout_session["customer_email"]
+        # checkout_session = event["data"]["object"]
+        # customer_id = checkout_session["customer"]
+        # customer_email = checkout_session["customer_email"]
         logger.info("[checkout.session.completed]")
         # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-        session = stripe.checkout.Session.retrieve(
-            checkout_session["id"],
-            # expand=["line_items"],
-        )
+        # session = stripe.checkout.Session.retrieve(
+        #     checkout_session["id"],
+        #     # expand=["line_items"],
+        # )
     elif event["type"] == "customer.created":
-        customer = event["data"]["object"]
+        # customer = event["data"]["object"]
         logger.info("[%s]", event["type"])
         # # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
         # session = stripe.checkout.Session.retrieve(

@@ -4,6 +4,8 @@ import stripe
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Max
+from django.db.models.signals import post_save
+from notifier.models import SentNotification
 from rest_framework import serializers
 
 from core import models
@@ -43,18 +45,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if subscription.default_payment_method:
             payment_method = stripe.PaymentMethod.retrieve(subscription.default_payment_method)
             if payment_method.type == "card":
-                description = "%(brand)s **** %(last_digit)s" % {
+                description = "%(brand)s **** **** **** %(last_digit)s" % {
                     "brand": payment_method.card.brand.upper(),
-                    "last_digit":  payment_method.card.last4
+                    "last_digit": payment_method.card.last4,
                 }
             else:
                 logger.error("Unknown payment method type: %s", payment_method.type)
                 description = "?"
 
-            return PaymentMethodSerializer({
-                "type": payment_method.type,
-                "description": description
-            }).data
+            return PaymentMethodSerializer({"type": payment_method.type, "description": description}).data
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -160,7 +159,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         if password:
             instance.set_password(password)
-            instance.save()
+            instance.save(update_fields=["password"])
         return instance
 
     def get_full_name(self, user):
@@ -370,9 +369,22 @@ class BookingSerializer(serializers.ModelSerializer):
             )
         return instance
 
+    def get_updated_fields(self, instance, validated_data, updated_fields=[]):
+        updated_fields = []
+        for field, value in validated_data.items():
+            if not isinstance(value, dict):
+                if value != getattr(instance, field, None):
+                    updated_fields.append(field)
+            else:
+                self.get_updated_fields(getattr(instance, field), validated_data[field], updated_fields)
+        return updated_fields
+
     def update(self, instance, validated_data):
+        updated_fields = self.get_updated_fields(instance, validated_data)
         options = validated_data.pop("bookedservice_set", [])
         instance = super().update(instance, validated_data)
+        # Duplicate the post_send signal but with an `update_fields` parameter set
+        post_save.send(instance.__class__, instance=instance, created=False, raw=False, update_fields=updated_fields)
         existing_service_ids = instance.options.all().values_list("id", flat=True)
         all_service_ids = []
         for option in options:
@@ -485,6 +497,17 @@ class ContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Contract
         fields = "__all__"
+
+
+class SentNotificationSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(source="created")
+
+    class Meta:
+        model = SentNotification
+        fields = ("id", "notification", "date", "description", "path", "read")
+
+    def get_date(self, instance: SentNotification):
+        return instance.created
 
 
 class GuestSerializer(serializers.Serializer):

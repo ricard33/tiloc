@@ -39,8 +39,8 @@ const PricingTable = (props: Props) => {
   const basicFeatures = [
     ...commonFeatures,
     { label: t("Synchronizing calendars"), available: false },
-    { label: t("Lodgings"), count: 3 },
-    { label: t("Users"), count: 1 },
+    { label: t("Lodging"), count: 1 },
+    { label: t("User"), count: 1 },
     { label: t("24/7 Support"), available: false }
   ];
 

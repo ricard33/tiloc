@@ -20,8 +20,6 @@ const Checkout = (props: Props) => {
   const { plan, interval }: { plan: Plan, interval: "monthly" | "yearly" } = location.state;
   const { t } = useTranslation();
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null>>();
-  // const [clientSecret, setClientSecret] = useState("");
-  // const [currentCheckout, setCurrentCheckout] = useLocalStorage("stripe.currentCheckout", { clientSecret: "", planRef: "", interval: "" });
 
   useEffect(() => {
     // Create a Checkout Session as soon as the page loads
@@ -31,28 +29,6 @@ const Checkout = (props: Props) => {
         setStripePromise(loadStripe(response.data.publishableKey));
       });
   }, []);
-
-  // useEffect(() => {
-  //   // Create a Subscription as soon as the page loads
-  //   if (currentCheckout.planRef === plan.ref && currentCheckout.interval === interval) {
-  //     console.log("Reuse previous subscription");
-  //     setClientSecret(currentCheckout.clientSecret);
-  //     return;
-  //   }
-  //
-  //   console.log(`Create subscription for ${plan.ref} ${interval}`);
-  //   axios.post("/api/subscription/", {
-  //     plan: `${plan.ref}-${interval.toUpperCase()}`
-  //   })
-  //     .then((response) => {
-  //       setClientSecret(response.data.clientSecret);
-  //       setCurrentCheckout({ planRef: plan.ref, interval, clientSecret: response.data.clientSecret });
-  //     });
-  // }, [currentCheckout.planRef, currentCheckout.interval, currentCheckout.clientSecret, plan.ref, interval, setCurrentCheckout, clientSecret]);
-
-  // function onSuccess() {
-  //   setCurrentCheckout({});
-  // }
 
   const options: StripeElementsOptions = {
     mode: "subscription",

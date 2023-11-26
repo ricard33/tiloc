@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='booking',
             name='custom_tourist_tax',
-            field=models.DecimalField(blank=True, decimal_places=2, help_text='overwrite automated tourist tax', max_digits=20, null=True, verbose_name='custom tourist tax'),
+            field=models.DecimalField(blank=True, decimal_places=2, help_text='overwrite automated tourist tax', max_digits=20, null=True, verbose_name='personalized tourist tax'),
         ),
         migrations.AddField(
             model_name='historicalbooking',
             name='custom_tourist_tax',
-            field=models.DecimalField(blank=True, decimal_places=2, help_text='overwrite automated tourist tax', max_digits=20, null=True, verbose_name='custom tourist tax'),
+            field=models.DecimalField(blank=True, decimal_places=2, help_text='overwrite automated tourist tax', max_digits=20, null=True, verbose_name='personalized tourist tax'),
         ),
         migrations.AlterField(
             model_name='historicallodging',

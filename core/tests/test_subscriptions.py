@@ -48,4 +48,3 @@ class SubscriptionsTestCase(APITestCase):
         response = self.client.post("/api/user/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.data)
         self.assertEqual(1, models.User.objects.all().count())
-

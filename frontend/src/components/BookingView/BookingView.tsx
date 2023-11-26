@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Booking, Service } from "../../types";
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton } from "@mui/material";
+import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import useWindowDimensions from "../../common/windowDimensions";
 import BookingQuickView from "../BookingQuickView";
@@ -69,10 +69,13 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       fullWidth
       fullScreen={width < 600}
     >
-      <DialogTitle id="simple-dialog-title">
+      <DialogTitle id="simple-dialog-title" sx={{/*booking.cancelled ? { bgcolor: "warning.main" } : {}*/}}>
         <Grid justifyContent="space-between" container spacing={4}>
           <Grid item xs={6}>
             {t("Booking details")}
+            {booking.cancelled &&
+            <Alert severity="warning" sx={{display: "inline-flex", marginLeft: 2}}>{t("CANCELED")}</Alert>
+            }
           </Grid>
           <Grid item xs={6} sx={{ textAlign: "right" }}>
             <IconButton aria-label="copy" title={t("Copy booking to clipboard")} onClick={() => copyToClipboard()}>

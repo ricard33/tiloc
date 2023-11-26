@@ -6,7 +6,7 @@ import {
   AppBar,
   AppBarProps,
   Avatar,
-  // Badge,
+  Badge,
   Hidden,
   IconButton,
   Theme,
@@ -14,10 +14,10 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-// import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
+import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import InputIcon from "@mui/icons-material/Input";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoTiloc from "../../../assets/images/logos/logo-tiloc-with-name.png";
@@ -25,12 +25,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getGravatarUrl } from "../../../components/Gravatar";
 import { useTranslation } from "react-i18next";
 import { auth } from "../../../actions";
-import { useLogoutMutation } from "../../../services/api";
+import { useListNotificationsQuery, useLogoutMutation } from "../../../services/api";
 import { fetchErrorDecode } from "../../../common/apiUtils";
 import { useAlert } from "../../../common/alertUtils";
 import logger from "../../../common/logger";
 import { RootState } from "../../../store";
 import { User } from "../../../types";
+import NotificationButton from "../../../components/NotificationButton";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -67,7 +68,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   const classes = useStyles();
 
   const { t } = useTranslation();
-  // const [notifications] = useState([]);
+  const { data: notifications } = useListNotificationsQuery();
   const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null);
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const dispatch = useDispatch();
@@ -128,15 +129,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           {/*<span className={classes.appName}>Tiloc</span>*/}
         </RouterLink>
         <div className={classes.flexGrow} />
-        {/*<IconButton color="inherit" size="large">*/}
-        {/*  <Badge*/}
-        {/*    badgeContent={notifications.length}*/}
-        {/*    color="primary"*/}
-        {/*    variant="dot"*/}
-        {/*  >*/}
-        {/*    <NotificationsIcon />*/}
-        {/*  </Badge>*/}
-        {/*</IconButton>*/}
+        <NotificationButton />
         <Avatar
           alt="Person"
           className={classes.avatar}

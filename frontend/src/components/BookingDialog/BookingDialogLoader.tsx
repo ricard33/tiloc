@@ -4,7 +4,7 @@ import { BookingDialog } from "../index";
 import { Backdrop, CircularProgress } from "@mui/material";
 import { useAllGuestsQuery, useGetBookingQuery, useListLodgingsQuery, useListServicesQuery } from "../../services/api";
 import BookingView from "../BookingView";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import queryString from "query-string";
 import { parseISO } from "date-fns";
 import { useBookingActions } from "../../common/bookingActions";
@@ -26,7 +26,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
     lodging: lodging_id && lodgings ? lodgings.filter(l => l.id === lodging_id)[0] : undefined,
     begin_date: parseISO(query.begin_date as string)
   } : undefined;
-  const { data: loadedBooking, isLoading } = useGetBookingQuery(Number(bookingId), {
+  const { data: loadedBooking, isLoading, error: bookingError } = useGetBookingQuery(Number(bookingId), {
     skip: bookingId === "new",
     // pollingInterval: 1000,
     refetchOnMountOrArgChange: true,
@@ -37,6 +37,12 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const { data: allGuests } = useAllGuestsQuery();
   const [isEditMode, setIsEditMode] = useState(bookingId === "new");
   const { onCancelBooking, onUncancelBooking, onDeleteBooking } = useBookingActions();
+  const navigate = useNavigate();
+
+  if(bookingError) {
+    // navigate(-1);
+    return <></>;
+  }
 
   if (booking && !isLoading && lodgings && allGuests && optionsLoaded) {
     if (isEditMode)

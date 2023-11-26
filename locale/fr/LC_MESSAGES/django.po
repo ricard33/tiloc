@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-27 13:09+0000\n"
-"PO-Revision-Date: 2023-10-27 09:11-0400\n"
+"POT-Creation-Date: 2023-11-25 21:31+0000\n"
+"PO-Revision-Date: 2023-11-25 17:56-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -18,64 +18,73 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.3.2\n"
 
-#: core/admin.py:137
+#: core/admin.py:142
 msgid "Tiloc site admin"
 msgstr "Administrateur du site Tiloc"
 
-#: core/admin.py:140
+#: core/admin.py:145
 msgid "Tiloc administration"
 msgstr "Administration Tiloc"
 
-#: core/admin.py:143
+#: core/admin.py:148
 msgid "Site administration"
 msgstr "Administration du site"
 
-#: core/admin.py:180
+#: core/admin.py:186
 msgid "Personal info"
 msgstr "Informations personnelles"
 
-#: core/admin.py:182
+#: core/admin.py:188
 msgid "Permissions"
 msgstr "Permissions"
 
-#: core/admin.py:195
+#: core/admin.py:201
 msgid "Contracts and billing details"
 msgstr "Contrats et détails de facturation"
 
-#: core/admin.py:198
+#: core/admin.py:204
 msgid "Important dates"
 msgstr "Dates importantes"
 
-#: core/admin.py:291
+#: core/admin.py:297
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "l'objet %(name)s avec la clé primaire %(key)r n'existe pas."
 
-#: core/admin.py:303
+#: core/admin.py:309
 msgid "Password changed successfully."
 msgstr "Mot de passe changé avec succès."
 
-#: core/admin.py:324
+#: core/admin.py:330
 #, python-format
 msgid "Change password: %s"
 msgstr "Changer le mot de passe :%s"
 
-#: core/admin.py:421
+#: core/admin.py:427
 msgid "Channel UID"
 msgstr "Canal UID"
 
-#: core/admin.py:470
+#: core/admin.py:471
 #, python-format
 msgid "%d channel was successfully synchronized."
 msgid_plural "%d channels were successfully synchronized."
 msgstr[0] "%d canal a été synchronisé avec succès."
 msgstr[1] "%d canaux ont été synchronisés avec succès."
 
-#: core/api.py:201
+#: core/api.py:69
+msgid "This ressource has already reach his limit"
+msgstr "Cette ressource a déjà atteint sa limite"
+
+#: core/api.py:219
 msgid "Request of deletion of all your account's data successfully sent."
 msgstr ""
 "Demande de suppression de toutes les données de votre compte envoyée avec "
 "succès."
+
+#: core/api.py:592
+#, python-format
+msgid "Price plan %(plan_ref)s doesn't exist"
+msgstr "Le plan tarifaire %(plan_ref)s n'existe pas"
 
 #: core/models.py:92
 msgid "Deposit"
@@ -101,8 +110,8 @@ msgstr "Reçu"
 msgid "Quittance"
 msgstr "Quittance"
 
-#: core/models.py:101 core/models.py:269 core/models.py:345 core/models.py:388
-#: core/models.py:611 core/models.py:629 core/models.py:647
+#: core/models.py:101 core/models.py:312 core/models.py:418 core/models.py:686
+#: core/models.py:704 core/models.py:722
 msgid "name"
 msgstr "nom"
 
@@ -118,182 +127,194 @@ msgstr "libellé des factures"
 msgid "deposit or down payment"
 msgstr "arrhes ou acompte"
 
-#: core/models.py:221 core/models.py:265 core/models.py:309 core/models.py:387
-#: core/models.py:570 core/models.py:610 core/models.py:628
+#: core/models.py:257 core/models.py:302 core/models.py:369 core/models.py:417
+#: core/models.py:644 core/models.py:685 core/models.py:703
 msgid "account"
 msgstr "compte"
 
-#: core/models.py:223
+#: core/models.py:259
 msgid "email address"
 msgstr "adresse e-mail"
 
-#: core/models.py:224
+#: core/models.py:260
 msgid "phone"
 msgstr "téléphone"
 
-#: core/models.py:225 core/models.py:274
+#: core/models.py:261 core/models.py:317
 msgid "address"
 msgstr "adresse"
 
-#: core/models.py:228
+#: core/models.py:264
 msgid "lodgings"
 msgstr "hébergements"
 
-#: core/models.py:230
+#: core/models.py:266
 msgid "The lodgings this user has access."
 msgstr "Les logements auxquels cet utilisateur a accès."
 
-#: core/models.py:236
+#: core/models.py:272
 msgid "legal mention"
 msgstr "mention légale"
 
-#: core/models.py:236
+#: core/models.py:272
 msgid "Legal mention on bills"
 msgstr "Mentions légales sur les factures"
 
-#: core/models.py:237
+#: core/models.py:273
 msgid "payment"
 msgstr "paiement"
 
-#: core/models.py:237
+#: core/models.py:273
 msgid "Payment information"
 msgstr "Informations relatives au paiement"
 
-#: core/models.py:238
+#: core/models.py:274
 msgid "billing"
 msgstr "facturation"
 
-#: core/models.py:238
+#: core/models.py:274
 msgid "Billing conditions"
 msgstr "Conditions de facturation"
 
-#: core/models.py:239
+#: core/models.py:275
 msgid "no vat"
 msgstr "pas de TVA"
 
-#: core/models.py:240
+#: core/models.py:276
 msgid "vat rate"
 msgstr "taux TVA"
 
-#: core/models.py:241
+#: core/models.py:277
 msgid "logo"
 msgstr "logo"
 
-#: core/models.py:242
+#: core/models.py:278
 msgid "signature"
 msgstr "signature"
 
-#: core/models.py:244
+#: core/models.py:280
 msgid "verified"
 msgstr "vérifié"
 
-#: core/models.py:244
+#: core/models.py:280
 msgid "Define if email user has been verified or not"
 msgstr "Définir si l'utilisateur de l'email a été vérifié ou non"
 
-#: core/models.py:249
+#: core/models.py:286
 msgid "user"
 msgstr "utilisateur"
 
-#: core/models.py:250
+#: core/models.py:287
 msgid "users"
 msgstr "utilisateurs"
 
-#: core/models.py:266
+#: core/models.py:306
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:267 core/models.py:408
+#: core/models.py:310 core/models.py:438
 msgid "active"
 msgstr "actif"
 
-#: core/models.py:268
+#: core/models.py:311
 msgid "shown"
 msgstr "visible"
 
-#: core/models.py:271 core/models.py:347
+#: core/models.py:314
 msgid "rank"
 msgstr "rang"
 
-#: core/models.py:277 core/models.py:455 core/models.py:630 core/models.py:654
+#: core/models.py:320 core/models.py:487 core/models.py:705 core/models.py:729
 msgid "daily rate"
 msgstr "prix par jour"
 
-#: core/models.py:277
+#: core/models.py:320
 msgid "Default price for one night"
 msgstr "Prix par défaut pour une nuit"
 
-#: core/models.py:280
+#: core/models.py:324
+msgid "due date for balance (in days)"
+msgstr "date d'échéance du solde (en jours)"
+
+#: core/models.py:326
+msgid "When the balance should be paid (in days before arrival)"
+msgstr "Date de paiement du solde (en jours avant l'arrivée)"
+
+#: core/models.py:328
 msgid "guaranty deposit"
 msgstr "dépôt de garantie"
 
-#: core/models.py:281
+#: core/models.py:329
 msgid "capacity"
 msgstr "capacité"
 
-#: core/models.py:282
+#: core/models.py:330
 msgid "information"
 msgstr "information"
 
-#: core/models.py:283
-msgid "tourist tax"
-msgstr "taxe de séjour"
+#: core/models.py:331
+msgid "flat rate tourist tax"
+msgstr "taxe de séjour forfaitaire"
 
-#: core/models.py:286 core/models.py:674
+#: core/models.py:333
+msgid "tourist tax included in payment"
+msgstr "taxe de séjour incluse dans le paiement"
+
+#: core/models.py:336
+msgid "max daily tourist tax"
+msgstr "taxe de séjour journalière maximale"
+
+#: core/models.py:339
+msgid "tourist tax rate"
+msgstr "taux de la taxe de séjour"
+
+#: core/models.py:343 core/models.py:749
 msgid "description"
 msgstr "description"
 
-#: core/models.py:286
+#: core/models.py:343
 msgid "Used by contracts generation"
 msgstr "Utilisé par la création de contrats"
 
-#: core/models.py:291
+#: core/models.py:345
+msgid "Services added by default on new bookings"
+msgstr "Services ajoutés par défaut aux nouvelles réservations"
+
+#: core/models.py:351
 msgid "Lodging"
 msgstr "Hébergement"
 
-#: core/models.py:310
+#: core/models.py:370
 msgid "reference"
 msgstr "référence"
 
-#: core/models.py:311
+#: core/models.py:371
 msgid "designation"
 msgstr "désignation"
 
-#: core/models.py:312 core/models.py:591
+#: core/models.py:372 core/models.py:665
 msgid "unit price VAT incl."
-msgstr "prix unitaire TVA incluse"
+msgstr "prix unitaire TVA incl."
 
 # Ok
-#: core/models.py:313
+#: core/models.py:373
 msgid "VAT %"
 msgstr "% de TVA"
 
-#: core/models.py:315 core/models.py:463 core/models.py:593
+#: core/models.py:375 core/models.py:495 core/models.py:667
 msgid "flat rate?"
 msgstr "forfait ?"
 
-#: core/models.py:315 core/models.py:593
+#: core/models.py:375 core/models.py:667
 msgid "Use flat rate price instead of daily price computation"
 msgstr ""
 "Utilise le prix forfaitaire plutôt que le calcul par le prix journalier"
 
-#: core/models.py:318
-msgid "included in booking"
-msgstr "inclus dans la réservation"
-
-#: core/models.py:320
-msgid ""
-"If true, the price of this option is included in booking price and not "
-"displayed separately"
-msgstr ""
-"Si vrai, le prix de cette option est inclus dans le prix de la réservation "
-"et n’est pas affiché séparément"
-
-#: core/models.py:323
+#: core/models.py:378
 msgid "not included in price"
 msgstr "non inclus dans le tarif"
 
-#: core/models.py:325
+#: core/models.py:380
 msgid ""
 "Service not included in current booking price. Maybe provided by external "
 "partner..."
@@ -301,301 +322,336 @@ msgstr ""
 "Service non inclus dans le prix de réservation actuel. Peut-être fourni par "
 "un partenaire externe..."
 
-#: core/models.py:327
-msgid "auto add booking"
-msgstr "ajout automatique à chaque réservation"
-
-#: core/models.py:328
-msgid "auto add invoice"
-msgstr "ajout automatique à chaque facture"
-
-#: core/models.py:333
+#: core/models.py:386
 msgid "Service"
 msgstr "Service"
 
-#: core/models.py:346
-msgid "color"
-msgstr "couleur"
-
-#: core/models.py:349
-msgid "Check to ignore from statistics bookings with this status"
-msgstr ""
-"Cochez la case pour ignorer des statistiques les réservations ayant ce statut"
-
-#: core/models.py:352
-msgid "If true, the booking is finalized and considered as real"
-msgstr ""
-"Si c'est le cas, la réservation est finalisée et considérée comme réelle"
-
-#: core/models.py:356
-msgid "Booking status"
-msgstr "Satut de la réservation"
-
-#: core/models.py:357
-msgid "Booking statuses"
-msgstr "Statuts de réservation"
-
-#: core/models.py:363
+#: core/models.py:399
 msgid "Not available"
 msgstr "Indisponible"
 
-#: core/models.py:364
+#: core/models.py:400
 msgid "Option"
 msgstr "Option"
 
-#: core/models.py:365
+#: core/models.py:401
 msgid "Contract sent"
 msgstr "Contrat envoyé"
 
-#: core/models.py:366
+#: core/models.py:402
 msgid "Deposit paid"
 msgstr "Arrhes payées"
 
-#: core/models.py:367
+#: core/models.py:403
 msgid "Payment on arrival"
 msgstr "Paiement à l’arrivée"
 
-#: core/models.py:368
+#: core/models.py:404
 msgid "Paid"
 msgstr "Payé"
 
-#: core/models.py:369
+#: core/models.py:405
 msgid "External"
 msgstr "Externe"
 
-#: core/models.py:391
+#: core/models.py:421
 msgid "Booking channel"
 msgstr "Canal de réservation"
 
-#: core/models.py:392
+#: core/models.py:422
 msgid "Booking channels"
 msgstr "Canaux de réservation"
 
-#: core/models.py:407
+#: core/models.py:437
 msgid "Source URL"
 msgstr "URL source"
 
-#: core/models.py:410
+#: core/models.py:440
 msgid "Last time we imported remote calendar from channel."
 msgstr "Date du dernier import du calendrier du canal."
 
-#: core/models.py:413
+#: core/models.py:443
 msgid ""
 "Last time the calendar has been successfully requested by remote channel."
 msgstr "Date de la dernière requête réussie du canal distant."
 
-#: core/models.py:427
+#: core/models.py:457
 msgid "None"
 msgstr "Aucun"
 
-#: core/models.py:428
+#: core/models.py:458
 msgid "Breakfast"
 msgstr "Petit-déjeuner"
 
-#: core/models.py:429
+#: core/models.py:459
 msgid "Half board"
 msgstr "Demi-pension"
 
-#: core/models.py:430
+#: core/models.py:460
 msgid "Full board"
 msgstr "Pension complète"
 
-#: core/models.py:434
+#: core/models.py:464
 msgid "guest name"
 msgstr "nom du client"
 
-#: core/models.py:435
+#: core/models.py:465
 msgid "guest contact"
 msgstr "coordonnées du client"
 
-#: core/models.py:436
+#: core/models.py:466
 msgid "guest address"
 msgstr "adresse du client"
 
-#: core/models.py:440
+#: core/models.py:468
+msgid "status"
+msgstr "statut"
+
+#: core/models.py:472
 msgid "channel UID"
 msgstr "canal UID"
 
-#: core/models.py:440
+#: core/models.py:472
 msgid "UID on source channel"
 msgstr "UID du canal source"
 
-#: core/models.py:443 core/models.py:613 core/models.py:649
+#: core/models.py:475 core/models.py:688 core/models.py:724
 msgid "begin date"
 msgstr "date de début"
 
-#: core/models.py:446 core/models.py:616 core/models.py:652
+#: core/models.py:478 core/models.py:691 core/models.py:727
 msgid "end date"
 msgstr "date de fin"
 
-#: core/models.py:449
+#: core/models.py:481
 msgid "duration"
 msgstr "durée"
 
-#: core/models.py:451
+#: core/models.py:483
 msgid "adults"
 msgstr "adultes"
 
-#: core/models.py:452
+#: core/models.py:484
 msgid "children"
 msgstr "enfants"
 
-#: core/models.py:453
+#: core/models.py:485
 msgid "babies"
 msgstr "bébés"
 
-#: core/models.py:454
+#: core/models.py:486
 msgid "catering"
 msgstr "restauration"
 
-#: core/models.py:457
+#: core/models.py:489
 msgid "price"
 msgstr "prix"
 
-#: core/models.py:460
+#: core/models.py:492
 msgid "Total price, either computed by daily price or applying flat rate"
 msgstr ""
 "Prix total, soit par prix journalier, soit en appliquant le tarif forfaitaire"
 
-#: core/models.py:463
+#: core/models.py:495
 msgid "Use flat rate price instead of daily price computation if true"
 msgstr ""
 "Utilise le prix forfaitaire plutôt que le calcul par le prix journalier si "
 "coché"
 
-#: core/models.py:465
+#: core/models.py:497
 msgid "deposit"
 msgstr "arrhes"
 
-#: core/models.py:466
+#: core/models.py:498
 msgid "guaranty"
 msgstr "dépôt de garantie"
 
-#: core/models.py:467
+#: core/models.py:499
 msgid "commission fees"
 msgstr "frais de commission"
 
-#: core/models.py:470
+#: core/models.py:501
+msgid "personalized tourist tax"
+msgstr "taxe de séjour personnalisée"
+
+#: core/models.py:510
 msgid "arrival details"
 msgstr "détails de l'arrivée"
 
-#: core/models.py:470
+#: core/models.py:510
 msgid "Arrival time, flight number, etc..."
 msgstr "Heure d'arrivée, numéro de vol, etc..."
 
-#: core/models.py:472
+#: core/models.py:512
 msgid "Notes"
 msgstr "Notes"
 
-#: core/models.py:474
+#: core/models.py:514
 msgid "cancelled"
 msgstr "annulée"
 
-#: core/models.py:474
+#: core/models.py:514
 msgid "True if this booking was cancelled"
 msgstr "Vrai si cette réservation a été annulée"
 
-#: core/models.py:475
+#: core/models.py:515
 msgid "deleted"
 msgstr "supprimé"
 
-#: core/models.py:475
+#: core/models.py:515
 msgid "True if this booking was deleted"
 msgstr "Vrai si cette réservation a été supprimée"
 
-#: core/models.py:482
+#: core/models.py:522
 msgid "Booking"
 msgstr "Réservation"
 
-#: core/models.py:526 core/models.py:534 core/models.py:572
+#: core/models.py:600 core/models.py:608 core/models.py:646
 msgid "Contract"
 msgstr "Contrat"
 
-#: core/models.py:531
+#: core/models.py:605
 msgid "signed"
 msgstr "signé"
 
-#: core/models.py:578
+#: core/models.py:652
 msgid "Contract template"
 msgstr "Modèle de contrat"
 
-#: core/models.py:597
+#: core/models.py:671
 msgid "Booking service"
 msgstr "Options de réservation"
 
-#: core/models.py:620
+#: core/models.py:695
 msgid "holidays"
 msgstr "vacances"
 
-#: core/models.py:631 core/models.py:655
+#: core/models.py:706 core/models.py:730
 msgid "weekend rate"
 msgstr "forfait week-end"
 
-#: core/models.py:632 core/models.py:656
+#: core/models.py:707 core/models.py:731
 msgid "weekly rate"
 msgstr "forfait hebdomadaire"
 
-#: core/models.py:633 core/models.py:657
+#: core/models.py:708 core/models.py:732
 msgid "Minimum stay"
 msgstr "Séjour minimum"
 
-#: core/models.py:634
+#: core/models.py:709
 msgid "Number of guests included in the price"
 msgstr "Nombre de personnes incluses dans le tarif"
 
-#: core/models.py:636
+#: core/models.py:711
 msgid "Supplement per night and per additional guest"
 msgstr "Supplément par nuit et par personne supplémentaire"
 
-#: core/models.py:638
+#: core/models.py:713
 msgid "info"
 msgstr "info"
 
-#: core/models.py:665
+#: core/models.py:740
 msgid "Cash"
 msgstr "Espèces"
 
-#: core/models.py:666
+#: core/models.py:741
 msgid "Bank card"
 msgstr "Carte bancaire"
 
-#: core/models.py:667
+#: core/models.py:742
 msgid "Check"
 msgstr "Chèque"
 
-#: core/models.py:668
+#: core/models.py:743
 msgid "Transfer"
 msgstr "Virement"
 
-#: core/models.py:669
+#: core/models.py:744
 msgid "PayPal"
 msgstr "PayPal"
 
-#: core/models.py:670
+#: core/models.py:745
 msgid "Holiday vouchers"
 msgstr "Chèques vacances"
 
-#: core/models.py:671
+#: core/models.py:746
 msgid "Other"
 msgstr "Autre"
 
-#: core/models.py:675
+#: core/models.py:750
 msgid "amount"
 msgstr "montant"
 
-#: core/models.py:676
+#: core/models.py:751
 msgid "Payment method"
 msgstr "Méthode de paiement"
 
-#: core/models.py:677
+#: core/models.py:752
 msgid "Payment date"
 msgstr "Date de paiement"
 
-#: core/models.py:678
+#: core/models.py:753
 msgid "Used for account reconciliation"
 msgstr "Utilisé pour le rapprochement des comptes"
 
-#: core/views.py:32 location/serve_static_file.py:18
+#: core/models.py:782
+msgid "Monthly"
+msgstr "Mensuel"
+
+#: core/models.py:783
+msgid "Yearly"
+msgstr "Annuel"
+
+#: core/notifications.py:6
+msgid "Booking added"
+msgstr "Réservation ajoutée"
+
+#: core/notifications.py:7
+msgid "Booking modified"
+msgstr "Réservation modifiée"
+
+#: core/notifications.py:8
+msgid "Booking canceled"
+msgstr "Réservation annulée"
+
+#: core/notifications.py:9
+msgid "Booking uncanceled"
+msgstr "Réservation désannulée"
+
+#: core/notifications.py:10
+msgid "Booking deleted"
+msgstr "Réservation supprimée"
+
+#: core/notifications.py:11
+msgid "Comment added"
+msgstr "Commentaire ajouté"
+
+#: core/signals.py:39
+#, python-format
+msgid "New booking: [%(booking)s]"
+msgstr "Nouvelle réservation : [%(booking)s]"
+
+#: core/signals.py:51
+#, python-format
+msgid "Booking [%(booking)s] has been canceled"
+msgstr "La réservation [%(booking)s] a été annulée"
+
+#: core/signals.py:59
+#, python-format
+msgid "Booking [%(booking)s] has been uncanceled"
+msgstr "La réservation [%(booking)s] a été désannulée"
+
+#: core/signals.py:68
+#, python-format
+msgid "Booking [%(booking)s] has been deleted"
+msgstr "La réservation [%(booking)s] a été supprimée"
+
+#: core/signals.py:76
+#, python-format
+msgid "Booking [%(booking)s] has been modified"
+msgstr "La réservation [%(booking)s] a été modifiée"
+
+#: core/views.py:36 location/serve_static_file.py:18
 #, python-format
 msgid "\"%(path)s\" does not exist"
 msgstr "\"%(path)s\" n’existe pas"
@@ -604,15 +660,15 @@ msgstr "\"%(path)s\" n’existe pas"
 msgid "Directory indexes are not allowed here."
 msgstr "Index de répertoire non autorisé ici."
 
-#: location/settings.py:186
+#: location/settings.py:187
 msgid "English"
 msgstr "Anglais"
 
-#: location/settings.py:187
+#: location/settings.py:188
 msgid "French"
 msgstr "Français"
 
-#: location/settings.py:287
+#: location/settings.py:288
 msgid "Tiloc"
 msgstr "Tiloc"
 
@@ -623,6 +679,47 @@ msgstr "Site d'administration de Django"
 #: templates/admin/base_site.html:8
 msgid "Django administration"
 msgstr "Administration Django"
+
+#, fuzzy
+#~| msgid "cancelled"
+#~ msgid "canceled"
+#~ msgstr "annulée"
+
+#, fuzzy
+#~| msgid "billing"
+#~ msgid "trialing"
+#~ msgstr "facturation"
+
+#~ msgid "included in booking"
+#~ msgstr "inclus dans la réservation"
+
+#~ msgid ""
+#~ "If true, the price of this option is included in booking price and not "
+#~ "displayed separately"
+#~ msgstr ""
+#~ "Si vrai, le prix de cette option est inclus dans le prix de la "
+#~ "réservation et n’est pas affiché séparément"
+
+#~ msgid "auto add booking"
+#~ msgstr "ajout automatique à chaque réservation"
+
+#~ msgid "auto add invoice"
+#~ msgstr "ajout automatique à chaque facture"
+
+#~ msgid "color"
+#~ msgstr "couleur"
+
+#~ msgid "Check to ignore from statistics bookings with this status"
+#~ msgstr ""
+#~ "Cochez la case pour ignorer des statistiques les réservations ayant ce "
+#~ "statut"
+
+#~ msgid "If true, the booking is finalized and considered as real"
+#~ msgstr ""
+#~ "Si c'est le cas, la réservation est finalisée et considérée comme réelle"
+
+#~ msgid "Booking statuses"
+#~ msgstr "Statuts de réservation"
 
 #~ msgid "properties"
 #~ msgstr "propriétés"

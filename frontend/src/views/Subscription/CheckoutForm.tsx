@@ -59,7 +59,7 @@ const CheckoutForm = (props: Props) => {
     const result = await axios.post("/api/subscription/", {
       plan: `${plan.ref}-${interval.toUpperCase()}`
     });
-    const {type, clientSecret} = result.data;
+    const {type, subscriptionId, clientSecret} = result.data;
     const confirmIntent = type === "setup" ? stripe.confirmSetup : stripe.confirmPayment;
 
     // Confirm the Intent using the details collected by the Payment Element
@@ -67,7 +67,7 @@ const CheckoutForm = (props: Props) => {
       elements,
       clientSecret,
       confirmParams: {
-        return_url: `${window.location.origin}/account/checkout-done?session_id={CHECKOUT_SESSION_ID}`
+        return_url: `${window.location.origin}/?subscription_id=${subscriptionId}`
       },
       // Uncomment below if you only want redirect for redirect-based payments
       // redirect: "if_required",

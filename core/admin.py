@@ -1,5 +1,7 @@
 from functools import reduce
 
+import notifier.admin
+import notifier.models
 from constance.admin import Config, ConstanceAdmin
 from django.conf import settings
 from django.contrib import admin, messages
@@ -597,7 +599,7 @@ class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 
 @admin.register(models.Subscription, site=site)
 class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = ("id", "customer", "plan", "created", "start_date", "current_period_start", "current_period_end", "status", "latest_invoice")
+    list_display = ("id", "customer", "plan", "created", "start_date", "current_period_start", "current_period_end", "status", "cancel_at_period_end", "latest_invoice")
 
 
 site.register(models.Booking, BookingAdmin)
@@ -618,3 +620,9 @@ site.register(Group, GroupAdmin)
 site.register(CronJobLog, CronJobLogAdmin)
 site.register(CronJobLock)
 site.register(AuthToken, AuthTokenAdmin)
+
+site.register(notifier.models.Backend, notifier.admin.BackendAdmin)
+site.register(notifier.models.Notification, notifier.admin.NotificationAdmin)
+site.register(notifier.models.GroupPrefs, notifier.admin.GroupPrefsAdmin)
+site.register(notifier.models.UserPrefs, notifier.admin.UserPrefsAdmin)
+site.register(notifier.models.SentNotification, notifier.admin.SentNotifcationAdmin)

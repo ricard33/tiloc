@@ -62,7 +62,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             booking = same_bookings.first()
             logger.info("Found booking with same dates for event [%s -> %s: %s]", event.begin, event.end, event.summary)
             booking.source_uid = event.uid
-            booking.save()
+            booking.save(update_fields=["source_uid"])
             continue
 
         logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.summary)

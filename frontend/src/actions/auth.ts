@@ -1,10 +1,11 @@
 import * as actionTypes from "./actionTypes";
-import { LoginInfo, User } from "../types";
+import { LoginInfo, Subscription, User } from "../types";
 
 export interface AuthAction {
   type: string,
   user?: User,
   data?: LoginInfo,
+  subscription?: Subscription,
 }
 
 
@@ -51,5 +52,12 @@ export function logoutSuccessful() {
 export function tokenExpired() {
   return {
     type: actionTypes.AUTH_TOKEN_EXPIRED,
+  };
+}
+
+export function subscriptionUpdated(subscription: Subscription) {
+  return {
+    type: actionTypes.SUBSCRIPTION_UPDATED,
+    subscription
   };
 }

@@ -67,8 +67,6 @@ ALLOWED_HOSTS = []
 ALLOWED_HOSTS.extend(config.getlist("SECURITY", "ALLOWED_HOSTS", []))
 
 CSRF_TRUSTED_ORIGINS = [
-#     "https://app.tiloc.fr",
-#     "https://*.tiloc.fr",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
@@ -92,6 +90,7 @@ INSTALLED_APPS = [
     "simple_history",
     "django_cron",
     "django_email_verification",
+    "notifier",
     "core",
     # 'frontend',
     "django.contrib.admin",  # after to allow templates override
@@ -183,8 +182,8 @@ AUTHENTICATION_BACKENDS = ["core.auth_backend.EmailBackend"]
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
 LANGUAGES = [
-    ("en", _("English")),
     ("fr", _("French")),
+    ("en", _("English")),
 ]
 
 LANGUAGE_CODE = "fr"
@@ -356,3 +355,8 @@ EMAIL_PASSWORD_CALLBACK = password_change_callback
 STRIPE_PUBLIC_API_KEY = config.get("STRIPE", "PUBLIC_API_KEY", "")
 STRIPE_PRIVATE_API_KEY = config.get("STRIPE", "PRIVATE_API_KEY", "")
 STRIPE_ENDPOINT_SECRET = config.get("STRIPE", "ENDPOINT_SECRET", "")
+
+NOTIFIER_BACKENDS = (
+    'notifier.backends.EmailBackend',
+    'core.notifier_backend.NoopBackend',
+)

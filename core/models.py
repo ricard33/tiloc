@@ -257,7 +257,7 @@ class User(auth_models.AbstractUser):
     account = models.ForeignKey(Account, null=True, on_delete=models.CASCADE, verbose_name=_("account"))
     username = None
     email = models.EmailField(_("email address"), unique=True)
-    phone = models.CharField(_("phone"), max_length=30, blank=True, null=True)
+    phone = models.CharField(_("phone"), max_length=50, blank=True, null=True)
     address = models.TextField(_("address"), blank=True, null=True)
     lodgings = models.ManyToManyField(
         "Lodging",
@@ -498,7 +498,7 @@ class Booking(models.Model):
     guaranty = models.DecimalField(_("guaranty"), max_digits=20, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
     custom_tourist_tax = models.DecimalField(
-        _("custom tourist tax"),
+        _("personalized tourist tax"),
         max_digits=20,
         decimal_places=2,
         blank=True,
@@ -795,14 +795,14 @@ class Plan(models.Model):
 
 class Subscription(models.Model):
     class Status(models.TextChoices):
-        active = "active", _("active")
-        past_due = "past_due", _("past_due")
-        unpaid = "unpaid", _("unpaid")
-        canceled = "canceled", _("canceled")
-        incomplete = "incomplete", _("incomplete")
-        incomplete_expired = "incomplete_expired", _("incomplete_expired")
-        trialing = "trialing", _("trialing")
-        paused = "paused", _("paused")
+        active = "active", "active"
+        past_due = "past_due", "past_due"
+        unpaid = "unpaid", "unpaid"
+        canceled = "canceled", "canceled"
+        incomplete = "incomplete", "incomplete"
+        incomplete_expired = "incomplete_expired", "incomplete_expired"
+        trialing = "trialing", "trialing"
+        paused = "paused", "paused"
 
     id = models.CharField(max_length=255, primary_key=True)
     customer = models.ForeignKey(Account, to_field="stripe_customer_id", on_delete=models.CASCADE)
@@ -814,5 +814,6 @@ class Subscription(models.Model):
     status = models.CharField(max_length=50, choices=Status.choices)
     latest_invoice = models.CharField(max_length=255, null=True, blank=True)
     default_payment_method = models.CharField(max_length=255, null=True, blank=True)
+    cancel_at_period_end = models.BooleanField(default=False)
 
     _account_qs_path = "customer"

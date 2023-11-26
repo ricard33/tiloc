@@ -67,6 +67,7 @@ psycopg2-binary = "^2.9.7"
 faker = "^19.3.0"
 django-email-verification = "^0.3.3"
 stripe = "^7.5.0"
+django-notifier = {git = "https://github.com/ricard33/django-notifier-plus.git", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^6.5.0"

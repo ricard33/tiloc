@@ -8,7 +8,8 @@ import {
   Lodging,
   Payment,
   Service,
-  User
+  User,
+  Notification,
 } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
@@ -194,5 +195,14 @@ export function api2CalendarSync(calendarSync: Record<string, any>): CalendarSyn
     ...calendarSync as CalendarSync,
     last_import: parseISO(calendarSync.last_import),
     last_export: parseISO(calendarSync.last_export)
+  };
+}
+
+// ----- NOTIFICATION -----
+
+export function api2Notification(notification: Record<string, any>): Notification {
+  return {
+    ...notification as Notification,
+    date: parseISO(notification.date),
   };
 }

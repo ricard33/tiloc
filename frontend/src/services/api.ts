@@ -14,7 +14,8 @@ import {
   Pagination,
   Payment,
   Service,
-  User
+  User,
+  Notification
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
@@ -23,7 +24,7 @@ import {
   api2Comment,
   api2Contract,
   api2ContractTemplate,
-  api2Lodging,
+  api2Lodging, api2Notification,
   api2Payment,
   api2Service,
   api2User,
@@ -279,6 +280,7 @@ const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "Con
 const contractApi = makeApi<Contract>("contract/", "Contract", api2Contract);
 const serviceApi = makeApi<Service>("service/", "Service", api2Service);
 const calendarSyncApi = makeApi<CalendarSync>("booking_channel_sync/", "CalendarSync", api2CalendarSync);
+const notificationApi = makeApi<Notification>("notification/", "Notification", api2Notification);
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
@@ -294,7 +296,8 @@ export const api = createApi({
     "Contract",
     "ContractTemplate",
     "Service",
-    "User"
+    "User",
+    "Notofication"
   ],
   // keepUnusedDataFor: 5,
   endpoints: (builder) => ({
@@ -315,7 +318,7 @@ export const api = createApi({
       },
       invalidatesTags: (result, error, obj) => [
         { type: "User", id: obj.id },
-        { type: "User", id: "LIST" },
+        { type: "User", id: "LIST" }
       ],
       transformResponse: (response) => {
         return api2User(response as ApiModel);
@@ -460,7 +463,17 @@ export const api = createApi({
     getCalendarSync: calendarSyncApi.get(builder),
     createCalendarSync: calendarSyncApi.create(builder),
     updateCalendarSync: calendarSyncApi.update(builder),
-    deleteCalendarSync: calendarSyncApi.delete(builder)
+    deleteCalendarSync: calendarSyncApi.delete(builder),
+
+    // Notification
+    listNotifications: notificationApi.list(builder),
+    getNotification: notificationApi.get(builder),
+    readNotification: builder.mutation<Lodging, { id: number }>({
+      query: ({ id }) => {
+        return { url: `notification/${id}/`, method: "PATCH", data: { read: true } };
+      }
+    })
+
   })
 });
 
@@ -542,6 +555,9 @@ export const {
   useListCalendarSyncsQuery,
   useCreateCalendarSyncMutation,
   useUpdateCalendarSyncMutation,
-  useDeleteCalendarSyncMutation
+  useDeleteCalendarSyncMutation,
 
+  useListNotificationsQuery,
+  useGetNotificationQuery,
+  useReadNotificationMutation,
 } = api;

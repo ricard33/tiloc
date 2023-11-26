@@ -44,7 +44,7 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
       if ((result as any).error) {
         const error = (result as any).error;
         console.error("Error while trying to resend verification", error);
-        showError(t("Impossible resend verification email: ") + fetchErrorDecode(error));
+        showError(t("Impossible resend verification email:") + " " + fetchErrorDecode(error));
       } else {
         showSuccess(t("Verification email sent"));
       }

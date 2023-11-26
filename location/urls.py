@@ -41,6 +41,9 @@ router.register(r"contract", api.ContractViewSet, "contract")
 router.register(r"payment", api.PaymentViewSet, "payment")
 router.register(r"comment", api.CommentViewSet, "comment")
 router.register(r"user", api.UserViewSet, "user")
+router.register(r"notification", api.NotificationViewSet, "notification")
+
+router.register(r"subscription", api.SubscriptionViewSet, "subscription")
 
 urlpatterns = [
     path("api/", include((router.urls, "drf"), namespace="api")),
@@ -60,7 +63,6 @@ urlpatterns = [
     re_path(r'^api/my-account/$', api.CurrentAccountViewSet.as_view(), name='my-account'),
     re_path(r'^api/stripe_config/$', api.StripeConfig.as_view(), name='stripe_config'),
     re_path(r'^api/prices/$', api.Prices.as_view(), name='prices'),
-    re_path(r'^api/subscription/$', api.Subscription.as_view(), name='subscription'),
     re_path(r'^api/stripe_webhook/$', api.stripe_webhook, name='stripe_webhook'),
 
     path(r"calendar/<uuid:uid>/", views.export_calendar, name="calendar_sync"),

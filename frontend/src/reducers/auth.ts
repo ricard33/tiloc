@@ -1,5 +1,5 @@
 import * as actionTypes from "../actions/actionTypes";
-import { User } from "../types";
+import { Account, User } from "../types";
 import { AuthAction } from "../actions";
 
 export interface AuthState {
@@ -19,7 +19,7 @@ const initialState: AuthState = {
 };
 
 
-export default function auth(state = initialState, action:  AuthAction): AuthState {
+export default function auth(state = initialState, action: AuthAction): AuthState {
 
   switch (action.type) {
 
@@ -39,6 +39,16 @@ export default function auth(state = initialState, action:  AuthAction): AuthSta
       return {
         ...state, errors: action.data, token: undefined, user: undefined,
         isAuthenticated: false, isLoading: false
+      };
+
+    case actionTypes.SUBSCRIPTION_UPDATED:
+      return {
+        ...state, user: {
+          ...state.user as User, account: {
+            ...state.user!.account as Account,
+            current_subscription: action.subscription!,
+          }
+        }
       };
 
     default:

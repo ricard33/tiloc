@@ -5,6 +5,23 @@ export interface LoginInfo {
   account: Account;
 }
 
+export interface Subscription {
+  id: string;
+  customer: Account;
+  plan: {};
+  created: Date;
+  start_date: Date;
+  current_period_start: Date;
+  current_period_end: Date;
+  status: string;
+  cancel_at_period_end: boolean;
+  latest_invoice: string;
+  default_payment_method: {
+    type: string;
+    description: string;
+  };
+}
+
 export interface Account {
   is_active: boolean;
   is_initialized: boolean;
@@ -16,21 +33,7 @@ export interface Account {
     price: number;
     interval: "monthly" | "yearly"
   };
-  current_subscription: {
-    id: string;
-    customer: Account;
-    plan: {};
-    created: Date;
-    start_date: Date;
-    current_period_start: Date;
-    current_period_end: Date;
-    status: string;
-    latest_invoice: string;
-    default_payment_method: {
-      type: string;
-      description: string;
-    };
-  }
+  current_subscription: Subscription;
   created: Date;
   validity: Date;
   trial_is_over: boolean;
@@ -53,8 +56,8 @@ export interface User {
   billing: string;
   no_vat: boolean;
   vat_rate: number;
-  logo: string|null;
-  signature: string|null;
+  logo: string | null;
+  signature: string | null;
   lodgings: Lodging[];
   verified: boolean;
   groups: string[];
@@ -125,7 +128,7 @@ export interface Booking {
   children: number;
   babies: number;
   catering: string;
-  daily_rate?: number
+  daily_rate?: number;
   is_flat_rate: boolean;
   price?: number;
   deposit?: number;
@@ -199,7 +202,7 @@ export interface NextEvent {
   id: number;
   date: string;
   lodging_name: string;
-  event_type: "CHECKOUT"|"CHECKIN";
+  event_type: "CHECKOUT" | "CHECKIN";
   guest_name: string;
   booking_channel: string;
 }
@@ -216,4 +219,13 @@ export interface CalendarSync {   // name is BookingChannelSync on API
   last_import: Date;
   last_export: Date;
   last_import_error: string;
+}
+
+export interface Notification {
+  id: number;
+  notification: string;
+  date: Date;
+  description: string;
+  path: string;
+  read: boolean;
 }

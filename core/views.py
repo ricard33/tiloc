@@ -63,7 +63,7 @@ def export_calendar(request, uid):
         qs = qs.exclude(source=sync.channel)
         logger.info("Calendar requested by channel [%s] for lodging [%s]", sync.channel.name, lodging.name)
         sync.last_export = arrow.utcnow().datetime
-        sync.save()
+        sync.save(update_fields=["last_export"])
     else:
         logger.info("Full calendar requested for lodging [%s]", lodging.name)
     c = Calendar(creator="-//Ti'Gecko//Tiloc//EN")

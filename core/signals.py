@@ -1,0 +1,123 @@
+import logging
+from typing import List
+
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+from django.utils.translation import gettext as _
+from notifier.shortcuts import send_notification
+
+from core import models
+
+logger = logging.getLogger("signals")
+
+
+def get_current_user():
+    import inspect
+
+    for frame_record in inspect.stack():
+        if frame_record[3] == "get_response":
+            request = frame_record[0].f_locals["request"]
+            return request.user
+    return None
+
+
+def get_listening_users_for_lodging(lodging, current_user_id):
+    current_user_id = 0  # TODO remove it after tests
+    return (
+        lodging.account.user_set.filter(groups__name="administrator")
+        .exclude(id=current_user_id)
+        .union(lodging.users.exclude(id=current_user_id))
+    )
+
+
+@receiver(post_save, sender=models.Booking)
+def on_booking_saved(sender, instance: models.Booking, created: bool, update_fields: List[str], **kwargs):
+    lodging = instance.lodging
+    user = get_current_user()
+    users = get_listening_users_for_lodging(lodging, user.id)
+    if created:
+        logger.info("booking_created [%s] %s" % (instance.id, instance))
+        send_notification(
+            "booking-added",
+            users,
+            _("New booking: [%(booking)s]") % {"booking": instance},
+            "/bookings/%d" % instance.id,
+            context={"booking": instance},
+        )
+    else:
+        logger.info("booking_modified [%s] %s" % (instance.id, instance))
+        if update_fields:
+            if "cancelled" in update_fields:
+                if instance.cancelled:
+                    send_notification(
+                        "booking-canceled",
+                        users,
+                        _("Booking [%(booking)s] has been canceled") % {"booking": instance},
+                        "/bookings/%d" % instance.id,
+                        context={"booking": instance},
+                    )
+                else:
+                    send_notification(
+                        "booking-uncanceled",
+                        users,
+                        _("Booking [%(booking)s] has been uncanceled") % {"booking": instance},
+                        "/bookings/%d" % instance.id,
+                        context={"booking": instance},
+                    )
+            elif "deleted" in update_fields:
+                if instance.deleted:
+                    send_notification(
+                        "booking-deleted",
+                        users,
+                        _("Booking [%(booking)s] has been deleted") % {"booking": instance},
+                        "/bookings/%d" % instance.id,
+                        context={"booking": instance},
+                    )
+            else:
+                send_notification(
+                    "booking-modified",
+                    users,
+                    _("Booking [%(booking)s] has been modified") % {"booking": instance},
+                    "/bookings/%d" % instance.id,
+                    context={"booking": instance},
+                )
+
+
+@receiver(post_save, sender=models.Comment)
+def on_comment_saved(sender, instance: models.Comment, created: bool, update_fields: List[str], **kwargs):
+    lodging = instance.booking.lodging
+    user = get_current_user()
+    users = get_listening_users_for_lodging(lodging, user.id)
+    if created:
+        logger.info("comment_created [%s] %s" % (instance.id, instance))
+        send_notification(
+            "comment-added",
+            users,
+            _("New comment on booking [%(booking)s]") % {"booking": instance.booking},
+            "/bookings/%d" % instance.booking.id,
+            context={"comment": instance},
+        )
+    else:
+        logger.info("comment_modified [%s] %s" % (instance.id, instance))
+        send_notification(
+            "comment-modified",
+            users,
+            _("Comment has been modified on booking %(booking)s") % {"booking": instance.booking},
+            "/bookings/%d" % instance.id,
+            context={"comment": instance},
+        )
+
+
+@receiver(post_delete, sender=models.Comment)
+def on_comment_deleted(sender, instance: models.Comment, **kwargs):
+    lodging = instance.booking.lodging
+    user = get_current_user()
+    users = get_listening_users_for_lodging(lodging, user.id)
+    logger.info("comment_deleted [%s] %s" % (instance.id, instance))
+    send_notification(
+        "comment-deleted",
+        users,
+        _("Comment has been deleted on booking %(booking)s") % {"booking": instance.booking},
+        "/bookings/%d" % instance.booking.id,
+        context={"comment": instance},
+    )

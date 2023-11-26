@@ -8,6 +8,8 @@ import { Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/materi
 import { Footer, Sidebar, Topbar } from "./components";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import queryString from "query-string";
+import CheckoutResult from "../../components/CheckoutResult";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -40,6 +42,8 @@ const Main = () => {
     defaultMatches: true
   });
   const [openSidebar, setOpenSidebar] = useState(false);
+  const query = queryString.parse(location.search) as { subscription_id: string };
+  const { subscription_id } = query;
 
   const breadcrumbNameMap: { [key: string]: string | undefined, } = {
     "dashboard": t("Dashboard"),
@@ -106,6 +110,7 @@ const Main = () => {
             );
           })}
         </Breadcrumbs>
+        { subscription_id && <CheckoutResult subscriptionId={subscription_id} /> }
         <Outlet />
         <Footer />
       </main>

@@ -155,10 +155,10 @@ function SettingsIndex() {
 
   return (
     <Page sx={{ display: "flex", flexFlow: "row", flexWrap: "wrap", flex: "0 1 auto", justifyContent: "space-evenly" }}>
-      {pages.map((page) => {
+      {pages.map((page, index) => {
         const Icon = page.icon;
         return (
-          <HtmlTooltip title={page.premium ? <PremiumFeature /> : page.title}>
+          <HtmlTooltip key={index} title={page.premium ? <PremiumFeature /> : page.title}>
             <BigButton
               focusRipple
               key={page.title}
