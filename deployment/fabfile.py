@@ -158,6 +158,7 @@ def build_python(c):
         c.run("python deployment/compile.py -c")
 
         c.run("python manage.py migrate --noinput")
+        c.run("python manage.py migrate --noinput --prune core")
         c.run("python manage.py compilemessages --no-color")
         # subprocess.check_call(['python', 'manage.py', 'migrate', '--noinput'], cwd=WORKSPACE)
         # subprocess.check_call(['python', 'manage.py', 'compilemessages', '--no-color'], cwd=WORKSPACE)
