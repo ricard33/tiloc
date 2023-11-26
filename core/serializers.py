@@ -32,6 +32,8 @@ class PlanSerializer(serializers.ModelSerializer):
 class PaymentMethodSerializer(serializers.Serializer):
     type = serializers.CharField()
     description = serializers.CharField()
+    exp_month = serializers.IntegerField()
+    exp_year = serializers.IntegerField()
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
@@ -44,16 +46,18 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     def get_default_payment_method(self, subscription: models.Subscription):
         if subscription.default_payment_method:
             payment_method = stripe.PaymentMethod.retrieve(subscription.default_payment_method)
+            data = {"type": payment_method.type}
             if payment_method.type == "card":
-                description = "%(brand)s **** **** **** %(last_digit)s" % {
+                data["description"] = "%(brand)s **** **** **** %(last_digit)s" % {
                     "brand": payment_method.card.brand.upper(),
                     "last_digit": payment_method.card.last4,
                 }
+                data["exp_year"] = payment_method.card.exp_year
+                data["exp_month"] = payment_method.card.exp_month
             else:
                 logger.error("Unknown payment method type: %s", payment_method.type)
-                description = "?"
-
-            return PaymentMethodSerializer({"type": payment_method.type, "description": description}).data
+                data["description"] = "?"
+            return PaymentMethodSerializer(data).data
 
 
 class AccountSerializer(serializers.ModelSerializer):

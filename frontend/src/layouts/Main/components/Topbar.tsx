@@ -1,4 +1,4 @@
-import React, { /*useState*/ } from "react";
+import React from "react";
 import { Link, Link as RouterLink, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
@@ -6,18 +6,16 @@ import {
   AppBar,
   AppBarProps,
   Avatar,
-  Badge,
   Hidden,
   IconButton,
-  Theme,
-  Toolbar,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
-  ListItemIcon,
-  ListItemText
+  Theme,
+  Toolbar
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import InputIcon from "@mui/icons-material/Input";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoTiloc from "../../../assets/images/logos/logo-tiloc-with-name.png";
@@ -25,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getGravatarUrl } from "../../../components/Gravatar";
 import { useTranslation } from "react-i18next";
 import { auth } from "../../../actions";
-import { useListNotificationsQuery, useLogoutMutation } from "../../../services/api";
+import { useLogoutMutation } from "../../../services/api";
 import { fetchErrorDecode } from "../../../common/apiUtils";
 import { useAlert } from "../../../common/alertUtils";
 import logger from "../../../common/logger";
@@ -68,7 +66,6 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   const classes = useStyles();
 
   const { t } = useTranslation();
-  const { data: notifications } = useListNotificationsQuery();
   const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null);
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const dispatch = useDispatch();

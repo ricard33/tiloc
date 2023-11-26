@@ -44,7 +44,7 @@ const PricingTable = (props: Props) => {
     { label: t("24/7 Support"), available: false }
   ];
 
-  const proFeatures = [
+  const ownerFeatures = [
     ...commonFeatures,
     { label: t("Synchronizing calendars"), available: true },
     { label: t("Lodgings"), count: 3 },
@@ -52,7 +52,7 @@ const PricingTable = (props: Props) => {
     { label: t("24/7 Support"), available: true }
   ];
 
-  const conciergeFeatures = [
+  const proFeatures = [
     ...commonFeatures,
     { label: t("Synchronizing calendars"), available: true },
     { label: t("Lodgings"), count: 10 },
@@ -63,21 +63,23 @@ const PricingTable = (props: Props) => {
   const plans = [
     {
       ref: "FREE",
-      title: t("Basic"), subtitle: t("Your first rentals"), slogan: t("Always free"),
+      title: t("Basic"), subtitle: t("Basic features"), slogan: t("Always free"),
       price: { monthly: 0, yearly: 0 },
       features: basicFeatures
     },
     {
       ref: "OWNER",
-      title: t("Owner"), subtitle: t("Everything for a tourist rental owner"), slogan: t("Few lodgings"),
+      title: t("Essential"), subtitle: t("All the tools to manage your rentals"), slogan: t("Few lodgings"),
       price: { monthly: 10, yearly: 100 },
-      features: proFeatures
+      features: ownerFeatures
     },
     {
       ref: "PRO10",
-      title: t("Professional"), subtitle: t("Multi-property management, Concierge service"), slogan: t("More lodgings?"),
+      title: t("Professional"),
+      subtitle: t("Multi-property management, Concierge service"),
+      slogan: t("More lodgings?"),
       price: { monthly: 25, yearly: 250 },
-      features: conciergeFeatures
+      features: proFeatures
     }
   ];
   const intervalLabel = {
@@ -95,8 +97,8 @@ const PricingTable = (props: Props) => {
         <CardContent>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1em" }}>
             <Stack direction="row" style={{}}>
-              <span style={{fontSize: "3em"}}>{t("{{ price }}€", { price: plan.price[interval] })}</span>
-              <Stack style={{fontSize: "1.2em", paddingTop: "0.2em", marginLeft: "0.3em", textAlign: "left"}}>
+              <span style={{ fontSize: "3em" }}>{t("{{ price }}€", { price: plan.price[interval] })}</span>
+              <Stack style={{ fontSize: "1.2em", paddingTop: "0.2em", marginLeft: "0.3em", textAlign: "left" }}>
                 <span style={{}}>{t("per")}</span>
                 <span style={{}}>{intervalLabel[interval]}</span>
               </Stack>
@@ -110,9 +112,14 @@ const PricingTable = (props: Props) => {
             ? <Chip label={t("Current plan")} />
             :
             <Button
-              variant="contained" component={Link} to={"../checkout"}
+              variant="contained" component={Link} to={plan.ref === "FREE" ? "../cancel" : "../checkout"}
               state={{ plan: plan, interval }}
-            >{t("Subscribe")}</Button>
+            >
+              {
+                plan.ref === "FREE"
+                  ? t("Choose")
+                  : (user.account.current_subscription ? t("Subscribe") : t("Change"))
+              }</Button>
           }
         </CardActions>
       </Card>

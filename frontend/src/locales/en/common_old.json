@@ -1,6 +1,5 @@
 {
   "Duration": "Duration",
-  "Details": "Details",
   "{count} night": "{count} night",
   "{count} night_plural": "{count} nights",
   "Daily price": "Daily price",
@@ -107,5 +106,7 @@
   "Plafond de votre taxe journalière": "",
   "Automatically added to new bookings": "Automatically added to new bookings",
   "Done": "",
-  "Impossible resend verification email: ": ""
+  "Impossible resend verification email: ": "",
+  "Your first rentals": "",
+  "Everything for a tourist rental owner": ""
 }

@@ -1,5 +1,7 @@
 import logging
 import os
+import time
+from decimal import Decimal
 
 import arrow
 import jinja2
@@ -584,17 +586,9 @@ class SubscriptionViewSet(ViewSet):
         plan_ref = request.data["plan"]
         user = request.user
 
-        try:
-            plan = models.Plan.objects.get(ref=plan_ref)
-            prices = stripe.Price.list(lookup_keys=[plan.lookup_key])
-        except models.Plan.DoesNotExist:
-            logger.exception("Plan with ref=%s doesn't exist", plan_ref)
-            raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist") % {"plan_ref": plan_ref})
-        except Exception as e:
-            logger.exception("Error getting prices")
-            raise APIException(detail=str(e))
+        price = self.get_price(plan_ref)
 
-        price_id = prices.data[0].id
+        price_id = price.id
 
         if user.account.stripe_customer_id is None:
             try:
@@ -656,6 +650,18 @@ class SubscriptionViewSet(ViewSet):
                 }
             )
 
+    def get_price(self, plan_ref):
+        try:
+            plan = models.Plan.objects.get(ref=plan_ref)
+            prices = stripe.Price.list(lookup_keys=[plan.lookup_key])
+            return prices.data[0]
+        except models.Plan.DoesNotExist:
+            logger.exception("Plan with ref=%s doesn't exist", plan_ref)
+            raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist") % {"plan_ref": plan_ref})
+        except Exception as e:
+            logger.exception("Error getting prices")
+            raise APIException(detail=str(e))
+
     def retrieve(self, request, pk=None):
         subscription = stripe.Subscription.retrieve(
             pk,  # request.GET.get("subscription_id"),
@@ -682,10 +688,80 @@ class SubscriptionViewSet(ViewSet):
     def reactivate(self, request, pk):
         return self._cancel_or_reactivate(pk, False)
 
+    @action(detail=True, methods=["GET"])
+    def preview(self, request, pk):
+        subscription = stripe.Subscription.retrieve(pk)
+        plan_ref = request.GET["plan"]
+        user = request.user
+        price = self.get_price(plan_ref)
+
+        # See what the next invoice would look like with a price switch
+        # and proration set:
+        items = [
+            {
+                "id": subscription["items"]["data"][0].id,
+                "price": price.id,  # Switch to new price
+            }
+        ]
+
+        invoice = stripe.Invoice.upcoming(
+            customer=user.account.stripe_customer_id,
+            subscription=pk,
+            subscription_items=items,
+            subscription_proration_date=int(time.time()),
+        )
+        return Response(
+            data={
+                "lines": map(
+                    lambda line: {
+                        "amount": Decimal(line.amount / 100),
+                        "description": line.description,
+                        "period": {
+                            "start": arrow.get(line.period.start).datetime,
+                            "end": arrow.get(line.period.end).datetime,
+                        },
+                    },
+                    invoice.lines.data,
+                ),
+                "subtotal": Decimal(invoice.subtotal / 100),
+                "total": Decimal(invoice.total / 100),
+                "period_start": arrow.get(invoice.period_start).datetime,
+                "period_end": arrow.get(invoice.period_end).datetime,
+                "subscription_proration_date": arrow.get(invoice.subscription_proration_date).datetime,
+                # "invoice": invoice,
+            }
+        )
+
+    @action(detail=True, methods=["POST"])
+    def change(self, request, pk):
+        subscription = stripe.Subscription.retrieve(pk)
+        plan_ref = request.data["plan"]
+        user = request.user
+        price = self.get_price(plan_ref)
+
+        stripe.SubscriptionItem.modify(subscription["items"]["data"][0].id, price=price.id)
+
+        subscription = stripe.Subscription.retrieve(pk)
+
+        models.Subscription.objects.filter(id=subscription.id).update(
+            customer=user.account,
+            plan_id=subscription["items"].data[0].price.lookup_key,
+            created=arrow.get(subscription.created).datetime,
+            start_date=arrow.get(subscription.start_date).datetime,
+            current_period_start=arrow.get(subscription.current_period_start).datetime,
+            current_period_end=arrow.get(subscription.current_period_end).datetime,
+            status=subscription.status,
+            latest_invoice=subscription.latest_invoice,
+            default_payment_method=subscription.default_payment_method,
+        )
+
+        return Response(data=SubscriptionSerializer(models.Subscription.objects.get(id=subscription.id)).data)
+
 
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
+    test_mode = settings.STRIPE_PRIVATE_API_KEY.startswith("sk_test_")
 
     sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
     event = None
@@ -697,103 +773,111 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError:
         # Invalid signature
-        return HttpResponse(status=400)
+        return HttpResponse(400)
 
-    if event.type == "customer.subscription.created":
-        logger.info("[%s]", event.type)
-        subscription: StripeSubsription = event.data.object
-        account = models.Account.objects.get(stripe_customer_id=subscription.customer)
-        logger.info("Subscription for customer '%s' created with status '%s'", account.name, subscription.status)
-        print(subscription)
-        models.Subscription.objects.get_or_create(
-            id=subscription.id,
-            defaults=dict(
-                customer_id=subscription.customer,
+    try:
+        if event.type == "customer.subscription.created":
+            logger.info("[%s]", event.type)
+            subscription: StripeSubsription = event.data.object
+            account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+            logger.info("Subscription for customer '%s' created with status '%s'", account.name, subscription.status)
+            print(subscription)
+            models.Subscription.objects.get_or_create(
+                id=subscription.id,
+                defaults=dict(
+                    customer_id=subscription.customer,
+                    plan_id=subscription["items"].data[0].price.lookup_key,
+                    created=arrow.get(subscription.created).datetime,
+                    start_date=arrow.get(subscription.start_date).datetime,
+                    current_period_start=arrow.get(subscription.current_period_start).datetime,
+                    current_period_end=arrow.get(subscription.current_period_end).datetime,
+                    status=subscription.status,
+                    latest_invoice=subscription.latest_invoice,
+                    default_payment_method=subscription.default_payment_method,
+                ),
+            )
+
+        elif event.type == "customer.subscription.updated":
+            logger.info("[%s]", event.type)
+            subscription: StripeSubsription = event.data.object
+            account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+            logger.info("Subscription for customer '%s' has status '%s'", account.name, subscription.status)
+
+            models.Subscription.objects.filter(id=subscription.id).update(
                 plan_id=subscription["items"].data[0].price.lookup_key,
-                created=arrow.get(subscription.created).datetime,
+                # created=arrow.get(subscription.created).datetime,
                 start_date=arrow.get(subscription.start_date).datetime,
                 current_period_start=arrow.get(subscription.current_period_start).datetime,
                 current_period_end=arrow.get(subscription.current_period_end).datetime,
                 status=subscription.status,
                 latest_invoice=subscription.latest_invoice,
                 default_payment_method=subscription.default_payment_method,
-            ),
-        )
+                cancel_at_period_end=subscription.cancel_at_period_end,
+            )
 
-    elif event.type == "customer.subscription.updated":
-        logger.info("[%s]", event.type)
-        subscription: StripeSubsription = event.data.object
-        account = models.Account.objects.get(stripe_customer_id=subscription.customer)
-        logger.info("Subscription for customer '%s' has status '%s'", account.name, subscription.status)
+        elif event.type == "customer.subscription.deleted":
+            # handle subscription cancelled automatically based
+            # upon your subscription settings. Or if the user cancels it.
+            logger.info("[%s]", event.type)
+            logger.warning(event.data)
+            subscription: StripeSubsription = event.data.object
+            account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+            logger.info("Subscription for customer '%s' has ended", account.name)
+            models.Subscription.objects.filter(id=subscription.id).update(
+                start_date=arrow.get(subscription.start_date).datetime,
+                current_period_start=arrow.get(subscription.current_period_start).datetime,
+                current_period_end=arrow.get(subscription.current_period_end).datetime,
+                status=subscription.status,
+                latest_invoice=subscription.latest_invoice,
+            )
 
-        models.Subscription.objects.filter(id=subscription.id).update(
-            # plan=plan,
-            # created=arrow.get(subscription.created).datetime,
-            start_date=arrow.get(subscription.start_date).datetime,
-            current_period_start=arrow.get(subscription.current_period_start).datetime,
-            current_period_end=arrow.get(subscription.current_period_end).datetime,
-            status=subscription.status,
-            latest_invoice=subscription.latest_invoice,
-            default_payment_method=subscription.default_payment_method,
-            cancel_at_period_end=subscription.cancel_at_period_end,
-        )
+        elif event.type == "payment_intent.succeeded":
+            logger.info("[%s]", event.type)
+            print(event.data)
+            payment_intent: PaymentIntent = event.data.object
+            account = models.Account.objects.get(stripe_customer_id=payment_intent.customer)
+            logger.info("PaymentIntent for customer '%s' has status '%s", account.name, payment_intent.status)
+        elif event.type == "invoice.paid":
+            # Used to provision services after the trial has ended.
+            # The status of the invoice will show up as paid. Store the status in your
+            # database to reference when a user accesses your service to avoid hitting rate
+            # limits.
+            logger.info("[%s]", event.type)
+            print(event.data)
+        elif event.type == "invoice.payment_failed":
+            # If the payment fails or the customer does not have a valid payment method,
+            # an invoice.payment_failed event is sent, the subscription becomes past_due.
+            # Use this webhook to notify your user that their payment has
+            # failed and to retrieve new card details.
+            logger.info("[%s]", event.type)
+            print(event.data)
 
-    elif event.type == "customer.subscription.deleted":
-        # handle subscription cancelled automatically based
-        # upon your subscription settings. Or if the user cancels it.
-        logger.info("[%s]", event.type)
-        logger.warning(event.data)
-        subscription: StripeSubsription = event.data.object
-        account = models.Account.objects.get(stripe_customer_id=subscription.customer)
-        logger.info("Subscription for customer '%s' has ended", account.name)
-        models.Subscription.objects.filter(id=subscription.id).update(
-            start_date=arrow.get(subscription.start_date).datetime,
-            current_period_start=arrow.get(subscription.current_period_start).datetime,
-            current_period_end=arrow.get(subscription.current_period_end).datetime,
-            status=subscription.status,
-            latest_invoice=subscription.latest_invoice,
-        )
-        # TODO invalidate subscription
+        elif event["type"] == "checkout.session.completed":
+            # checkout_session = event["data"]["object"]
+            # customer_id = checkout_session["customer"]
+            # customer_email = checkout_session["customer_email"]
+            logger.info("[checkout.session.completed]")
+            # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+            # session = stripe.checkout.Session.retrieve(
+            #     checkout_session["id"],
+            #     # expand=["line_items"],
+            # )
+        elif event["type"] == "customer.created":
+            # customer = event["data"]["object"]
+            logger.info("[%s]", event["type"])
+            # # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+            # session = stripe.checkout.Session.retrieve(
+            #     checkout_session["id"],
+            #     # expand=["line_items"],
+            # )
 
-    elif event.type == "payment_intent.succeeded":
-        logger.info("[%s]", event.type)
-        print(event.data)
-        payment_intent: PaymentIntent = event.data.object
-        account = models.Account.objects.get(stripe_customer_id=payment_intent.customer)
-        logger.info("PaymentIntent for customer '%s' has status '%s", account.name, payment_intent.status)
-    elif event.type == "invoice.paid":
-        # Used to provision services after the trial has ended.
-        # The status of the invoice will show up as paid. Store the status in your
-        # database to reference when a user accesses your service to avoid hitting rate
-        # limits.
-        logger.info("[%s]", event.type)
-        print(event.data)
-    elif event.type == "invoice.payment_failed":
-        # If the payment fails or the customer does not have a valid payment method,
-        # an invoice.payment_failed event is sent, the subscription becomes past_due.
-        # Use this webhook to notify your user that their payment has
-        # failed and to retrieve new card details.
-        logger.info("[%s]", event.type)
-        print(event.data)
-
-    elif event["type"] == "checkout.session.completed":
-        # checkout_session = event["data"]["object"]
-        # customer_id = checkout_session["customer"]
-        # customer_email = checkout_session["customer_email"]
-        logger.info("[checkout.session.completed]")
-        # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-        # session = stripe.checkout.Session.retrieve(
-        #     checkout_session["id"],
-        #     # expand=["line_items"],
-        # )
-    elif event["type"] == "customer.created":
-        # customer = event["data"]["object"]
-        logger.info("[%s]", event["type"])
-        # # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-        # session = stripe.checkout.Session.retrieve(
-        #     checkout_session["id"],
-        #     # expand=["line_items"],
-        # )
-
-    # Passed signature verification
-    return HttpResponse(status=200)
+        # Passed signature verification
+        return HttpResponse(status=200)
+    except models.Account.DoesNotExist:
+        if test_mode and settings.ENV == "prod":
+            # In test mode, we can have multiple applications with different customers
+            # So we don't return error to avoid crash emails and hook in error
+            return HttpResponse(status=200)
+        raise
+    except Exception:
+        raise

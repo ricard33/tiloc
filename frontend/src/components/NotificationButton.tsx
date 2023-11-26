@@ -1,27 +1,16 @@
 import React, { useState } from "react";
-import {
-  Backdrop,
-  Badge,
-  CircularProgress,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton, ListItemIcon,
-  ListItemText
-} from "@mui/material";
-import Box from "@mui/material/Box";
+import { Badge, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
 import CalendarIcon from "@mui/icons-material/CalendarToday";
-import CommentIcon from '@mui/icons-material/Comment';
+import CommentIcon from "@mui/icons-material/Comment";
 import CheckIcon from "@mui/icons-material/Check";
 import { useListNotificationsQuery, useReadNotificationMutation } from "../services/api";
 import { Notification } from "../types";
 import { useNavigate } from "react-router-dom";
 
 const NotificationButton = () => {
-  const { data: notifications, refetch } = useListNotificationsQuery({}, { pollingInterval: 5000 });
+  const { data: notifications, refetch } = useListNotificationsQuery({}, { pollingInterval: 10000 });
   const [markNotificationAsRead] = useReadNotificationMutation();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -96,7 +85,8 @@ const NotificationButton = () => {
                 <ListItemButton onClick={() => handleNotificationClick(notification)}>
                   <ListItemIcon>{getNotificationIcon(notification)}</ListItemIcon>
                   <ListItemText>
-                    <span style={{ fontWeight: notification.read ? "normal" : "bold" }}
+                    <span
+                      style={{ fontWeight: notification.read ? "normal" : "bold" }}
                     >{notification.description}</span>
                   </ListItemText>
                 </ListItemButton>

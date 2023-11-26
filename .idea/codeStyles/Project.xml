@@ -3,6 +3,7 @@
     <HTMLCodeStyleSettings>
       <option name="HTML_SPACE_INSIDE_EMPTY_TAG" value="true" />
       <option name="HTML_ENFORCE_QUOTES" value="true" />
+      <option name="HTML_NEWLINE_BEFORE_FIRST_ATTRIBUTE" value="When multiline" />
       <option name="HTML_NEWLINE_AFTER_LAST_ATTRIBUTE" value="When multiline" />
     </HTMLCodeStyleSettings>
     <JSCodeStyleSettings version="0">
@@ -10,6 +11,7 @@
       <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
       <option name="FORCE_QUOTE_STYlE" value="true" />
       <option name="ENFORCE_TRAILING_COMMA" value="Remove" />
+      <option name="JSX_ATTRIBUTE_VALUE" value="Based on type" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
     </JSCodeStyleSettings>

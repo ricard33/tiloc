@@ -11,16 +11,16 @@ import axios from "axios";
 type Props = {
   plan: Plan;
   interval: "monthly" | "yearly";
+  testMode: boolean;
 };
 
 const CheckoutForm = (props: Props) => {
-  const { plan, interval } = props;
+  const { plan, interval, testMode } = props;
   const { t } = useTranslation();
   // Initialize an instance of stripe.
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState("");
-  const [testMode] = useState(true);
   const [loading, setLoading] = useState(false);
 
   console.log("origin:", window.location.origin);
@@ -59,16 +59,16 @@ const CheckoutForm = (props: Props) => {
     const result = await axios.post("/api/subscription/", {
       plan: `${plan.ref}-${interval.toUpperCase()}`
     });
-    const {type, subscriptionId, clientSecret} = result.data;
+    const { type, subscriptionId, clientSecret } = result.data;
     const confirmIntent = type === "setup" ? stripe.confirmSetup : stripe.confirmPayment;
 
     // Confirm the Intent using the details collected by the Payment Element
-    const {error} = await confirmIntent({
+    const { error } = await confirmIntent({
       elements,
       clientSecret,
       confirmParams: {
         return_url: `${window.location.origin}/?subscription_id=${subscriptionId}`
-      },
+      }
       // Uncomment below if you only want redirect for redirect-based payments
       // redirect: "if_required",
     });
@@ -94,15 +94,17 @@ const CheckoutForm = (props: Props) => {
   return (
     <div id="checkout">
       {testMode &&
-        <Alert severity={"info"} title={"TEST MODE"}>
-          <AlertTitle>Test mode</AlertTitle>
-          <p>Try the successful test card: <span>4242424242424242</span>.</p>
-          <p>Try the test card that requires SCA: <span>4000002500003155</span>.</p>
-          <p>Use any <i>future</i> expiry date, CVC,5 digit postal code</p>
-        </Alert>
+        <>
+          <Alert severity={"info"} title={"TEST MODE"}>
+            <AlertTitle>Test mode</AlertTitle>
+            <p>Try the successful test card: <span>4242424242424242</span>.</p>
+            <p>Try the test card that requires SCA: <span>4000002500003155</span>.</p>
+            <p>Use any <i>future</i> expiry date, CVC,5 digit postal code</p>
+          </Alert>
+          <hr />
+        </>
       }
 
-      <hr />
       <form onSubmit={handleSubmit}>
         <Typography variant={"h1"} style={{ marginBottom: "1em" }}>{t("Pay by credit card")}</Typography>
         {/*<label>*/}

@@ -12,3 +12,12 @@ export type Plan = {
   slogan: string,
   features: Feature[]
 };
+
+export type SubscriptionPreview = {
+  lines: { amount: number, description: string }[];
+  subtotal: number;
+  total: number;
+  period_start: string;
+  period_end: string;
+  subscription_proration_date: string;
+};

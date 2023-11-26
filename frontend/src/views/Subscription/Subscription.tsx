@@ -4,33 +4,23 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { User } from "../../types";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import { styled } from "@mui/material/styles";
 import { formatDate } from "../../common/dateUtils";
 import { DecimalPrecision } from "../../common/priceUtils";
 import axios from "axios";
 import { auth } from "../../actions";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { useAlert } from "../../common/alertUtils";
+import { Label, Value } from "../../components";
 
 
 function Subscription() {
   const { t } = useTranslation();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const navigate = useNavigate();
   const confirm = useConfirm();
   const dispatch = useDispatch();
   const { showSuccess, showError } = useAlert();
-
-  const Label = styled(Grid2)(({ theme }) => ({
-    color: "#7a7a7a"
-  }));
-  const Value = styled(Grid2)(({ theme }) => ({
-    color: "#646464",
-    textAlign: "right",
-    fontWeight: "bold"
-  }));
 
   function reactivateHandler() {
     confirm({
@@ -62,8 +52,9 @@ function Subscription() {
             <Value xs={7}>{user.account.current_plan.name}</Value>
             <Label xs={5}>{t("Renewal")}</Label>
             <Value xs={7}>{user.account.current_subscription.cancel_at_period_end ?
-              <Alert severity="warning"
-              >{t("Will be cancelled on {{date}}", { date: formatDate(user.account.validity, "PPPP") })}</Alert>
+              <Alert severity="warning">
+                {t("Will be cancelled on {{date}}", { date: formatDate(user.account.validity, "PPPP") })}
+              </Alert>
               : user.account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
             <Label xs={5}>{t("Price")}</Label>
             <Value xs={7}>{user.account.current_plan.interval === "monthly"

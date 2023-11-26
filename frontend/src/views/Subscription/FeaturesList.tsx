@@ -14,7 +14,7 @@ const FeaturesList: FC<Props & StackProps>= ({ features, ...stackProps }: Props)
   return (
     <Stack sx={{ textAlign: "left", marginTop: 3 }} {...stackProps}>
       {features.map((value, index) => {
-        return <Typography key={index} variant={"body1"} sx={{ verticalAlign: "top", height: "2em" }}>
+        return <Typography key={index} variant={"body1"} sx={{ verticalAlign: "top", minHeight: "2em" }}>
           {typeof value.available !== "undefined" && (
             value.available
               ? <CheckCircleOutlineIcon color={"success"} sx={{ marginRight: 1 }} />
