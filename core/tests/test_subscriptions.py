@@ -12,10 +12,8 @@ class SubscriptionsTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        # factories.PlanFactory.create(ref="FREE", name="Basic", max_lodgings=1, max_users=1, price=0)
         plan = factories.PlanFactory.create(ref="OWNER", name="Essentiel", max_lodgings=3, max_users=1, price=10)
-        # factories.PlanFactory.create(ref="PRO10", name="Conciergerie", max_lodgings=10, max_users=10, price=25)
-        self.user = factories.AdminUserFactory.create(account__current_plan=plan)
+        self.user = factories.AdminUserFactory.create(account__subscription_set__plan=plan)
         self.header = force_login(self.user)
 
     def test_lodgings_limit(self):

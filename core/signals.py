@@ -21,8 +21,8 @@ def get_current_user():
     return None
 
 
-def get_listening_users_for_lodging(lodging, current_user_id):
-    current_user_id = 0  # TODO remove it after tests
+def get_listening_users_for_lodging(lodging, current_user):
+    current_user_id = current_user and current_user.id or 0
     return (
         lodging.account.user_set.filter(groups__name="administrator")
         .exclude(id=current_user_id)
@@ -34,7 +34,7 @@ def get_listening_users_for_lodging(lodging, current_user_id):
 def on_booking_saved(sender, instance: models.Booking, created: bool, update_fields: List[str], **kwargs):
     lodging = instance.lodging
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodging, user.id)
+    users = get_listening_users_for_lodging(lodging, user)
     if created:
         logger.info("booking_created [%s] %s" % (instance.id, instance))
         send_notification(
@@ -87,7 +87,7 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
 def on_comment_saved(sender, instance: models.Comment, created: bool, update_fields: List[str], **kwargs):
     lodging = instance.booking.lodging
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodging, user.id)
+    users = get_listening_users_for_lodging(lodging, user)
     if created:
         logger.info("comment_created [%s] %s" % (instance.id, instance))
         send_notification(
@@ -112,7 +112,7 @@ def on_comment_saved(sender, instance: models.Comment, created: bool, update_fie
 def on_comment_deleted(sender, instance: models.Comment, **kwargs):
     lodging = instance.booking.lodging
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodging, user.id)
+    users = get_listening_users_for_lodging(lodging, user)
     logger.info("comment_deleted [%s] %s" % (instance.id, instance))
     send_notification(
         "comment-deleted",

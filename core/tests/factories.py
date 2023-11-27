@@ -1,7 +1,9 @@
+import datetime
 import random
 
 import arrow
 import factory
+import factory.fuzzy
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 
@@ -11,14 +13,34 @@ from core import models
 class PlanFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Plan
-        django_get_or_create = ("ref",)
+        # django_get_or_create = ("ref",)
 
-    ref = "PLAN"
+    ref = factory.Sequence(lambda n: "PLAN_%d" % n)
     name = "default"
     max_lodgings = 10
     max_users = 10
     price = 10
     interval = "monthly"
+    lookup_key = factory.LazyAttribute(lambda p: p.ref.lower() + "-" + p.interval)
+
+
+class SubscriptionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Subscription
+        django_get_or_create = ("customer",)  # to avoid multiple creation by factory.RelatedFactory()
+
+    id = factory.Sequence(lambda n: "pk_sub_%d" % n)
+    plan = factory.SubFactory(PlanFactory)
+    customer = factory.SubFactory("core.tests.factories.SubscriptionFactory", subscription_set=None)
+    start_date = factory.Faker("date_time_between", start_date="-20d", end_date="-2d", tzinfo=datetime.UTC)
+    current_period_start = factory.LazyAttribute(lambda b: b.start_date)
+    current_period_end = factory.LazyAttribute(
+        lambda b: arrow.get(b.current_period_start)
+        .shift(months=(b.plan.interval == "monthly" and 1 or 0), years=(b.plan.interval == "yearly" and 1 or 0))
+        .datetime
+    )
+    # status=factory.fuzzy.FuzzyChoice(models.Subscription.Status, getter=lambda c: c)
+    status = "active"
 
 
 class AccountFactory(factory.django.DjangoModelFactory):
@@ -27,7 +49,8 @@ class AccountFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("name",)
 
     name = "default"
-    current_plan = factory.SubFactory(PlanFactory)
+    stripe_customer_id = factory.Sequence(lambda n: "pk_customer_%d" % n)
+    subscription_set = factory.RelatedFactory(SubscriptionFactory, factory_related_name="customer")
 
 
 class InactiveAccount(AccountFactory):
