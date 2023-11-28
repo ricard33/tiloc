@@ -168,9 +168,7 @@ class SignUpAPI(KnoxLoginView):
         if models.User.objects.filter(email=email):
             return Response({"error": "This email is already in use."}, status=status.HTTP_409_CONFLICT)
 
-        account = models.Account.objects.create(
-            name=serializer.validated_data["email"], validity=arrow.utcnow().shift(days=14).datetime
-        )
+        account = models.Account.objects.create(name=serializer.validated_data["email"])
         user = models.User.objects.create_user(
             serializer.validated_data["email"],
             serializer.validated_data["password"],
@@ -182,6 +180,32 @@ class SignUpAPI(KnoxLoginView):
         send_verification_email(user, context={"request": request})
         # raise APIException(detail="TEST")
         login(request, user)
+
+        # STRIPE API START
+        customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
+        account.stripe_customer_id = customer.id
+        account.save(update_fields=("stripe_customer_id",))
+        subscription = stripe.Subscription.create(
+            customer=customer.id,
+            items=[{"price": stripe_get_price("OWNER-MONTHLY")}],
+            trial_period_days=14,
+        )
+        # STRIPE API END
+        models.Subscription.objects.get_or_create(
+            id=subscription.id,
+            defaults=dict(
+                customer=user.account,
+                plan_id=subscription["items"].data[0].price.lookup_key,
+                created=arrow.get(subscription.created).datetime,
+                start_date=arrow.get(subscription.start_date).datetime,
+                current_period_start=arrow.get(subscription.current_period_start).datetime,
+                current_period_end=arrow.get(subscription.current_period_end).datetime,
+                status=subscription.status,
+                latest_invoice=subscription.latest_invoice,
+                default_payment_method=subscription.default_payment_method,
+            ),
+        )
+
         return super(SignUpAPI, self).post(request, format=None)
 
 
@@ -579,6 +603,19 @@ class Prices(APIView):
 # https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=elements
 
 
+def stripe_get_price(plan_ref):
+    try:
+        plan = models.Plan.objects.get(ref=plan_ref)
+        prices = stripe.Price.list(lookup_keys=[plan.lookup_key])
+        return prices.data[0]
+    except models.Plan.DoesNotExist:
+        logger.exception("Plan with ref=%s doesn't exist", plan_ref)
+        raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist") % {"plan_ref": plan_ref})
+    except Exception as e:
+        logger.exception("Error getting prices")
+        raise APIException(detail=str(e))
+
+
 class SubscriptionViewSet(ViewSet):
     permission_classes = [IsCompanyAdminPermissions]
 
@@ -586,7 +623,7 @@ class SubscriptionViewSet(ViewSet):
         plan_ref = request.data["plan"]
         user = request.user
 
-        price = self.get_price(plan_ref)
+        price = stripe_get_price(plan_ref)
 
         price_id = price.id
 
@@ -650,18 +687,6 @@ class SubscriptionViewSet(ViewSet):
                 }
             )
 
-    def get_price(self, plan_ref):
-        try:
-            plan = models.Plan.objects.get(ref=plan_ref)
-            prices = stripe.Price.list(lookup_keys=[plan.lookup_key])
-            return prices.data[0]
-        except models.Plan.DoesNotExist:
-            logger.exception("Plan with ref=%s doesn't exist", plan_ref)
-            raise APIException(detail=_("Price plan %(plan_ref)s doesn't exist") % {"plan_ref": plan_ref})
-        except Exception as e:
-            logger.exception("Error getting prices")
-            raise APIException(detail=str(e))
-
     def retrieve(self, request, pk=None):
         subscription = stripe.Subscription.retrieve(
             pk,  # request.GET.get("subscription_id"),
@@ -693,7 +718,7 @@ class SubscriptionViewSet(ViewSet):
         subscription = stripe.Subscription.retrieve(pk)
         plan_ref = request.GET["plan"]
         user = request.user
-        price = self.get_price(plan_ref)
+        price = stripe_get_price(plan_ref)
 
         # See what the next invoice would look like with a price switch
         # and proration set:
@@ -737,7 +762,7 @@ class SubscriptionViewSet(ViewSet):
         subscription = stripe.Subscription.retrieve(pk)
         plan_ref = request.data["plan"]
         user = request.user
-        price = self.get_price(plan_ref)
+        price = stripe_get_price(plan_ref)
 
         stripe.SubscriptionItem.modify(subscription["items"]["data"][0].id, price=price.id)
 
@@ -757,11 +782,20 @@ class SubscriptionViewSet(ViewSet):
 
         return Response(data=SubscriptionSerializer(models.Subscription.objects.get(id=subscription.id)).data)
 
+    @action(detail=True, methods=["POST"])
+    def create_customer_portal_session(self, request, pk):
+        return_url = request.data["return_url"]
+        session = stripe.billing_portal.Session.create(
+            customer=request.user.account.stripe_customer_id,
+            return_url=return_url,
+        )
+        return Response(data=session)
+
 
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
-    test_mode = settings.STRIPE_PRIVATE_API_KEY.startswith("sk_test_")
+    test_mode = settings.STRIPE_TEST_MODE
 
     sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
     event = None

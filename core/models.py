@@ -127,7 +127,8 @@ class Account(models.Model):
     def current_subscription(self):
         return (
             self.subscription_set.filter(
-                status=Subscription.Status.active.value, current_period_start__lte=arrow.utcnow().datetime
+                status__in=[Subscription.Status.active.value, Subscription.Status.trialing.value],
+                current_period_start__lte=arrow.utcnow().datetime
             )
             .order_by("-current_period_end")
             .first()
@@ -817,3 +818,21 @@ class Subscription(models.Model):
     cancel_at_period_end = models.BooleanField(default=False)
 
     _account_qs_path = "customer"
+
+    @property
+    def _base_stripe_url(self):
+        if settings.STRIPE_TEST_MODE:
+            return "https://dashboard.stripe.com/test/"
+        return "https://dashboard.stripe.com/"
+
+    @property
+    def subscription_url(self):
+        return self._base_stripe_url + "invoices/" + self.latest_invoice
+
+    @property
+    def latest_invoice_url(self):
+        return self._base_stripe_url + "invoices/" + self.latest_invoice
+
+    @property
+    def customer_dashboard_url(self):
+        return settings.STRIPE_CUSTOMER_DASHBOARD_URL  #+ "?prefilled_email=" + self.customer.

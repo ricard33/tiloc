@@ -325,7 +325,9 @@ def password_change_callback(user, password):
 
 # Global Package Settings
 EMAIL_FROM_ADDRESS = "Cédric de Tiloc <noreply@tiloc.fr>"  # mandatory
-EMAIL_PAGE_DOMAIN = config.get("EMAIL_VERIFICATION", "PAGE_DOMAIN", "https://app.tiloc.fr/")  # mandatory (unless you use a custom link)
+EMAIL_PAGE_DOMAIN = config.get(
+    "EMAIL_VERIFICATION", "PAGE_DOMAIN", "https://app.tiloc.fr/"
+)  # mandatory (unless you use a custom link)
 EMAIL_MULTI_USER = False  # optional (defaults to False)
 
 # Email Verification Settings (mandatory for email sending)
@@ -355,8 +357,11 @@ EMAIL_PASSWORD_CALLBACK = password_change_callback
 STRIPE_PUBLIC_API_KEY = config.get("STRIPE", "PUBLIC_API_KEY", "")
 STRIPE_PRIVATE_API_KEY = config.get("STRIPE", "PRIVATE_API_KEY", "")
 STRIPE_ENDPOINT_SECRET = config.get("STRIPE", "ENDPOINT_SECRET", "")
+STRIPE_CUSTOMER_DASHBOARD_URL = config.get("STRIPE", "CUSTOMER_DASHBOARD_URL", "")
+STRIPE_TEST_MODE = STRIPE_PRIVATE_API_KEY.startswith("sk_test_")
+
 
 NOTIFIER_BACKENDS = (
-    'notifier.backends.EmailBackend',
-    'core.notifier_backend.NoopBackend',
+    "notifier.backends.EmailBackend",
+    "core.notifier_backend.NoopBackend",
 )

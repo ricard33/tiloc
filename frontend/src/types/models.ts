@@ -20,6 +20,7 @@ export interface Subscription {
     type: string;
     description: string;
   };
+  customer_dashboard_url: string;
 }
 
 export interface Account {

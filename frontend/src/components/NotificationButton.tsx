@@ -10,7 +10,7 @@ import { Notification } from "../types";
 import { useNavigate } from "react-router-dom";
 
 const NotificationButton = () => {
-  const { data: notifications, refetch } = useListNotificationsQuery({}, { pollingInterval: 10000 });
+  const { data: notifications, refetch } = useListNotificationsQuery({}, { pollingInterval: 30000 });
   const [markNotificationAsRead] = useReadNotificationMutation();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();

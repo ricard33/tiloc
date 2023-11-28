@@ -1,0 +1,9 @@
+Un nouvel abonnement a été créé :
+    Compte      : {{ account }}
+    Utilisateur : {{ user }}
+    Plan        : {{ subscription.plan.name }}
+    Statut      : {{ subscription.status }}
+    Début       : {{ subscription.current_period_start }}
+    Fin         : {{ subscription.current_period_end }}
+    Url         : {{ subscription.subscription_url }}
+    Facture     : {{ subscription.subscription_url }}

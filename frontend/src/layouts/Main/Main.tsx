@@ -4,12 +4,16 @@ import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
 import { useTheme } from "@mui/material/styles";
-import { Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/material";
+import { Alert, Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/material";
 import { Footer, Sidebar, Topbar } from "./components";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import queryString from "query-string";
 import CheckoutResult from "../../components/CheckoutResult";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { User } from "../../types";
+import { differenceInCalendarDays } from "date-fns";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -42,6 +46,7 @@ const Main = () => {
     defaultMatches: true
   });
   const [openSidebar, setOpenSidebar] = useState(false);
+  const user = useSelector<RootState>(store => store.auth.user) as User;
   const query = queryString.parse(location.search) as { subscription_id: string };
   const { subscription_id } = query;
 
@@ -62,7 +67,7 @@ const Main = () => {
     "calendar-syncs": t("Calendars synchronization"),
     "profile": t("My profile"),
     "account": t("My account"),
-    "subscription": t("Subscription"),
+    "subscription": t("Subscription")
   };
 
 
@@ -76,6 +81,10 @@ const Main = () => {
 
   const shouldOpenSidebar = isDesktop ? true : openSidebar;
   const pathnames = location.pathname.split("/").filter((x) => x);
+  const trialDaysLeft = user.account.current_subscription && user.account.current_subscription.status === "trialing"
+    ? differenceInCalendarDays(user.account.current_subscription.current_period_end, new Date())
+    : -1
+  ;
 
   return (
     <div
@@ -110,7 +119,14 @@ const Main = () => {
             );
           })}
         </Breadcrumbs>
-        { subscription_id && <CheckoutResult subscriptionId={subscription_id} /> }
+        {subscription_id && <CheckoutResult subscriptionId={subscription_id} />}
+        {trialDaysLeft >= 0 &&
+          <Alert
+            severity={trialDaysLeft > 5 ? "info" : trialDaysLeft > 2 ? "warning" : "error"}
+            style={{ marginBottom: "1em" }}
+          >
+            {t("End of trial period in {{count}} days.", { count: trialDaysLeft })}
+          </Alert>}
         <Outlet />
         <Footer />
       </main>

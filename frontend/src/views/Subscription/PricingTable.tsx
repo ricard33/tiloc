@@ -10,13 +10,16 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Feature, Plan } from "./subscription_types";
 import FeaturesList from "./FeaturesList";
+import { HighlightBadge } from "../../components";
+
 
 type Props = {};
 
 const PricingTable = (props: Props) => {
   const { t } = useTranslation();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const [interval, setInterval] = useState<"monthly" | "yearly">("yearly");
+  const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
+  const currentPlanRef = user.account.current_plan ? user.account.current_plan.ref : "FREE";
 
   useEffect(() => {
     axios.get("/api/prices/")
@@ -63,7 +66,7 @@ const PricingTable = (props: Props) => {
   const plans = [
     {
       ref: "FREE",
-      title: t("Basic"), subtitle: t("Basic features"), slogan: t("Always free"),
+      title: t("Free"), subtitle: t("Basic features"), slogan: t("Always free"),
       price: { monthly: 0, yearly: 0 },
       features: basicFeatures
     },
@@ -88,27 +91,35 @@ const PricingTable = (props: Props) => {
   };
 
   function renderPlan(plan: Plan) {
+    const mostPopular = plan.ref === "OWNER" && interval === "monthly";
+    const isCurrentPlan = currentPlanRef === plan.ref || currentPlanRef === `${plan.ref}-${interval.toUpperCase()}`;
     return (
-      <Card key={plan.ref} sx={{ textAlign: "center" }}>
+      <Card key={plan.ref} sx={{ textAlign: "center", maxWidth: "20em", margin: "0 auto" }}>
         <CardHeader
-          title={plan.title} subheader={plan.subtitle}
-          sx={{ background: "linear-gradient(#f9f9f9, #f9f9f9)" }}
+          title={<>{plan.title}{mostPopular &&
+            <HighlightBadge label={t("MOST POPULAR")} sx={{ marginLeft: 2 }} color="warning" size="small" />}</>}
+          subheader={plan.subtitle}
+          sx={{ background: "linear-gradient(#f9f9f9, #f9f9f9)", minHeight: "7em" }}
         />
         <CardContent>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1em" }}>
-            <Stack direction="row" style={{}}>
-              <span style={{ fontSize: "3em" }}>{t("{{ price }}€", { price: plan.price[interval] })}</span>
-              <Stack style={{ fontSize: "1.2em", paddingTop: "0.2em", marginLeft: "0.3em", textAlign: "left" }}>
-                <span style={{}}>{t("per")}</span>
-                <span style={{}}>{intervalLabel[interval]}</span>
+            {plan.price[interval] > 0 ?
+              <Stack direction="row" style={{}}>
+                <span style={{ fontSize: "3em" }}>{t("{{ price }}€", { price: plan.price[interval] })}</span>
+                <Stack style={{ fontSize: "1.2em", paddingTop: "0.2em", marginLeft: "0.3em", textAlign: "left" }}>
+                  <span style={{}}>{t("per")}</span>
+                  <span style={{}}>{intervalLabel[interval]}</span>
+                </Stack>
               </Stack>
-            </Stack>
+              :
+              <span style={{ fontSize: "3em" }}>{t("Free")}</span>
+            }
           </div>
-          <Typography variant="body2">{plan.slogan}</Typography>
+          {/*<Typography variant="body2">{plan.slogan}</Typography>*/}
           <FeaturesList features={plan.features} />
         </CardContent>
         <CardActions sx={{ justifyContent: "space-around" }}>
-          {user.account.current_plan.ref === `${plan.ref}-${interval.toUpperCase()}`
+          {isCurrentPlan
             ? <Chip label={t("Current plan")} />
             :
             <Button
@@ -118,7 +129,7 @@ const PricingTable = (props: Props) => {
               {
                 plan.ref === "FREE"
                   ? t("Choose")
-                  : (user.account.current_subscription ? t("Subscribe") : t("Change"))
+                  : (!user.account.current_subscription ? t("Subscribe") : t("Change"))
               }</Button>
           }
         </CardActions>

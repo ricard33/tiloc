@@ -38,6 +38,7 @@ class PaymentMethodSerializer(serializers.Serializer):
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     default_payment_method = serializers.SerializerMethodField()
+    customer_dashboard_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = models.Subscription

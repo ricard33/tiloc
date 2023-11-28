@@ -121,3 +121,14 @@ def on_comment_deleted(sender, instance: models.Comment, **kwargs):
         "/bookings/%d" % instance.booking.id,
         context={"comment": instance},
     )
+
+
+@receiver(post_save, sender=models.Subscription)
+def on_subscription_saved(sender, instance: models.Subscription, created: bool, update_fields: List[str], **kwargs):
+    send_notification(
+        created and "subscription-added" or "subscription-modified",
+        models.User.objects.filter(is_staff=True),
+        _("New subscription: [%(subscription)s]") % {"subscription": instance},
+        context={"subscription": instance, "account": instance.customer, "user": get_current_user()},
+    )
+

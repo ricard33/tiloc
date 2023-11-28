@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Button, Card, CardActions, CardContent, CardHeader, Stack } from "@mui/material";
+import { Alert, Button, Card, CardActions, CardContent, CardHeader, Chip, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -22,14 +22,30 @@ function Subscription() {
   const dispatch = useDispatch();
   const { showSuccess, showError } = useAlert();
 
+  function openCustomerPortal() {
+    axios.post(`/api/subscription/${user.account.current_subscription.id}/create_customer_portal_session/`, {
+      return_url: window.location.href
+    })
+      .then(({ data, status }) => {
+        // console.log(data)
+        window.location.href = data.url;
+        // navigate("../subscription");
+      })
+      .catch((error) => {
+        console.error(error);
+        showError(t("Error while creating customer portal session."));
+      });
+
+  }
+
   function reactivateHandler() {
     confirm({
       title: t("Confirmation: reactivate your subscription?"),
-      description: t("Your subscription will be immediately reactivated without any service interruption. Renewal payments will take place at the same dates than before cancellation."),
+      description: t("Your subscription will be immediately reactivated without any service interruption. Renewal payments will take place at the same dates than before cancellation.")
     }).then(() => {
       console.info(`Reactivate subscription`);
       axios.post(`/api/subscription/${user.account.current_subscription.id}/reactivate/`)
-        .then(({data, status}) => {
+        .then(({ data, status }) => {
           showSuccess(t("Subscription reactivated"));
           dispatch(auth.subscriptionUpdated(data));
           // navigate("../subscription");
@@ -37,9 +53,8 @@ function Subscription() {
         .catch((error) => {
           console.error(error);
           showError(t("Error while reactivating subscription."));
-        })
-    })
-
+        });
+    });
   }
 
   return (
@@ -47,38 +62,62 @@ function Subscription() {
       <Card sx={{ maxWidth: "500px" }}>
         <CardHeader title={t("Subscription")} />
         <CardContent>
-          <Grid2 container spacing={2}>
-            <Label xs={5}>{t("Current plan")}</Label>
-            <Value xs={7}>{user.account.current_plan.name}</Value>
-            <Label xs={5}>{t("Renewal")}</Label>
-            <Value xs={7}>{user.account.current_subscription.cancel_at_period_end ?
-              <Alert severity="warning">
-                {t("Will be cancelled on {{date}}", { date: formatDate(user.account.validity, "PPPP") })}
-              </Alert>
-              : user.account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
-            <Label xs={5}>{t("Price")}</Label>
-            <Value xs={7}>{user.account.current_plan.interval === "monthly"
-              ? t("{{amount}} € / month", { amount: DecimalPrecision.round(user.account.current_plan.price) })
-              : t("{{amount}} € / year", { amount: DecimalPrecision.round(user.account.current_plan.price) })
-            }
-            </Value>
-            {!user.account.current_subscription.cancel_at_period_end &&
-              <>
-                <Label xs={5}>{t("Next billing")}</Label>
-                <Value xs={7}>{formatDate(user.account.validity, "PPPP")}</Value>
-              </>
-            }
-
-            <Label xs={5}>{t("Credit card")}</Label>
-            <Value xs={7}>{user.account.current_subscription.default_payment_method.description}</Value>
-          </Grid2>
+          {user.account.current_subscription ?
+            <Grid2 container spacing={2}>
+              <Label xs={5}>{t("Current plan")}</Label>
+              <Value xs={7}>
+                {user.account.current_subscription.status === "trialing" &&
+                  <Chip label={t("TRIAL PERIOD")} color="success" size="small" sx={{ marginRight: 1 }} />}
+                {user.account.current_plan.name}
+              </Value>
+              <Label xs={5}>{t("Renewal")}</Label>
+              <Value xs={7}>
+                {user.account.current_subscription.cancel_at_period_end ?
+                  <Alert severity="warning">
+                    {t("Will be cancelled on {{date}}", { date: formatDate(user.account.validity, "PPPP") })}
+                  </Alert>
+                  : user.account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
+              <Label xs={5}>{t("Price")}</Label>
+              <Value xs={7}>{user.account.current_plan.interval === "monthly"
+                ? t("{{amount}} € / month", { amount: DecimalPrecision.round(user.account.current_plan.price) })
+                : t("{{amount}} € / year", { amount: DecimalPrecision.round(user.account.current_plan.price) })
+              }
+              </Value>
+              {!user.account.current_subscription.cancel_at_period_end &&
+                <>
+                  <Label xs={5}>{t("Next billing")}</Label>
+                  <Value xs={7}>{formatDate(user.account.validity, "PPPP")}</Value>
+                </>
+              }
+              {user.account.current_subscription.default_payment_method &&
+                <>
+                  <Label xs={5}>{t("Credit card")}</Label>
+                  <Value xs={7}>{user.account.current_subscription.default_payment_method.description}</Value>
+                </>
+              }
+              <Label xs={5}>{t("Customer portal")}</Label>
+              <Value xs={7}>
+                <Button variant="contained" onClick={() => openCustomerPortal()}>
+                  {t("Customer portal")}
+                </Button>
+              </Value>
+            </Grid2>
+            :
+            <Alert severity="warning">{t("No active subscription")}</Alert>
+          }
         </CardContent>
         <CardActions>
           <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
-            <Button component={Link} to="../prices">{t("Change plan")}</Button>
-            {user.account.current_subscription.cancel_at_period_end
-              ? <Button onClick={() => reactivateHandler()} color="primary">{t("Reactivate subscription")}</Button>
-              : <Button component={Link} to="../cancel" color="warning">{t("Cancel subscription")}</Button>
+            {user.account.current_subscription ?
+              <>
+                <Button component={Link} to="../prices">{t("Change plan")}</Button>
+                {user.account.current_subscription.cancel_at_period_end
+                  ? <Button onClick={() => reactivateHandler()} color="primary">{t("Reactivate subscription")}</Button>
+                  : <Button component={Link} to="../cancel" color="warning">{t("Cancel subscription")}</Button>
+                }
+              </>
+              :
+              <Button component={Link} to="../prices">{t("Subscribe plan")}</Button>
             }
           </Stack>
         </CardActions>
