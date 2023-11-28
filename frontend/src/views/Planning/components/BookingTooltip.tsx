@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import { Booking, BookingStatus } from "../../../types";
 import { formatDate } from "../../../common/dateUtils";
 import { useTranslation } from "react-i18next";
-import { getBookingStatus, otaBranding } from "../../../common/statusUtils";
+import { getBookingStatus, otaBranding, OtaIconProps } from "../../../common/statusUtils";
 
 type Props = {
   booking: Booking;
@@ -15,7 +15,7 @@ export default function BookingTooltip(props: Props) {
   const { booking, onOpenBooking } = props;
   const { t } = useTranslation();
   const status = getBookingStatus(booking.status);
-  const statusDisplay = status.name === BookingStatus.External.name && booking.source && booking.source.name in otaBranding
+  const statusDisplay: OtaIconProps & {label: string} = status.name === BookingStatus.External.name && booking.source && booking.source.name in otaBranding
     ? { label: booking.source.name, ...otaBranding[booking.source.name] }
     : { label: status.getLabel(t), bgColor: status.color };
   return (

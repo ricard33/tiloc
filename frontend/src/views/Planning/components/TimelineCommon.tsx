@@ -44,7 +44,7 @@ export type TimelineItem = {
   booking: Booking,
   color: string,
   bgColor: string,
-  selectedBgColor: string,
+  selectedBgColor?: string,
   icon?: ReactElement,
 };
 
@@ -160,7 +160,8 @@ function getIconAndBgColor(booking: Booking): OtaIconProps {
     return otaBranding[booking.source.name];
   } else
     return {
-      bgColor: getBookingStatus(booking.status).color
+      bgColor: getBookingStatus(booking.status).color,
+      selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1),
     };
 }
 
@@ -179,9 +180,11 @@ export function makeItems(bookings: Booking[]): TimelineItem[] {
     ...(
       booking.status === BookingStatus.External.name
         ? getIconAndBgColor(booking)
-        : { bgColor: getBookingStatus(booking.status).color }
+        : {
+          bgColor: getBookingStatus(booking.status).color,
+          selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1)
+        }
     ),
-    selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1),
     itemProps: {
       // these optional attributes are passed to the root <div /> of each item as <div {...itemProps} />
       // "data-custom-attribute": "Random content",
@@ -223,7 +226,7 @@ export function makeRenderItem(onOpenBooking: (booking: Booking) => void, settin
       ...item.itemProps,
       style: {
         color: item.color,
-        backgroundColor,
+        background: backgroundColor,
         opacity: item.booking.lodging_id > 0 && !item.booking.cancelled ? undefined : "50%",
         borderRadius: 4,
         borderLeftWidth: itemContext.selected ? 3 : 1,

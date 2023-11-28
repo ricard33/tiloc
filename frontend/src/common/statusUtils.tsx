@@ -5,6 +5,7 @@ import { faAirbnb } from "@fortawesome/free-brands-svg-icons/faAirbnb";
 import { ReactComponent as BookingIcon } from "../assets/icones/Booking.com.svg";
 import { ReactComponent as HomeawayIcon } from "../assets/icones/homeaway.svg";
 import { ReactComponent as TripadvisorIcon } from "../assets/icones/tripadvisor.svg";
+import { darken } from "@mui/system";
 
 export const getBookingStatus = (name: string) => {
   for (let key in BookingStatus) {
@@ -23,6 +24,7 @@ export const getBookingStatuses = () => {
 export interface OtaIconProps {
   color?: string;
   bgColor: string;
+  selectedBgColor?: string;
   icon?: ReactElement<any, any>;
 }
 
@@ -37,6 +39,7 @@ export const otaBranding: {
   "Airbnb": {
     color: "white",
     bgColor: "#EB4C60",
+    selectedBgColor: darken("#EB4C60", 0.1),
     icon:
       <FontAwesomeSvgIcon
         icon={faAirbnb}
@@ -48,6 +51,7 @@ export const otaBranding: {
   "Booking.com": {
     color: "white",
     bgColor: "#163A8F",
+    selectedBgColor: darken("#163A8F", 0.1),
     icon:
       <BookingIcon
         className="ota-icon"
@@ -59,6 +63,7 @@ export const otaBranding: {
   "Abritel": {
     color: "white",
     bgColor: "#0167DC",
+    selectedBgColor: darken("#0167DC", 0.1),
     icon:
       <HomeawayIcon
         style={{
@@ -69,6 +74,7 @@ export const otaBranding: {
   "Tripadvisor": {
     color: "white",
     bgColor: "#579641",
+    selectedBgColor: darken("#579641", 0.1),
     icon:
       <TripadvisorIcon
         style={{
