@@ -59,29 +59,29 @@ loggly-python-handler = "^1.0.1"
 my-django-tweaks = "^0.0.6"
 newrelic = "^9.0.0"
 pdfkit = "^1.0.0"
-Pillow = "^9.3.0"
+Pillow = "^10.1.0"
 requests = "^2.28.1"
 smartconfigparser = "^1.0.0"
 whitenoise = { version = "^6.2.0", extras = ["brotli"] }
 psycopg2-binary = "^2.9.7"
-faker = "^19.3.0"
+faker = "^20.1.0"
 django-email-verification = "^0.3.3"
 stripe = "^7.5.0"
 django-notifier-plus = {git = "https://github.com/ricard33/django-notifier-plus.git", develop = true}
 
 [tool.poetry.group.dev.dependencies]
-coverage = "^6.5.0"
+coverage = "^7.3.2"
 fabric = "^3.0"
 factory_boy = "*"
-flake8 = "^5.0.4"
+flake8 = "^6.1.0"
 isort = "^5.6.4"
 patchwork = {git = "https://github.com/ricard33/patchwork.git", rev = "fabric3"}
 pep8 = "^1.7.1"
-pytest = "^6.2.5"
-pytest-django = "^4.5.2"
-black = "^22.10.0"
+pytest = "^7.4.3"
+pytest-django = "^4.7.0"
+black = "^23.11.0"
 pytest-cov = "^4.0.0"
-setuptools = "^68.1.2"
+setuptools = "^69.0.2"
 
 [build-system]
 requires = ["poetry-core"]

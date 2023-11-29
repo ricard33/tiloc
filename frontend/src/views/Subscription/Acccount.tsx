@@ -6,7 +6,6 @@ import { RootState } from "../../store";
 import { User } from "../../types";
 import Page from "../../layouts/Main/Page";
 import { Alert } from "@mui/material";
-import { differenceInCalendarDays } from "date-fns";
 
 const Account = () => {
   const { t } = useTranslation();
