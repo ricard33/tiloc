@@ -38,7 +38,7 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
   const navigate = useNavigate();
   const { showError, showSuccess } = useAlert();
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canAdd = user.permissions.includes("core.add_lodging");
+  const canAdd = user.permissions.includes("core.add_lodging") && data && data.length < user.account.current_plan.max_lodgings;
   const canChange = user.permissions.includes("core.change_lodging");
 
   const onRankUpDown = React.useCallback((lodging: Lodging, direction: "up" | "down") => {

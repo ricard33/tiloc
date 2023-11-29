@@ -150,7 +150,7 @@ const Planning = () => {
         <>
           <BookingTimeline
             bookings={bookings ?? []}
-            lodgings={[...(lodgings ?? [])]}
+            lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
             endDate={dates.end}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
@@ -167,7 +167,7 @@ const Planning = () => {
           />
           <BookingScheduler
             bookings={bookings ?? []}
-            lodgings={[...(lodgings ?? [])]}
+            lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
             onOpenBooking={onEditBooking}

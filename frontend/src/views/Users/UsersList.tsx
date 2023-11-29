@@ -17,7 +17,7 @@ const UsersList: React.FunctionComponent<Props> = () => {
   const { data } = useListUsersQuery({}, { refetchOnMountOrArgChange: 20 });
   const navigate = useNavigate();
   const user = useSelector<RootState>((store) => store.auth.user) as User;
-  const canAdd = user.permissions.includes("core.add_user");
+  const canAdd = user.permissions.includes("core.add_user") && data && data.length < user.account.current_plan.max_users;
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 70 },
