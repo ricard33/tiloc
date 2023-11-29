@@ -51,7 +51,7 @@
     "@stripe/stripe-js": "^2.1.11",
     "@ti-gecko/react-calendar-timeline": "^0.30.4",
     "@ti-gecko/tiloc-ckeditor5": "file:./ckeditor5",
-    "axios": "^0.25.0",
+    "axios": "^1.6.0",
     "chart.js": "^4.1.1",
     "classnames": "^2.3.2",
     "clsx": "^1.2.1",
