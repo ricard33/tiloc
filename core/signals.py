@@ -131,4 +131,3 @@ def on_subscription_saved(sender, instance: models.Subscription, created: bool, 
         _("New subscription: [%(subscription)s]") % {"subscription": instance},
         context={"subscription": instance, "account": instance.customer, "user": get_current_user()},
     )
-

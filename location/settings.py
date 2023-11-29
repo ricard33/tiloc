@@ -288,6 +288,7 @@ APP_NAME = _("Tiloc")
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
     "DEBUG": (False, "Turn on DEBUG information on Django"),
+    "CAN_SIGNUP": (False, "Turn on/off new accounts signup")
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True

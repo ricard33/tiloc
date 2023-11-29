@@ -27,7 +27,7 @@ class ContractTestCase(APITestCase):
         generate_contract(booking)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
-        self.assertEqual("", booking.contract.content)
+        self.assertIn(booking.lodging.name, booking.contract.content)
 
     def test_generate_contract_with_api(self):
         user = factories.StandardUserFactory.create()

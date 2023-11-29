@@ -49,7 +49,7 @@ urlpatterns = [
     path("api/", include((router.urls, "drf"), namespace="api")),
     path("email/", include(email_urls)),  # connect them to an arbitrary path
 
-    re_path(r"^api/info/", api.version_view, name="version"),
+    re_path(r"^api/info/", api.info_view, name="version"),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # re_path("^api/auth/register/$", api.RegistrationAPI.as_view()),
     re_path("^api/auth/login/$", api.LoginAPI.as_view()),

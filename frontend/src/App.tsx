@@ -4,7 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import validate from "validate.js";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "./actions";
+import { appInfoLoaded, auth } from "./actions";
 import "./assets/scss/index.scss";
 import validators from "./common/validators";
 import Routes from "./Routes";
@@ -18,9 +18,10 @@ import { useCurrentUserQuery } from "./services/api";
 import { RootState } from "./store";
 import { DateProvider } from "@ti-gecko/react-calendar-timeline";
 import { useAlert } from "./common/alertUtils";
-import { differenceInCalendarDays, formatDistanceToNow } from "date-fns";
+import { differenceInCalendarDays, formatDistanceToNow, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { isValidDate } from "./common/dateUtils";
+import { formatDate, isValidDate } from "./common/dateUtils";
+import axios from "axios";
 
 validate.validators = {
   ...validate.validators,
@@ -42,6 +43,20 @@ function App(props: Props) {
     // dispatch(auth.userLoading());
     refetchUser();
   }, [dispatch, refetchUser, token]);
+
+  useEffect(() => {
+    axios.get("/api/info/")
+      .then(response => {
+        // console.debug(response);
+        dispatch(appInfoLoaded({
+          version: response.data.version,
+          buildDate: formatDate(parseISO(response.data.build_date)),
+          canRegister: response.data.can_register,
+        }))
+      })
+      .catch(() => {
+      });
+  }, [dispatch]);
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);

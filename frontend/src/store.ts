@@ -17,6 +17,7 @@ export const store = configureStore({
     return combineReducers({
       alert: reducers.alert,
       auth: reducers.auth,
+      appInfo: reducers.appInfo,
       [api.reducerPath]: api.reducer
     })(state, action);
   },

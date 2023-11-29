@@ -843,4 +843,4 @@ class Subscription(models.Model):
 
     @property
     def customer_dashboard_url(self):
-        return settings.STRIPE_CUSTOMER_DASHBOARD_URL  #+ "?prefilled_email=" + self.customer.
+        return settings.STRIPE_CUSTOMER_DASHBOARD_URL  # + "?prefilled_email=" + self.customer.

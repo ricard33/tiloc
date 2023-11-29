@@ -1,3 +1,4 @@
+export const APP_INFO_LOADED = "APP_INFO_LOADED";
 export const USER_LOADING = "USER_LOADING";
 export const USER_LOADED = "USER_LOADED";
 export const LOGIN_REQUEST = "LOGIN_REQUEST";

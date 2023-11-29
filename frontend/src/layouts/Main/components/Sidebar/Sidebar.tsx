@@ -1,38 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { makeStyles } from "@mui/styles";
 import { Drawer, Theme } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import GroupIcon from "@mui/icons-material/Group";
-// import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MovingIcon from "@mui/icons-material/Moving";
 import CalendarIcon from "@mui/icons-material/CalendarToday";
 import ListIcon from "@mui/icons-material/List";
-// import MoneyIcon from "@mui/icons-material/AttachMoney";
-// import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-// import HotelIcon from "@mui/icons-material/Hotel";
-// import RoomServiceIcon from "@mui/icons-material/RoomService";
-// import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import PriceCheckIcon from "@mui/icons-material/PriceCheck";
-// import { ReactComponent as BookingSourcesIcon } from "../../../../assets/icones/booking-sources.svg";
-// import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
-import { parseISO } from "date-fns";
-
 import { SidebarNav, UpgradePlan } from "./components";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { formatDate } from "../../../../common/dateUtils";
 import { useLocation } from "react-router-dom";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
-import { User } from "../../../../types";
+import { AppInfo, User } from "../../../../types";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-// import { useSelector } from "react-redux";
-// import { RootState } from "../../../../store";
-// import { User } from "../../../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -77,10 +62,10 @@ const Sidebar: React.FC<Props> = props => {
 
   const classes = useStyles();
   const { t } = useTranslation();
-  const [version, setVersion] = useState({ version: "?", build_date: "-" });
   const location = useLocation();
   const locationPathname = location.pathname;
   const user = useSelector<RootState>(store => store.auth.user) as User;
+  const appInfo = useSelector<RootState>(store => store.appInfo) as AppInfo;
   // const canViewUsers = user.permissions.includes("core.view_user");
 
   const menus = [
@@ -143,19 +128,6 @@ const Sidebar: React.FC<Props> = props => {
     || menu.url === "/"
   )[0];
 
-  useEffect(() => {
-    axios.get("/api/info/")
-      .then(response => {
-        // console.debug(response);
-        setVersion({
-          version: response.data.version,
-          build_date: formatDate(parseISO(response.data.build_date))
-        });
-      })
-      .catch(() => {
-      });
-  }, []);
-
   return (
     <Drawer
       anchor="left"
@@ -172,8 +144,8 @@ const Sidebar: React.FC<Props> = props => {
         />
         {user.account.trial_is_over && <UpgradePlan />}
         <div className={classes.version}>
-          <div>{t("version")} {version.version}</div>
-          <div>{t("build on")} {version.build_date}</div>
+          <div>{t("version")} {appInfo.version}</div>
+          <div>{t("build on")} {appInfo.buildDate}</div>
         </div>
       </div>
     </Drawer>

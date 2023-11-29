@@ -4,14 +4,25 @@ import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { QueryError, useGetUserQuery, useSignupMutation } from "../../services/api";
 import { Trans, useTranslation } from "react-i18next";
 import { useAlert } from "../../common/alertUtils";
-import { LoginInfo } from "../../types";
+import { AppInfo, LoginInfo } from "../../types";
 import { FormContainer, PasswordElement, PasswordRepeatElement, TextFieldElement } from "react-hook-form-mui";
-import { Button, Container, Link, Paper, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  Container,
+  Link,
+  Paper,
+  Stack,
+  Typography,
+  Unstable_Grid2 as Grid2
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { SerializedError } from "@reduxjs/toolkit";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { auth } from "../../actions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 type SignUpData = {
   first_name: string;
@@ -28,16 +39,20 @@ export function SignUp() {
     isLoading
   } = useGetUserQuery(Number(userId), { skip: typeof userId === "undefined" });
   const { showError } = useAlert();
-  const formContext = useForm<SignUpData>({
-  });
+  const formContext = useForm<SignUpData>({});
   const { formState } = formContext;
   const { isDirty } = formState;
   const [doSignup] = useSignupMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const appInfo = useSelector<RootState>(store => store.appInfo) as AppInfo;
 
   const onSubmit = (formData: SignUpData) => {
-    doSignup(formData).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
+    doSignup(formData).then((result: {
+      data: LoginInfo
+    } | {
+      error: QueryError | SerializedError
+    }) => {
       const { data, error } = result as any;
       if (error) {
         showError(t("SignUp error: ") + fetchErrorDecode(error));
@@ -51,6 +66,19 @@ export function SignUp() {
 
   // console.log(error)
   if (isLoading) return <div>{t("Loading...")}</div>;
+  if (!appInfo.canRegister) {
+    return (
+      <Container maxWidth="sm" sx={{ display: "flex", height: "100%", alignItems: "center" }}>
+        <Stack>
+
+          <Alert severity="warning">
+            <AlertTitle>{t("Signups closed")}</AlertTitle>
+            {t("Signups aren't currently opened. Only existing users can signin this application.")}</Alert>
+          <Button component={RouterLink} to={"/"} variant="contained">{t("Back")}</Button>
+        </Stack>
+      </Container>
+    );
+  }
   return (
     <Container maxWidth="sm" sx={{ display: "flex", height: "100%", alignItems: "center" }}>
       <FormContainer

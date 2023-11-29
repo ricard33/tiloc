@@ -6,6 +6,7 @@ from decimal import Decimal
 import arrow
 import jinja2
 import stripe
+from constance import config
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
@@ -104,11 +105,12 @@ class OrderedModelMixin:
 
 @api_view()
 @permission_classes([AllowAny])
-def version_view(request, *args, **kwargs):
+def info_view(request, *args, **kwargs):
     return Response(
         {
             "version": __version__,
             "build_date": __date__.isoformat(timespec="seconds"),
+            "can_register": config.CAN_SIGNUP,
         }
     )
 

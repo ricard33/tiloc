@@ -7,6 +7,12 @@ export interface Pagination<T> {
   results: T[];
 }
 
+export interface AppInfo {
+  version: string;
+  buildDate: string;
+  canRegister: boolean;
+}
+
 const t = (s: string) => s;
 
 export class BookingStatus {
