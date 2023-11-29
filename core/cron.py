@@ -28,9 +28,10 @@ class SyncBookingsJob(CronJobBase):
         t0 = time()
         logger.info("Starting booking synchronizer")
         for sync in (
-            models.BookingChannelSync.objects.exclude(channel__account__name=settings.DEMO_ACCOUNT_NAME)
-            .exclude(channel__account__is_active=False)
-            .exclude(channel__account__validity__lt=arrow.utcnow().datetime)
+            models.BookingChannelSync.objects.exclude(lodging__account__name=settings.DEMO_ACCOUNT_NAME)
+            .exclude(lodging__account__is_active=False)
+            .filter(lodging__account__subscription__status__in=[models.Subscription.Status.active.value,
+                                                                models.Subscription.Status.trialing.value])
             .filter(active=True)
         ):
             logger.info("[%s] Synchronize bookings from [%s]", sync.lodging.name, sync.channel.name)

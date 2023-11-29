@@ -453,7 +453,7 @@ class BookingChannelSync(models.Model):
     )
     last_import_error = models.TextField(null=True, blank=True)
 
-    _account_qs_path = "channel__account"
+    _account_qs_path = "lodging__account"
     _lodging_qs_path = "lodging"
     objects = ForUserQuerySet.as_manager()
 
