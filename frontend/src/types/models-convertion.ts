@@ -9,7 +9,7 @@ import {
   Payment,
   Service,
   User,
-  Notification,
+  Notification
 } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
@@ -58,7 +58,7 @@ export function api2User(user: Record<string, any>): User {
   return {
     ...user as User,
     vat_rate: Number(user.vat_rate),
-    account: api2Account(user.account),
+    account: api2Account(user.account)
   };
 }
 
@@ -89,14 +89,18 @@ export function api2Account(account: Record<string, any>): Account {
     validity: parseISO(account.validity),
     current_plan: {
       ...account.current_plan,
-      price: Number(account.current_plan.price),
+      price: Number(account.current_plan.price)
     },
     current_subscription: {
       ...account.current_subscription,
-      created: parseISO(account.current_subscription.created),
-      start_date: parseISO(account.current_subscription.start_date),
-      current_period_start: parseISO(account.current_subscription.current_period_start),
-      current_period_end: parseISO(account.current_subscription.current_period_end),
+      ...(account.current_subscription ?
+        {
+          created: parseISO(account.current_subscription.created),
+          start_date: parseISO(account.current_subscription.start_date),
+          current_period_start: parseISO(account.current_subscription.current_period_start),
+          current_period_end: parseISO(account.current_subscription.current_period_end)
+        }
+        : {})
     }
   };
 }
@@ -104,7 +108,7 @@ export function api2Account(account: Record<string, any>): Account {
 export function account2Api(account: Partial<Account>): Record<string, any> {
   const { created, validity, ...rest } = account;
   return {
-    ...rest,
+    ...rest
     // ...(account.created && { begin_date: formatISO(account.created) }),
   };
 }
@@ -210,6 +214,6 @@ export function api2CalendarSync(calendarSync: Record<string, any>): CalendarSyn
 export function api2Notification(notification: Record<string, any>): Notification {
   return {
     ...notification as Notification,
-    date: parseISO(notification.date),
+    date: parseISO(notification.date)
   };
 }
