@@ -7,6 +7,7 @@ import arrow
 from babel.dates import format_date as babel_format_date
 from babel.numbers import format_decimal as babel_format_decimal
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 from core.models import BookedService, Booking, Contract
 
@@ -140,7 +141,9 @@ def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True):
         booking.contract.content = content
     else:
         logger.warning("Contract template not set for lodging '%s', can't generate a contract", booking.lodging)
-        booking.contract.content = ""
+        booking.contract.content = _(
+            "Contract template not set for lodging '%(lodging)s', can't generate a contract"
+        ) % {"lodging": booking.lodging.name}
     if save:
         booking.contract.save()
     return booking.contract

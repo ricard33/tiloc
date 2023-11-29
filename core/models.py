@@ -153,6 +153,14 @@ class Account(models.Model):
         return self.validity and self.validity < arrow.utcnow().datetime or self.current_plan is None
 
     @property
+    def is_free_plan(self):
+        return self.current_plan is None or self.current_plan.ref == "FREE"
+
+    @property
+    def is_trial_period(self):
+        return not self.is_free_plan and self.current_subscription.status == Subscription.Status.trialing.value
+
+    @property
     def max_lodgings(self):
         return self.trial_is_over and 1 or self.current_plan.max_lodgings
 

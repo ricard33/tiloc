@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Python" pattern="file:*.py||file:.coverage||file:.flake8||file:pyproject.toml||file:poetry.lock||file:Readme.md||file:TODO.md||file:templates//*||file[tiloc]:core//*||file[tiloc]:location//*||file[tiloc]:deployment//*" />
+  <scope name="Python" pattern="file:*.py||file:.coverage||file:.flake8||file:pyproject.toml||file:poetry.lock||file:Readme.md||file:TODO.md||file:templates//*||file[tiloc]:core//*||file[tiloc]:location//*||file[tiloc]:deployment//*||file[tiloc]:locale//*" />
 </component>

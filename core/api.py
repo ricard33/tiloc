@@ -449,6 +449,7 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
             generate_pdf(
                 generate_empty_contract(lodging, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
                 full_path,
+                request.user.account.is_free_plan,
             )
         except jinja2.exceptions.TemplateError as ex:
             logger.exception("Template generation error")
@@ -514,7 +515,7 @@ class ContractViewSet(viewsets.ModelViewSet):
         full_path = os.path.join(settings.MEDIA_ROOT, rel_path)
         if contract.pdf_created is None or contract.modified > contract.pdf_created or not os.path.exists(full_path):
             os.makedirs(os.path.split(full_path)[0], exist_ok=True)
-            generate_pdf(contract.content, full_path)
+            generate_pdf(contract.content, full_path, request.user.account.is_free_plan)
             models.Contract.objects.filter(id=pk).update(pdf=rel_path, pdf_created=arrow.utcnow().isoformat(sep=" "))
 
         if os.path.exists(full_path):
