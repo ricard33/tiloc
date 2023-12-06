@@ -30,9 +30,6 @@ files = [
     {file = "asgiref-3.7.2.tar.gz", hash = "sha256:9e0ce3aa93a819ba5b45120216b23878cf6e8525eb3848653452b4192b92afed"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4", markers = "python_version < \"3.11\""}
-
 [package.extras]
 tests = ["mypy (>=0.800)", "pytest", "pytest-asyncio"]
 
@@ -133,8 +130,6 @@ mypy-extensions = ">=0.4.3"
 packaging = ">=22.0"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
-tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
-typing-extensions = {version = ">=4.0.1", markers = "python_version < \"3.11\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -525,9 +520,6 @@ files = [
     {file = "coverage-7.3.2.tar.gz", hash = "sha256:be32ad29341b0170e795ca590e1c07e81fc061cb5b10c74ce7203491484404ef"},
 ]
 
-[package.dependencies]
-tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.11.0a6\" and extra == \"toml\""}
-
 [package.extras]
 toml = ["tomli"]
 
@@ -645,13 +637,13 @@ dev = ["attribution (==1.6.2)", "black (==23.3.0)", "flit (==3.8.0)", "mypy (==1
 
 [[package]]
 name = "django"
-version = "4.2.7"
+version = "4.2.8"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Django-4.2.7-py3-none-any.whl", hash = "sha256:e1d37c51ad26186de355cbcec16613ebdabfa9689bbade9c538835205a8abbe9"},
-    {file = "Django-4.2.7.tar.gz", hash = "sha256:8e0f1c2c2786b5c0e39fe1afce24c926040fad47c8ea8ad30aaf1188df29fc41"},
+    {file = "Django-4.2.8-py3-none-any.whl", hash = "sha256:6cb5dcea9e3d12c47834d32156b8841f533a4493c688e2718cafd51aa430ba6d"},
+    {file = "Django-4.2.8.tar.gz", hash = "sha256:d69d5e36cc5d9f4eb4872be36c622878afcdce94062716cf3e25bcedcb168b62"},
 ]
 
 [package.dependencies]
@@ -742,13 +734,13 @@ validators = "*"
 
 [[package]]
 name = "django-filter"
-version = "23.4"
+version = "23.5"
 description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "django-filter-23.4.tar.gz", hash = "sha256:bed070b38359dce7d2dbe057b165d59773057986356cb809ded983b36c77a976"},
-    {file = "django_filter-23.4-py3-none-any.whl", hash = "sha256:526954f18bd7d6423f232a9a7974f58fbc6863908b9fc160de075e01adcc2a5f"},
+    {file = "django-filter-23.5.tar.gz", hash = "sha256:67583aa43b91fe8c49f74a832d95f4d8442be628fd4c6d65e9f811f5153a4e5c"},
+    {file = "django_filter-23.5-py3-none-any.whl", hash = "sha256:99122a201d83860aef4fe77758b69dda913e874cc5e0eaa50a86b0b18d708400"},
 ]
 
 [package.dependencies]
@@ -901,20 +893,6 @@ files = [
     {file = "et_xmlfile-1.1.0-py3-none-any.whl", hash = "sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada"},
     {file = "et_xmlfile-1.1.0.tar.gz", hash = "sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c"},
 ]
-
-[[package]]
-name = "exceptiongroup"
-version = "1.2.0"
-description = "Backport of PEP 654 (exception groups)"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
-    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
-]
-
-[package.extras]
-test = ["pytest (>=6)"]
 
 [[package]]
 name = "fabric"
@@ -1508,13 +1486,13 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "platformdirs"
-version = "4.0.0"
+version = "4.1.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "platformdirs-4.0.0-py3-none-any.whl", hash = "sha256:118c954d7e949b35437270383a3f2531e99dd93cf7ce4dc8340d3356d30f173b"},
-    {file = "platformdirs-4.0.0.tar.gz", hash = "sha256:cb633b2bcf10c51af60beb0ab06d2f1d69064b43abf4c185ca6b28865f3f9731"},
+    {file = "platformdirs-4.1.0-py3-none-any.whl", hash = "sha256:11c8f37bcca40db96d8144522d925583bdb7a31f7b0e37e3ed4318400a8e2380"},
+    {file = "platformdirs-4.1.0.tar.gz", hash = "sha256:906d548203468492d432bcb294d4bc2fff751bf84971fbb2c10918cc206ee420"},
 ]
 
 [package.extras]
@@ -1706,11 +1684,9 @@ files = [
 
 [package.dependencies]
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
-exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
 iniconfig = "*"
 packaging = "*"
 pluggy = ">=0.12,<2.0"
-tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
@@ -2036,13 +2012,13 @@ test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "stripe"
-version = "7.6.0"
+version = "7.7.0"
 description = "Python bindings for the Stripe API"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "stripe-7.6.0-py2.py3-none-any.whl", hash = "sha256:7bd0c0af5426a9842a3587a63265b916a3213395ed9c34f16c9f1ce365937357"},
-    {file = "stripe-7.6.0.tar.gz", hash = "sha256:69e6b80f76f9587c8326e43232d2e9f24d2129a61b995d5a14deb3813048896a"},
+    {file = "stripe-7.7.0-py2.py3-none-any.whl", hash = "sha256:4abaf64dab50c6309a258c63f609b8b41ccb4fd776b052fc6fad4aa6943e053f"},
+    {file = "stripe-7.7.0.tar.gz", hash = "sha256:e13fe07d4d2334c8338ea269a21673a4e7f862a7548e1eddac4aa020b596db96"},
 ]
 
 [package.dependencies]
@@ -2077,17 +2053,6 @@ pandas = ["pandas"]
 xls = ["xlrd", "xlwt"]
 xlsx = ["openpyxl (>=2.6.0)"]
 yaml = ["pyyaml"]
-
-[[package]]
-name = "tomli"
-version = "2.0.1"
-description = "A lil' TOML parser"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
-    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
-]
 
 [[package]]
 name = "types-python-dateutil"
@@ -2335,5 +2300,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "10ff8161c0e871fe999473eafedb75b744205de1c5caa732d95f8e8702c1ca13"
+python-versions = "^3.12"
+content-hash = "22c7ca42e34897c6888b5b845dd8dc65218a8949e30563901bf4d4563fbb886a"

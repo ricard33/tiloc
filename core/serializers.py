@@ -130,7 +130,7 @@ class UserSerializer(serializers.ModelSerializer):
     permissions = serializers.SerializerMethodField(read_only=True)
     groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
     lodgings = FilteredSlugRelatedField(many=True, queryset=Lodging.objects.all(), slug_field="name", required=False)
-    tz = TimeZoneSerializerField()
+    tz = TimeZoneSerializerField(required=False)
 
     class Meta:
         model = User
