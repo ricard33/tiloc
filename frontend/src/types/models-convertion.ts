@@ -91,17 +91,17 @@ export function api2Account(account: Record<string, any>): Account {
       ...account.current_plan,
       price: Number(account.current_plan.price)
     },
-    current_subscription: {
-      ...account.current_subscription,
-      ...(account.current_subscription ?
-        {
+    ...(account.current_subscription ?
+      {
+        current_subscription: {
+          ...account.current_subscription,
           created: parseISO(account.current_subscription.created),
           start_date: parseISO(account.current_subscription.start_date),
           current_period_start: parseISO(account.current_subscription.current_period_start),
           current_period_end: parseISO(account.current_subscription.current_period_end)
         }
-        : {})
-    }
+      }
+      : {})
   };
 }
 

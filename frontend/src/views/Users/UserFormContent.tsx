@@ -15,6 +15,7 @@ import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import UnverifiedUserIcon from "@mui/icons-material/GppMaybe";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
+import { TimezonePickerElement } from "../../components/Fields/TimezonePickerElement";
 
 type Props = {
   canChangeEmail: boolean;
@@ -118,6 +119,9 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
         </Grid2>
         <Grid2 sm={6} xs={12}>
           <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth />
+        </Grid2>
+        <Grid2 xs={12}>
+          <TimezonePickerElement name={"tz"} label={t("Time zone")}/>
         </Grid2>
 
         {!myProfileOnly && (

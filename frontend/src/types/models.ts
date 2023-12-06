@@ -60,6 +60,7 @@ export interface User {
   email: string;
   phone: string;
   address: string;
+  tz: string;
   legal: string;
   payment: string;
   billing: string;

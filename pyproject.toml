@@ -68,6 +68,7 @@ faker = "^20.1.0"
 django-email-verification = "^0.3.3"
 stripe = "^7.5.0"
 django-notifier-plus = {git = "https://github.com/ricard33/django-notifier-plus.git", develop = true}
+django-timezone-field = "^6.1.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.3.2"

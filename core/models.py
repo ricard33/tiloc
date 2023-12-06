@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse as drf_reverse
 from simple_history.models import HistoricalRecords
+from timezone_field import TimeZoneField
 
 logger = logging.getLogger("models")
 
@@ -128,7 +129,7 @@ class Account(models.Model):
         return (
             self.subscription_set.filter(
                 status__in=[Subscription.Status.active.value, Subscription.Status.trialing.value],
-                current_period_start__lte=arrow.utcnow().datetime
+                current_period_start__lte=arrow.utcnow().datetime,
             )
             .order_by("-current_period_end")
             .first()
@@ -184,7 +185,6 @@ class Account(models.Model):
         super().delete(using, keep_parents)
 
     def cleanup_account(self, using=None, keep_parents=False):
-
         Payment.objects.filter(booking__lodging__account=self).delete()
         Contract.objects.filter(booking__lodging__account=self).delete()
         BookedService.objects.filter(booking__lodging__account=self).delete()
@@ -276,6 +276,7 @@ class User(auth_models.AbstractUser):
         related_name="users",
         related_query_name="user",
     )
+    tz = TimeZoneField(default="America/Martinique")
 
     # Contracts and billing details
     legal = models.TextField(_("legal mention"), blank=True, null=True, help_text=_("Legal mention on bills"))
