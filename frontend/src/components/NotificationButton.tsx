@@ -30,8 +30,9 @@ const NotificationButton = () => {
   }
 
   function handleNotificationClick(notification: Notification) {
-    markNotificationAsRead(notification);
-    refetch();
+    markNotificationAsRead(notification).then(() => {
+      refetch();
+    });
     if (notification.path)
       navigate(notification.path);
   }

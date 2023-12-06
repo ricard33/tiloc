@@ -22,6 +22,7 @@ import { differenceInCalendarDays, formatDistanceToNow, parseISO } from "date-fn
 import { useTranslation } from "react-i18next";
 import { formatDate, isValidDate } from "./common/dateUtils";
 import axios from "axios";
+import { useAppSelector } from "./app/hooks";
 
 validate.validators = {
   ...validate.validators,
@@ -33,37 +34,44 @@ type Props = {
 
 function App(props: Props) {
   const dispatch = useDispatch();
-  const token = useSelector<RootState>((store) => store.auth.token);
+  const token = useAppSelector((store) => store.auth.token);
+  const isNeedToReloadUser = useAppSelector((store) => store.auth.needToReload);
+  const isAppInfoLoaded = useAppSelector((store) => store.appInfo.loaded);
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
   const { showInfo, showWarning } = useAlert();
   const { t } = useTranslation();
 
   useEffect(() => {
-    // console.log("useEffect token", token);
-    // dispatch(auth.userLoading());
     refetchUser();
-  }, [dispatch, refetchUser, token]);
+  }, [refetchUser, token]);
 
   useEffect(() => {
-    axios.get("/api/info/")
-      .then(response => {
-        // console.debug(response);
-        dispatch(appInfoLoaded({
-          version: response.data.version,
-          buildDate: formatDate(parseISO(response.data.build_date)),
-          canRegister: response.data.can_register,
-        }))
-      })
-      .catch(() => {
-      });
-  }, [dispatch]);
+    if(isNeedToReloadUser)
+      refetchUser();
+  }, [refetchUser, isNeedToReloadUser]);
+
+  useEffect(() => {
+    if (!isAppInfoLoaded)
+      axios.get("/api/info/")
+        .then(response => {
+          // console.debug(response);
+          dispatch(appInfoLoaded({
+            loaded: true,
+            version: response.data.version,
+            buildDate: formatDate(parseISO(response.data.build_date)),
+            canRegister: response.data.can_register,
+          }))
+        })
+        .catch(() => {
+        });
+  }, [dispatch, isAppInfoLoaded]);
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);
     if(currentUser) {
       dispatch(auth.userLoaded(currentUser));
-      console.log(currentUser.account);
-      console.log("End fo validity: ", currentUser.account.validity);
+      // console.log(currentUser.account);
+      // console.log("End fo validity: ", currentUser.account.validity);
       if(isValidDate(currentUser.account.validity)) {
         console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
       }

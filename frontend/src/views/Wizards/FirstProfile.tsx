@@ -35,7 +35,6 @@ export const FirstProfile: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
 
   const onSubmitHandler = (data: User) => {
-    console.log(data);
     updateUser({ ...currentUser, ...data }).then((result) => {
       if ((result as any).error) {
         const error = (result as any).error;

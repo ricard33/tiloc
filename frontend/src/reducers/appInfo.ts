@@ -3,6 +3,7 @@ import { AppInfo } from "../types";
 import { AppInfoAction } from "../actions";
 
 const initialState: AppInfo = {
+  loaded: false,
   version: "?",
   buildDate: "-",
   canRegister: false,

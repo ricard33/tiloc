@@ -18,7 +18,7 @@ class ExportCalendarTestCase(TestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        self.lodging = factories.LodgingFactory()
+        self.lodging = factories.LodgingFactory.create()
 
     def test_simple_export(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
@@ -30,6 +30,19 @@ class ExportCalendarTestCase(TestCase):
         self.assertEqual("GREGORIAN", c.extra["CALSCALE"][0].value)
         e = c.events.pop()
         self.assertEqual(e.summary, "Cédric")
+
+    def test_no_export_for_free_account(self):
+        # plan = models.Plan.objects.get(name='FREE')
+        # plan = factories.PlanFactory.create(name="FREE")
+        # subscription = self.lodging.account.subscription_set.first()
+        # subscription.plan = plan
+        # subscription.save()
+        self.lodging.account.subscription_set.set( [])
+        # self.lodging.account.subscription_set.clear()
+        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        self.assertTrue(self.lodging.account.is_free_plan)
+        r = self.client.get("/calendar/%s/" % self.lodging.uid)
+        self.assertEqual(r.status_code, 403)
 
     def test_secondary_export_url(self):
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
@@ -211,9 +224,15 @@ class ChannelsDistributionTestCase(APITestCase):
     def test_channel_distribution(self):
         lodging = factories.LodgingFactory()
         self.user.lodgings.add(lodging)
-        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date())
-        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-07-02").date(), end_date=arrow.get("2020-07-18").date(),
-                                 source=models.BookingChannel.objects.get(name="airbnb"))
+        factories.BookingFactory(
+            lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date()
+        )
+        factories.BookingFactory(
+            lodging=lodging,
+            begin_date=arrow.get("2020-07-02").date(),
+            end_date=arrow.get("2020-07-18").date(),
+            source=models.BookingChannel.objects.get(name="airbnb"),
+        )
         channels_count = models.BookingChannel.objects.for_user(self.user).count()
         response = self.client.get("/stats/channel_distribution/2020-01-01/2020-09-30/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -225,9 +244,15 @@ class ChannelsDistributionTestCase(APITestCase):
 
     def test_multiple_lodgings_are_filtered(self):
         lodging = factories.LodgingFactory()
-        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date())
-        factories.BookingFactory(lodging=lodging, begin_date=arrow.get("2020-07-02").date(), end_date=arrow.get("2020-07-18").date(),
-                                 source=models.BookingChannel.objects.get(name="airbnb"))
+        factories.BookingFactory(
+            lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date()
+        )
+        factories.BookingFactory(
+            lodging=lodging,
+            begin_date=arrow.get("2020-07-02").date(),
+            end_date=arrow.get("2020-07-18").date(),
+            source=models.BookingChannel.objects.get(name="airbnb"),
+        )
         channels_count = models.BookingChannel.objects.for_user(self.user).count()
         response = self.client.get("/stats/channel_distribution/2020-01-01/2020-09-30/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

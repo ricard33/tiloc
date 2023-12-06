@@ -103,6 +103,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 class LoginUserSerializer(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField()
+    keep_connected = serializers.BooleanField(required=False)
 
     # def validate(self, data):
     #     user = authenticate(**data)
@@ -116,6 +117,7 @@ class SignUpSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField()
+    plan = serializers.CharField(required=False)
 
 
 class UserSerializer(serializers.ModelSerializer):

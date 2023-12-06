@@ -4,7 +4,7 @@ import arrow
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.utils import timezone
@@ -37,14 +37,6 @@ class IndexPage(TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class CreateAccountClassView(FormView):
-    def form_valid(self, form):
-        user = form.save()
-        return_val = super(CreateAccountClassView, self).form_valid(form)
-        send_email(user)
-        return return_val
-
-
 @csrf_exempt
 def loggly_proxy(request, path):
     extra_requests_args = {}
@@ -56,6 +48,9 @@ def loggly_proxy(request, path):
 @transaction.atomic
 def export_calendar(request, uid):
     lodging = get_object_or_404(models.Lodging, uid=uid)
+    if lodging.account.is_free_plan:
+        logger.warning("Calender request for a FREE account [%s]. Request rejected.")
+        return HttpResponseForbidden("No calendar export for FREE account")
     source = request.GET.get("s")
     qs = lodging.booking_set.filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
     if source:
@@ -97,6 +92,9 @@ def export_full_planning(request):
     #         r = HttpResponse(status=401)
     #         r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
     #         return r
+    if request.user.account.is_free_plan:
+        logger.warning("Calender request for a FREE account [%s]. Request rejected.")
+        return HttpResponseForbidden("No calendar export for FREE account")
     qs = models.Booking.objects.for_user(request.user).filter(cancelled=False, deleted=False)
     logger.info("Full planning requested")
 

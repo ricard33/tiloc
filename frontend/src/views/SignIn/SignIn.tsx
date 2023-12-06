@@ -11,13 +11,14 @@ import { useAlert } from "../../common/alertUtils";
 import { RootState } from "../../store";
 import { useForm, useFormState } from "react-hook-form";
 import { LoginInfo } from "../../types";
-import { FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
 import { SerializedError } from "@reduxjs/toolkit";
 
 
 type LoginData = {
   email: string,
   password: string,
+  keep_connected: boolean;
 }
 
 function SignIn() {
@@ -44,7 +45,7 @@ function SignIn() {
   }, [from, navigate, isAuthenticated]);
 
   const handleSignIn = (formData: LoginData) => {
-    doLogin({ email: formData.email, password: formData.password }).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
+    doLogin({ email: formData.email, password: formData.password, keep_connected: formData.keep_connected }).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
       const { data, error } = result as any;
       if (error) {
         showError(t("Login error: ") + fetchErrorDecode(error));
@@ -66,7 +67,7 @@ function SignIn() {
         onSuccess={handleSignIn}
         formContext={formContext}
       >
-        <Paper sx={{padding: "1em"}}>
+        <Paper sx={{padding: "1em", width: "500px"}}>
           <Stack direction="column" spacing={2} style={{ width: "100%" }}>
             <Typography
               variant="h2"
@@ -99,6 +100,10 @@ function SignIn() {
               type="password"
               variant="outlined"
             />
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <CheckboxElement name="keep_connected" label={t("Remember me")} />
+              <Link component={RouterLink} to={"/reset-password"}>{t("Forgotten password")}</Link>
+            </Stack>
             <Button
               color="primary"
               disabled={!isDirty}

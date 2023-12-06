@@ -1,3 +1,11 @@
+export interface SignUpData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  plan: string;
+}
+
 export interface LoginInfo {
   expiry: string;
   token: string;

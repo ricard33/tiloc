@@ -7,7 +7,8 @@ export interface AuthState {
   isAuthenticated: boolean,
   isLoading: boolean,
   user?: User,
-  errors?: {}
+  errors?: {},
+  needToReload: boolean,
 }
 
 const initialState: AuthState = {
@@ -15,7 +16,8 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: true,
   user: undefined,
-  errors: {}
+  errors: {},
+  needToReload: true,
 };
 
 
@@ -24,10 +26,10 @@ export default function auth(state = initialState, action: AuthAction): AuthStat
   switch (action.type) {
 
     case actionTypes.USER_LOADING:
-      return { ...state, isLoading: true };
+      return { ...state, isLoading: true, needToReload: false };
 
     case actionTypes.USER_LOADED:
-      return { ...state, isAuthenticated: true, isLoading: false, user: action.user };
+      return { ...state, isAuthenticated: true, isLoading: false, needToReload: false, user: action.user };
 
     case actionTypes.LOGIN_SUCCESSFUL:
       return { ...state, ...action.data, isAuthenticated: true, isLoading: false, errors: undefined };
@@ -40,6 +42,9 @@ export default function auth(state = initialState, action: AuthAction): AuthStat
         ...state, errors: action.data, token: undefined, user: undefined,
         isAuthenticated: false, isLoading: false
       };
+
+    case actionTypes.NEED_TO_RELOAD_USER:
+      return { ...state, needToReload: true, };
 
     case actionTypes.SUBSCRIPTION_UPDATED:
       return {

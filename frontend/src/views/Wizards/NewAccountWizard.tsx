@@ -11,6 +11,7 @@ import { WizardContext } from "./WizardContext";
 import { WizardFooter } from "./WizardFooter";
 import { FirstLodgingForm } from "./FirstLodgingForm";
 import { Link, useNavigate } from "react-router-dom";
+import { Container } from "@mui/material";
 
 
 export default function NewAccountWizard() {
@@ -109,34 +110,36 @@ export default function NewAccountWizard() {
 
   return (
     <WizardContext.Provider value={{ steps, activeStep, isStepOptional }}>
-      <Paper sx={{ padding: "1em" }}>
-        <Box sx={{ width: "100%" }}>
-          <Stepper activeStep={activeStep}>
-            {steps.map((label, index) => {
-              const stepProps: { completed?: boolean } = {};
-              const labelProps: {
-                optional?: React.ReactNode;
-              } = {};
-              if (isStepOptional(index)) {
-                labelProps.optional = (
-                  <Typography variant="caption">Optional</Typography>
+      <Container maxWidth={"md"}>
+        <Paper sx={{ padding: "1em" }}>
+          <Box sx={{ width: "100%" }}>
+            <Stepper activeStep={activeStep}>
+              {steps.map((label, index) => {
+                const stepProps: { completed?: boolean } = {};
+                const labelProps: {
+                  optional?: React.ReactNode;
+                } = {};
+                if (isStepOptional(index)) {
+                  labelProps.optional = (
+                    <Typography variant="caption">Optional</Typography>
+                  );
+                }
+                if (isStepSkipped(index)) {
+                  stepProps.completed = false;
+                }
+                return (
+                  <Step key={label} {...stepProps}>
+                    <StepLabel {...labelProps}>{label}</StepLabel>
+                  </Step>
                 );
-              }
-              if (isStepSkipped(index)) {
-                stepProps.completed = false;
-              }
-              return (
-                <Step key={label} {...stepProps}>
-                  <StepLabel {...labelProps}>{label}</StepLabel>
-                </Step>
-              );
-            })}
-          </Stepper>
-          <React.Fragment>
-            {renderStep()}
-          </React.Fragment>
-        </Box>
-      </Paper>
+              })}
+            </Stepper>
+            <React.Fragment>
+              {renderStep()}
+            </React.Fragment>
+          </Box>
+        </Paper>
+      </Container>
     </WizardContext.Provider>
 
   );

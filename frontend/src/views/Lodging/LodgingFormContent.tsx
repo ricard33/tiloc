@@ -25,7 +25,6 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
     return { label: user.full_name, id: user.id };
   }) : [];
 
-  console.log(isFlatRateTourismTax);
   return (
     <>
       <input type="hidden" name={"id"} value={lodging ? lodging.id : undefined} />

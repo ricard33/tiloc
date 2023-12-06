@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Tooltip, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
+import { Button, Stack, Tooltip, Typography, Unstable_Grid2 as Grid2 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
   MultiSelectElement,
@@ -76,10 +76,10 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
             </Tooltip>
             :
             <Tooltip title={t("Email not verified")}>
-              <>
+              <Stack direction={"row"} alignItems="center">
                 <UnverifiedUserIcon color="warning" />
                 <Button onClick={() => onResendVerification()}>{t("Resend verification email")}</Button>
-              </>
+              </Stack>
             </Tooltip>
           }
         </Grid2>
@@ -192,9 +192,9 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
         {/*</Grid2>*/}
         {/*<Grid2 sm={6} xs={12}>*/}
         {/*</Grid2>*/}
-        <Grid2 sm={6} xs={12}>
-          <ImageUploadElement name="logo" label={t("Logo")} />
-        </Grid2>
+        {/*<Grid2 sm={6} xs={12}>*/}
+        {/*  <ImageUploadElement name="logo" label={t("Logo")} />*/}
+        {/*</Grid2>*/}
         <Grid2 sm={6} xs={12}>
           <ImageUploadElement
             name="signature" label={t("Signature")}

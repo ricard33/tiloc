@@ -1,10 +1,10 @@
 import React from "react";
 
-import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import { QueryError, useGetUserQuery, useSignupMutation } from "../../services/api";
 import { Trans, useTranslation } from "react-i18next";
 import { useAlert } from "../../common/alertUtils";
-import { AppInfo, LoginInfo } from "../../types";
+import { AppInfo, LoginInfo, SignUpData } from "../../types";
 import { FormContainer, PasswordElement, PasswordRepeatElement, TextFieldElement } from "react-hook-form-mui";
 import {
   Alert,
@@ -23,21 +23,12 @@ import { fetchErrorDecode } from "../../common/apiUtils";
 import { auth } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
+import queryString from "query-string";
+import * as actionTypes from "../../actions/actionTypes";
 
-type SignUpData = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-}
 
 export function SignUp() {
   const { t } = useTranslation();
-  let { userId } = useParams();
-  const {
-    data: user,
-    isLoading
-  } = useGetUserQuery(Number(userId), { skip: typeof userId === "undefined" });
   const { showError } = useAlert();
   const formContext = useForm<SignUpData>({});
   const { formState } = formContext;
@@ -46,6 +37,9 @@ export function SignUp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appInfo = useSelector<RootState>(store => store.appInfo) as AppInfo;
+  const location = useLocation();
+  const query = queryString.parse(location.search) as { plan: string };
+
 
   const onSubmit = (formData: SignUpData) => {
     doSignup(formData).then((result: {
@@ -65,7 +59,6 @@ export function SignUp() {
   };
 
   // console.log(error)
-  if (isLoading) return <div>{t("Loading...")}</div>;
   if (!appInfo.canRegister) {
     return (
       <Container maxWidth="sm" sx={{ display: "flex", height: "100%", alignItems: "center" }}>
@@ -86,7 +79,7 @@ export function SignUp() {
         formContext={formContext}
       >
         <Paper sx={{ padding: "1em" }}>
-          <input type="hidden" name={"id"} value={user ? user.id : 0} />
+          <input type="hidden" name={"plan"} value={query.plan} />
           <Grid2 container spacing={2}>
             <Grid2 xs={12}>
               <Typography variant="h2">{t("Sign up")}</Typography>

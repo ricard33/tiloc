@@ -13,8 +13,9 @@ import {
   useUpdateLodgingMutation
 } from "../../services/api";
 import { useAlert } from "../../common/alertUtils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { auth, needToReloadUser } from "../../actions";
 
 
 type Props = {
@@ -34,6 +35,7 @@ export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
   const [createLodging] = useCreateLodgingMutation();
   const [updateLodging] = useUpdateLodgingMutation();
   const { showError, showSuccess } = useAlert();
+  const dispatch = useDispatch();
 
   const onSubmitHandler = (data: Lodging) => {
     // console.log(data);
@@ -45,6 +47,7 @@ export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
           showError(t("Impossible to create lodging: ") + fetchErrorDecode(error));
         } else {
           showSuccess(t("Lodging added"));
+          dispatch(auth.needToReloadUser());
           onNext();
         }
       });
@@ -63,8 +66,6 @@ export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
   };
 
   if(isLoading || isLoadingUsers) return <div>{t("Loading...")}</div>
-  console.log(lodgings);
-  console.log(lodgings && lodgings.length > 0 ? lodgings[0] : defaultValues);
   return (
     <FormContainer
       defaultValues={lodgings && lodgings.length > 0 ? lodgings[0] : defaultValues}

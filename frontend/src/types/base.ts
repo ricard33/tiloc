@@ -8,6 +8,7 @@ export interface Pagination<T> {
 }
 
 export interface AppInfo {
+  loaded: boolean;
   version: string;
   buildDate: string;
   canRegister: boolean;

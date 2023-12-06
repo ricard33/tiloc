@@ -15,7 +15,7 @@ import {
   Payment,
   Service,
   User,
-  Notification
+  Notification, SignUpData
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
@@ -324,7 +324,7 @@ export const api = createApi({
         return api2User(response as ApiModel);
       }
     }),
-    login: builder.mutation<LoginInfo, { email: string; password: string }>({
+    login: builder.mutation<LoginInfo, { email: string; password: string, keep_connected: boolean }>({
       query(args) {
         return {
           url: `auth/login/`,
@@ -341,7 +341,7 @@ export const api = createApi({
         };
       }
     }),
-    signup: builder.mutation<LoginInfo, { first_name: string, last_name: string, email: string; password: string }>({
+    signup: builder.mutation<LoginInfo, SignUpData>({
       query(args) {
         return {
           url: `signup/`,

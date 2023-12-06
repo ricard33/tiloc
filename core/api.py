@@ -140,6 +140,8 @@ class LoginAPI(KnoxLoginView):
         if not user or not user.is_active:
             raise AuthenticationFailed()
         logging.getLogger("auth").info("User %s successfully logged." % user.email)
+        if not serializer.validated_data.get("keep_connected", False):
+            request.session.set_expiry(0)  # expire when the user’s web browser is closed
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
@@ -183,29 +185,31 @@ class SignUpAPI(KnoxLoginView):
         # raise APIException(detail="TEST")
         login(request, user)
 
-        # STRIPE API START
-        customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
-        account.stripe_customer_id = customer.id
-        account.save(update_fields=("stripe_customer_id",))
-        subscription = stripe.Subscription.create(
-            customer=customer.id,
-            items=[{"price": stripe_get_price("OWNER-MONTHLY")}],
-            trial_period_days=14,
-        )
-        # STRIPE API END
-        models.Subscription.objects.get_or_create(
-            id=subscription.id,
-            defaults=dict(
-                customer=user.account,
-                plan_id=subscription["items"].data[0].price.lookup_key,
-                created=arrow.get(subscription.created).datetime,
-                start_date=arrow.get(subscription.start_date).datetime,
-                current_period_start=arrow.get(subscription.current_period_start).datetime,
-                current_period_end=arrow.get(subscription.current_period_end).datetime,
-                status=subscription.status,
-                latest_invoice=subscription.latest_invoice,
-                default_payment_method=subscription.default_payment_method,
-            ),
+        plan_ref = serializer.validated_data.get('plan')
+        if plan_ref and  models.Plan.objects.filter(ref=plan_ref).exists():
+            # STRIPE API START
+            customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
+            account.stripe_customer_id = customer.id
+            account.save(update_fields=("stripe_customer_id",))
+            subscription = stripe.Subscription.create(
+                customer=customer.id,
+                items=[{"price": stripe_get_price("OWNER-MONTHLY")}],
+                trial_period_days=14,
+            )
+            # STRIPE API END
+            models.Subscription.objects.get_or_create(
+                id=subscription.id,
+                defaults=dict(
+                    customer=user.account,
+                    plan_id=subscription["items"].data[0].price.lookup_key,
+                    created=arrow.get(subscription.created).datetime,
+                    start_date=arrow.get(subscription.start_date).datetime,
+                    current_period_start=arrow.get(subscription.current_period_start).datetime,
+                    current_period_end=arrow.get(subscription.current_period_end).datetime,
+                    status=subscription.status,
+                    latest_invoice=subscription.latest_invoice,
+                    default_payment_method=subscription.default_payment_method,
+                ),
         )
 
         return super(SignUpAPI, self).post(request, format=None)

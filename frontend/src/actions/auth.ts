@@ -49,6 +49,12 @@ export function logoutSuccessful() {
   };
 }
 
+export function needToReloadUser() {
+  return {
+    type: actionTypes.NEED_TO_RELOAD_USER,
+  };
+}
+
 export function tokenExpired() {
   return {
     type: actionTypes.AUTH_TOKEN_EXPIRED,
