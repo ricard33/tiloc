@@ -137,7 +137,24 @@ class SyncBookingsTestCase(TestCase):
         factories.BookingFactory(lodging=self.lodging, source=self.sync.channel)
         synchronize_bookings(self.sync, empty_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
+        # not canceled at first synchro
+        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 1)
+        synchronize_bookings(self.sync, empty_ical)
+        synchronize_bookings(self.sync, empty_ical)
+        # but at third
         self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 0)
+
+    def test_missing_count_reseted(self):
+        updated_ical = airbnb_ical.replace("VALUE=DATE:2020", "VALUE=DATE:%d" % (arrow.utcnow().date().year+1))
+        synchronize_bookings(self.sync, updated_ical)
+        self.assertEqual(models.Booking.objects.all().count(), 1)
+        synchronize_bookings(self.sync, empty_ical)
+        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 1)
+        self.assertEqual(models.SyncRemovedByExternal.objects.all().count(), 1)
+
+        synchronize_bookings(self.sync, airbnb_ical)
+        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 1)
+        self.assertEqual(models.SyncRemovedByExternal.objects.all().count(), 0)
 
     def test_empty_string_answer(self):
         """Change on 26/06/2023: Booking returns empty string if calendar is empty"""

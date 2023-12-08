@@ -40,14 +40,14 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
         if event.summary in ["Airbnb (Not available)"]:
             continue
 
-        if (
-            event.uid
-            and models.Booking.objects.filter(
+        if event.uid:
+            qs = models.Booking.objects.filter(
                 lodging=lodging, source_uid=event.uid, cancelled=False, deleted=False
-            ).exists()
-        ):
-            logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.summary)
-            continue
+            )
+            if qs.exists():
+                logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.summary)
+                models.SyncRemovedByExternal.objects.filter(sync=sync, booking__in=qs).delete()
+                continue
 
         same_bookings = models.Booking.objects.filter(
             lodging=lodging,
@@ -62,6 +62,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             booking = same_bookings.first()
             logger.info("Found booking with same dates for event [%s -> %s: %s]", event.begin, event.end, event.summary)
             booking.source_uid = event.uid
+            booking._change_reason = "Updating source_uid"
             booking.save(update_fields=["source_uid"])
             continue
 
@@ -86,9 +87,23 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
         source=channel, lodging=lodging, end_date__gt=arrow.utcnow().date(), cancelled=False, deleted=False
     ):
         if booking.source_uid not in event_uids:
-            booking.cancelled = True
-            booking.notes = ("**CANCELLED by %s on %s\n" % (channel.name, arrow.utcnow().date())) + (booking.notes or "")
-            booking.save(update_fields=["cancelled", "notes"])
+            obj, created = models.SyncRemovedByExternal.objects.get_or_create(sync=sync, booking=booking)
+            if not created and obj.see_count >= 2:
+                logger.info("Canceling booking {}".format(booking))
+                booking.cancelled = True
+                booking.notes = ("**CANCELLED by %s on %s\n" % (channel.name, arrow.utcnow().date())) + (
+                    booking.notes or ""
+                )
+                booking._change_reason = "Canceled by %s on %s" % (channel.name, arrow.utcnow())
+                booking.save(update_fields=["cancelled", "notes"])
+                obj.delete()
+            else:
+                if not created:
+                    obj.see_count += 1
+                    obj.save(update_fields=["see_count"])
+                logger.warning(
+                    "Booking [%s] not found on channel %s (count %d)" % (booking, channel.name, obj.see_count)
+                )
 
     sync.last_import = arrow.utcnow().datetime
     sync.last_import_error = ""

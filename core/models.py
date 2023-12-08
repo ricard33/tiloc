@@ -845,3 +845,13 @@ class Subscription(models.Model):
     @property
     def customer_dashboard_url(self):
         return settings.STRIPE_CUSTOMER_DASHBOARD_URL  # + "?prefilled_email=" + self.customer.
+
+
+class SyncRemovedByExternal(models.Model):
+    sync = models.ForeignKey(BookingChannelSync, on_delete=models.CASCADE, related_name="+")
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="+")
+    date = models.DateTimeField(auto_now_add=True)
+    see_count = models.IntegerField(default=1)
+
+    class Meta:
+        unique_together = ("sync", "booking")
