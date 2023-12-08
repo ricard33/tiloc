@@ -12,8 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from django.views.generic.edit import FormView
-from django_email_verification import default_token_generator, send_email
+from django_email_verification import default_token_generator
 from django_email_verification.errors import NotAllFieldCompiled
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view

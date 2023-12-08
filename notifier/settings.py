@@ -4,10 +4,10 @@
 # Python
 from importlib import import_module
 
-# Django
-from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 
+# Django
+from django.core.exceptions import ImproperlyConfigured
 
 ###############################################################################
 ## App Settings

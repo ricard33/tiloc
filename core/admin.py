@@ -1,7 +1,5 @@
 from functools import reduce
 
-import notifier.admin
-import notifier.models
 from constance.admin import Config, ConstanceAdmin
 from django.conf import settings
 from django.contrib import admin, messages
@@ -33,6 +31,8 @@ from knox.admin import AuthTokenAdmin
 from knox.models import AuthToken
 from simple_history.admin import SimpleHistoryAdmin
 
+import notifier.admin
+import notifier.models
 from core import models
 from core.imp_exp_resources import BookingResource
 from core.sync import retrieve_and_synchronize_bookings

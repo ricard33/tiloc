@@ -20,7 +20,6 @@ from django_email_verification import send_email as send_verification_email
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
-from notifier.models import SentNotification
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
@@ -32,6 +31,7 @@ from stripe import PaymentIntent
 from stripe import Subscription as StripeSubsription
 
 from location import __date__, __version__
+from notifier.models import SentNotification
 
 from . import models
 from .contracts import generate_contract, generate_empty_contract
@@ -185,8 +185,8 @@ class SignUpAPI(KnoxLoginView):
         # raise APIException(detail="TEST")
         login(request, user)
 
-        plan_ref = serializer.validated_data.get('plan')
-        if plan_ref and  models.Plan.objects.filter(ref=plan_ref).exists():
+        plan_ref = serializer.validated_data.get("plan")
+        if plan_ref and models.Plan.objects.filter(ref=plan_ref).exists():
             # STRIPE API START
             customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
             account.stripe_customer_id = customer.id
@@ -210,7 +210,7 @@ class SignUpAPI(KnoxLoginView):
                     latest_invoice=subscription.latest_invoice,
                     default_payment_method=subscription.default_payment_method,
                 ),
-        )
+            )
 
         return super(SignUpAPI, self).post(request, format=None)
 

@@ -3,15 +3,13 @@
 ###############################################################################
 # Django
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
-from django.contrib.auth.models import Permission
 from django.core import mail
+from django.test import TestCase
 
 # User
-from notifier import shortcuts, models
-
+from notifier import models, shortcuts
 
 User = get_user_model()
 

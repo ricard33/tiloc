@@ -11,7 +11,6 @@ from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
 
-
 logger = logging.getLogger("notifier.backend")
 
 ###############################################################################

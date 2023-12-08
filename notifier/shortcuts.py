@@ -10,7 +10,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission, User
 from django.db.models.query import QuerySet
 
 # User
-from notifier.models import Notification, Backend, UserPrefs
+from notifier.models import Backend, Notification, UserPrefs
 
 
 ###############################################################################

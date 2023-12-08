@@ -5,13 +5,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Max
 from django.db.models.signals import post_save
-from timezone_field.rest_framework import TimeZoneSerializerField
-
-from notifier.models import SentNotification
 from rest_framework import serializers
+from timezone_field.rest_framework import TimeZoneSerializerField
 
 from core import models
 from core.models import Account, Lodging
+from notifier.models import SentNotification
 
 logger = logging.getLogger(__name__)
 

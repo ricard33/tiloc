@@ -626,7 +626,7 @@ class Contract(models.Model):
 
     def make_pdf_path(self):
         def multiple_replace(string, rep_dict: dict):
-            k: str
+            k: str  # noqa: F842
             pattern = re.compile(
                 "|".join([re.escape(k) for k in sorted(rep_dict.keys(), key=len, reverse=True)]), flags=re.DOTALL
             )

@@ -145,7 +145,7 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 0)
 
     def test_missing_count_reseted(self):
-        updated_ical = airbnb_ical.replace("VALUE=DATE:2020", "VALUE=DATE:%d" % (arrow.utcnow().date().year+1))
+        updated_ical = airbnb_ical.replace("VALUE=DATE:2020", "VALUE=DATE:%d" % (arrow.utcnow().date().year + 1))
         synchronize_bookings(self.sync, updated_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
         synchronize_bookings(self.sync, empty_ical)

@@ -4,9 +4,9 @@ from typing import List
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
-from notifier.shortcuts import send_notification
 
 from core import models
+from notifier.shortcuts import send_notification
 
 logger = logging.getLogger("signals")
 
