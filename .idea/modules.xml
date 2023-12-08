@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/Library/Caches/pypoetry/virtualenvs/tiloc-CLVrveRv-py3.11/src/django-notifier-plus/.idea/django-notifier-plus.iml" filepath="$USER_HOME$/Library/Caches/pypoetry/virtualenvs/tiloc-CLVrveRv-py3.11/src/django-notifier-plus/.idea/django-notifier-plus.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/tiloc.iml" filepath="$PROJECT_DIR$/.idea/tiloc.iml" />
     </modules>
   </component>

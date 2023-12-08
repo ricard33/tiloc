@@ -37,8 +37,7 @@ class ExportCalendarTestCase(TestCase):
         # subscription = self.lodging.account.subscription_set.first()
         # subscription.plan = plan
         # subscription.save()
-        self.lodging.account.subscription_set.set( [])
-        # self.lodging.account.subscription_set.clear()
+        self.lodging.account.subscription_set.all().delete()
         factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
         self.assertTrue(self.lodging.account.is_free_plan)
         r = self.client.get("/calendar/%s/" % self.lodging.uid)

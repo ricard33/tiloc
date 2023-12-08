@@ -67,7 +67,6 @@ psycopg2-binary = "^2.9.7"
 faker = "^20.1.0"
 django-email-verification = "^0.3.3"
 stripe = "^7.5.0"
-django-notifier-plus = {git = "https://github.com/ricard33/django-notifier-plus.git", develop = true}
 django-timezone-field = "^6.1.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -83,6 +82,7 @@ pytest-django = "^4.7.0"
 black = "^23.11.0"
 pytest-cov = "^4.0.0"
 setuptools = "^69.0.2"
+poetry-plugin-export = "^1.6.0"
 
 [build-system]
 requires = ["poetry-core"]
