@@ -9,6 +9,7 @@
 - /staticfiles/
 + /templates/
 + /manage.py
++ /notifier/
 + /requirement.txt
 + /frontend/
 + /frontend/build/
