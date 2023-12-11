@@ -6,7 +6,20 @@ from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from faker import Faker
 
-from core.models import Account, BookedService, Booking, BookingChannel, BookingStatus, Contract, Lodging, Payment, User
+from core.models import (
+    Account,
+    BookedService,
+    Booking,
+    BookingChannel,
+    BookingStatus,
+    Contract,
+    ContractTemplate,
+    Lodging,
+    Payment,
+    Plan,
+    Subscription,
+    User,
+)
 
 
 class Command(BaseCommand):
@@ -21,23 +34,50 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        demo_account: Account
         demo_account, created = Account.objects.get_or_create_demo()
         if options["clean"] and not created:
             demo_account.cleanup_account()
             demo_account.fill_account_with_default_ressources()
+
+        if demo_account.is_free_plan:
+            if demo_account.stripe_customer_id != "__DEMO__":
+                demo_account.stripe_customer_id = "__DEMO__"
+                demo_account.save(update_fields=["stripe_customer_id"])
+            plan = Plan.objects.get(ref="PRO10-YEARLY")
+            subscription, created = Subscription.objects.get_or_create(
+                customer=demo_account,
+                defaults=dict(
+                    plan=plan,
+                    start_date=arrow.utcnow().datetime,
+                    current_period_start=arrow.utcnow().datetime,
+                    current_period_end=arrow.utcnow().shift(years=1).datetime,
+                    status=Subscription.Status.active.value,
+                ),
+            )
+            if not created:
+                # revalidate dates and plan
+                subscription.plan = plan
+                subscription.start_date = arrow.utcnow().datetime
+                subscription.current_period_start = arrow.utcnow().datetime
+                subscription.current_period_end = arrow.utcnow().shift(years=1).datetime
+                subscription.status = Subscription.Status.active.value
+                subscription.save()
 
         fake = Faker("fr_FR")
 
         admin, created = User.objects.get_or_create(
             account=demo_account,
             email="admin@app.tiloc.fr",
+            defaults=dict(
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
+                phone=fake.phone_number(),
+                address=fake.address(),
+            ),
         )
         if created:
-            admin.first_name = (fake.first_name(),)
-            admin.last_name = (fake.last_name(),)
-
             admin.groups.add(Group.objects.get(name__iexact="administrator"))
-
             admin.set_password("admin")
             admin.save()
 
@@ -47,6 +87,7 @@ class Command(BaseCommand):
         BookedService.objects.filter(booking__lodging__account=demo_account).delete()
         Booking.objects.filter(lodging__account=demo_account).delete()
 
+        default_template = ContractTemplate.objects.filter(account=demo_account).first()
         # create lodgings
         lodgings = []
         for rank, name in enumerate(["Hibiscus", "Frangipanier", "Orchidée", "Anthurium", "Heliconia"]):
@@ -54,15 +95,18 @@ class Command(BaseCommand):
                 account=demo_account,
                 owner=admin,
                 name=name,
-                rank=rank,
-                guaranty=300,
-                max_daily_tourist_tax=1.5,
+                defaults=dict(
+                    rank=rank,
+                    guaranty=300,
+                    is_flat_rate_tourist_tax=False,
+                    max_daily_tourist_tax=1.5,
+                    tourist_tax_rate=5,
+                    contract_template=default_template,
+                    address=fake.address(),
+                    capacity=random.choice([2, 3, 4]),
+                    daily_rate=random.randrange(50, 120, 10),
+                ),
             )
-            if created:
-                lodging.address = fake.address()
-                lodging.capacity = random.choice([2, 3, 4])
-                lodgings.daily_rate = random.randrange(50, 120, 10)
-                lodging.save()
             lodgings.append(lodging)
 
         # create bookings
