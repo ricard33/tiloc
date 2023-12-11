@@ -94,6 +94,7 @@ export interface Lodging {
   tourist_tax_rate: number;
   description: string;
   default_services: string[];  // list of refs
+  contract_template: number;
 }
 
 export interface Service {

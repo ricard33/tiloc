@@ -6,7 +6,7 @@ import { MultiSelectElement, SelectElement, SwitchElement, TextFieldElement } fr
 import { Lodging, User } from "../../types";
 import RichTextEditorElement from "../../components/Fields/RichTextEditorElement";
 import { useFormContext } from "react-hook-form";
-import { useListServicesQuery } from "../../services/api";
+import { useListContractTemplatesQuery, useListServicesQuery } from "../../services/api";
 
 
 type Props = {
@@ -17,9 +17,14 @@ type Props = {
 export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
   const { t } = useTranslation();
   const formContext = useFormContext();
-  const { watch, getValues } = formContext;
+  const { watch, getValues, setValue } = formContext;
   const isFlatRateTourismTax = watch("is_flat_rate_tourist_tax", getValues("is_flat_rate_tourist_tax"));
   const { data: services } = useListServicesQuery();
+  const { data: templates } = useListContractTemplatesQuery();
+  const template = watch("contract_template", lodging?.contract_template)
+
+  if(!template && templates)
+    setValue("contract_template", templates[0].id, {shouldDirty: true});
 
   const usersOptions: { label: string, id: number }[] = users ? users.map((user) => {
     return { label: user.full_name, id: user.id };
@@ -112,7 +117,20 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users }) => {
             options={services ? services.map(l => {
               return { id: l.reference, label: `[${l.reference}] ${l.designation}` };
             }) : []}
+            fullWidth
+            style={{minWidth: "300px"}}
             showChips
+          />
+        </Grid2>
+        <Grid2 xs={12}>
+          <SelectElement
+            label={t("Contract template")}
+            name="contract_template"
+            options={templates ? templates.map(l => {
+              return { id: l.id, label: l.name };
+            }) : []}
+            fullWidth
+            style={{minWidth: "300px"}}
           />
         </Grid2>
         <Grid2 xs={12}>

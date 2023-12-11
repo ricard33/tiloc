@@ -74,7 +74,7 @@ export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("Lodging properties")} />
         <CardContent sx={{}}>
-          <LodgingFormContent  users={users ?? []}/>
+          <LodgingFormContent users={users ?? []}/>
         </CardContent>
       </Card>
       <WizardFooter onBack={onBack} onNext={() => null} onSkip={() => null} />

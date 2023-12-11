@@ -558,6 +558,10 @@ class Booking(models.Model):
         return total
 
     @property
+    def price_with_options_and_taxes(self):
+        return self.price_with_options + (self.lodging.tourist_tax_included_in_payment and self.tourist_tax or 0)
+
+    @property
     def total_payments(self):
         """Returns the sum of the payments already made."""
         return self.payment_set.aggregate(total_payments=Sum("amount"))["total_payments"] or 0

@@ -88,7 +88,7 @@ def make_context(booking, url_server):
         "Logement_DEPOT_GARANTIE": format_decimal(booking.lodging.guaranty),
         # "Logement_HORAIRE_ARRIVEE": booking,
         # "Logement_HORAIRE_DEPART": booking,
-        "Logement_MODALITE_PAIEMENT": booking.lodging.owner.payment,
+        "Logement_MODALITE_PAIEMENT": booking.lodging.owner.payment or "",
         # "Logement_METHODE_PAIEMENT": booking,
         # "Logement_DEPOT_G_MONTANT": booking,
         # "Logement_DEPOT_G_DELAI": booking,
@@ -98,7 +98,7 @@ def make_context(booking, url_server):
         "Réservation_MONTANT": format_decimal(booking.price),
         "Réservation_MONTANT_AVEC_OPTIONS": format_decimal(booking.price_with_options),
         "Réservation_ARRHES": format_decimal(booking.deposit),
-        "Réservation_SOLDE_APRES_ARRHES": format_decimal(booking.price_with_options - (booking.deposit or 0)),
+        "Réservation_SOLDE_APRES_ARRHES": format_decimal(booking.price_with_options_and_taxes - (booking.deposit or 0)),
         "Réservation_NB_VOYAGEURS": booking.adults + booking.children + booking.babies,
         "Réservation_NB_ADULTES": booking.adults,
         "Réservation_NB_ENFANTS": booking.children,
@@ -110,7 +110,7 @@ def make_context(booking, url_server):
         "Réservation_SERVICES_ADDITIONELS": format_services(
             booking.id and booking.bookedservice_set.filter(service__not_included_in_price=True) or [], booking
         ),
-        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax),
+        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax / booking.adults),
         "Réservation_TAXE_DE_SEJOUR": format_decimal(booking.tourist_tax),
         "Réservation_ECHEANCE_DU_SOLDE": booking.begin_date
         and format_date(arrow.get(booking.begin_date).shift(days=-booking.lodging.balance_due_date).date(), "short")

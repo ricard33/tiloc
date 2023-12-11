@@ -109,10 +109,10 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                   defaultValue={option.not_included_in_price}
                 />
                 {option.designation}</TableCell>
-              <TableCell>{option.unit_price && !options[index].is_flat_rate &&
+              <TableCell>{Number(option.unit_price) >= 0 && !options[index].is_flat_rate &&
                 <span>{duration}&nbsp;x</span>}</TableCell>
               <TableCell>
-                {option.unit_price &&
+                {Number(option.unit_price) >= 0 &&
                   <TextFieldElement
                     control={control}
                     name={`options.${index}.unit_price`}
@@ -129,7 +129,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                   />}
               </TableCell>
               <TableCell>
-                {option.unit_price &&
+                {Number(option.unit_price) >= 0 &&
                   <CheckboxElement
                     control={control}
                     name={`options.${index}.is_flat_rate`}
@@ -140,7 +140,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                   />}
               </TableCell>
               <TableCell>
-                {option.unit_price &&
+                {Number(option.unit_price) >= 0 &&
                   <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
               </TableCell>
               <TableCell>
