@@ -12,15 +12,18 @@ def generate_pdf(content: str, full_path: str, add_watermark: bool):
     options = {
         "encoding": "UTF-8",
         "page-size": "A4",
-        "margin-top": "20mm",
-        "margin-bottom": "20mm",
-        "margin-right": "20mm",
-        "margin-left": "20mm",
+        "margin-top": "15mm",
+        "margin-bottom": "15mm",
+        "margin-right": "15mm",
+        "margin-left": "15mm",
         "footer-right": "Page [page] sur [topage]",
         "footer-font-size": "9",
         "custom-header": [("Accept-Encoding", "gzip")],
         "enable-local-file-access": False,
         "no-outline": None,
+        # "disable-smart-shrinking": None,
+        "dpi": "96",
+        "user-style-sheet": os.path.join(settings.BASE_DIR, "static", "pdf", "pdf-base.css")
     }
 
     temp = tempfile.NamedTemporaryFile(delete=True, suffix=".html")
