@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router-dom";
-import { QueryError, useGetUserQuery, useSignupMutation } from "../../services/api";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { QueryError, useSignupMutation } from "../../services/api";
 import { Trans, useTranslation } from "react-i18next";
 import { useAlert } from "../../common/alertUtils";
 import { AppInfo, LoginInfo, SignUpData } from "../../types";
@@ -24,7 +24,6 @@ import { auth } from "../../actions";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import queryString from "query-string";
-import * as actionTypes from "../../actions/actionTypes";
 
 
 export function SignUp() {

@@ -15,7 +15,7 @@ import {
 import { useAlert } from "../../common/alertUtils";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { auth, needToReloadUser } from "../../actions";
+import { auth } from "../../actions";
 
 
 type Props = {

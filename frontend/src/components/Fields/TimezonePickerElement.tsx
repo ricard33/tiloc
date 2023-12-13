@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React from "react";
 import { AutocompleteElement, AutocompleteElementProps } from "react-hook-form-mui";
 import { getTimeZoneOptions } from "../../common/timezones";
 import { FieldValues } from "react-hook-form/dist/types/fields";
