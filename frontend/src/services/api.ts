@@ -297,7 +297,7 @@ export const api = createApi({
     "ContractTemplate",
     "Service",
     "User",
-    "Notofication"
+    "Notification"
   ],
   // keepUnusedDataFor: 5,
   endpoints: (builder) => ({
@@ -468,11 +468,16 @@ export const api = createApi({
     // Notification
     listNotifications: notificationApi.list(builder),
     getNotification: notificationApi.get(builder),
-    readNotification: builder.mutation<Lodging, { id: number }>({
+    readNotification: builder.mutation<Notification, { id: number }>({
       query: ({ id }) => {
         return { url: `notification/${id}/`, method: "PATCH", data: { read: true } };
       }
-    })
+    }),
+    readAllNotifications: builder.mutation<Notification, void>({
+      query: () => {
+        return { url: `notification/all_read/`, method: "POST" };
+      }
+    }),
 
   })
 });
@@ -560,4 +565,5 @@ export const {
   useListNotificationsQuery,
   useGetNotificationQuery,
   useReadNotificationMutation,
+  useReadAllNotificationsMutation,
 } = api;

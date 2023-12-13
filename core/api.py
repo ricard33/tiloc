@@ -36,7 +36,7 @@ from notifier.models import SentNotification
 from . import models
 from .contracts import generate_contract, generate_empty_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
-from .pagination import LargeResultsSetPagination
+from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
 from .pdf_tools import generate_pdf
 from .permissions import IsCompanyAdminPermissions, IsSuperUserPermission
 from .serializers import (
@@ -564,9 +564,15 @@ class ServiceViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = SentNotification.objects.filter(backend__name="noop").order_by("-created")
     serializer_class = SentNotificationSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
+
+    @action(detail=False, methods=["POST"])
+    def all_read(self, request):
+        self.get_queryset().filter(read=False).update(read=True)
+        return Response(status=status.HTTP_200_OK)
 
 
 # Billing API

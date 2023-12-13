@@ -806,6 +806,9 @@ class Plan(models.Model):
     max_lodgings = models.PositiveSmallIntegerField(null=True, blank=True)
     max_users = models.PositiveSmallIntegerField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Subscription(models.Model):
     class Status(models.TextChoices):
@@ -831,6 +834,9 @@ class Subscription(models.Model):
     cancel_at_period_end = models.BooleanField(default=False)
 
     _account_qs_path = "customer"
+
+    def __str__(self):
+        return "%s -> %s" % (self.customer, self.plan)
 
     @property
     def _base_stripe_url(self):
