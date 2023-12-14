@@ -172,7 +172,7 @@ class SignUpAPI(KnoxLoginView):
         if models.User.objects.filter(email=email):
             return Response({"error": "This email is already in use."}, status=status.HTTP_409_CONFLICT)
 
-        account = models.Account.objects.create(name=serializer.validated_data["email"])
+        account = models.Account.objects.create()
         user = models.User.objects.create_user(
             serializer.validated_data["email"],
             serializer.validated_data["password"],
@@ -882,15 +882,22 @@ def stripe_webhook(request):
             logger.info("[%s]", event.type)
             print(event.data)
             payment_intent: PaymentIntent = event.data.object
-            account = models.Account.objects.get(stripe_customer_id=payment_intent.customer)
-            logger.info("PaymentIntent for customer '%s' has status '%s", account.name, payment_intent.status)
+            if not payment_intent.customer:
+                return HttpResponse(status=200)
+            try:
+                account = models.Account.objects.get(stripe_customer_id=payment_intent.customer)
+                logger.info("PaymentIntent for customer '%s' has status '%s", account.name, payment_intent.status)
+            except models.Account.DoesNotExist:
+                # unknown customer
+                logger.warning("PaymentIntent for unkonwn customer '%s'", payment_intent.customer)
+                pass
         elif event.type == "invoice.paid":
             # Used to provision services after the trial has ended.
             # The status of the invoice will show up as paid. Store the status in your
             # database to reference when a user accesses your service to avoid hitting rate
             # limits.
             logger.info("[%s]", event.type)
-            print(event.data)
+            # print(event.data)
         elif event.type == "invoice.payment_failed":
             # If the payment fails or the customer does not have a valid payment method,
             # an invoice.payment_failed event is sent, the subscription becomes past_due.

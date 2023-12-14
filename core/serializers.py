@@ -63,6 +63,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source="name", read_only=True)
     is_initialized = serializers.SerializerMethodField()
     current_plan = serializers.SerializerMethodField()
     current_subscription = SubscriptionSerializer()
@@ -70,6 +71,7 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = [
+            "id",
             "is_active",
             "is_initialized",
             "current_plan",

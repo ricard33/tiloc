@@ -173,6 +173,14 @@ class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("name", "is_active", "created", "validity", "current_plan", "stripe_customer_id")
     list_filter = ("is_active",)
 
+    actions = ["regenerate_id"]
+
+    @admin.action(description="Re-generate account ID")
+    def regenerate_id(self, request, queryset):
+        for account in queryset:
+            account.name = models.generate_account_id()
+            account.save(update_fields=["name"])
+
 
 @admin.register(models.User, site=site)
 class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):

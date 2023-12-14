@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import uuid
+from random import choice
 
 import arrow
 from django.conf import settings
@@ -88,6 +89,20 @@ class AccountQuerySet(models.QuerySet):
         return self.get(name="__template__")
 
 
+def generate_account_id():
+    alphabet = [chr(i) for i in range(48, 58)]
+    while True:
+        account_id = ''
+        for i in range(6):
+            if not account_id:
+                account_id += choice(alphabet[1:])  # don't start with 0
+            else:
+                account_id += choice(alphabet)
+        if not Account.objects.filter(name=account_id).exists():
+            break
+    return account_id
+
+
 class Account(models.Model):
     class DepositOrDownPayment(models.TextChoices):
         DEPOSIT = "deposit", _("Deposit")
@@ -98,8 +113,9 @@ class Account(models.Model):
         NOTE = "note", _("Note")
         RECEIPT = "receipt", _("Receipt")
         QUITTANCE = "quittance", _("Quittance")
-
-    name = models.CharField(_("name"), max_length=200, unique=True, help_text=_("Internal name, should be unique"))
+    name = models.CharField(_("name"), max_length=200, unique=True,
+                            default=generate_account_id,
+                            help_text=_("Internal name, should be unique"))
     invoice_label = models.CharField(
         _("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT
     )

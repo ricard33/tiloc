@@ -32,6 +32,7 @@ export interface Subscription {
 }
 
 export interface Account {
+  id: string;
   is_active: boolean;
   is_initialized: boolean;
   current_plan: {

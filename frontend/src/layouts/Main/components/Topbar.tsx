@@ -6,12 +6,14 @@ import {
   AppBar,
   AppBarProps,
   Avatar,
+  Divider,
   Hidden,
   IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  Stack,
   Theme,
   Toolbar
 } from "@mui/material";
@@ -52,7 +54,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: "white",
     fontSize: "2em"
   },
-  avatar: {}
 }));
 
 export interface TopbarProps extends AppBarProps {
@@ -129,9 +130,8 @@ const Topbar: React.FC<TopbarProps> = (props) => {
         <NotificationButton />
         <Avatar
           alt="Person"
-          className={classes.avatar}
-          component={IconButton}
           src={avatar}
+          style={{cursor: "pointer"}}
           aria-controls="user-menu"
           aria-haspopup="true"
           onClick={handleClickUser}
@@ -152,6 +152,20 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           open={Boolean(anchorEl)}
           onClose={handleCloseUserMenu}
         >
+          <Stack direction={"row"} spacing={2} style={{margin: "5px"}}>
+            <Avatar
+              alt="Person"
+              style={{ width: "80px", height: "80px" }}
+              // component={IconButton}
+              src={avatar}
+            />
+            <Stack direction={"column"}>
+              <span style={{fontSize: "1.25em", fontWeight: "bold"}}>{user.full_name}</span>
+              <span style={{fontSize: "0.8em"}}>{user.email}</span>
+              <span style={{fontSize: "0.7em"}}>{t("ID:")}&nbsp;{user.account.id}</span>
+            </Stack>
+          </Stack>
+          <Divider />
           <MenuItem component={Link} to={"/account"} onClick={handleCloseUserMenu}>
             <ListItemIcon>
               <AccountBoxIcon fontSize="small" />

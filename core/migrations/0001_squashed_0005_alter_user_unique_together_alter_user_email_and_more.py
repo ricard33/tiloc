@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             name='Account',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(help_text='Internal name, should be unique', max_length=200, unique=True, verbose_name='name')),
+                ('name', models.CharField(default=core.models.generate_account_id, help_text='Internal name, should be unique', max_length=200, unique=True, verbose_name='name')),
                 ('is_active', models.BooleanField(default=True)),
             ],
             options={
