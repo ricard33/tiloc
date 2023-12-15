@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     "notifier",
     "core",
     # 'frontend',
+    'anymail',
     "django.contrib.admin",  # after to allow templates override
 ]
 
@@ -235,6 +236,9 @@ if os.path.exists(DJANGO_VITE_ASSETS_PATH):
 ADMINS = (("Support", config.get("APP", "EMAIL_ADMIN", "support@tiloc.fr")),)
 
 # Email configuration
+
+EMAIL_BACKEND = config.get("EMAIL", "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+
 DEFAULT_FROM_EMAIL = config.get("EMAIL", "DEFAULT_FROM_EMAIL", "app@tiloc.fr")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_HOST = config.get("EMAIL", "SMTP_HOST", "smtp-crd.alwaysdata.net")
@@ -243,6 +247,13 @@ EMAIL_HOST_USER = config.get("EMAIL", "SMTP_USER", "")
 EMAIL_HOST_PASSWORD = config.get("EMAIL", "SMTP_PASSWORD", "")
 EMAIL_USE_TLS = True
 EMAIL_SUBJECT_PREFIX = config.get("EMAIL", "SUBJECT_PREFIX", "[Tiloc]") + " "
+
+ANYMAIL = {
+    "SENDINBLUE_API_KEY": config.get("EMAIL", "SENDINBLUE_API_KEY", ""),
+    "MAILJET_API_KEY": config.get("EMAIL", "MAILJET_API_KEY", ""),
+    "MAILJET_SECRET_KEY": config.get("EMAIL", "MAILJET_SECRET_KEY", ""),
+}
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 

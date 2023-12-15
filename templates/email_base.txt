@@ -1,0 +1,10 @@
+{% block email_body %}{% endblock %}
+
+{% block email_footer %}
+---
+Cet email a été envoyé à {{ user.email }}
+Vous avez reçu cet email car vous êtes inscrit sur Tiloc.
+
+Tiloc, 17 allée des sucriers, 97229 Les Trois Îlets, Martinique
+Email: info@tiloc.fr
+{% endblock %}

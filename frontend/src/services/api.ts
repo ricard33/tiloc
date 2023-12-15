@@ -475,7 +475,7 @@ export const api = createApi({
     }),
     readAllNotifications: builder.mutation<Notification, void>({
       query: () => {
-        return { url: `notification/all_read/`, method: "POST" };
+        return { url: `notification/all_read/`, method: "PATCH" };
       }
     }),
 

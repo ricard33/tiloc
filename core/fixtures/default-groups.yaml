@@ -75,6 +75,8 @@
             - [ "delete_user", "core", "user" ]
             - [ "view_user", "core", "user" ]
             - [ "view_sentnotification", "notifier", "sentnotification" ]
+            - [ "change_sentnotification", "notifier", "sentnotification" ]
+            - [ "delete_sentnotification", "notifier", "sentnotification" ]
 -   model: auth.group
     fields:
         name: standard
@@ -113,6 +115,8 @@
             - [ "view_seasonalvariation", "core", "seasonalvariation" ]
             - [ "view_service", "core", "service" ]
             - [ "view_sentnotification", "notifier", "sentnotification" ]
+            - [ "change_sentnotification", "notifier", "sentnotification" ]
+            - [ "delete_sentnotification", "notifier", "sentnotification" ]
 -   model: auth.group
     fields:
         name: readonly
@@ -135,6 +139,8 @@
             - [ "view_seasonalvariation", "core", "seasonalvariation" ]
             - [ "view_service", "core", "service" ]
             - [ "view_sentnotification", "notifier", "sentnotification" ]
+            - [ "change_sentnotification", "notifier", "sentnotification" ]
+            - [ "delete_sentnotification", "notifier", "sentnotification" ]
 -   model: auth.group
     fields:
         name: external
@@ -150,3 +156,5 @@
             - [ "view_lodging", "core", "lodging" ]
             - [ "view_service", "core", "service" ]
             - [ "view_sentnotification", "notifier", "sentnotification" ]
+            - [ "change_sentnotification", "notifier", "sentnotification" ]
+            - [ "delete_sentnotification", "notifier", "sentnotification" ]

@@ -1,3 +1,6 @@
+{% extends "email_base.txt" %}
+
+{% block email_body %}
 Bonjour {{ user.first_name }},
 
 Merci pour votre inscription sur Tiloc. Le logiciel pour Location Saisonnière, développé par des hôtes, tout comme vous.
@@ -7,13 +10,6 @@ Si le lien ci-dessus ne devait pas fonctionner, merci de copier le lien suivant 
 
 {{ link }}
 
-Cordialement,
-
+Bien cordialement,
 L'équipe Tiloc
-
----
-Cet email a été envoyé à {{user.email}}
-Vous avez reçu cet email car vous êtes inscrit sur Tiloc.
-
-Cédric RICARD, 17 allée des sucriers, 97229 Les Trois Îlets, Martinique
-Email: service@tigecko.fr
+{% endblock %}

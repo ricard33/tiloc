@@ -1,0 +1,71 @@
+{% extends "email_base.html" %}
+
+{% block email_body %}
+    <table
+        border="0" cellpadding="0" cellspacing="0" width="590" class="templateContainer"
+        style="max-width:590px!important; width: 590px;"
+    >
+        <tbody>
+        <tr>
+            <td height="20" style="font-size:1px; line-height:20px; mso-hide: all;">&nbsp;</td>
+        </tr>
+        <tr>
+            <td
+                valign="top" align="center"
+                style="border-bottom: 1px solid rgb(229, 229, 229); border-radius: 0px; padding-left: 20px; padding-right: 20px; border-collapse: separate;"
+            >
+                <table
+                    cellpadding="0" border="0" align="center" cellspacing="0"
+                    class="logo-img-center" style="margin-bottom: 10px"
+                >
+                    <tbody>
+                    <tr>
+                        <td valign="middle" align="center" style="line-height: 1px;">
+                            <div>
+                                <a style="text-decoration:none;" target="_blank" href="https://tiloc.fr">
+                                    <img
+                                        width="150" vspace="0" hspace="0" border="0" alt="Tiloc"
+                                        style="float: left;max-width:150px;" class="rnb-logo-img"
+                                        src="{{ base_url }}/static/mails/tiloc-logo-150x52.png"
+                                    >
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td height="20" style="font-size:1px; line-height:20px; mso-hide: all;">&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="font-size:14px; color:#3c4858;text-align: left;">
+                <p><strong>Bonjour {{ user.first_name }},</strong></p>
+                <p>Je m'appelle Cédric, concepteur de Tiloc.
+                    Je suis ravi de vous accueillir dans notre version d'essai !
+                </p>
+                <p>Je suis convaincu que Tiloc peut vous aider à améliorer votre activité de location saisonnière, quels
+                    que
+                    soient vos objectifs. Je suis là pour vous accompagner et vous aider à tirer le meilleur parti de
+                    notre
+                    logiciel.
+                </p>
+                <p><strong>Prêt à booster vos réservations ?</strong><br />
+                    Vous pouvez vous connecter à votre compte en cliquant sur ce lien :<br />
+                    <a href="https://app.tiloc.fr/">https://app.tiloc.fr/</a>
+                </p>
+                <p>N'hésitez pas à me contacter si vous avez des questions ou si vous souhaitez en savoir
+                    plus sur Tiloc.
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size:14px;">
+                <p>Bien cordialement,</p>
+                <p>Cédric</p>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

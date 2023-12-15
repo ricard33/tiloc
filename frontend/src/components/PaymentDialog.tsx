@@ -154,7 +154,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
           {t("Cancel")}
         </Button>
         <Button onClick={handleSubmit(onSubmit)} color="primary" type="submit">
-          {payment!.id ? t("Modify") : t("Add")}
+          {payment!.id ? t("Save") : t("Add")}
         </Button>
       </DialogActions>
     </Dialog>

@@ -736,6 +736,27 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-anymail"
+version = "10.2"
+description = "Django email backends and webhooks for Amazon SES, Brevo (Sendinblue),     MailerSend, Mailgun, Mailjet, Mandrill, Postal, Postmark, Resend,     SendGrid, and SparkPost"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "django_anymail-10.2-py3-none-any.whl", hash = "sha256:ca273abbc04b5ce06d1f3b3e5f28e2d79331519198fa6d6b5ba1b5aa5eea02f7"},
+    {file = "django_anymail-10.2.tar.gz", hash = "sha256:1f3006d3b16874aaa32976078da6cdc9baa7f5274cf80e3fc51a288887617aaf"},
+]
+
+[package.dependencies]
+django = ">=2.0"
+requests = ">=2.4.3"
+urllib3 = ">=1.25.0"
+
+[package.extras]
+amazon-ses = ["boto3"]
+postal = ["cryptography"]
+resend = ["svix"]
+
+[[package]]
 name = "django-constance"
 version = "3.1.0"
 description = "Django live settings with pluggable backends, including Redis."
@@ -3012,4 +3033,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "4f50c86e5fbb410fbfcfb0cc069b87b12b774ecc76e9fb378a2f5cf17b9659f3"
+content-hash = "919f3228164ad6ee2f5522cb230ca730ea0dbfb0830ccf6220a0978257fe60c3"

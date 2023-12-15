@@ -36,6 +36,7 @@ from notifier.models import SentNotification
 from . import models
 from .contracts import generate_contract, generate_empty_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
+from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
 from .pdf_tools import generate_pdf
 from .permissions import IsCompanyAdminPermissions, IsSuperUserPermission
@@ -212,6 +213,7 @@ class SignUpAPI(KnoxLoginView):
                 ),
             )
 
+        send_generic_email("welcome", request.user)
         return super(SignUpAPI, self).post(request, format=None)
 
 
@@ -569,7 +571,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-    @action(detail=False, methods=["POST"])
+    @action(detail=False, methods=["PATCH"])
     def all_read(self, request):
         self.get_queryset().filter(read=False).update(read=True)
         return Response(status=status.HTTP_200_OK)

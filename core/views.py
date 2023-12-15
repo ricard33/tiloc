@@ -17,7 +17,7 @@ from django_email_verification.errors import NotAllFieldCompiled
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from core import models
@@ -175,6 +175,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     return Response(data)
 
 
+@permission_classes([IsAdminUser])
 def preview_verification_email(request):
     user = request.user
     exp = default_token_generator.now() + 60 * 60
@@ -183,9 +184,22 @@ def preview_verification_email(request):
     return TemplateResponse(request, "signup/mail_body.html", context)
 
 
+@permission_classes([IsAdminUser])
 def preview_verified(request):
     try:
         template = settings.EMAIL_MAIL_PAGE_TEMPLATE
         return render(request, template, {"success": True, "user": request.user, "request": request})
     except (AttributeError, TypeError):
         raise NotAllFieldCompiled("EMAIL_MAIL_PAGE_TEMPLATE field not found")
+
+
+def get_base_url(request):
+    if request:
+        return f"{request.scheme}://{request.get_host()}"
+    else:
+        return settings.EMAIL_PAGE_DOMAIN
+
+
+@permission_classes([IsAdminUser])
+def preview_welcome(request):
+    return render(request, 'signup/welcome_body.html', {"user": request.user, "base_url": get_base_url(request)})

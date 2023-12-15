@@ -1,0 +1,20 @@
+{% extends "email_base.txt" %}
+
+{% block email_body %}
+Bonjour {{ user.first_name }},
+
+Je m'appelle Cédric, concepteur de Tiloc. Je suis ravi de vous accueillir dans notre version d'essai !
+
+Je suis convaincu que Tiloc peut vous aider à améliorer votre activité de location saisonnière,
+quels que soient vos objectifs. Je suis là pour vous accompagner et vous aider à tirer le meilleur
+parti de notre logiciel.
+
+Prêt à booster vos réservations ?
+Vous pouvez vous connecter à votre compte en cliquant sur ce lien :
+https://app.tiloc.fr/
+
+N'hésitez pas à me contacter si vous avez des questions ou si vous souhaitez en savoir plus sur Tiloc.
+
+Bien cordialement,
+Cédric
+{% endblock %}

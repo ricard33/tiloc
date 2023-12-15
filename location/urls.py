@@ -79,6 +79,7 @@ urlpatterns = [
 
     re_path("preview/verif/", views.preview_verification_email),
     re_path("preview/verified/", views.preview_verified),
+    re_path("preview/welcome/", views.preview_welcome),
 ]
 
 if settings.ENV == "dev":
