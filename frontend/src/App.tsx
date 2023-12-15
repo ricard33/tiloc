@@ -28,8 +28,7 @@ validate.validators = {
   ...validators
 };
 
-type Props = {
-};
+type Props = {};
 
 function App(props: Props) {
   const dispatch = useDispatch();
@@ -45,7 +44,7 @@ function App(props: Props) {
   }, [refetchUser, token]);
 
   useEffect(() => {
-    if(isNeedToReloadUser)
+    if (isNeedToReloadUser)
       refetchUser();
   }, [refetchUser, isNeedToReloadUser]);
 
@@ -58,8 +57,8 @@ function App(props: Props) {
             loaded: true,
             version: response.data.version,
             buildDate: formatDate(parseISO(response.data.build_date)),
-            canRegister: response.data.can_register,
-          }))
+            canRegister: response.data.can_register
+          }));
         })
         .catch(() => {
         });
@@ -67,28 +66,32 @@ function App(props: Props) {
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);
-    if(currentUser) {
+    if (currentUser) {
       dispatch(auth.userLoaded(currentUser));
       // console.log(currentUser.account);
       // console.log("End fo validity: ", currentUser.account.validity);
-      if(isValidDate(currentUser.account.validity)) {
-        console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
-      }
-      const remainingDays = isValidDate(currentUser.account.validity) ?
-        differenceInCalendarDays(currentUser.account.validity, new Date()) : -1;
-      if(remainingDays < 0) {
+      if (currentUser.account.trial_is_over) {
         showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
-      }
-      else if(remainingDays < 14) {
-        console.log(`Your subscription will end in ${remainingDays} days.`);
-        const showMessage = remainingDays < 5 ? showWarning : showInfo;
-        showMessage(t("Your subscription will end in {{ count }} days.", {count: remainingDays}));
+      } else if (currentUser.account.current_subscription.status !== "active") {
+        if (isValidDate(currentUser.account.validity)) {
+          console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
+        }
+        const remainingDays = isValidDate(currentUser.account.validity) ?
+          differenceInCalendarDays(currentUser.account.validity, new Date()) : -1;
+        if (currentUser.account.trial_is_over) {
+          showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
+        } else if (remainingDays < 14) {
+          console.log(`Your subscription will end in ${remainingDays} days.`);
+          const showMessage = remainingDays < 5 ? showWarning : showInfo;
+          showMessage(t("Your subscription will end in {{ count }} days.", { count: remainingDays }));
+        }
       }
     }
-  }, [dispatch, currentUser, token, showInfo, t, showWarning]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
 
   useEffect(() => {
-    if(userLoadingError)
+    if (userLoadingError)
       dispatch(auth.authenticationError(userLoadingError));
   }, [dispatch, userLoadingError]);
 

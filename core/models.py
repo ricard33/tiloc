@@ -92,7 +92,7 @@ class AccountQuerySet(models.QuerySet):
 def generate_account_id():
     alphabet = [chr(i) for i in range(48, 58)]
     while True:
-        account_id = ''
+        account_id = ""
         for i in range(6):
             if not account_id:
                 account_id += choice(alphabet[1:])  # don't start with 0
@@ -113,9 +113,14 @@ class Account(models.Model):
         NOTE = "note", _("Note")
         RECEIPT = "receipt", _("Receipt")
         QUITTANCE = "quittance", _("Quittance")
-    name = models.CharField(_("name"), max_length=200, unique=True,
-                            default=generate_account_id,
-                            help_text=_("Internal name, should be unique"))
+
+    name = models.CharField(
+        _("name"),
+        max_length=200,
+        unique=True,
+        default=generate_account_id,
+        help_text=_("Internal name, should be unique"),
+    )
     invoice_label = models.CharField(
         _("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT
     )
@@ -871,6 +876,28 @@ class Subscription(models.Model):
     @property
     def customer_dashboard_url(self):
         return settings.STRIPE_CUSTOMER_DASHBOARD_URL  # + "?prefilled_email=" + self.customer.
+
+
+class Invoice(models.Model):
+    class Status(models.TextChoices):
+        draft = "draft", "draft"
+        open = "open", "open"
+        paid = "paid", "paid"
+        uncollectible = "uncollectible", "uncollectible"
+        void = "void", "void"
+
+    id = models.CharField(max_length=255, primary_key=True)
+    customer = models.ForeignKey(Account, to_field="stripe_customer_id", on_delete=models.CASCADE)
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, null=True, blank=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=Status.choices)
+    hosted_invoice_url = models.URLField(null=True, blank=True)
+    period_start = models.DateTimeField()
+    period_end = models.DateTimeField()
+    next_payment_attempt = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    _account_qs_path = "customer"
 
 
 class SyncRemovedByExternal(models.Model):
