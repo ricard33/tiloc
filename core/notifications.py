@@ -4,6 +4,7 @@ from notifier.shortcuts import create_notification
 
 create_notification('subscription-added')
 create_notification('subscription-modified')
+create_notification('trial_will_end')
 create_notification('booking-added', _("Booking added"))
 create_notification('booking-modified', _("Booking modified"), default_notify=False)
 create_notification('booking-canceled', _("Booking canceled"))

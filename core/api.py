@@ -33,6 +33,7 @@ from stripe import Subscription as StripeSubscription
 
 from location import __date__, __version__
 from notifier.models import SentNotification
+from notifier.shortcuts import send_notification
 
 from . import models
 from .contracts import generate_contract, generate_empty_contract
@@ -831,8 +832,20 @@ def stripe_webhook(request):
                 logger.warning("Subscription update for unknown customer '%s'", subscription.customer)
         elif event.type == "customer.subscription.trial_will_end":
             logger.info("[%s]", event.type)
-            # TODO send email to customer
-            # TODO create notification
+            subscription: StripeSubscription = event.data.object
+            try:
+                account = models.Account.objects.get(stripe_customer_id=subscription.customer)
+                # TODO send email to customer
+                send_notification(
+                    "trial_will_end",
+                    account.user_set.all(),
+                    _("The trial period of your subscription will end on %(date)s") % {
+                        "date": arrow.get(subscription.trial_end).date().strftime("%x")
+                    },
+                    "/account/subscription",
+                )
+            except models.Account.DoesNotExist:
+                logger.warning("'Trial will end' notification for unknown customer '%s'", subscription.customer)
 
         elif event.type == "payment_intent.succeeded":
             logger.info("[%s]", event.type)
