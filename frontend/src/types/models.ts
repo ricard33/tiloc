@@ -27,6 +27,8 @@ export interface Subscription {
   default_payment_method: {
     type: string;
     description: string;
+    exp_month: number;
+    exp_year: number;
   };
   customer_dashboard_url: string;
 }

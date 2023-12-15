@@ -92,7 +92,15 @@ function Subscription() {
               {user.account.current_subscription.default_payment_method &&
                 <>
                   <Label xs={5}>{t("Credit card")}</Label>
-                  <Value xs={7}>{user.account.current_subscription.default_payment_method.description}</Value>
+                  <Value xs={7}>
+                    <Stack direction={"column"}>
+                      {user.account.current_subscription.default_payment_method.description}
+                      <span style={{fontWeight: "lighter" }}>{t("Expire: {{month}}/{{year}}", {
+                        month: user.account.current_subscription.default_payment_method.exp_month.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}),
+                        year: user.account.current_subscription.default_payment_method.exp_year,
+                      })}</span>
+                    </Stack>
+                  </Value>
                 </>
               }
               <Label xs={5}>{t("Customer portal")}</Label>
