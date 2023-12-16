@@ -307,8 +307,10 @@ IMPORT_EXPORT_SKIP_ADMIN_LOG = True
 
 CRON_CLASSES = [
     "core.cron.SyncBookingsJob",
+    "core.cron.ExportBookingsJob",
     # ...
 ]
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 30
 
 WKHTMLTOPDF_PATH = config.get("PDF", "WKHTMLTOPDF_PATH", "wkhtmltopdf")
 

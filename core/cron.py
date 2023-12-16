@@ -62,7 +62,7 @@ class SyncBookingsJob(CronJobBase):
 
 
 class ExportBookingsJob(CronJobBase):
-    schedule = Schedule(run_at_times="02:00")
+    schedule = Schedule(run_at_times=["02:00"])
     code = "core.export_bookings"  # a unique code
     PURGE_OLDER_THAN_DAYS = 30
 

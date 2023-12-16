@@ -940,7 +940,7 @@ def create_or_update_subscription(subscription):
 
 
 def create_or_update_invoice(stripe_invoice):
-    if not models.Account.objects.filter(customer_id=stripe_invoice.customer).exists():
+    if not models.Account.objects.filter(stripe_customer_id=stripe_invoice.customer).exists():
         logger.warning("Invoice for an unknown customer [%s]", stripe_invoice.customer)
         return
     models.Invoice.objects.get_or_create(

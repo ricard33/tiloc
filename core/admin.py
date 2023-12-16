@@ -170,7 +170,7 @@ FieldListFilter.register(lambda f: f.remote_field, RelatedOnlyFieldListFilter, t
 
 @admin.register(models.Account, site=site)
 class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = ("name", "is_active", "created", "validity", "current_plan", "stripe_customer_id")
+    list_display = ("name", "admin_user", "is_active", "created", "validity", "current_plan", "stripe_customer_id")
     list_filter = ("is_active",)
 
     actions = ["regenerate_id"]
@@ -180,6 +180,11 @@ class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
         for account in queryset:
             account.name = models.generate_account_id()
             account.save(update_fields=["name"])
+
+    def admin_user(self, obj: models.Account):
+        user = obj.user_set.filter(groups__name="administrator").first()
+        if user:
+            return "%s <%s>" % (user.get_full_name(), user.email)
 
 
 @admin.register(models.User, site=site)
@@ -608,6 +613,10 @@ class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 @admin.register(models.Subscription, site=site)
 class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("id", "customer", "plan", "created", "start_date", "current_period_start", "current_period_end", "status", "cancel_at_period_end", "latest_invoice")
+
+@admin.register(models.Invoice, site=site)
+class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    list_display = ("id", "customer", "subscription", "total", "status", "hosted_invoice_url", "period_start", "period_end", "next_payment_attempt", "created")
 
 
 site.register(models.Booking, BookingAdmin)
