@@ -22,6 +22,7 @@ import { useTranslation } from "react-i18next";
 import { formatDate, isValidDate } from "./common/dateUtils";
 import axios from "axios";
 import { useAppSelector } from "./app/hooks";
+import ChatwootWidget from "./components/ChatwootWidget";
 
 validate.validators = {
   ...validate.validators,
@@ -103,6 +104,7 @@ function App(props: Props) {
         <DateProvider locale={frLocale}>
           <ConfirmProvider>
             <Notifier />
+            <ChatwootWidget token={"UE45iXRLSEwoFyg8AkNgvivH"}/>
             <BrowserRouter>
               <Routes />
             </BrowserRouter>
