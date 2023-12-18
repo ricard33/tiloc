@@ -110,9 +110,7 @@ def make_context(booking, url_server):
         "Réservation_SERVICES_ADDITIONELS": format_services(
             booking.id and booking.bookedservice_set.filter(service__not_included_in_price=True) or [], booking
         ),
-        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(
-            booking.daily_tourist_tax / max(booking.adults, 1)
-        ),
+        "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax_per_adult),
         "Réservation_TAXE_DE_SEJOUR": format_decimal(booking.tourist_tax),
         "Réservation_ECHEANCE_DU_SOLDE": booking.begin_date
         and format_date(arrow.get(booking.begin_date).shift(days=-booking.lodging.balance_due_date).date(), "short")

@@ -604,7 +604,7 @@ class Booking(models.Model):
         return self.computed_tourist_tax()
 
     @property
-    def daily_tourist_tax(self):
+    def daily_tourist_tax_per_adult(self):
         if self.adults > 0:
             return self.tourist_tax / self.duration / self.adults
         return 0
@@ -908,3 +908,13 @@ class SyncRemovedByExternal(models.Model):
 
     class Meta:
         unique_together = ("sync", "booking")
+
+
+# class AddOn(models.Model):
+#     """Additional functionalities (marketplace)"""
+#     name = models.CharField(max_length=255)
+#
+#     class Meta:
+#         abstract = True
+#
+#
