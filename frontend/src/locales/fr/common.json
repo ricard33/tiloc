@@ -113,6 +113,7 @@
   "Failed to copy booking data to clipboard!": "Impossible de copier les données de la réservation !",
   "CANCELED": "ANNULÉE",
   "Copy booking to clipboard": "Copier les informations de la réservation dans le presse-papier",
+  "Need help?": "Besoin d'aide ?",
   "Processing transaction...": "Traitement des transactions...",
   "Transaction error": "Erreur de transaction",
   "Successful transaction": "Transaction réussie",

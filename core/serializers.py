@@ -185,7 +185,7 @@ class UserSerializer(serializers.ModelSerializer):
         import hmac
 
         # Define your key and identifier
-        secret = bytes("Dvo7FGVyHg3K8sxqv4wcjLrv", "utf-8")
+        secret = bytes("3kJewR8EYgoExYUMCEaFnhnc", "utf-8")
         identifier = bytes(str(user.id), "utf-8")
 
         # Generate the HMAC

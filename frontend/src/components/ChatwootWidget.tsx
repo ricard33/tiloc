@@ -3,6 +3,7 @@ import { useEffect, Fragment } from "react";
 import { User } from "../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { useTranslation } from "react-i18next";
 
 export interface ChatwootProps {
   token: string;
@@ -12,13 +13,15 @@ export interface ChatwootProps {
 declare global {
   interface Window {
     chatwootSDK: any;
+    chatwootSettings: any;
   }
 }
 
 function ChatwootScript(props: ChatwootProps) {
   const { token} = props;
+  const { t } = useTranslation();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
-  const BASE_URL = "https://app.chatwoot.com";
+  const BASE_URL = "https://support.tiloc.fr";
   const SCRIPT_URL = BASE_URL + "/packs/js/sdk.js";
   //const status = useScript(SCRIPT_URL)
 
@@ -42,6 +45,7 @@ function ChatwootScript(props: ChatwootProps) {
     (e.target as HTMLScriptElement).setAttribute("data-status", "error");
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const checkExistingScript = useCallback((): HTMLScriptElement | null => document.querySelector(`script[src="${SCRIPT_URL}"]`), []);
 
   useEffect(() => {
@@ -52,6 +56,16 @@ function ChatwootScript(props: ChatwootProps) {
     let existingScriptEl: HTMLScriptElement | null = checkExistingScript();
 
     if (!existingScriptEl) {
+      // Add Chatwoot Settings
+      window.chatwootSettings = {
+        hideMessageBubble: false,
+        position: "right", // This can be left or right
+        locale: "fr", // Language to be set
+        type: "expanded_bubble", // [standard, expanded_bubble]
+        launcherTitle: t("Need help?"),
+
+      };
+
       let scriptEl: HTMLScriptElement = document.createElement("script");
       scriptEl.id = "chatwoot-script";
       scriptEl.src = SCRIPT_URL;
@@ -63,7 +77,7 @@ function ChatwootScript(props: ChatwootProps) {
       return () => scriptEl.removeEventListener("load", onLoadHandler);
     }
 
-  }, [SCRIPT_URL, checkExistingScript, onLoadHandler, token]);
+  }, [SCRIPT_URL, checkExistingScript, onLoadHandler, t, token]);
 
   useEffect(() => {
     // console.log("Chatwoot: changing user", currentUser)

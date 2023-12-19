@@ -104,7 +104,7 @@ function App(props: Props) {
         <DateProvider locale={frLocale}>
           <ConfirmProvider>
             <Notifier />
-            <ChatwootWidget token={"UE45iXRLSEwoFyg8AkNgvivH"}/>
+            <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"}/>
             <BrowserRouter>
               <Routes />
             </BrowserRouter>
