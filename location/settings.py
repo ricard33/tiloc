@@ -233,7 +233,7 @@ if os.path.exists(DJANGO_VITE_ASSETS_PATH):
     STATICFILES_DIRS.append(DJANGO_VITE_ASSETS_PATH)
 
 # admin user
-ADMINS = (("Support", config.get("APP", "EMAIL_ADMIN", "support@tiloc.fr")),)
+ADMINS = (("Support", config.get("APP", "EMAIL_ADMIN", "app@tiloc.fr")),)
 
 # Email configuration
 
