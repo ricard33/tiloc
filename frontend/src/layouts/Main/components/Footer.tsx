@@ -15,12 +15,12 @@ const Footer = () => {
         &copy;{" "}
         <Link
           component="a"
-          href="https://ti-gecko.fr/"
+          href="https://tiloc.fr/"
           target="_blank"
         >
-          Ti'Gecko
+          Tiloc
         </Link>
-        . 2020-{new Date().getFullYear()}
+         2020-{new Date().getFullYear()}
       </Typography>
       <Typography variant="caption">
         Created with love for the environment.

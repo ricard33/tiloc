@@ -70,7 +70,7 @@ function App(props: Props) {
           showError(t("Server error. Can't load application information."));
           setInitialised(true);
         });
-  }, [dispatch, isAppInfoLoaded]);
+  }, [dispatch, isAppInfoLoaded, showError, t]);
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);

@@ -44,7 +44,8 @@ function SignIn() {
       setValue("email", "admin@app.tiloc.fr", {shouldDirty: true, shouldTouch: true});
       setValue("password", "admin", {shouldDirty: true, shouldTouch: true});
     }
-  }, [isDemo]);
+  }, [isDemo, setValue]);
+
   useEffect(() => {
     if (isAuthenticated) {
       console.debug("Redirect to", from);

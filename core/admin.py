@@ -614,8 +614,9 @@ class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("id", "customer", "plan", "created", "start_date", "current_period_start", "current_period_end", "status", "cancel_at_period_end", "latest_invoice")
 
+
 @admin.register(models.Invoice, site=site)
-class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+class InvoiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("id", "customer", "subscription", "total", "status", "hosted_invoice_url", "period_start", "period_end", "next_payment_attempt", "created")
 
 
