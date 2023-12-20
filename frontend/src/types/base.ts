@@ -12,6 +12,7 @@ export interface AppInfo {
   version: string;
   buildDate: string;
   canRegister: boolean;
+  useInAppChat: boolean;
 }
 
 const t = (s: string) => s;

@@ -7,6 +7,7 @@ const initialState: AppInfo = {
   version: "?",
   buildDate: "-",
   canRegister: false,
+  useInAppChat: false,
 };
 
 

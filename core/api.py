@@ -114,6 +114,7 @@ def info_view(request, *args, **kwargs):
             "version": __version__,
             "build_date": __date__.isoformat(timespec="seconds"),
             "can_register": config.CAN_SIGNUP,
+            "use_inapp_chat": config.USE_INAPP_CHAT,
         }
     )
 

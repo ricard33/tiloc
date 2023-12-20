@@ -58,7 +58,8 @@ function App(props: Props) {
             loaded: true,
             version: response.data.version,
             buildDate: formatDate(parseISO(response.data.build_date)),
-            canRegister: response.data.can_register
+            canRegister: response.data.can_register,
+            useInAppChat: response.data.use_inapp_chat,
           }));
         })
         .catch(() => {
