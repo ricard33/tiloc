@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import validate from "validate.js";
@@ -23,6 +23,7 @@ import { formatDate, isValidDate } from "./common/dateUtils";
 import axios from "axios";
 import { useAppSelector } from "./app/hooks";
 import ChatwootWidget from "./components/ChatwootWidget";
+import LoadingInProgress from "./components/LoadingInProgress";
 
 validate.validators = {
   ...validate.validators,
@@ -37,8 +38,9 @@ function App(props: Props) {
   const isNeedToReloadUser = useAppSelector((store) => store.auth.needToReload);
   const isAppInfoLoaded = useAppSelector((store) => store.appInfo.loaded);
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
-  const { showInfo, showWarning } = useAlert();
+  const { showInfo, showWarning, showError } = useAlert();
   const { t } = useTranslation();
+  const [initialised, setInitialised] = useState(false);
 
   useEffect(() => {
     refetchUser();
@@ -60,9 +62,13 @@ function App(props: Props) {
             buildDate: formatDate(parseISO(response.data.build_date)),
             canRegister: response.data.can_register,
             useInAppChat: response.data.use_inapp_chat,
+            isDemo: response.data.is_demo
           }));
+          setInitialised(true);
         })
         .catch(() => {
+          showError(t("Server error. Can't load application information."));
+          setInitialised(true);
         });
   }, [dispatch, isAppInfoLoaded]);
 
@@ -103,13 +109,17 @@ function App(props: Props) {
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
         <DateProvider locale={frLocale}>
-          <ConfirmProvider>
-            <Notifier />
-            <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"}/>
-            <BrowserRouter>
-              <Routes />
-            </BrowserRouter>
-          </ConfirmProvider>
+          {initialised ?
+            <ConfirmProvider>
+              <Notifier />
+              <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} />
+              <BrowserRouter>
+                <Routes />
+              </BrowserRouter>
+            </ConfirmProvider>
+            :
+            <LoadingInProgress />
+          }
         </DateProvider>
       </LocalizationProvider>
     </ThemeProvider>

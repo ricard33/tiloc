@@ -39,6 +39,7 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ENV = os.environ.get("APP_ENV", DEBUG and "dev" or "prod")
 UNITTEST = "test" in sys.argv or "pytest" in sys.modules
+IS_DEMO = config.getboolean("APP", "IS_DEMO", False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 try:
@@ -300,7 +301,7 @@ CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
     "DEBUG": (False, "Turn on DEBUG information on Django"),
     "CAN_SIGNUP": (False, "Turn on/off new accounts signup"),
-    "USE_INAPP_CHAT": (True, "Turn on/off in-app chat and support (using Chatwoot)"),
+    "USE_INAPP_CHAT": (not IS_DEMO, "Turn on/off in-app chat and support (using Chatwoot)"),
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True

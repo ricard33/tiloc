@@ -13,6 +13,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { LoginInfo } from "../../types";
 import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
 import { SerializedError } from "@reduxjs/toolkit";
+import { useAppSelector } from "../../app/hooks";
 
 
 type LoginData = {
@@ -24,6 +25,7 @@ type LoginData = {
 function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isDemo } = useAppSelector((store) => store.appInfo);
   const isAuthenticated = useSelector<RootState>(store => store.auth.isAuthenticated);
   const [doLogin] = useLoginMutation();
   // const classes = useStyles();
@@ -31,12 +33,18 @@ function SignIn() {
   let { from } = location.state || { from: { pathname: "/" } };
 
   const formContext = useForm<LoginData>();
-  const { control } = formContext;
+  const { control, setValue } = formContext;
   const { isDirty, errors } = useFormState({ control });
 
   const { t } = useTranslation();
   const { showError } = useAlert();
 
+  useEffect(() => {
+    if(isDemo) {
+      setValue("email", "admin@app.tiloc.fr", {shouldDirty: true, shouldTouch: true});
+      setValue("password", "admin", {shouldDirty: true, shouldTouch: true});
+    }
+  }, [isDemo]);
   useEffect(() => {
     if (isAuthenticated) {
       console.debug("Redirect to", from);
@@ -80,6 +88,8 @@ function SignIn() {
             >
               {t("Sign in with email address")}
             </Typography>
+            <Typography color="red" gutterBottom>{t("DEMO: use 'admin@app.tiloc.fr' as email")}<br />
+              {t("and 'admin' as pawword")}</Typography>
             <TextFieldElement
               control={control}
               name="email"

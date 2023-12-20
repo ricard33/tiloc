@@ -8,6 +8,7 @@ const initialState: AppInfo = {
   buildDate: "-",
   canRegister: false,
   useInAppChat: false,
+  isDemo: false,
 };
 
 

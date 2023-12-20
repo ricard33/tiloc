@@ -25,6 +25,8 @@ class SyncBookingsJob(CronJobBase):
     code = "core.sync_bookings"  # a unique code
 
     def do(self):
+        if settings.IS_DEMO:
+            return
         t0 = time()
         logger.info("Starting booking synchronizer")
         for sync in (
