@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function useInterval(callback: () => void, delay: number) {
   const savedCallback = useRef<() => void>(() => undefined);
 
   // Remember the latest callback.
-  useEffect(() => {
+  useLayoutEffect(() => {
     savedCallback.current = callback;
   }, [callback]);
 

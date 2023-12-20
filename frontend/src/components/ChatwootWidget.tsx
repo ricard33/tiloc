@@ -59,7 +59,7 @@ function ChatwootScript(props: ChatwootProps) {
       hideMessageBubble: !useInAppChat,
       position: "right", // This can be left or right
       locale: "fr", // Language to be set
-      type: "expanded_bubble", // [standard, expanded_bubble]
+      type: "standard", // [standard, expanded_bubble]
       launcherTitle: t("Need help?"),
 
     };

@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   appName: {
     color: "white",
     fontSize: "2em"
-  },
+  }
 }));
 
 export interface TopbarProps extends AppBarProps {
@@ -131,7 +131,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
         <Avatar
           alt="Person"
           src={avatar}
-          style={{cursor: "pointer"}}
+          style={{ cursor: "pointer" }}
           aria-controls="user-menu"
           aria-haspopup="true"
           onClick={handleClickUser}
@@ -152,7 +152,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           open={Boolean(anchorEl)}
           onClose={handleCloseUserMenu}
         >
-          <Stack direction={"row"} spacing={2} style={{margin: "5px"}}>
+          <Stack direction={"row"} spacing={2} style={{ margin: "5px" }}>
             <Avatar
               alt="Person"
               style={{ width: "80px", height: "80px" }}
@@ -160,9 +160,9 @@ const Topbar: React.FC<TopbarProps> = (props) => {
               src={avatar}
             />
             <Stack direction={"column"}>
-              <span style={{fontSize: "1.25em", fontWeight: "bold"}}>{user.full_name}</span>
-              <span style={{fontSize: "0.8em"}}>{user.email}</span>
-              <span style={{fontSize: "0.7em"}}>{t("ID:")}&nbsp;{user.account.id}</span>
+              <span style={{ fontSize: "1.25em", fontWeight: "bold" }}>{user.full_name}</span>
+              <span style={{ fontSize: "0.8em" }}>{user.email}</span>
+              <span style={{ fontSize: "0.7em" }}>{t("ID:")}&nbsp;{user.account.id}</span>
             </Stack>
           </Stack>
           <Divider />
