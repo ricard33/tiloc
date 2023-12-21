@@ -14,10 +14,10 @@ const Dashboard = () => {
   return (
     <Page>
       <Grid container spacing={4}>
-        <Grid item xl={9} lg={8} md={12} xs={12}>
+        <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
           <NextEvents />
         </Grid>
-        <Grid item xl={3} lg={4} md={12} sm={12} xs={12}>
+        <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
           <LatestBookings />
         </Grid>
         {/*<Grid*/}

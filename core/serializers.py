@@ -534,5 +534,7 @@ class NextEventSerializer(serializers.Serializer):
     date = serializers.DateField(read_only=True)
     lodging_name = serializers.CharField(read_only=True)
     event_type = serializers.CharField(read_only=True)
+    duration = serializers.IntegerField(read_only=True)
+    guests  = serializers.IntegerField(read_only=True)
     guest_name = serializers.CharField(read_only=True)
     booking_channel = serializers.CharField(read_only=True)

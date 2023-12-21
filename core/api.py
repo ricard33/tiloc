@@ -339,13 +339,16 @@ class BookingViewSet(viewsets.ModelViewSet):
             self.get_queryset()
             .filter(begin_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
-            .annotate(date=F("begin_date"), event_type=Value("CHECKIN"))
+            .annotate(
+                date=F("begin_date"), event_type=Value("CHECKIN"), guests=F("adults") + F("children") + F("babies")
+            )
             .values(
                 "id",
                 "date",
                 "guest_name",
                 "event_type",
-                "guest_name",
+                "duration",
+                "guests",
                 lodging_name=F("lodging__name"),
                 booking_channel=F("source__name"),
             )
@@ -354,13 +357,16 @@ class BookingViewSet(viewsets.ModelViewSet):
             self.get_queryset()
             .filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
-            .annotate(date=F("end_date"), event_type=Value("CHECKOUT"))
+            .annotate(
+                date=F("end_date"), event_type=Value("CHECKOUT"), guests=F("adults") + F("children") + F("babies")
+            )
             .values(
                 "id",
                 "date",
                 "guest_name",
                 "event_type",
-                "guest_name",
+                "duration",
+                "guests",
                 lodging_name=F("lodging__name"),
                 booking_channel=F("source__name"),
             )
@@ -841,9 +847,8 @@ def stripe_webhook(request):
                 send_notification(
                     "trial_will_end",
                     account.user_set.all(),
-                    _("The trial period of your subscription will end on %(date)s") % {
-                        "date": arrow.get(subscription.trial_end).date().strftime("%x")
-                    },
+                    _("The trial period of your subscription will end on %(date)s")
+                    % {"date": arrow.get(subscription.trial_end).date().strftime("%x")},
                     "/account/subscription",
                 )
             except models.Account.DoesNotExist:

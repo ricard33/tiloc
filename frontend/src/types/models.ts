@@ -219,6 +219,8 @@ export interface NextEvent {
   lodging_name: string;
   event_type: "CHECKOUT" | "CHECKIN";
   guest_name: string;
+  duration: number;
+  guests: number;
   booking_channel: string;
 }
 
