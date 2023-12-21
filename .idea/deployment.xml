@@ -13,6 +13,16 @@
           </excludedPaths>
         </serverdata>
       </paths>
+      <paths name="tiloc-demo">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/frontend" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
       <paths name="tiloc-staging">
         <serverdata>
           <mappings>

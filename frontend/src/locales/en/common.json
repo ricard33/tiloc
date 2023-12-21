@@ -1,4 +1,5 @@
 {
+  "Server error. Can't load application information.": "",
   "Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential.": "",
   "Your subscription will end in {{ count }} days._one": "",
   "Your subscription will end in {{ count }} days._other": "",
@@ -362,6 +363,8 @@
   "Login error: ": "Login error: ",
   "Sign in": "Sign in",
   "Sign in with email address": "Sign in with email address",
+  "DEMO: use 'admin@app.tiloc.fr' as email": "",
+  "and 'admin' as password": "",
   "Email address": "Email address",
   "Password": "Password",
   "Remember me": "",

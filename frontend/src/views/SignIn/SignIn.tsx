@@ -28,7 +28,6 @@ function SignIn() {
   const { isDemo } = useAppSelector((store) => store.appInfo);
   const isAuthenticated = useSelector<RootState>(store => store.auth.isAuthenticated);
   const [doLogin] = useLoginMutation();
-  // const classes = useStyles();
   let location = useLocation();
   let { from } = location.state || { from: { pathname: "/" } };
 
@@ -40,9 +39,10 @@ function SignIn() {
   const { showError } = useAlert();
 
   useEffect(() => {
-    if(isDemo) {
-      setValue("email", "admin@app.tiloc.fr", {shouldDirty: true, shouldTouch: true});
-      setValue("password", "admin", {shouldDirty: true, shouldTouch: true});
+    if (isDemo) {
+      console.log("set demo identifiers");
+      setValue("email", "admin@app.tiloc.fr", { shouldDirty: true, shouldTouch: true });
+      setValue("password", "admin", { shouldDirty: true, shouldTouch: true });
     }
   }, [isDemo, setValue]);
 
@@ -54,7 +54,11 @@ function SignIn() {
   }, [from, navigate, isAuthenticated]);
 
   const handleSignIn = (formData: LoginData) => {
-    doLogin({ email: formData.email, password: formData.password, keep_connected: formData.keep_connected }).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
+    doLogin({
+      email: formData.email,
+      password: formData.password,
+      keep_connected: formData.keep_connected
+    }).then((result: { data: LoginInfo } | { error: QueryError | SerializedError }) => {
       const { data, error } = result as any;
       if (error) {
         showError(t("Login error: ") + fetchErrorDecode(error));
@@ -76,7 +80,7 @@ function SignIn() {
         onSuccess={handleSignIn}
         formContext={formContext}
       >
-        <Paper sx={{padding: "1em", width: "500px"}}>
+        <Paper sx={{ padding: "1em", width: "500px" }}>
           <Stack direction="column" spacing={2} style={{ width: "100%" }}>
             <Typography
               variant="h2"
@@ -89,8 +93,8 @@ function SignIn() {
             >
               {t("Sign in with email address")}
             </Typography>
-            <Typography color="red" gutterBottom>{t("DEMO: use 'admin@app.tiloc.fr' as email")}<br />
-              {t("and 'admin' as pawword")}</Typography>
+            {isDemo && <Typography color="orange" gutterBottom>{t("DEMO: use 'admin@app.tiloc.fr' as email")}<br />
+              {t("and 'admin' as password")}</Typography>}
             <TextFieldElement
               control={control}
               name="email"
@@ -100,6 +104,7 @@ function SignIn() {
               label={t("Email address")}
               type="email"
               variant="outlined"
+              autoComplete="username"
             />
             <TextFieldElement
               control={control}
@@ -110,6 +115,7 @@ function SignIn() {
               label={t("Password")}
               type="password"
               variant="outlined"
+              autoComplete="current-password"
             />
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <CheckboxElement name="keep_connected" label={t("Remember me")} />
