@@ -154,7 +154,7 @@ class TilocAdminSite(admin.AdminSite):
         return urlpatterns
 
     def set_active_account(self, request):
-        account_id = request.POST["select_account"]
+        account_id = request.POST.get("select_account", None)
         if account_id:
             account = get_object_or_404(models.Account, id=account_id)
             request.session["account_goggles"] = {"id": account.id, "name": account.name}
