@@ -15,6 +15,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
+// @ts-ignore
 import { DateProvider } from "@ti-gecko/react-calendar-timeline";
 import { useAlert } from "./common/alertUtils";
 import { differenceInCalendarDays, formatDistanceToNow, parseISO } from "date-fns";

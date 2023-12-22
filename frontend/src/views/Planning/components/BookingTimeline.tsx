@@ -6,6 +6,7 @@ import Timeline, {
   TimelineHeaders,
   TimelineMarkers,
   TodayMarker
+// @ts-ignore
 } from "@ti-gecko/react-calendar-timeline";
 import "@ti-gecko/react-calendar-timeline/lib/Timeline.css";
 import { useTranslation } from "react-i18next";
@@ -33,9 +34,9 @@ type Props = {
   disabled: boolean,
   lodgings: Lodging[],
   onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
-  onItemDeselected: (booking: Booking) => void,
-  onItemSelected: (booking: Booking) => void,
   onOpenBooking: (booking: Booking) => void,
+  onEditBooking?: (booking: Booking) => void,
+  onCancelBooking?: (booking: Booking) => void,
   onBoundsChange: (canvasTimeStart: number, canvasTimeEnd: number) => void,
   settings: PlanningSettings,
 };
@@ -43,14 +44,14 @@ type Props = {
 const BookingTimeline: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate, endDate,
-    onOpenBooking, onCreateBooking, onItemSelected, onItemDeselected, onBoundsChange,
+    onOpenBooking, onCreateBooking, onBoundsChange,
+    onEditBooking, onCancelBooking,
     settings, disabled
   } = props;
   const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
   const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
   const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
-  const [selected, setSelected] = useState<number[]>([]);
   const { t } = useTranslation();
   const timelineRef = useRef<Timeline>(null);
   const [visibleDates, setVisibleDates] = useState({ start: beginDate.valueOf(), end: endDate.valueOf() });
@@ -65,18 +66,7 @@ const BookingTimeline: React.FC<Props> = props => {
   // items && console.debug(items[0]);
 
   function eventClicked(bookingId: number) {
-    onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
-  }
-
-  function eventItemSelected(bookingId: number) {
-    setSelected([bookingId]);
-    onItemSelected && onItemSelected(bookings.filter(b => b.id === bookingId)[0]);
     // onOpenBooking && onOpenBooking(bookings.filter(b => b.id === bookingId)[0]);
-  }
-
-  function eventItemDeselected(bookingId: number) {
-    setSelected(selected.filter((value /*index, arr*/) => value === bookingId));
-    onItemDeselected && onItemDeselected(bookings.filter(b => b.id === bookingId)[0]);
   }
 
   function onCanvasClick(groupId: number, time: number) {
@@ -104,7 +94,7 @@ const BookingTimeline: React.FC<Props> = props => {
   }, []);
 
   const renderSidebarHeader = makeRenderSidebarHeader(collapsed, setCollapsed);
-  const renderItem = makeRenderItem(onOpenBooking, settings);
+  const renderItem = makeRenderItem({ onOpenBooking, onEditBooking, onCancelBooking }, settings);
   const renderGroup = makeRenderGroup();
 
   return (
@@ -122,13 +112,10 @@ const BookingTimeline: React.FC<Props> = props => {
             // visibleTimeStart={beginDate.valueOf()}
             // visibleTimeEnd={endDate.valueOf()}
             onItemClick={eventClicked}
-            selected={selected}
-            onItemSelect={eventItemSelected}
-            onItemDeselect={eventItemDeselected}
             onCanvasClick={onCanvasClick}
             minZoom={14 * 86400 * 1000}
             canMove={false}
-            // canSelect={false}
+            canSelect={false}
             canChangeGroup={false}
             canResize={false}
             dragSnap={24 * 60 * 60 * 1000}

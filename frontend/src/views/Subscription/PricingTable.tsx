@@ -44,7 +44,7 @@ const PricingTable = (props: Props) => {
     { label: t("Synchronizing calendars"), available: false },
     { label: t("Lodging"), count: 1 },
     { label: t("User"), count: 1 },
-    { label: t("24/7 Support"), available: false }
+    { label: t("Premium support"), available: false }
   ];
 
   const ownerFeatures = [
@@ -52,7 +52,7 @@ const PricingTable = (props: Props) => {
     { label: t("Synchronizing calendars"), available: true },
     { label: t("Lodgings"), count: 3 },
     { label: t("Users"), count: 1 },
-    { label: t("24/7 Support"), available: true }
+    { label: t("Premium support"), available: true }
   ];
 
   const proFeatures = [
@@ -60,7 +60,7 @@ const PricingTable = (props: Props) => {
     { label: t("Synchronizing calendars"), available: true },
     { label: t("Lodgings"), count: 10 },
     { label: t("Users"), count: 10 },
-    { label: t("24/7 Support"), available: true }
+    { label: t("Premium support"), available: true }
   ];
 
   const plans = [

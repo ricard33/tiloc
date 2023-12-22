@@ -17,15 +17,14 @@ import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
 import { RootState } from "../../store";
 import { Booking, Lodging, User } from "../../types";
-import { useDeviceDetector } from "../../common/useDeviceDetector";
 import useWindowDimensions from "../../common/windowDimensions";
 import { getBookingStatuses } from "../../common/statusUtils";
+import { useBookingActions } from "../../common/bookingActions";
 
 
 const Planning = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { hasTouchScreen } = useDeviceDetector();
   const query = queryString.parse(location.search);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
@@ -33,10 +32,8 @@ const Planning = () => {
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
   const [monthsToDisplay, setMonthsToDisplay] = useLocalStorage("planning.monthsToDisplay", 12);
-  const [showTooltips, setShowTooltips] = useLocalStorage("planning.showTooltips", !hasTouchScreen);
-  const [smallTooltips, setSmallTooltips] = useLocalStorage("planning.smallTooltips", false);
   const [scrollingTimeline, setScrollingTimeline] = useLocalStorage("planning.scrollingTimeline", false);
-
+  const { onCancelBooking } = useBookingActions();
   const initialZoomLevel = isDesktop ? 2 : 1;
 
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
@@ -81,9 +78,14 @@ const Planning = () => {
     setDates({ start: new Date(canvasTimeStart), end: new Date(canvasTimeEnd) });
   }, []);
 
-  const onEditBooking = useCallback((booking: Booking) => {
+  const onOpenBooking = useCallback((booking: Booking) => {
     console.debug("EDIT ", booking.id);
     navigate(`${booking.id}`);
+  }, [navigate]);
+
+  const onEditBooking = useCallback((booking: Booking) => {
+    console.debug("EDIT ", booking.id);
+    navigate(`${booking.id}`, {state: {edit: true}});
   }, [navigate]);
 
   const onCreateBooking = useCallback((lodging: Lodging, begin_date: Date) => {
@@ -96,13 +98,6 @@ const Planning = () => {
     refetch();
   }, [navigate, refetch]);
 
-  const onSelectBooking = useCallback((booking: Booking) => {
-    console.debug("onSelectBooking", booking);
-  }, []);
-
-  const onDeselectBooking = useCallback(() => {
-  }, []);
-
   const onEditContract = useCallback((booking: Booking) => {
     navigate("/bookings/" + booking.id + "/contract");
   }, [navigate]);
@@ -112,17 +107,13 @@ const Planning = () => {
     if (typeof newSettings !== "undefined") {
       setShowPaymentStatus(newSettings.showPaymentStatus);
       setMonthsToDisplay(newSettings.monthsToDisplay);
-      setShowTooltips(newSettings.showTooltips);
-      setSmallTooltips(newSettings.smallTooltips);
       setScrollingTimeline(newSettings.scrollingTimeline);
     }
-  }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus, setShowTooltips, setSmallTooltips]);
+  }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus]);
 
   const settings: PlanningSettings = {
     showPaymentStatus,
     monthsToDisplay,
-    showTooltips,
-    smallTooltips,
     scrollingTimeline
   };
 
@@ -154,9 +145,9 @@ const Planning = () => {
             beginDate={dates.start}
             endDate={dates.end}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
-            onOpenBooking={onEditBooking}
-            onItemSelected={onSelectBooking}
-            onItemDeselected={onDeselectBooking}
+            onOpenBooking={onOpenBooking}
+            onEditBooking={onEditBooking}
+            onCancelBooking={onCancelBooking}
             onBoundsChange={onBoundsChange}
             settings={settings}
             disabled={isLoadingBookings}
@@ -170,9 +161,9 @@ const Planning = () => {
             lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
-            onOpenBooking={onEditBooking}
-            onItemSelected={onSelectBooking}
-            onItemDeselected={onDeselectBooking}
+            onOpenBooking={onOpenBooking}
+            onEditBooking={onEditBooking}
+            onCancelBooking={onCancelBooking}
             settings={settings}
             disabled={isLoadingBookings}
           />
@@ -201,8 +192,6 @@ const Planning = () => {
           settings={{
             showPaymentStatus,
             monthsToDisplay,
-            showTooltips,
-            smallTooltips,
             scrollingTimeline
           }}
           onClose={onCloseSettings}

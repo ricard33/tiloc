@@ -1,12 +1,12 @@
 import React from "react";
-import { Divider, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import NightsStayOutlinedIcon from "@mui/icons-material/NightsStayOutlined";
 import Groups2OutlinedIcon from "@mui/icons-material/Groups2Outlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../../common/dateUtils";
 import { parseISO } from "date-fns";
@@ -28,6 +28,7 @@ const InOutEvent: React.FC<Props> = props => {
   const { t } = useTranslation();
 
   // console.log(events);
+  /* eslint-disable react/no-multi-comp */
   function Sep() {
     return <HorizontalRuleIcon fontSize="small"/>
   }

@@ -35,7 +35,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const booking = (loadedBooking ?? newBooking) as Booking;
   const { data: allOptions, isSuccess: optionsLoaded } = useListServicesQuery();
   const { data: allGuests } = useAllGuestsQuery();
-  const [isEditMode, setIsEditMode] = useState(bookingId === "new");
+  const [isEditMode, setIsEditMode] = useState(bookingId === "new" || location.state?.edit);
   const { onCancelBooking, onUncancelBooking, onDeleteBooking } = useBookingActions();
 
   if(bookingError) {

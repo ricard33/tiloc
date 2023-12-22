@@ -59,7 +59,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
               :
               <Button
                 type="button"
-                className="delete-button"
+                className="cancel-button"
                 color="secondary"
                 startIcon={<EventBusyIcon />}
                 onClick={onCancelBooking}

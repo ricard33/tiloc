@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useState } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
 import { TFunction } from "react-i18next";
 import { add } from "date-fns";
@@ -8,9 +8,11 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import EuroIcon from "@mui/icons-material/Euro";
 import clsx from "clsx";
-import { BookingQuickView, HtmlTooltip, Tooltip } from "../../../components";
+import { Tooltip } from "../../../components";
 import BookingTooltip from "./BookingTooltip";
 import { PlanningSettings } from "./PlanningSettingsDialog";
+import { BookingHandlers } from "../../../common/bookingActions";
+import { Popover, PopoverProps } from "@mui/material";
 
 export const timeSteps = {
   second: 0,
@@ -153,15 +155,13 @@ export function makeGroups(lodgings: Lodging[], t: TFunction<"translation">) {
 }
 
 
-
-
 function getIconAndBgColor(booking: Booking): OtaIconProps {
   if (booking.status === BookingStatus.External.name && booking.source && booking.source.name in otaBranding) {
     return otaBranding[booking.source.name];
   } else
     return {
       bgColor: getBookingStatus(booking.status).color,
-      selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1),
+      selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1)
     };
 }
 
@@ -216,7 +216,9 @@ export function makeRenderSidebarHeader(collapsed: boolean, setCollapsed: (v: bo
   return renderSidebarHeader;
 }
 
-export function makeRenderItem(onOpenBooking: (booking: Booking) => void, settings: PlanningSettings) {
+export function makeRenderItem(
+  { onOpenBooking, onEditBooking, onCancelBooking }: BookingHandlers,
+  settings: PlanningSettings) {
 
   function renderItem(props: RenderItemProps) {
     // /* eslint-disable react/prop-types */
@@ -235,41 +237,63 @@ export function makeRenderItem(onOpenBooking: (booking: Booking) => void, settin
     }); // remove the title props
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
 
-    function getItem() {
-      return <div {...itemProps}>
-        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
+    function Item() {
+      const [open, setOpen] = useState(false);
+      const [anchorEl, setAnchorEl] = useState<PopoverProps["anchorEl"]>(null);
+      const id = open ? "virtual-element-popover" : undefined;
 
-        <div
-          className="rct-item-content item-content"
-          style={{ maxHeight: `${itemContext.dimensions.height}` }}
-        >
-          {item.icon ? item.icon : ""}
-          <div className="item-title">{itemContext.title}</div>
-          {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 ?
-            <EuroIcon
-              className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
-              style={{ height: `${itemContext.dimensions.height - 2}` }}
-            /> : ""}
-        </div>
-        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
-      </div>;
-    }
+      const handleClose = () => {
+        setOpen(false);
+      };
 
-    if (settings.showTooltips)
+      const handleOpen = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const getBoundingClientRect = () => {
+          const rect = new DOMRect(event.clientX, event.clientY, 1, 10);
+          console.log(rect);
+          return rect;
+        };
+
+        setOpen(true);
+        setAnchorEl({ getBoundingClientRect, nodeType: 1 });
+
+      };
+
       return (
-        settings.smallTooltips
-          ? <HtmlTooltip title={<BookingTooltip booking={item.booking} onOpenBooking={onOpenBooking} />} arrow>
-            {getItem()}
-          </HtmlTooltip>
-          :
-          <HtmlTooltip
-            title={<BookingQuickView booking={item.booking} readonly />} enterDelay={500}
-            arrow
+        <>
+          <div {...itemProps} onClick={handleOpen}>
+            {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
+
+            <div
+              className="rct-item-content item-content"
+              style={{ maxHeight: `${itemContext.dimensions.height}` }}
+            >
+              {item.icon ? item.icon : ""}
+              <div className="item-title">{itemContext.title}</div>
+              {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 ?
+                <EuroIcon
+                  className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
+                  style={{ height: `${itemContext.dimensions.height - 2}` }}
+                /> : ""}
+            </div>
+            {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
+          </div>
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+            onClose={handleClose}
           >
-            {getItem()}
-          </HtmlTooltip>
+            <BookingTooltip
+              booking={item.booking} onOpenBooking={onOpenBooking} onEditBooking={onEditBooking}
+              onCancelBooking={onCancelBooking}
+            />
+          </Popover>
+        </>
       );
-    else return getItem();
+    }
+    return <Item />;
   }
 
   return renderItem;

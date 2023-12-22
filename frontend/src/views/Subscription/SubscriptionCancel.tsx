@@ -75,7 +75,7 @@ function SubscriptionCancel() {
                         { label: t("Synchronizing calendars"), available: false },
                         { label: t("Multi-properties managment"), available: false },
                         { label: t("Multi users"), available: false },
-                        { label: t("24/7 Support"), available: false }
+                        { label: t("Premium support"), available: false }
                       ]}
                     />
                   </Grid2>

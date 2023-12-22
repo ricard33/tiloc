@@ -8,6 +8,12 @@ import { useConfirm } from "../libs/MuiConfirm";
 import { useTranslation } from "react-i18next";
 
 
+export type BookingHandlers = {
+  onOpenBooking?: (booking: Booking) => void;
+  onEditBooking?: (booking: Booking) => void;
+  onCancelBooking?: (booking: Booking) => void;
+}
+
 export const useBookingActions = () => {
   const [updateBooking] = useUpdateBookingMutation();
   const [deleteBooking] = useDeleteBookingMutation();

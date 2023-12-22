@@ -2,29 +2,11 @@ import React from "react";
 import clsx from "clsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { makeStyles } from "@mui/styles";
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardContent,
-  Button,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tooltip,
-  TableSortLabel, Theme
-} from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Divider, Theme } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-
-import { StatusBullet } from "../../../components";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { useNextEventsQuery } from "../../../services/api";
-import { formatDate } from "../../../common/dateUtils";
-import { parseISO } from "date-fns";
 import InOutEvent from "./InOutEvent";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -46,11 +28,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: "flex-end"
   }
 }));
-
-const statusColors = {
-  CHECKOUT: "success",
-  CHECKIN: "danger"
-};
 
 type Props = {
   className?: string
