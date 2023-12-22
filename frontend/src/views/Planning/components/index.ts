@@ -1,3 +1,3 @@
-export { default as BookingScheduler } from './BookingScheduler';
-export { default as BookingTimeline } from './BookingTimeline';
+export { default as BookingFixedTimeline } from './BookingFixedTimeline';
+export { default as BookingScrollingTimeline } from './BookingScrollingTimeline';
 export { ZoomNavBar, DateNavBar } from './NavBar';

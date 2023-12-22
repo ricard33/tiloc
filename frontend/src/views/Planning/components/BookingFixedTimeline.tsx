@@ -11,11 +11,11 @@ import Timeline, {
 import "@ti-gecko/react-calendar-timeline/lib/Timeline.css";
 import { add, startOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
-import "./BookingScheduler.scss";
-import { shiftUTCDateToLocalDate } from "../../../../common/tzUtils";
+import "./BookingFixedTimeline.scss";
+import { shiftUTCDateToLocalDate } from "../../../common/tzUtils";
 import clsx from "clsx";
-import useWindowDimensions from "../../../../common/windowDimensions";
-import { Booking, Lodging } from "../../../../types";
+import useWindowDimensions from "../../../common/windowDimensions";
+import { Booking, Lodging } from "../../../types";
 import {
   makeGroups,
   makeItems,
@@ -23,8 +23,8 @@ import {
   makeRenderItem,
   makeRenderSidebarHeader,
   timeSteps
-} from "../TimelineCommon";
-import { PlanningSettings } from "../PlanningSettingsDialog";
+} from "./TimelineCommon";
+import { PlanningSettings } from "./PlanningSettingsDialog";
 
 
 type Props = {
@@ -40,8 +40,7 @@ type Props = {
 };
 
 
-// TODO rename to BookingFixedTimeline
-const BookingScheduler: React.FC<Props> = props => {
+const BookingFixedTimeline: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate: _beginDate,
     onOpenBooking, onEditBooking, onCancelBooking, onCreateBooking,
@@ -165,4 +164,4 @@ const BookingScheduler: React.FC<Props> = props => {
 
 };
 
-export default BookingScheduler;
+export default BookingFixedTimeline;

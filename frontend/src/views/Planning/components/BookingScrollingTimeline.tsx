@@ -41,7 +41,7 @@ type Props = {
   settings: PlanningSettings,
 };
 
-const BookingTimeline: React.FC<Props> = props => {
+const BookingScrollingTimeline: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate, endDate,
     onOpenBooking, onCreateBooking, onBoundsChange,
@@ -157,4 +157,4 @@ const BookingTimeline: React.FC<Props> = props => {
 
 };
 
-export default BookingTimeline;
+export default BookingScrollingTimeline;

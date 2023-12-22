@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { add, parse, startOfMonth, sub } from "date-fns";
-import { BookingScheduler, BookingTimeline } from "./components";
+import { BookingFixedTimeline, BookingScrollingTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { IconButton } from "@mui/material";
@@ -139,7 +139,7 @@ const Planning = () => {
       </div>
       {scrollingTimeline ?
         <>
-          <BookingTimeline
+          <BookingScrollingTimeline
             bookings={bookings ?? []}
             lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
@@ -156,7 +156,7 @@ const Planning = () => {
           <DateNavBar
             date={dates.start} onChange={(newDate) => setDates({ start: newDate, end: add(newDate, { years: 1 }) })}
           />
-          <BookingScheduler
+          <BookingFixedTimeline
             bookings={bookings ?? []}
             lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
