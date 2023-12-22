@@ -53,9 +53,6 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
                     models.Activity.objects.create(
                         type=models.Activity.ActivityType.cancel_booking, author=user, booking=instance
                     )
-                    models.Activity.objects.create(
-                        type=models.Activity.ActivityType.modify_booking, author=user, booking=instance
-                    )
                     send_notification(
                         "booking-canceled",
                         users,
