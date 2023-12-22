@@ -365,6 +365,7 @@ class BookingSerializer(serializers.ModelSerializer):
     price_with_options = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     computed_tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    guests = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = models.Booking
@@ -442,6 +443,10 @@ class BookingSubSerializer(BookingSerializer):
             "custom_tourist_tax",
             "cancelled",
             "deleted",
+            "guests",
+            "adults",
+            "children",
+            "babies"
         ]
 
 
@@ -529,12 +534,12 @@ class GuestSerializer(serializers.Serializer):
     address = serializers.CharField(read_only=True)
 
 
-class NextEventSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
+class NextEventSerializer(BookingSerializer):
     date = serializers.DateField(read_only=True)
-    lodging_name = serializers.CharField(read_only=True)
     event_type = serializers.CharField(read_only=True)
-    duration = serializers.IntegerField(read_only=True)
-    guests  = serializers.IntegerField(read_only=True)
-    guest_name = serializers.CharField(read_only=True)
-    booking_channel = serializers.CharField(read_only=True)
+    # booking = BookingSubSerializer(read_only=True)
+    # lodging_name = serializers.CharField(read_only=True)
+    # duration = serializers.IntegerField(read_only=True)
+    # guests  = serializers.IntegerField(read_only=True)
+    # guest_name = serializers.CharField(read_only=True)
+    # booking_channel = serializers.CharField(read_only=True)

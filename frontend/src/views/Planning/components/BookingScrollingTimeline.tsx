@@ -34,9 +34,6 @@ type Props = {
   disabled: boolean,
   lodgings: Lodging[],
   onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
-  onOpenBooking: (booking: Booking) => void,
-  onEditBooking?: (booking: Booking) => void,
-  onCancelBooking?: (booking: Booking) => void,
   onBoundsChange: (canvasTimeStart: number, canvasTimeEnd: number) => void,
   settings: PlanningSettings,
 };
@@ -44,8 +41,7 @@ type Props = {
 const BookingScrollingTimeline: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate, endDate,
-    onOpenBooking, onCreateBooking, onBoundsChange,
-    onEditBooking, onCancelBooking,
+    onCreateBooking, onBoundsChange,
     settings, disabled
   } = props;
   const { width } = useWindowDimensions();
@@ -94,7 +90,7 @@ const BookingScrollingTimeline: React.FC<Props> = props => {
   }, []);
 
   const renderSidebarHeader = makeRenderSidebarHeader(collapsed, setCollapsed);
-  const renderItem = makeRenderItem({ onOpenBooking, onEditBooking, onCancelBooking }, settings);
+  const renderItem = makeRenderItem(settings);
   const renderGroup = makeRenderGroup();
 
   return (

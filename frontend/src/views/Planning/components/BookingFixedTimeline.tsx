@@ -33,9 +33,6 @@ type Props = {
   disabled: boolean,
   lodgings: Lodging[],
   onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
-  onOpenBooking: (booking: Booking) => void,
-  onEditBooking?: (booking: Booking) => void,
-  onCancelBooking?: (booking: Booking) => void,
   settings: PlanningSettings,
 };
 
@@ -43,7 +40,7 @@ type Props = {
 const BookingFixedTimeline: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate: _beginDate,
-    onOpenBooking, onEditBooking, onCancelBooking, onCreateBooking,
+    onCreateBooking,
     settings, disabled
   } = props;
   const { width, height } = useWindowDimensions();
@@ -93,7 +90,7 @@ const BookingFixedTimeline: React.FC<Props> = props => {
   }, []);
 
   const renderSidebarHeader = makeRenderSidebarHeader(collapsed, setCollapsed);
-  const renderItem = makeRenderItem({ onOpenBooking, onEditBooking, onCancelBooking }, settings);
+  const renderItem = makeRenderItem(settings);
   const renderGroup = makeRenderGroup();
 
   // eslint-disable-next-line react/no-multi-comp

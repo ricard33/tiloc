@@ -1,6 +1,5 @@
 import React from "react";
 import clsx from "clsx";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import { makeStyles } from "@mui/styles";
 import { Button, Card, CardActions, CardContent, CardHeader, Divider, Theme } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -60,9 +59,9 @@ const NextEvents: React.FC<Props> = props => {
       />
       <Divider />
       <CardContent className={classes.content}>
-        <PerfectScrollbar>
-          {events && events.map(event => <InOutEvent key={event.event_type + event.id} event={event} />)}
-        </PerfectScrollbar>
+        {events &&
+            events.map(event => <InOutEvent key={event.event_type + event.id} event={event} />)
+        }
       </CardContent>
       <Divider />
       <CardActions className={classes.actions}>

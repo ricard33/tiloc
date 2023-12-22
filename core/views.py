@@ -202,4 +202,4 @@ def get_base_url(request):
 
 @permission_classes([IsAdminUser])
 def preview_welcome(request):
-    return render(request, 'signup/welcome_body.html', {"user": request.user, "base_url": get_base_url(request)})
+    return render(request, "signup/welcome_body.html", {"user": request.user, "base_url": get_base_url(request)})

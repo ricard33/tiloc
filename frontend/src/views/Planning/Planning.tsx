@@ -19,7 +19,6 @@ import { RootState } from "../../store";
 import { Booking, Lodging, User } from "../../types";
 import useWindowDimensions from "../../common/windowDimensions";
 import { getBookingStatuses } from "../../common/statusUtils";
-import { useBookingActions } from "../../common/bookingActions";
 
 
 const Planning = () => {
@@ -33,7 +32,6 @@ const Planning = () => {
   const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
   const [monthsToDisplay, setMonthsToDisplay] = useLocalStorage("planning.monthsToDisplay", 12);
   const [scrollingTimeline, setScrollingTimeline] = useLocalStorage("planning.scrollingTimeline", false);
-  const { onCancelBooking, onUncancelBooking } = useBookingActions();
   const initialZoomLevel = isDesktop ? 2 : 1;
 
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
@@ -78,16 +76,6 @@ const Planning = () => {
     setDates({ start: new Date(canvasTimeStart), end: new Date(canvasTimeEnd) });
   }, []);
 
-  const onOpenBooking = useCallback((booking: Booking) => {
-    console.debug("EDIT ", booking.id);
-    navigate(`${booking.id}`);
-  }, [navigate]);
-
-  const onEditBooking = useCallback((booking: Booking) => {
-    console.debug("EDIT ", booking.id);
-    navigate(`${booking.id}`, {state: {edit: true}});
-  }, [navigate]);
-
   const onCreateBooking = useCallback((lodging: Lodging, begin_date: Date) => {
     console.debug("CREATE ", lodging ? lodging.id : null, begin_date);
     navigate(`new?lodging_id=${lodging.id}&begin_date=${formatISO(begin_date)}`);
@@ -110,13 +98,6 @@ const Planning = () => {
       setScrollingTimeline(newSettings.scrollingTimeline);
     }
   }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus]);
-
-  const onCancelOrUncancelBooking = useCallback((booking: Booking) => {
-    if(booking.cancelled)
-      onUncancelBooking(booking);
-    else
-      onCancelBooking(booking);
-  }, [onCancelBooking, onUncancelBooking]);
 
   const settings: PlanningSettings = {
     showPaymentStatus,
@@ -152,9 +133,6 @@ const Planning = () => {
             beginDate={dates.start}
             endDate={dates.end}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
-            onOpenBooking={onOpenBooking}
-            onEditBooking={onEditBooking}
-            onCancelBooking={onCancelOrUncancelBooking}
             onBoundsChange={onBoundsChange}
             settings={settings}
             disabled={isLoadingBookings}
@@ -168,9 +146,6 @@ const Planning = () => {
             lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
-            onOpenBooking={onOpenBooking}
-            onEditBooking={onEditBooking}
-            onCancelBooking={onCancelOrUncancelBooking}
             settings={settings}
             disabled={isLoadingBookings}
           />

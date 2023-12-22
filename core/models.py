@@ -609,6 +609,10 @@ class Booking(models.Model):
             return self.tourist_tax / self.duration / self.adults
         return 0
 
+    @property
+    def guests(self):
+        return self.adults + self.children + self.babies
+
     def computed_tourist_tax(self):
         if self.lodging.is_flat_rate_tourist_tax:
             daily_rate = self.lodging.max_daily_tourist_tax or 0

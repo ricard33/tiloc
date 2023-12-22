@@ -139,6 +139,7 @@ export interface Booking {
   begin_date: Date;
   end_date: Date;
   duration: number;
+  guests: number;
   adults: number;
   children: number;
   babies: number;
@@ -213,15 +214,9 @@ export interface Guest {
   address: string;
 }
 
-export interface NextEvent {
-  id: number;
-  date: string;
-  lodging_name: string;
+export interface NextEvent extends Booking {
+  date: Date;
   event_type: "CHECKOUT" | "CHECKIN";
-  guest_name: string;
-  duration: number;
-  guests: number;
-  booking_channel: string;
 }
 
 export interface CalendarSync {   // name is BookingChannelSync on API

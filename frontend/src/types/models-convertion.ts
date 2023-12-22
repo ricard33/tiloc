@@ -9,7 +9,7 @@ import {
   Payment,
   Service,
   User,
-  Notification
+  Notification, NextEvent
 } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
@@ -217,3 +217,14 @@ export function api2Notification(notification: Record<string, any>): Notificatio
     date: parseISO(notification.date)
   };
 }
+
+// ----- NEXT EVENTS -----
+
+export function api2NextEvent(event: Record<string, any>): NextEvent {
+  return {
+    ...api2Booking(event as NextEvent),
+    event_type: event.event_type,
+    date: parseISO(event.date)
+  };
+}
+

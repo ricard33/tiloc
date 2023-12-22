@@ -6,31 +6,37 @@ import { RootState } from "../store";
 import { useAlert } from "./alertUtils";
 import { useConfirm } from "../libs/MuiConfirm";
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 
-export type BookingHandlers = {
-  onOpenBooking?: (booking: Booking) => void;
-  onEditBooking?: (booking: Booking) => void;
-  onCancelBooking?: (booking: Booking) => void;
-}
-
-export const useBookingActions = () => {
+export const useBookingActions = (baseUrl = "/bookings") => {
   const [updateBooking] = useUpdateBookingMutation();
-  const [deleteBooking] = useDeleteBookingMutation();
+  const [deleteBookingMutation] = useDeleteBookingMutation();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canEdit = user.permissions.includes("core.change_booking");
   const canDelete = user.permissions.includes("core.delete_booking");
   const { showError, showSuccess } = useAlert();
   const confirm = useConfirm();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  const onCancelBooking = (booking: Booking) => {
+  const openBooking = useCallback((booking: Booking) => {
+    navigate(`${baseUrl}/${booking.id}`);
+  }, [baseUrl, navigate]);
+
+  const editBooking = useCallback((booking: Booking) => {
+    navigate(`${baseUrl}/${booking.id}`, { state: { edit: true } });
+  }, [baseUrl, navigate]);
+
+
+  const cancelBooking = (booking: Booking) => {
     if (!canEdit) return;
     return confirm({
       title: t("Confirmation required"),
       description: t("By cancelling this booking, the dates will become available on any connected portals. Do you wish to continue?\n"),
       confirmationText: t("Yes"),
-      cancellationText: t("Discard"),
+      cancellationText: t("Discard")
     })
       .then(() => {
         updateBooking({ ...booking, cancelled: true }).then((result) => {
@@ -45,7 +51,7 @@ export const useBookingActions = () => {
       });
   };
 
-  const onUncancelBooking = (booking: Booking) => {
+  const uncancelBooking = (booking: Booking) => {
     if (!canEdit) return;
     updateBooking({ ...booking, cancelled: false }).then((result) => {
       if ((result as any).error) {
@@ -58,7 +64,7 @@ export const useBookingActions = () => {
     });
   };
 
-  const onDeleteBooking = async (booking: Booking) => {
+  const deleteBooking = async (booking: Booking) => {
     if (!canDelete) return await Promise.resolve();
     return confirm({
       title: t("Delete booking: {{ guest_name }} on {{ lodging_name }}", {
@@ -68,7 +74,7 @@ export const useBookingActions = () => {
       description: t("Do you really want to permanently delete this booking?")
     })
       .then(() => {
-        return deleteBooking(booking).then((result) => {
+        return deleteBookingMutation(booking).then((result) => {
           if ((result as any).error) {
             const error = (result as any).error;
             console.error("Error deleting booking", error);
@@ -83,8 +89,10 @@ export const useBookingActions = () => {
   };
 
   return {
-    onCancelBooking,
-    onUncancelBooking,
-    onDeleteBooking
+    openBooking,
+    editBooking,
+    cancelBooking: cancelBooking,
+    uncancelBooking: uncancelBooking,
+    deleteBooking: deleteBooking
   };
 };

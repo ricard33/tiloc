@@ -340,36 +340,36 @@ class BookingViewSet(viewsets.ModelViewSet):
             .filter(begin_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
             .annotate(
-                date=F("begin_date"), event_type=Value("CHECKIN"), guests=F("adults") + F("children") + F("babies")
+                date=F("begin_date"), event_type=Value("CHECKIN")
             )
-            .values(
-                "id",
-                "date",
-                "guest_name",
-                "event_type",
-                "duration",
-                "guests",
-                lodging_name=F("lodging__name"),
-                booking_channel=F("source__name"),
-            )
+            # .values(
+            #     "id",
+            #     "date",
+            #     "guest_name",
+            #     "event_type",
+            #     "duration",
+            #     "guests",
+            #     lodging_name=F("lodging__name"),
+            #     booking_channel=F("source__name"),
+            # )
         )
         qs2 = (
             self.get_queryset()
             .filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
             .annotate(
-                date=F("end_date"), event_type=Value("CHECKOUT"), guests=F("adults") + F("children") + F("babies")
+                date=F("end_date"), event_type=Value("CHECKOUT")
             )
-            .values(
-                "id",
-                "date",
-                "guest_name",
-                "event_type",
-                "duration",
-                "guests",
-                lodging_name=F("lodging__name"),
-                booking_channel=F("source__name"),
-            )
+            # .values(
+            #     "id",
+            #     "date",
+            #     "guest_name",
+            #     "event_type",
+            #     "duration",
+            #     "guests",
+            #     lodging_name=F("lodging__name"),
+            #     booking_channel=F("source__name"),
+            # )
         )
         qs = qs1.union(qs2).order_by("date")
         count = int(self.request.query_params.get("count", 10))

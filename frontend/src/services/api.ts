@@ -24,7 +24,7 @@ import {
   api2Comment,
   api2Contract,
   api2ContractTemplate,
-  api2Lodging, api2Notification,
+  api2Lodging, api2NextEvent, api2Notification,
   api2Payment,
   api2Service,
   api2User,
@@ -401,7 +401,10 @@ export const api = createApi({
       query: () => "booking/all_guests/"
     }),
     nextEvents: builder.query<NextEvent[], number>({
-      query: (count) => "booking/next_events/?count=" + count
+      query: (count) => "booking/next_events/?count=" + count,
+      transformResponse: (response) => {
+        return (response as NextEvent[]).map((p) => api2NextEvent(p));
+      }
     }),
 
     // Payment

@@ -11,8 +11,6 @@ import clsx from "clsx";
 import { Tooltip } from "../../../components";
 import BookingTooltip from "../../../components/BookingTooltip";
 import { PlanningSettings } from "./PlanningSettingsDialog";
-import { BookingHandlers } from "../../../common/bookingActions";
-import { Popover, PopoverProps } from "@mui/material";
 
 export const timeSteps = {
   second: 0,
@@ -217,7 +215,6 @@ export function makeRenderSidebarHeader(collapsed: boolean, setCollapsed: (v: bo
 }
 
 export function makeRenderItem(
-  { onOpenBooking, onEditBooking, onCancelBooking }: BookingHandlers,
   settings: PlanningSettings) {
 
   function renderItem(props: RenderItemProps) {
@@ -239,28 +236,10 @@ export function makeRenderItem(
 
     function Item() {
       const [open, setOpen] = useState(false);
-      const [anchorEl, setAnchorEl] = useState<PopoverProps["anchorEl"]>(null);
-      const id = open ? "virtual-element-popover" : undefined;
-
-      const handleClose = () => {
-        setOpen(false);
-      };
-
-      const handleOpen = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        const getBoundingClientRect = () => {
-          const rect = new DOMRect(event.clientX, event.clientY, 1, 10);
-          console.log(rect);
-          return rect;
-        };
-
-        setOpen(true);
-        setAnchorEl({ getBoundingClientRect, nodeType: 1 });
-
-      };
 
       return (
         <>
-          <div {...itemProps} onClick={handleOpen}>
+          <div {...itemProps} onClick={() => setOpen(true)}>
             {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
             <div
@@ -277,19 +256,13 @@ export function makeRenderItem(
             </div>
             {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
           </div>
-          <Popover
-            id={id}
+          <BookingTooltip
+            booking={item.booking}
+            // onOpenBooking={onOpenBooking} onEditBooking={onEditBooking}
+            // onCancelBooking={onCancelBooking}
             open={open}
-            anchorEl={anchorEl}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-            onClose={handleClose}
-          >
-            <BookingTooltip
-              booking={item.booking} onOpenBooking={onOpenBooking} onEditBooking={onEditBooking}
-              onCancelBooking={onCancelBooking}
-            />
-          </Popover>
+            onClose={() => setOpen(false)}
+          />
         </>
       );
     }
