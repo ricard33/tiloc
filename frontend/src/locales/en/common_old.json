@@ -112,5 +112,7 @@
   "Basic": "",
   "Logo": "Logo",
   "Type": "Type",
-  "Display": "Display"
+  "Display": "Display",
+  "Show booking details on tooltip": "Show booking details on tooltip",
+  "Show only summary in tooltip": "Show only summary in tooltip"
 }

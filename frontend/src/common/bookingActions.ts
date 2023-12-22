@@ -26,15 +26,23 @@ export const useBookingActions = () => {
 
   const onCancelBooking = (booking: Booking) => {
     if (!canEdit) return;
-    updateBooking({ ...booking, cancelled: true }).then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        console.error("Error canceling booking", error);
-        showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
-      } else {
-        showSuccess(t("Booking cancelled"));
-      }
-    });
+    return confirm({
+      title: t("Confirmation required"),
+      description: t("By cancelling this booking, the dates will become available on any connected portals. Do you wish to continue?\n"),
+      confirmationText: t("Yes"),
+      cancellationText: t("Discard"),
+    })
+      .then(() => {
+        updateBooking({ ...booking, cancelled: true }).then((result) => {
+          if ((result as any).error) {
+            const error = (result as any).error;
+            console.error("Error canceling booking", error);
+            showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Booking cancelled"));
+          }
+        });
+      });
   };
 
   const onUncancelBooking = (booking: Booking) => {

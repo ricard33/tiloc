@@ -33,7 +33,7 @@ const Planning = () => {
   const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
   const [monthsToDisplay, setMonthsToDisplay] = useLocalStorage("planning.monthsToDisplay", 12);
   const [scrollingTimeline, setScrollingTimeline] = useLocalStorage("planning.scrollingTimeline", false);
-  const { onCancelBooking } = useBookingActions();
+  const { onCancelBooking, onUncancelBooking } = useBookingActions();
   const initialZoomLevel = isDesktop ? 2 : 1;
 
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
@@ -111,6 +111,13 @@ const Planning = () => {
     }
   }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus]);
 
+  const onCancelOrUncancelBooking = useCallback((booking: Booking) => {
+    if(booking.cancelled)
+      onUncancelBooking(booking);
+    else
+      onCancelBooking(booking);
+  }, [onCancelBooking, onUncancelBooking]);
+
   const settings: PlanningSettings = {
     showPaymentStatus,
     monthsToDisplay,
@@ -147,7 +154,7 @@ const Planning = () => {
             onCreateBooking={canAdd ? onCreateBooking : undefined}
             onOpenBooking={onOpenBooking}
             onEditBooking={onEditBooking}
-            onCancelBooking={onCancelBooking}
+            onCancelBooking={onCancelOrUncancelBooking}
             onBoundsChange={onBoundsChange}
             settings={settings}
             disabled={isLoadingBookings}
@@ -163,7 +170,7 @@ const Planning = () => {
             onCreateBooking={canAdd ? onCreateBooking : undefined}
             onOpenBooking={onOpenBooking}
             onEditBooking={onEditBooking}
-            onCancelBooking={onCancelBooking}
+            onCancelBooking={onCancelOrUncancelBooking}
             settings={settings}
             disabled={isLoadingBookings}
           />

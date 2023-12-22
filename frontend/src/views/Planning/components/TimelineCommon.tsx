@@ -9,7 +9,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import EuroIcon from "@mui/icons-material/Euro";
 import clsx from "clsx";
 import { Tooltip } from "../../../components";
-import BookingTooltip from "./BookingTooltip";
+import BookingTooltip from "../../../components/BookingTooltip";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import { BookingHandlers } from "../../../common/bookingActions";
 import { Popover, PopoverProps } from "@mui/material";
