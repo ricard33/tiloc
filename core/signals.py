@@ -37,6 +37,7 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
     users = get_listening_users_for_lodging(lodging, user)
     if created:
         logger.info("booking_created [%s] %s" % (instance.id, instance))
+        models.Activity.objects.create(type=models.Activity.ActivityType.add_booking, author=user, booking=instance)
         send_notification(
             "booking-added",
             users,
@@ -49,6 +50,12 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
         if update_fields:
             if "cancelled" in update_fields:
                 if instance.cancelled:
+                    models.Activity.objects.create(
+                        type=models.Activity.ActivityType.cancel_booking, author=user, booking=instance
+                    )
+                    models.Activity.objects.create(
+                        type=models.Activity.ActivityType.modify_booking, author=user, booking=instance
+                    )
                     send_notification(
                         "booking-canceled",
                         users,
@@ -57,6 +64,9 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
                         context={"booking": instance},
                     )
                 else:
+                    models.Activity.objects.create(
+                        type=models.Activity.ActivityType.uncancel_booking, author=user, booking=instance
+                    )
                     send_notification(
                         "booking-uncanceled",
                         users,
@@ -65,6 +75,9 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
                         context={"booking": instance},
                     )
             elif "deleted" in update_fields:
+                models.Activity.objects.create(
+                    type=models.Activity.ActivityType.delete_booking, author=user, booking=instance
+                )
                 if instance.deleted:
                     send_notification(
                         "booking-deleted",
@@ -74,6 +87,9 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
                         context={"booking": instance},
                     )
             else:
+                models.Activity.objects.create(
+                    type=models.Activity.ActivityType.modify_booking, author=user, booking=instance
+                )
                 send_notification(
                     "booking-modified",
                     users,
@@ -90,6 +106,9 @@ def on_comment_saved(sender, instance: models.Comment, created: bool, update_fie
     users = get_listening_users_for_lodging(lodging, user)
     if created:
         logger.info("comment_created [%s] %s" % (instance.id, instance))
+        models.Activity.objects.create(
+            type=models.Activity.ActivityType.add_comment, author=user, booking=instance.booking
+        )
         send_notification(
             "comment-added",
             users,
@@ -99,6 +118,9 @@ def on_comment_saved(sender, instance: models.Comment, created: bool, update_fie
         )
     else:
         logger.info("comment_modified [%s] %s" % (instance.id, instance))
+        models.Activity.objects.create(
+            type=models.Activity.ActivityType.modify_comment, author=user, booking=instance.booking
+        )
         send_notification(
             "comment-modified",
             users,
@@ -114,6 +136,9 @@ def on_comment_deleted(sender, instance: models.Comment, **kwargs):
     user = get_current_user()
     users = get_listening_users_for_lodging(lodging, user)
     logger.info("comment_deleted [%s] %s" % (instance.id, instance))
+    models.Activity.objects.create(
+        type=models.Activity.ActivityType.delete_comment, author=user, booking=instance.booking
+    )
     send_notification(
         "comment-deleted",
         users,

@@ -15,10 +15,11 @@ import {
   Payment,
   Service,
   User,
-  Notification, SignUpData
+  Notification, SignUpData, Activity
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
+  api2Activity,
   api2Booking,
   api2CalendarSync,
   api2Comment,
@@ -281,6 +282,7 @@ const contractApi = makeApi<Contract>("contract/", "Contract", api2Contract);
 const serviceApi = makeApi<Service>("service/", "Service", api2Service);
 const calendarSyncApi = makeApi<CalendarSync>("booking_channel_sync/", "CalendarSync", api2CalendarSync);
 const notificationApi = makeApi<Notification>("notification/", "Notification", api2Notification);
+const activityApi = makeApi<Activity>("activity/", "Activity", api2Activity);
 
 // Define a service using a base URL and expected endpoints
 export const api = createApi({
@@ -482,6 +484,10 @@ export const api = createApi({
       }
     }),
 
+    // activity
+    listActivities: activityApi.list(builder),
+    getActivity: activityApi.get(builder),
+
   })
 });
 
@@ -569,4 +575,7 @@ export const {
   useGetNotificationQuery,
   useReadNotificationMutation,
   useReadAllNotificationsMutation,
+
+  useListActivitiesQuery,
+  useGetActivityQuery,
 } = api;

@@ -6,7 +6,6 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import NightsStayOutlinedIcon from "@mui/icons-material/NightsStayOutlined";
 import Groups2OutlinedIcon from "@mui/icons-material/Groups2Outlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../../common/dateUtils";
 import { NextEvent } from "../../../types";
@@ -31,7 +30,7 @@ const InOutEvent: React.FC<Props> = props => {
   // console.log(events);
   /* eslint-disable react/no-multi-comp */
   function Sep() {
-    return <HorizontalRuleIcon fontSize="small" />;
+    return <span style={{ margin: "0 4px" }}>-</span>;
   }
 
   return (

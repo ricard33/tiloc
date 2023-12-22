@@ -38,7 +38,7 @@ type Props = {
    * If `true`, the component is shown.
    */
   open: boolean;
-  onClose?: ModalProps["onClose"]
+  onClose: () => void
 };
 
 export default function BookingTooltip(props: Props) {
@@ -93,7 +93,8 @@ export default function BookingTooltip(props: Props) {
       uncancelBooking(booking);
     else
       cancelBooking(booking);
-  }, [cancelBooking, uncancelBooking, onCancelBooking]);
+    onClose();
+  }, [onCancelBooking, uncancelBooking, cancelBooking, onClose]);
 
   if (!anchorEl) {
     return <></>;
@@ -106,7 +107,7 @@ export default function BookingTooltip(props: Props) {
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       transformOrigin={{ vertical: "top", horizontal: "center" }}
-      onClose={onClose}
+      onClose={() => onClose()}
     >
       <Grid2 container style={{ maxWidth: "360px", fontSize: 14, fontWeight: "300" }} spacing={1} margin={1}>
         <Grid2 xs={12}>

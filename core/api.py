@@ -44,6 +44,7 @@ from .pdf_tools import generate_pdf
 from .permissions import IsCompanyAdminPermissions, IsSuperUserPermission
 from .serializers import (
     AccountSerializer,
+    ActivitySerializer,
     BookingChannelSerializer,
     BookingChannelSyncSerializer,
     BookingNoPriceSerializer,
@@ -70,7 +71,7 @@ from .serializers import (
 logger = logging.getLogger("api")
 
 
-class OverLimlitError(APIException):
+class OverLimitError(APIException):
     status_code = status.HTTP_403_FORBIDDEN
     default_detail = _("This ressource has already reach his limit")
     default_code = "over_limit"
@@ -262,7 +263,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         limit = request.user.account.max_users
         if self.get_queryset().count() >= limit:
-            raise OverLimlitError(detail="The maximum number of users has been reached.")
+            raise OverLimitError(detail="The maximum number of users has been reached.")
         return super().create(request, *args, **kwargs)
 
 
@@ -339,9 +340,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             self.get_queryset()
             .filter(begin_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
-            .annotate(
-                date=F("begin_date"), event_type=Value("CHECKIN")
-            )
+            .annotate(date=F("begin_date"), event_type=Value("CHECKIN"))
             # .values(
             #     "id",
             #     "date",
@@ -357,9 +356,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             self.get_queryset()
             .filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
             .order_by()
-            .annotate(
-                date=F("end_date"), event_type=Value("CHECKOUT")
-            )
+            .annotate(date=F("end_date"), event_type=Value("CHECKOUT"))
             # .values(
             #     "id",
             #     "date",
@@ -438,7 +435,7 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
     def create(self, request, *args, **kwargs):
         limit = request.user.account.max_lodgings
         if self.get_queryset().count() >= limit:
-            raise OverLimlitError(detail="The maximum number of lodgings has been reached.")
+            raise OverLimitError(detail="The maximum number of lodgings has been reached.")
         return super().create(request, *args, **kwargs)
 
     @action(detail=True, methods=["get"])
@@ -569,10 +566,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-    @action(detail=False, methods=["PATCH"])
-    def all_read(self, request):
-        self.get_queryset().filter(read=False).update(read=True)
-        return Response(status=status.HTTP_200_OK)
+
+class ActivityViewSet(viewsets.ModelViewSet):
+    queryset = models.Activity.objects.order_by("-date")
+    serializer_class = ActivitySerializer
+    pagination_class = StandardResultsSetPagination
 
 
 # Billing API

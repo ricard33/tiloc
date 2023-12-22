@@ -42,6 +42,7 @@ router.register(r"payment", api.PaymentViewSet, "payment")
 router.register(r"comment", api.CommentViewSet, "comment")
 router.register(r"user", api.UserViewSet, "user")
 router.register(r"notification", api.NotificationViewSet, "notification")
+router.register(r"activity", api.ActivityViewSet, "activity")
 
 router.register(r"subscription", api.SubscriptionViewSet, "subscription")
 

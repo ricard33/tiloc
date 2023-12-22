@@ -241,3 +241,11 @@ export interface Notification {
   path: string;
   read: boolean;
 }
+
+export interface Activity {
+  id: number;
+  type: string;
+  date: Date;
+  author: User;
+  booking: Booking;
+}

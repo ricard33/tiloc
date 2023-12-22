@@ -1,4 +1,4 @@
-import { BookingStatus } from "../types";
+import { Booking, BookingStatus } from "../types";
 import React, { ReactElement } from "react";
 import FontAwesomeSvgIcon from "../components/FontAwesomeSvgIcon";
 import { faAirbnb } from "@fortawesome/free-brands-svg-icons/faAirbnb";
@@ -6,6 +6,7 @@ import { ReactComponent as BookingIcon } from "../assets/icones/Booking.com.svg"
 import { ReactComponent as HomeawayIcon } from "../assets/icones/homeaway.svg";
 import { ReactComponent as TripadvisorIcon } from "../assets/icones/tripadvisor.svg";
 import { darken } from "@mui/system";
+import { useTranslation } from "react-i18next";
 
 export const getBookingStatus = (name: string) => {
   for (let key in BookingStatus) {
@@ -82,4 +83,53 @@ export const otaBranding: {
         }}
       />
   }
+};
+
+export const BookingSource = ({ booking }: { booking: Booking }) => {
+  const { t } = useTranslation();
+  const status = getBookingStatus(booking.status);
+  const statusDisplay: OtaIconProps & {
+    label: string
+  } = booking.source && booking.source.name in otaBranding
+    ? { label: booking.source.name, ...otaBranding[booking.source.name] }
+    : { label: booking.source ? booking.source.name : t("Direct booking"), bgColor: "#41F7936b" };
+
+  return (
+    <div
+      style={{
+        background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
+        display: "flex", alignItems: "center", flexWrap: "wrap",
+        padding: "0 4px"
+      }}
+    >
+      {statusDisplay.icon}
+      <span style={{ verticalAlign: "text-bottom" }}>
+        {statusDisplay.label}
+      </span>
+    </div>
+  );
+};
+
+export const BookingStatusLabel = ({ booking }: { booking: Booking }) => {
+  const { t } = useTranslation();
+  const status = getBookingStatus(booking.status);
+  const statusDisplay: OtaIconProps & {
+    label: string
+  } = status.name === BookingStatus.External.name && booking.source && booking.source.name in otaBranding
+    ? { label: booking.source.name, ...otaBranding[booking.source.name] }
+    : { label: status.getLabel(t), bgColor: status.color };
+
+  return (
+    <div
+      style={{
+        background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
+        display: "flex", alignItems: "center", flexWrap: "wrap"
+      }}
+    >
+      {statusDisplay.icon}
+      <span style={{ verticalAlign: "text-bottom" }}>
+        {statusDisplay.label}
+      </span>
+    </div>
+  );
 };

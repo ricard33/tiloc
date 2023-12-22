@@ -914,6 +914,35 @@ class SyncRemovedByExternal(models.Model):
         unique_together = ("sync", "booking")
 
 
+class Activity(models.Model):
+    """Log all changes made on bookings"""
+
+    class ActivityType(models.TextChoices):
+        add_booking = "add_booking", _("Add booking")
+        modify_booking = "modify_booking", _("Modify booking")
+        delete_booking = "delete_booking", _("Delete booking")
+        cancel_booking = "cancel_booking", _("Cancel booking")
+        uncancel_booking = "uncancel_booking", _("Uncancel booking")
+        add_comment = "add_comment", _("Add comment")
+        modify_comment = "modify_comment", _("Modify comment")
+        delete_comment = "delete_comment", _("Delete comment")
+
+    id = models.BigAutoField(primary_key=True, verbose_name="ID")
+    date = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(choices=ActivityType.choices, max_length=50, verbose_name="Activity type")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="+")
+
+    class Meta:
+        verbose_name = _("Activity")
+        verbose_name_plural = _("Activities")
+        ordering = ("-date",)
+
+    objects = ForUserQuerySet.as_manager()
+    _account_qs_path = "booking__lodging__account"
+    _lodging_qs_path = "booking__lodging"
+
+
 # class AddOn(models.Model):
 #     """Additional functionalities (marketplace)"""
 #     name = models.CharField(max_length=255)

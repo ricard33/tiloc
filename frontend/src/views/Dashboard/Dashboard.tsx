@@ -1,10 +1,9 @@
 import React, { Suspense } from "react";
 import { Grid } from "@mui/material";
-
-import LatestBookings from "./components/LatestBookings";
 import NextEvents from "./components/NextEvents";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
+import ActivityFeed from "./components/ActivityFeed";
 
 const ChannelsDistribution = React.lazy(() => import("./components/ChannelsDistribution"));
 const FillingRate = React.lazy(() => import("./components/FillingRate"));
@@ -18,7 +17,8 @@ const Dashboard = () => {
           <NextEvents />
         </Grid>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
-          <LatestBookings />
+          {/*<LatestBookings />*/}
+          <ActivityFeed />
         </Grid>
         {/*<Grid*/}
         {/*  item*/}

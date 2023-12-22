@@ -584,7 +584,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                                 required
                                 validation={{
                                   min: { value: 0, message: t("Rate can't be negative") },
-                                  validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                                  validate: { validateNumber: (v) => (typeof v !== "undefined") }
                                 }}
                                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                                 margin={margin}
@@ -606,7 +606,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             required
                             validation={{
                               min: { value: 0, message: t("Price can't be negative") },
-                              validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                              validate: { validateNumber: (v) => (typeof v !== "undefined") }
                             }}
                             InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                             margin={margin}
@@ -648,7 +648,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                               value: price ?? 0,
                               message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })
                             },
-                            validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                            validate: { validateNumber: (v) => (typeof v !== "undefined") }
                           }}
                           InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                           margin={margin}
@@ -670,7 +670,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           // required
                           validation={{
                             min: { value: 0, message: t("Commission fees can't be negative") },
-                            validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                            validate: { validateNumber: (v) => (typeof v !== "undefined") }
                           }}
                           InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                           margin={margin}
@@ -687,7 +687,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                               type={"number"}
                               validation={{
                                 min: { value: 0, message: t("Tourist tax can't be negative") },
-                                validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                                validate: { validateNumber: (v) => (typeof v !== "undefined") }
                               }}
                               InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                               margin={margin}
