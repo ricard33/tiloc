@@ -47,7 +47,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
                   color="success"
                   startIcon={<EventAvailableIcon />}
                   onClick={onUncancelBooking}
-                >{t("Uncancel")}</Button>
+                >{t("Book again")}</Button>
                 <Button
                   type="button"
                   className="delete-button"

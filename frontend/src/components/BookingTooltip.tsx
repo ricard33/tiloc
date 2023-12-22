@@ -145,7 +145,7 @@ export default function BookingTooltip(props: Props) {
                   <Button
                     startIcon={<EventAvailableIcon />} size="small" color="success"
                     onClick={() => onCancelBooking(booking)}
-                  >{t("Uncancel")}</Button>
+                  >{t("Book again")}</Button>
                   :
                   <Button
                     startIcon={<EventBusyIcon />} size="small" color="error"

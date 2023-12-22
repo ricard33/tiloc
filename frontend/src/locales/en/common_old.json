@@ -114,5 +114,8 @@
   "Type": "Type",
   "Display": "Display",
   "Show booking details on tooltip": "Show booking details on tooltip",
-  "Show only summary in tooltip": "Show only summary in tooltip"
+  "Show only summary in tooltip": "Show only summary in tooltip",
+  "Impossible to uncancel booking: ": "Impossible to uncancel booking: ",
+  "Booking uncancelled": "Booking uncancelled",
+  "Uncancel": "Uncancel"
 }

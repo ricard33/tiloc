@@ -51,9 +51,9 @@ export const useBookingActions = () => {
       if ((result as any).error) {
         const error = (result as any).error;
         console.error("Error uncancelling booking", error);
-        showError(t("Impossible to uncancel booking: ") + fetchErrorDecode(error));
+        showError(t("Impossible to reactivate booking: ") + fetchErrorDecode(error));
       } else {
-        showSuccess(t("Booking uncancelled"));
+        showSuccess(t("Booking modified"));
       }
     });
   };
