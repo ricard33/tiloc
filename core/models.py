@@ -930,8 +930,8 @@ class Activity(models.Model):
     id = models.BigAutoField(primary_key=True, verbose_name="ID")
     date = models.DateTimeField(auto_now_add=True)
     type = models.CharField(choices=ActivityType.choices, max_length=50, verbose_name="Activity type")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
-    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="+")
+    author = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _("Activity")
