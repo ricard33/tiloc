@@ -9,6 +9,7 @@ export const usePageUnloadAlert = (isDirty: boolean) => {
 
   useEffect(() => {
     const unloadCallback = (event: { preventDefault: () => void; returnValue: string; }) => {
+      console.log("unloadCallback", isDirty);
       if (isDirty) {
         event.preventDefault();
         event.returnValue = "";

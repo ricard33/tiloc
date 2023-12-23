@@ -151,7 +151,6 @@ export function api2Booking(booking: Record<string, any>): Booking {
 }
 
 export function booking2api(booking: Partial<Booking>): Record<string, any> {
-  console.log("booking2api: booking.custom_tourist_tax = " + booking.custom_tourist_tax);
   const newVar = {
     ...booking,
     ...(booking.begin_date && { begin_date: formatISO(booking.begin_date) }),

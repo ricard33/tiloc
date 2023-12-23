@@ -63,7 +63,6 @@ const ActivityFeed: React.FC<Props> = props => {
     }
 
     function getActivityColor(activity: Activity) {
-      console.log(activity.author);
       switch (activity.type) {
         case "add_booking":
           return "#2196f3";

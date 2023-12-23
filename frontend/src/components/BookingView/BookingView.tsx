@@ -1,7 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Booking, Service } from "../../types";
-import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton } from "@mui/material";
+import {
+  Alert,
+  AppBar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Stack,
+  Toolbar,
+  Typography
+} from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import useWindowDimensions from "../../common/windowDimensions";
 import BookingQuickView from "../BookingQuickView";
@@ -10,6 +23,7 @@ import { formatDate } from "../../common/dateUtils";
 import { useAlert } from "../../common/alertUtils";
 import { formatCurrency } from "../../common/intlUtils";
 import { getBookingStatus } from "../../common/statusUtils";
+import CloseIcon from "@mui/icons-material/Close";
 
 
 type BookingViewProps = {
@@ -18,14 +32,13 @@ type BookingViewProps = {
   onEdit: () => void;
   onCancelBooking: () => void;
   onUncancelBooking: () => void;
-  onDelete: () => void;
   onOpenContract?: (booking: Booking) => void;
 };
 
 const BookingView: React.FunctionComponent<BookingViewProps> = ({
   ...props
 }: BookingViewProps) => {
-  const { booking, onClose, onEdit, onCancelBooking, onUncancelBooking, onDelete, onOpenContract } = props;
+  const { booking, onClose, onEdit, onCancelBooking, onUncancelBooking, onOpenContract } = props;
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { showError, showSuccess } = useAlert();
@@ -59,6 +72,8 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
     });
   };
 
+  const fullScreen = width < 800;
+
   return (
     <Dialog
       className="booking-dialog"
@@ -67,35 +82,66 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       open={!!booking}
       maxWidth={false}
       fullWidth
-      fullScreen={width < 600}
+      fullScreen={fullScreen}
     >
-      <DialogTitle id="simple-dialog-title" sx={{/*booking.cancelled ? { bgcolor: "warning.main" } : {}*/}}>
-        <Grid justifyContent="space-between" container spacing={4}>
-          <Grid item xs={6}>
-            {t("Booking details")}
-            {booking.cancelled &&
-            <Alert severity="warning" sx={{display: "inline-flex", marginLeft: 2}}>{t("CANCELED")}</Alert>
-            }
-          </Grid>
-          <Grid item xs={6} sx={{ textAlign: "right" }}>
-            <IconButton aria-label="copy" title={t("Copy booking to clipboard")} onClick={() => copyToClipboard()}>
-              <ContentCopyIcon />
+      {fullScreen ?
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={onClose}
+              aria-label="close"
+            >
+              <CloseIcon />
             </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {t("Booking details")}
+            </Typography>
+            {booking.cancelled &&
+              <span style={{ fontSize: "small", color: "red", flex: 1 }}>{t("CANCELLED")}</span>
+            }
+            <BookingActions
+              booking={booking} onEdit={onEdit}
+              onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
+              onOpenContract={onOpenContract}
+              primaryColor="inherit"
+            />
+          </Toolbar>
+        </AppBar>
+        :
+        <DialogTitle id="simple-dialog-title" sx={{/*booking.cancelled ? { bgcolor: "warning.main" } : {}*/ }}>
+          <Grid justifyContent="space-between" container spacing={4}>
+            <Grid item xs={6}>
+              {t("Booking details")}
+              {booking.cancelled &&
+                <Alert severity="warning" sx={{ display: "inline-flex", marginLeft: 2 }}>{t("CANCELED")}</Alert>
+              }
+            </Grid>
+            <Grid item xs={6} sx={{ textAlign: "right" }}>
+              <IconButton aria-label="copy" title={t("Copy booking to clipboard")} onClick={() => copyToClipboard()}>
+                <ContentCopyIcon />
+              </IconButton>
+            </Grid>
           </Grid>
-        </Grid>
-      </DialogTitle>
+        </DialogTitle>
+      }
       <DialogContent dividers sx={{ fontSize: "smaller" }}>
         <BookingQuickView booking={booking} />
       </DialogContent>
-      <DialogActions>
-        <BookingActions
-          booking={booking} onClose={onClose} onDelete={onDelete}
-          onEdit={onEdit}
-          onOpenContract={onOpenContract}
-          onCancelBooking={onCancelBooking}
-          onUncancelBooking={onUncancelBooking}
-        />
-      </DialogActions>
+      {!fullScreen &&
+        <DialogActions>
+          <Stack direction="row" justifyContent={"flex-end"}>
+            <Button type="button" onClick={onClose}>{t("Close")}</Button>
+            <BookingActions
+              booking={booking} onEdit={onEdit}
+              onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
+              onOpenContract={onOpenContract}
+            />
+            {width < 1100 && <div style={{width: "50px"}} />}
+          </Stack>
+        </DialogActions>
+      }
     </Dialog>
   );
 };

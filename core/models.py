@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import uuid
+from decimal import Decimal
 from random import choice
 
 import arrow
@@ -17,6 +18,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse as drf_reverse
 from simple_history.models import HistoricalRecords
 from timezone_field import TimeZoneField
+
+from core.tools import round_half_up
 
 logger = logging.getLogger("models")
 
@@ -585,16 +588,16 @@ class Booking(models.Model):
     @property
     def total_payments(self):
         """Returns the sum of the payments already made."""
-        return self.payment_set.aggregate(total_payments=Sum("amount"))["total_payments"] or 0
+        return self.payment_set.aggregate(total_payments=Sum("amount"))["total_payments"] or Decimal(0)
 
     @property
     def left_to_pay(self):
         """Returns the left to pay, with options included in price, but not excluded options."""
         return (
             self.price_with_options
-            + (self.lodging.tourist_tax_included_in_payment and self.tourist_tax or 0)
+            + (self.lodging.tourist_tax_included_in_payment and self.tourist_tax or Decimal(0))
             - self.total_payments
-            - (self.commission_fees or 0)
+            - (self.commission_fees or Decimal(0))
         )
 
     @property
@@ -615,10 +618,10 @@ class Booking(models.Model):
 
     def computed_tourist_tax(self):
         if self.lodging.is_flat_rate_tourist_tax:
-            daily_rate = self.lodging.max_daily_tourist_tax or 0
+            daily_rate = self.lodging.max_daily_tourist_tax or Decimal(0)
         elif self.adults + self.children + self.babies > 0:
-            daily_rate = round(
-                self.price
+            daily_rate = round_half_up(
+                Decimal(self.price)
                 / self.duration
                 / (self.adults + self.children + self.babies)
                 * self.lodging.tourist_tax_rate

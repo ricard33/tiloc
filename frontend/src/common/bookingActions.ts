@@ -30,38 +30,35 @@ export const useBookingActions = (baseUrl = "/bookings") => {
   }, [baseUrl, navigate]);
 
 
-  const cancelBooking = (booking: Booking) => {
-    if (!canEdit) return;
-    return confirm({
+  const cancelBooking = async (booking: Booking) => {
+    if (!canEdit) throw Error("prohibited");
+    await confirm({
       title: t("Confirmation required"),
       description: t("By cancelling this booking, the dates will become available on any connected portals. Do you wish to continue?\n"),
       confirmationText: t("Yes"),
       cancellationText: t("Discard")
-    })
-      .then(() => {
-        updateBooking({ ...booking, cancelled: true }).then((result) => {
-          if ((result as any).error) {
-            const error = (result as any).error;
-            console.error("Error canceling booking", error);
-            showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
-          } else {
-            showSuccess(t("Booking cancelled"));
-          }
-        });
-      });
-  };
-
-  const uncancelBooking = (booking: Booking) => {
-    if (!canEdit) return;
-    updateBooking({ ...booking, cancelled: false }).then((result) => {
+    });
+    updateBooking({ ...booking, cancelled: true }).then((result) => {
       if ((result as any).error) {
         const error = (result as any).error;
-        console.error("Error uncancelling booking", error);
-        showError(t("Impossible to reactivate booking: ") + fetchErrorDecode(error));
+        console.error("Error canceling booking", error);
+        showError(t("Impossible to cancel booking: ") + fetchErrorDecode(error));
       } else {
-        showSuccess(t("Booking modified"));
+        showSuccess(t("Booking cancelled"));
       }
     });
+  };
+
+  const uncancelBooking = async (booking: Booking) => {
+    if (!canEdit) throw Error("prohibited");
+    let result = await updateBooking({ ...booking, cancelled: false });
+    if ((result as any).error) {
+      const error = (result as any).error;
+      console.error("Error uncancelling booking", error);
+      showError(t("Impossible to reactivate booking: ") + fetchErrorDecode(error));
+    } else {
+      showSuccess(t("Booking modified"));
+    }
   };
 
   const deleteBooking = async (booking: Booking) => {

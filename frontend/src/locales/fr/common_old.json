@@ -115,5 +115,7 @@
   "Display": "Afficher",
   "Show booking details on tooltip": "Afficher les détails de la réservation dans l'info-bulle",
   "Show only summary in tooltip": "Afficher uniquement un résumé dans l'info-bulle",
-  "Booking uncancelled": "Réservation réactivée"
+  "Booking uncancelled": "Réservation réactivée",
+  "Edit": "Modifier",
+  "Open contract": "Ouvrir le contrat"
 }

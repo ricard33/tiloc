@@ -36,7 +36,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const { data: allOptions, isSuccess: optionsLoaded } = useListServicesQuery();
   const { data: allGuests } = useAllGuestsQuery();
   const [isEditMode, setIsEditMode] = useState(bookingId === "new" || location.state?.edit);
-  const { cancelBooking, uncancelBooking, deleteBooking } = useBookingActions();
+  const { cancelBooking, uncancelBooking } = useBookingActions();
 
   if(bookingError) {
     // navigate(-1);
@@ -54,7 +54,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           onClose={onClose}
           onCancelBooking={() => cancelBooking(booking)}
           onUncancelBooking={() => uncancelBooking(booking)}
-          onDelete={() => deleteBooking(booking).then(() => onClose())}
+          // onDelete={() => deleteBooking(booking).then(() => onClose())}
           onOpenContract={onOpenContract}
         />
       );
@@ -66,7 +66,7 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           onClose={onClose}
           onCancelBooking={() => cancelBooking(booking)}
           onUncancelBooking={() => uncancelBooking(booking)}
-          onDelete={() => deleteBooking(booking).then(() => onClose())}
+          // onDelete={() => deleteBooking(booking).then(() => onClose())}
           onOpenContract={onOpenContract}
         />
       );

@@ -15,28 +15,29 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  AppBar,
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
   Grid,
-  Hidden, IconButton,
+  Hidden,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
+  Toolbar,
   Typography
 } from "@mui/material";
 import useWindowDimensions from "../../common/windowDimensions";
 import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
-import {
-  useCreateBookingMutation,
-  useListBookingChannelsQuery,
-  useUpdateBookingMutation
-} from "../../services/api";
+import { useCreateBookingMutation, useListBookingChannelsQuery, useUpdateBookingMutation } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import "./BookingDialog.scss";
@@ -46,7 +47,8 @@ import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import {
   AutocompleteElement,
-  CheckboxElement, DatePickerElement,
+  CheckboxElement,
+  DatePickerElement,
   FormContainer,
   SelectElement,
   TextFieldElement
@@ -54,6 +56,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { getBookingStatuses } from "../../common/statusUtils";
+import CloseIcon from "@mui/icons-material/Close";
 
 
 type BookingDialogProps = {
@@ -66,14 +69,13 @@ type BookingDialogProps = {
   lodgings: Lodging[],
   allOptions: Service[],
   onClose: () => void,
-  onDelete: () => void,
   onOpenContract?: (booking: Booking) => void,
   onCancelBooking?: () => void,
   onUncancelBooking?: () => void
 };
 
 const BookingDialog: React.FC<BookingDialogProps> = props => {
-  const { booking, lodgings, allOptions, guests: allGuests, onClose, onDelete, onOpenContract } = props;
+  const { booking, lodgings, allOptions, guests: allGuests, onClose, onOpenContract } = props;
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
@@ -102,13 +104,19 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const formContext = useForm<Booking>({
     defaultValues: initialState
   });
-  const { register, control, setValue, getValues, watch, formState } = formContext;
+  const { register, control, setValue, getValues, watch, formState, reset } = formContext;
   const { errors, isDirty /*isValid*/ } = formState;
   const { dirtyFields } = useFormState({
     control
   });
 
   // console.log("ERRORS", errors);
+  // console.log("isDirty: ", isDirty, dirtyFields);
+  // console.log("defaultValues: ", initialState);
+  // console.log("values: ", getValues());
+  // console.log("DIFF", filterObject(deepDiffMapper.map(initialState, getValues()),
+  //   (value) => value && value?.type !== "unchanged"));
+
   usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
 
@@ -131,12 +139,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const depositLabel = user ? getDepositLabel(t, user.account.deposit_label) : t("Deposit");
 
   function initializeDefaults(booking: Booking) {
-    let initialState: Booking = {
-      ...booking
-      //   source: { ...bookingChannels.filter(x => x.id === booking.source_id)[0] }
-    };
-
     lodging = booking.lodging_id ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
+
+    // Only include editable fields because to make `isDirty` reseted to false working after a submit
+    // ==> dirty state is computed comparing default values and stored values (output of getValues())
+    let { price_with_options, left_to_pay, modified, computed_tourist_tax, guests, ...initialState }: Booking = booking;
 
     // Provide defaults for new bookings
     initialState.status = booking.status || BookingStatus.NotAvailable.name;
@@ -174,10 +181,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     if (!lodging.is_flat_rate_tourist_tax) {
       if (values.adults + values.children + values.babies > 0) {
 
-        daily_rate = values.price!
-          / values.duration
-          / (values.adults + values.children + values.babies)
-          * lodging.tourist_tax_rate
+        daily_rate = Math.round(values.price!
+            / values.duration
+            / (values.adults + values.children + values.babies)
+            * lodging.tourist_tax_rate)
           / 100;
 
         daily_rate = Math.min(daily_rate, lodging.max_daily_tourist_tax);
@@ -300,16 +307,16 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     return newBooking[fieldName];
   }
 
-  function openContract() {
-    if (onOpenContract) {
-      if (isDirty) {
-        unsavedChangesConfirm()
-          .then(() => {
-            formContext.handleSubmit((data: Booking) => saveBooking(data, submittedBooking => onOpenContract(submittedBooking)));
-          });
-      } else
-        onOpenContract(booking);
-    }
+  function handleSave(closeDialog: boolean) {
+    console.log("handleSave");
+    return new Promise<Booking>((resolve) => {
+      console.log("promise : run async funtion");
+      formContext.handleSubmit(
+        async (data: Booking) => await saveBooking(data).then((booking) => {
+          console.log("Booking saved");
+          resolve(booking);
+        }))().then(() => closeDialog && onClose());
+    });
   }
 
   function onCancelBooking() {
@@ -322,29 +329,29 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue("cancelled", false);
   }
 
-  function saveBooking(data: Booking, callback: (booking: Booking) => void) {
+  async function saveBooking(data: Booking, callback?: (booking: Booking) => void) {
     console.log("Submit: ", data);
     const submittedBooking = {
       ...data,
       source_id: data.source_id ? data.source_id : undefined
     };
     const action = booking.id ? updateBooking : createBooking;
-    action(submittedBooking).then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        console.error("Error saving booking", error);
-        showError(t("Impossible to save the booking: ") + fetchErrorDecode(error));
-      } else {
-        showSuccess(t("Booking saved"));
-        if (callback)
-          callback(submittedBooking);
-      }
-    });
-
+    let result = await action(submittedBooking);
+    if ((result as any).error) {
+      const error = (result as any).error;
+      console.error("Error saving booking", error);
+      showError(t("Impossible to save the booking: ") + fetchErrorDecode(error));
+      throw Error("Cant save booking");
+    } else {
+      showSuccess(t("Booking saved"));
+      if (callback)
+        callback(submittedBooking);
+      return submittedBooking;
+    }
   }
 
   function onSubmit(data: Booking) {
-    saveBooking(data, () => {
+    return saveBooking(data, () => {
       console.debug("Closing...");
       onClose();
     });
@@ -356,40 +363,73 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     } else onClose();
   }
 
+  const fullScreen = width < 800;
+
   function onCustomizeTouristTaxHandler() {
     console.log("onCustomizeTouristTaxHandler");
     setCustomizeTouristTax(!customizeTouristTax);
-    if(customizeTouristTax) {
+    if (customizeTouristTax) {
       console.log("set custom_tourist_tax to undefined");
-      setValue("custom_tourist_tax", undefined, {shouldDirty: true});
-      setValue("tourist_tax", getValues()["computed_tourist_tax"] );
+      setValue("custom_tourist_tax", undefined, { shouldDirty: true });
+      setValue("tourist_tax", getValues()["computed_tourist_tax"]);
     }
   }
+
+  // eslint-disable-next-line react/no-multi-comp
+  const dialogTitle = booking && booking.id ? t("Modify a booking") : t("Add a booking");
   return (
     <Dialog
       className="booking-dialog"
       onClose={onCloseHandler}
       aria-labelledby="simple-dialog-title"
       open={!!booking}
-      maxWidth={width < 1280 ? "sm" : "lg"}
-      fullScreen={width < 600}
+      maxWidth={width < 1200 ? "md" : "lg"}
+      fullScreen={fullScreen}
     >
-      <DialogTitle id="simple-dialog-title">
-        <Grid justifyContent="space-between" container spacing={4}>
-          <Grid item xs={6}>
-            {booking && booking.id ? t("Modify a booking") : t("Add a booking")}
-          </Grid>
-          <Grid item xs={6} className="total-wrapper">
-            <span className="total-price">
-              {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
-            {(excludedFromPriceOptions) > 0 && (
-              <span
-                className="third-party-price"
-              ><br />(+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")})</span>)
+      {fullScreen ?
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={onCloseHandler}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {dialogTitle}
+            </Typography>
+            {booking.cancelled &&
+              <span style={{ fontSize: "small", color: "red", flex: 1 }}>{t("CANCELLED")}</span>
             }
+            <BookingActions
+              booking={booking} isDirty={isDirty} onReset={reset}
+              onSave={handleSave}
+              onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
+              onOpenContract={onOpenContract}
+              primaryColor="inherit"
+            />
+          </Toolbar>
+        </AppBar>
+        :
+        <DialogTitle id="simple-dialog-title">
+          <Grid justifyContent="space-between" container spacing={4}>
+            <Grid item xs={6}>
+              {dialogTitle}
+            </Grid>
+            <Grid item xs={6} className="total-wrapper">
+              <span className="total-price">
+                {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
+              {(excludedFromPriceOptions) > 0 && (
+                <span
+                  className="third-party-price"
+                ><br />(+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")})</span>)
+              }
+            </Grid>
           </Grid>
-        </Grid>
-      </DialogTitle>
+        </DialogTitle>
+      }
       <DialogContent dividers>
         {booking &&
           <FormContainer
@@ -866,15 +906,19 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           </FormContainer>
         }
       </DialogContent>
-      <DialogActions>
-        <BookingActions
-          booking={booking} onClose={onCloseHandler} onDelete={onDelete}
-          onSave={isDirty ? formContext.handleSubmit(onSubmit) : undefined}
-          onOpenContract={() => openContract()}
-          onCancelBooking={onCancelBooking}
-          onUncancelBooking={onUncancelBooking}
-        />
-      </DialogActions>
+      {!fullScreen &&
+        <DialogActions>
+          <Stack direction="row" justifyContent={"flex-end"}>
+            <Button type="button" onClick={onCloseHandler}>{t("Close")}</Button>
+            <BookingActions
+              booking={booking} isDirty={isDirty} onReset={reset}
+              onSave={handleSave}
+              onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
+              onOpenContract={onOpenContract}
+            />
+            {width < 1100 && <div style={{width: "50px"}} />}
+          </Stack>
+        </DialogActions>}
     </Dialog>
   );
 };
