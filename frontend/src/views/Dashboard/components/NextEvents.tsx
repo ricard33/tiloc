@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
-import { Button, Card, CardActions, CardContent, CardHeader, Divider, Theme } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Divider, Theme, Typography } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
@@ -59,8 +59,10 @@ const NextEvents: React.FC<Props> = props => {
       />
       <Divider />
       <CardContent className={classes.content}>
-        {events &&
-            events.map(event => <InOutEvent key={event.event_type + event.id} event={event} />)
+        {(events && events.length > 0) ?
+          events.map(event => <InOutEvent key={event.event_type + event.id} event={event} />)
+          :
+          <Typography style={{ color: "grey", margin: "32px" }}>-- {t("no upcoming reservations")} --</Typography>
         }
       </CardContent>
       <Divider />

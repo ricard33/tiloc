@@ -572,6 +572,9 @@ class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ActivitySerializer
     pagination_class = StandardResultsSetPagination
 
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
 
 # Billing API
 

@@ -620,6 +620,11 @@ class InvoiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("id", "customer", "subscription", "total", "status", "hosted_invoice_url", "period_start", "period_end", "next_payment_attempt", "created")
 
 
+@admin.register(models.Activity, site=site)
+class ActivityAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    list_display = ("id", "type", "booking", "author")
+
+
 site.register(models.Booking, BookingAdmin)
 site.register(models.Service, ServiceAdmin)
 site.register(models.Lodging, LodgingAdmin)

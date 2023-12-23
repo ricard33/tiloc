@@ -49,9 +49,9 @@ const ActivityFeed: React.FC<Props> = props => {
 
     return (
       <>
-        <TimelineItem onClick={() => setOpen(true)} style={{cursor: "pointer"}}>
+        <TimelineItem onClick={() => setOpen(true)} style={{ cursor: "pointer" }}>
           <TimelineSeparator>
-            <TimelineDot style={{backgroundColor: getActivityColor(activity)}} />
+            <TimelineDot style={{ backgroundColor: getActivityColor(activity) }} />
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent style={{ fontSize: "smaller" }}>
@@ -145,9 +145,13 @@ const ActivityFeed: React.FC<Props> = props => {
             }
           }}
         >
-          {activities && activities.map((activity, i) => (
-            <ActivityItem key={activity.id} activity={activity} />
-          ))}
+          {(activities && activities.length > 0) ?
+            activities.map((activity, i) => (
+              <ActivityItem key={activity.id} activity={activity} />
+            ))
+            :
+            <span style={{color: "grey"}}>-- {t("no recent activity")} --</span>
+          }
         </Timeline>
       </CardContent>
       <Divider />

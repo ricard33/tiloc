@@ -53,7 +53,7 @@ function App(props: Props) {
   }, [refetchUser, isNeedToReloadUser]);
 
   useEffect(() => {
-    if (!isAppInfoLoaded)
+    if (!initialised)
       axios.get("/api/info/")
         .then(response => {
           // console.debug(response);
@@ -71,7 +71,7 @@ function App(props: Props) {
           showError(t("Server error. Can't load application information."));
           setInitialised(true);
         });
-  }, [dispatch, isAppInfoLoaded, showError, t]);
+  }, [dispatch, initialised, showError, t]);
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);
