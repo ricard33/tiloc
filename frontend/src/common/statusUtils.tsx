@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import { Booking, BookingStatus } from "../types";
 import React, { ReactElement } from "react";
 import FontAwesomeSvgIcon from "../components/FontAwesomeSvgIcon";
@@ -87,7 +88,6 @@ export const otaBranding: {
 
 export const BookingSource = ({ booking }: { booking: Booking }) => {
   const { t } = useTranslation();
-  const status = getBookingStatus(booking.status);
   const statusDisplay: OtaIconProps & {
     label: string
   } = booking.source && booking.source.name in otaBranding

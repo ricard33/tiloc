@@ -37,7 +37,6 @@ function App(props: Props) {
   const dispatch = useDispatch();
   const token = useAppSelector((store) => store.auth.token);
   const isNeedToReloadUser = useAppSelector((store) => store.auth.needToReload);
-  const isAppInfoLoaded = useAppSelector((store) => store.appInfo.loaded);
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
   const { showInfo, showWarning, showError } = useAlert();
   const { t } = useTranslation();

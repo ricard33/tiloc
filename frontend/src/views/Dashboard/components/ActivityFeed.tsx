@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, Divider, Stack } from "@mui/material";
 import Timeline from "@mui/lab/Timeline";
@@ -33,14 +34,51 @@ const ActivityFeed: React.FC<Props> = props => {
     page_size: count
   });
 
-  /* eslint-disable react/no-multi-comp */
   function Sep() {
     return <span style={{ margin: "0 4px" }}>-</span>;
   }
 
-  /* eslint-disable react/no-multi-comp */
   function ActivityItem({ activity }: { activity: Activity }) {
     const [open, setOpen] = useState(false);
+
+    function getActivityLabel(activity: Activity) {
+      switch (activity.type) {
+        case "add_booking":
+          return t("Booking");
+        case "modify_booking":
+          return t("Modification of booking");
+        case "delete_booking":
+          return t("Booking deleted");
+        case "cancel_booking":
+          return t("Cancellation");
+        case "uncancel_booking":
+          return t("Modification of booking");
+        case "add_comment":
+          return t("Comment");
+        case "modify_comment":
+          return t("Modification of comment");
+        case "delete_comment":
+          return t("Comment deleted");
+      }
+    }
+
+    function getActivityColor(activity: Activity) {
+      console.log(activity.author);
+      switch (activity.type) {
+        case "add_booking":
+          return "#2196f3";
+        case "modify_booking":
+        case "uncancel_booking":
+        case "add_comment":
+        case "modify_comment":
+        case "delete_comment":
+          return "#FFF07C";
+        case "delete_booking":
+        case "cancel_booking":
+          return "#f45b69";
+      }
+    }
+
 
     function handleClose() {
       setOpen(false);
@@ -81,43 +119,6 @@ const ActivityFeed: React.FC<Props> = props => {
     );
   }
 
-  function getActivityLabel(activity: Activity) {
-    switch (activity.type) {
-      case "add_booking":
-        return t("Booking");
-      case "modify_booking":
-        return t("Modification of booking");
-      case "delete_booking":
-        return t("Booking deleted");
-      case "cancel_booking":
-        return t("Cancellation");
-      case "uncancel_booking":
-        return t("Modification of booking");
-      case "add_comment":
-        return t("Comment");
-      case "modify_comment":
-        return t("Modification of comment");
-      case "delete_comment":
-        return t("Comment deleted");
-    }
-  }
-
-  function getActivityColor(activity: Activity) {
-    switch (activity.type) {
-      case "add_booking":
-        return "#2196f3";
-      case "modify_booking":
-      case "uncancel_booking":
-      case "add_comment":
-      case "modify_comment":
-      case "delete_comment":
-        return "#FFF07C";
-      case "delete_booking":
-      case "cancel_booking":
-        return "#f45b69";
-    }
-  }
-
   return (
     <Card
       {...rest}
@@ -146,11 +147,12 @@ const ActivityFeed: React.FC<Props> = props => {
           }}
         >
           {(activities && activities.length > 0) ?
-            activities.map((activity, i) => (
+            activities.map((activity) => (
+              // eslint-disable-next-line react/prop-types
               <ActivityItem key={activity.id} activity={activity} />
             ))
             :
-            <span style={{color: "grey"}}>-- {t("no recent activity")} --</span>
+            <span style={{ color: "grey" }}>-- {t("no recent activity")} --</span>
           }
         </Timeline>
       </CardContent>

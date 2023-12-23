@@ -19,7 +19,6 @@ import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import ReplayIcon from "@mui/icons-material/Replay";
-import { ModalProps } from "@mui/material/Modal";
 import useMousePosition from "../common/useMousePosition";
 import { useLocation } from "react-router-dom";
 import { useBookingActions } from "../common/bookingActions";

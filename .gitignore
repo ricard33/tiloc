@@ -147,3 +147,5 @@ frontend0/
 /requirements-prod.txt
 /files-unittest/
 .pgpass
+.yarn/
+.yarnrc.yml
