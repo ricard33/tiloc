@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, Divider, Stack } from "@mui/material";
 import Timeline from "@mui/lab/Timeline";
 
@@ -39,8 +39,6 @@ const ActivityFeed: React.FC<Props> = props => {
   }
 
   function ActivityItem({ activity }: { activity: Activity }) {
-    const [open, setOpen] = useState(false);
-
     function getActivityLabel(activity: Activity) {
       switch (activity.type) {
         case "add_booking":
@@ -78,15 +76,13 @@ const ActivityFeed: React.FC<Props> = props => {
       }
     }
 
-
-    function handleClose() {
-      setOpen(false);
+    function onBookingUpdated() {
       refetch();
     }
 
     return (
-      <>
-        <TimelineItem onClick={() => setOpen(true)} style={{ cursor: "pointer" }}>
+      <BookingTooltip booking={activity.booking} bookingUpdated={onBookingUpdated}>
+        <TimelineItem style={{ cursor: "pointer" }}>
           <TimelineSeparator>
             <TimelineDot style={{ backgroundColor: getActivityColor(activity) }} />
             <TimelineConnector />
@@ -109,12 +105,7 @@ const ActivityFeed: React.FC<Props> = props => {
             </Stack>
           </TimelineContent>
         </TimelineItem>
-        <BookingTooltip
-          booking={activity.booking}
-          open={open}
-          onClose={() => handleClose()}
-        />
-      </>
+      </BookingTooltip>
     );
   }
 

@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
 import { TFunction } from "react-i18next";
 import { add } from "date-fns";
@@ -235,37 +235,31 @@ export function makeRenderItem(
     const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
 
     function Item() {
-      const [open, setOpen] = useState(false);
-
       return (
         <>
-          <div {...itemProps} onClick={() => setOpen(true)}>
-            {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
+          <BookingTooltip booking={item.booking}>
+            <div {...itemProps}>
+              {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : ""}
 
-            <div
-              className="rct-item-content item-content"
-              style={{ maxHeight: `${itemContext.dimensions.height}` }}
-            >
-              {item.icon ? item.icon : ""}
-              <div className="item-title">{itemContext.title}</div>
-              {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 ?
-                <EuroIcon
-                  className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
-                  style={{ height: `${itemContext.dimensions.height - 2}` }}
-                /> : ""}
+              <div
+                className="rct-item-content item-content"
+                style={{ maxHeight: `${itemContext.dimensions.height}` }}
+              >
+                {item.icon ? item.icon : ""}
+                <div className="item-title">{itemContext.title}</div>
+                {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 ?
+                  <EuroIcon
+                    className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
+                    style={{ height: `${itemContext.dimensions.height - 2}` }}
+                  /> : ""}
+              </div>
+              {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
             </div>
-            {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : ""}
-          </div>
-          <BookingTooltip
-            booking={item.booking}
-            // onOpenBooking={onOpenBooking} onEditBooking={onEditBooking}
-            // onCancelBooking={onCancelBooking}
-            open={open}
-            onClose={() => setOpen(false)}
-          />
+          </BookingTooltip>
         </>
       );
     }
+
     return <Item />;
   }
 

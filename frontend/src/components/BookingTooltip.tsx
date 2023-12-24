@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { PropsWithChildren, useCallback, useState } from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Booking, BookingStatus } from "../types";
@@ -33,22 +33,18 @@ type Props = {
   onOpenBooking?: (booking: Booking) => void,
   onEditBooking?: (booking: Booking) => void,
   onCancelBooking?: (booking: Booking) => void,
-  /**
-   * If `true`, the component is shown.
-   */
-  open: boolean;
-  onClose: () => void
+  bookingUpdated?: () => void,
 };
 
-export default function BookingTooltip(props: Props) {
+export default function BookingTooltip(props: PropsWithChildren<Props>) {
   const {
-    booking, open, onClose,
-    onOpenBooking, onEditBooking, onCancelBooking
+    booking, bookingUpdated,
+    onOpenBooking, onEditBooking, onCancelBooking,
+    children
   } = props;
   const { t } = useTranslation();
-  // const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<PopoverProps["anchorEl"]>(null);
-  const id = open ? "virtual-element-popover" : undefined;
+  const id = anchorEl ? "virtual-element-popover" : undefined;
   const status = getBookingStatus(booking.status);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const statusDisplay: OtaIconProps & {
@@ -62,19 +58,12 @@ export default function BookingTooltip(props: Props) {
     openBooking,
     editBooking,
     cancelBooking,
-    uncancelBooking,
-  } = useBookingActions(location.pathname.startsWith("/planning") ? "/planning" : undefined );
+    uncancelBooking
+  } = useBookingActions(location.pathname.startsWith("/planning") ? "/planning" : undefined);
 
-  useEffect(() => {
-    if (mousePosition.x && open) {
-
-      const getBoundingClientRect = () => {
-        return new DOMRect(mousePosition.x, mousePosition.y, 1, 10);
-      };
-      setAnchorEl({ getBoundingClientRect, nodeType: 1 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  const getBoundingClientRect = () => {
+    return new DOMRect(mousePosition.x, mousePosition.y, 1, 10);
+  };
 
   const handleOpenBooking = useCallback((booking: Booking) => {
     if (onOpenBooking) return onOpenBooking(booking);
@@ -88,132 +77,141 @@ export default function BookingTooltip(props: Props) {
 
   const handleCancelBooking = useCallback((booking: Booking) => {
     if (onCancelBooking) return onCancelBooking(booking);
-    if (booking.cancelled)
-      uncancelBooking(booking);
-    else
-      cancelBooking(booking);
-    onClose();
-  }, [onCancelBooking, uncancelBooking, cancelBooking, onClose]);
+    (booking.cancelled ? uncancelBooking(booking) : cancelBooking(booking)).then(() => {
+      setAnchorEl(null);
+      if(bookingUpdated) bookingUpdated();
+    });
+  }, [onCancelBooking, uncancelBooking, cancelBooking, bookingUpdated]);
 
-  if (!anchorEl) {
-    return <></>;
-  }
+  const handleClick = () => {
+    console.log("item click", getBoundingClientRect());
+    if (!anchorEl)
+      setAnchorEl({ getBoundingClientRect, nodeType: 1 });
+    else
+      setAnchorEl(null);
+  };
 
   return (
-    <Popover
-      id={id}
-      open={open}
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      transformOrigin={{ vertical: "top", horizontal: "center" }}
-      onClose={() => onClose()}
-    >
-      <Grid2 container style={{ maxWidth: "360px", fontSize: 14, fontWeight: "300" }} spacing={1} margin={1}>
-        <Grid2 xs={12}>
-          <Typography variant="h5" component="div">
-            {booking.guest_name}
-          </Typography>
-        </Grid2>
-        <Grid2 xs={6}>
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-            <LoginIcon style={{ color: statusColors["CHECKIN"], marginRight: "10px" }} />
-            <span style={{ fontSize: 14, fontWeight: "300" }}>
-              {formatDate(booking.begin_date, "PP")}
-            </span>
-          </div>
-        </Grid2>
-        <Grid2 xs={6}>
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-            <LogoutIcon style={{ color: statusColors["CHECKOUT"], marginRight: "10px" }} />
-            <span style={{ fontSize: 14, fontWeight: "300" }}>
-              {formatDate(booking.end_date, "PP")}
-            </span>
-          </div>
-        </Grid2>
-        <Grid2 xs={6}>
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-            <Groups2OutlinedIcon
-              fontSize="small" style={{ marginRight: "10px" }}
-            />&nbsp;{booking.adults + booking.children + booking.babies}
-          </div>
-        </Grid2>
-        <Grid2 xs={6}>
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-            <MonetizationOnOutlinedIcon
-              style={{ marginRight: "10px" }}
-              fontSize="small"
-            />&nbsp;{DecimalPrecision.round(booking.price_with_options)}&nbsp;€
-          </div>
-        </Grid2>
-        <Grid2 xs={6}>
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-            <HomeOutlinedIcon fontSize="small" style={{ marginRight: "10px" }} />&nbsp;{booking.lodging.name}
-          </div>
-        </Grid2>
-        <Grid2 xs={6}>
-          <div
-            style={{
-              background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
-              display: "flex", alignItems: "center", flexWrap: "wrap"
-            }}
-          >
-            {statusDisplay.icon}
-            <span style={{ verticalAlign: "text-bottom" }}>
-              {statusDisplay.label}
-            </span>
-          </div>
-        </Grid2>
-        <Grid2 xs={12}>
-          <Divider />
-        </Grid2>
+    <>
+      <div onClick={() => handleClick()}>
+        {children}
+      </div>
+      <Popover
+        id={id}
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => setAnchorEl(null)}
+      >
+        <Grid2 container style={{ maxWidth: "360px", fontSize: 14, fontWeight: "300" }} spacing={1} margin={1}>
+          <Grid2 xs={12}>
+            <Typography variant="h5" component="div">
+              {booking.guest_name}
+            </Typography>
+          </Grid2>
+          <Grid2 xs={6}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+              <LoginIcon style={{ color: statusColors["CHECKIN"], marginRight: "10px" }} />
+              <span style={{ fontSize: 14, fontWeight: "300" }}>
+                {formatDate(booking.begin_date, "PP")}
+              </span>
+            </div>
+          </Grid2>
+          <Grid2 xs={6}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+              <LogoutIcon style={{ color: statusColors["CHECKOUT"], marginRight: "10px" }} />
+              <span style={{ fontSize: 14, fontWeight: "300" }}>
+                {formatDate(booking.end_date, "PP")}
+              </span>
+            </div>
+          </Grid2>
+          <Grid2 xs={6}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+              <Groups2OutlinedIcon
+                fontSize="small" style={{ marginRight: "10px" }}
+              />&nbsp;{booking.adults + booking.children + booking.babies}
+            </div>
+          </Grid2>
+          <Grid2 xs={6}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+              <MonetizationOnOutlinedIcon
+                style={{ marginRight: "10px" }}
+                fontSize="small"
+              />&nbsp;{DecimalPrecision.round(booking.price_with_options)}&nbsp;€
+            </div>
+          </Grid2>
+          <Grid2 xs={6}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+              <HomeOutlinedIcon fontSize="small" style={{ marginRight: "10px" }} />&nbsp;{booking.lodging.name}
+            </div>
+          </Grid2>
+          <Grid2 xs={6}>
+            <div
+              style={{
+                background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
+                display: "flex", alignItems: "center", flexWrap: "wrap"
+              }}
+            >
+              {statusDisplay.icon}
+              <span style={{ verticalAlign: "text-bottom" }}>
+                {statusDisplay.label}
+              </span>
+            </div>
+          </Grid2>
+          <Grid2 xs={12}>
+            <Divider />
+          </Grid2>
 
-        {
-          confirmCancel ?
-            <>
-              <Grid2 xs={8}>
-                <Button
-                  startIcon={<EventBusyIcon />} size="small" color="error"
-                  onClick={() => handleCancelBooking(booking)}
-                >{t("Confirm cancellation")}</Button>
-              </Grid2>
-              <Grid2 xs={4}>
-                <Button
-                  startIcon={<ReplayIcon />} size="small" color="primary"
-                  onClick={() => setConfirmCancel(false)}
-                >{t("Discard")}</Button>
-              </Grid2>
-            </>
-            :
-            <>
-              <Grid2 xs={4}>
-                <Button
-                  startIcon={<InfoOutlinedIcon />} size="small" color="primary"
-                  onClick={() => handleOpenBooking(booking)}
-                >{t("Details")}</Button>
-              </Grid2>
-              <Grid2 xs={4}>
-                <Button
-                  startIcon={<EditNoteOutlinedIcon />} size="small"
-                  onClick={() => handleEditBooking(booking)}
-                >{t("Modify")}</Button>
-              </Grid2>
-              <Grid2 xs={4}>
-                {
-                  booking.cancelled ?
-                    <Button
-                      startIcon={<EventAvailableIcon />} size="small" color="success"
-                      onClick={() => handleCancelBooking(booking)}
-                    >{t("Book again")}</Button>
-                    :
-                    <Button
-                      startIcon={<EventBusyIcon />} size="small" color="error"
-                      onClick={() => setConfirmCancel(true)}
-                    >{t("Cancel")}</Button>
-                }
-              </Grid2>
-            </>
-        }
-      </Grid2>
-    </Popover>
+          {
+            confirmCancel ?
+              <>
+                <Grid2 xs={8}>
+                  <Button
+                    startIcon={<EventBusyIcon />} size="small" color="error"
+                    onClick={() => handleCancelBooking(booking)}
+                  >{t("Confirm cancellation")}</Button>
+                </Grid2>
+                <Grid2 xs={4}>
+                  <Button
+                    startIcon={<ReplayIcon />} size="small" color="primary"
+                    onClick={() => setConfirmCancel(false)}
+                  >{t("Discard")}</Button>
+                </Grid2>
+              </>
+              :
+              <>
+                <Grid2 xs={4}>
+                  <Button
+                    startIcon={<InfoOutlinedIcon />} size="small" color="primary"
+                    onClick={() => handleOpenBooking(booking)}
+                  >{t("Details")}</Button>
+                </Grid2>
+                <Grid2 xs={4}>
+                  <Button
+                    startIcon={<EditNoteOutlinedIcon />} size="small"
+                    onClick={() => handleEditBooking(booking)}
+                  >{t("Modify")}</Button>
+                </Grid2>
+                <Grid2 xs={4}>
+                  {
+                    booking.cancelled ?
+                      <Button
+                        startIcon={<EventAvailableIcon />} size="small" color="success"
+                        onClick={() => handleCancelBooking(booking)}
+                      >{t("Book again")}</Button>
+                      :
+                      <Button
+                        startIcon={<EventBusyIcon />} size="small" color="error"
+                        onClick={() => setConfirmCancel(true)}
+                      >{t("Cancel")}</Button>
+                  }
+                </Grid2>
+              </>
+          }
+        </Grid2>
+      </Popover>
+    </>
+
   );
 }

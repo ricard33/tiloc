@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Stack } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -25,7 +25,6 @@ type Props = {
 const InOutEvent: React.FC<Props> = props => {
   const { className, event, ...rest } = props;
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
 
   // console.log(events);
   /* eslint-disable react/no-multi-comp */
@@ -34,38 +33,34 @@ const InOutEvent: React.FC<Props> = props => {
   }
 
   return (
-    <Box {...rest} className={className} style={{cursor: "pointer"}}>
-      <Stack direction={"row"} spacing={1} margin={1} onClick={() => setOpen(true)}>
-        {event.event_type === "CHECKIN" ?
-          <LoginIcon fontSize="large" style={{ color: statusColors[event.event_type] }} /> :
-          <LogoutIcon fontSize="large" style={{ color: statusColors[event.event_type] }} />
-        }
-        <Stack direction={"column"} style={{ fontWeight: "300" }} spacing={0}>
-          <div><span style={{ color: statusColors[event.event_type] }}>
-            {{ CHECKIN: t("arrival"), CHECKOUT: t("departure") }[event.event_type]}
-          </span> {t("on {{date}}", { date: formatDate(event.date, "PPPP") })}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              flexWrap: "wrap",
-              fontSize: "smaller"
-            }}
-          >
-            <HomeOutlinedIcon fontSize="small" />&nbsp;{event.lodging.name}
-            <Sep /><NightsStayOutlinedIcon fontSize="small" />&nbsp;{event.duration}
-            <Sep /><Groups2OutlinedIcon fontSize="small" />&nbsp;{event.guests}
-            <Sep /><PersonOutlineIcon fontSize="small" />&nbsp;{event.guest_name}
-          </div>
+    <Box {...rest} className={className} style={{ cursor: "pointer" }}>
+      <BookingTooltip booking={event}>
+        <Stack direction={"row"} spacing={1} margin={1}>
+          {event.event_type === "CHECKIN" ?
+            <LoginIcon fontSize="large" style={{ color: statusColors[event.event_type] }} /> :
+            <LogoutIcon fontSize="large" style={{ color: statusColors[event.event_type] }} />
+          }
+          <Stack direction={"column"} style={{ fontWeight: "300" }} spacing={0}>
+            <div><span style={{ color: statusColors[event.event_type] }}>
+              {{ CHECKIN: t("arrival"), CHECKOUT: t("departure") }[event.event_type]}
+            </span> {t("on {{date}}", { date: formatDate(event.date, "PPPP") })}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                fontSize: "smaller"
+              }}
+            >
+              <HomeOutlinedIcon fontSize="small" />&nbsp;{event.lodging.name}
+              <Sep /><NightsStayOutlinedIcon fontSize="small" />&nbsp;{event.duration}
+              <Sep /><Groups2OutlinedIcon fontSize="small" />&nbsp;{event.guests}
+              <Sep /><PersonOutlineIcon fontSize="small" />&nbsp;{event.guest_name}
+            </div>
+          </Stack>
         </Stack>
-      </Stack>
-      <BookingTooltip
-        booking={event}
-        open={open}
-        onClose={() => setOpen(false)}
-      />
-
+      </BookingTooltip>
     </Box>
   );
 };
