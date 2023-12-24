@@ -37,6 +37,7 @@ type BookingActionsProps = {
   onSave?: (closeDialog: boolean) => Promise<Booking>;
   onCancelBooking: () => void;
   onUncancelBooking: () => void;
+  onConfirmCancellation?: (confirm: boolean) => void;
   // onDelete: () => void;
   onOpenContract?: (booking: Booking) => void;
   primaryColor?: "inherit" | "primary" | "secondary" | "error" | "info" | "success" | "warning";
@@ -54,6 +55,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
     onSave,
     onCancelBooking,
     onUncancelBooking,
+    onConfirmCancellation,
     // onDelete,
     onOpenContract,
     primaryColor
@@ -96,6 +98,16 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
   }
 
 
+  function handlePreCancel() {
+    setConfirmCancel(true);
+    if (onConfirmCancellation) onConfirmCancellation(true);
+  }
+
+  function handleDiscardCancellation() {
+    setConfirmCancel(false);
+    if (onConfirmCancellation) onConfirmCancellation(false);
+  }
+
   return (
     <React.Fragment>
       {confirmCancel ?
@@ -106,12 +118,12 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
           >{t("Confirm cancellation")}</Button>
           <Button
             startIcon={<ReplayIcon />} size="small" color="primary"
-            variant="contained" onClick={() => setConfirmCancel(false)}
+            variant="contained" onClick={() => handleDiscardCancellation()}
           >{t("Discard")}</Button>
         </>
         :
         <>
-          {canDelete &&
+          {canDelete && !isDirty &&
             (
               booking.cancelled ?
                 <Tooltip title={t("Book again")}>
@@ -122,7 +134,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
                 :
                 <>
                   <Tooltip title={t("Cancel booking")}>
-                    <IconButton aria-label="cancel" onClick={() => setConfirmCancel(true)} color="error">
+                    <IconButton aria-label="cancel" onClick={() => handlePreCancel()} color="error">
                       <EventBusyIcon />
                     </IconButton>
                   </Tooltip>

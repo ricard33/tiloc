@@ -89,6 +89,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const depositPercent = 30; // TODO load this from lodging preferences
   const bookingStatuses = getBookingStatuses();
   const [customizeTouristTax, setCustomizeTouristTax] = useState(typeof booking.custom_tourist_tax !== "undefined");
+  const [showTitle, setShowTitle] = useState(true);
 
   // console.debug("booking", booking);
   console.assert(!!booking, "Booking not initialized");
@@ -376,7 +377,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   // eslint-disable-next-line react/no-multi-comp
-  const dialogTitle = booking && booking.id ? t("Modify a booking") : t("Add a booking");
+  const dialogTitle = booking && booking.id ? t("Modify") : t("Add");
   return (
     <Dialog
       className="booking-dialog"
@@ -397,17 +398,21 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
             >
               <CloseIcon />
             </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              {dialogTitle}
-            </Typography>
-            {booking.cancelled &&
-              <span style={{ fontSize: "small", color: "red", flex: 1 }}>{t("CANCELLED")}</span>
-            }
+            {showTitle &&
+              <>
+                <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+                  {dialogTitle}
+                </Typography>
+                {booking.cancelled &&
+                  <span style={{ fontSize: "small", color: "red", flex: 1 }}>{t("CANCELLED")}</span>
+                }
+              </>}
             <BookingActions
               booking={booking} isDirty={isDirty} onReset={reset}
               onSave={handleSave}
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
               onOpenContract={onOpenContract}
+              onConfirmCancellation={(confirm) => setShowTitle(!confirm)}
               primaryColor="inherit"
             />
           </Toolbar>
@@ -916,7 +921,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
               onOpenContract={onOpenContract}
             />
-            {width < 1100 && <div style={{width: "50px"}} />}
+            {width < 1100 && <div style={{ width: "50px" }} />}
           </Stack>
         </DialogActions>}
     </Dialog>

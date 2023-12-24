@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Booking, Service } from "../../types";
 import {
@@ -42,6 +42,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { showError, showSuccess } = useAlert();
+  const [showTitle, setShowTitle] = useState(true);
 
   const copyToClipboard = () => {
     const bookingStr = [
@@ -95,16 +96,21 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
             >
               <CloseIcon />
             </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              {t("Booking details")}
-            </Typography>
-            {booking.cancelled &&
-              <span style={{ fontSize: "small", color: "red", flex: 1 }}>{t("CANCELLED")}</span>
+            {showTitle &&
+              <>
+                <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+                  {t("Details")}
+                </Typography>
+                {booking.cancelled &&
+                  <span style={{ fontSize: "small", color: "red", flex: 1 }}>{t("CANCELLED")}</span>
+                }
+              </>
             }
             <BookingActions
               booking={booking} onEdit={onEdit}
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
               onOpenContract={onOpenContract}
+              onConfirmCancellation={(confirm) => setShowTitle(!confirm)}
               primaryColor="inherit"
             />
           </Toolbar>
@@ -113,7 +119,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
         <DialogTitle id="simple-dialog-title" sx={{/*booking.cancelled ? { bgcolor: "warning.main" } : {}*/ }}>
           <Grid justifyContent="space-between" container spacing={4}>
             <Grid item xs={6}>
-              {t("Booking details")}
+              {t("Details")}
               {booking.cancelled &&
                 <Alert severity="warning" sx={{ display: "inline-flex", marginLeft: 2 }}>{t("CANCELED")}</Alert>
               }
@@ -138,7 +144,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
               onOpenContract={onOpenContract}
             />
-            {width < 1100 && <div style={{width: "50px"}} />}
+            {width < 1100 && <div style={{ width: "50px" }} />}
           </Stack>
         </DialogActions>
       }
