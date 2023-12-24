@@ -566,6 +566,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
+    @action(detail=False, methods=["PATCH"])
+    def all_read(self, request):
+        self.get_queryset().filter(read=False).update(read=True)
+        return Response(status=status.HTTP_200_OK)
+
 
 class ActivityViewSet(viewsets.ModelViewSet):
     queryset = models.Activity.objects.order_by("-date")
