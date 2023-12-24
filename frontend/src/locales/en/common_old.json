@@ -109,7 +109,6 @@
   "Impossible resend verification email: ": "",
   "Your first rentals": "",
   "Everything for a tourist rental owner": "",
-  "Basic": "",
   "Logo": "Logo",
   "Type": "Type",
   "Display": "Display",
@@ -119,5 +118,8 @@
   "Booking uncancelled": "Booking uncancelled",
   "Uncancel": "Uncancel",
   "Edit": "Edit",
-  "Open contract": ""
+  "Open contract": "",
+  "Modify a booking": "Modify a booking",
+  "Add a booking": "Add a booking",
+  "Basic features": ""
 }

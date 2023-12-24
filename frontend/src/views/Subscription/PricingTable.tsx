@@ -66,7 +66,7 @@ const PricingTable = (props: Props) => {
   const plans = [
     {
       ref: "FREE",
-      title: t("Free"), subtitle: t("Basic features"), slogan: t("Always free"),
+      title: t("Basic"), subtitle: t("Simple features"), slogan: t("Always free"),
       price: { monthly: 0, yearly: 0 },
       features: basicFeatures
     },

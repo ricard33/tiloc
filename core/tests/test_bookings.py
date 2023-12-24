@@ -303,11 +303,9 @@ class BookingModelTestCase(TestCase):
         )
         booking = factories.BookingFactory.create(lodging=lodging, duration=4, adults=2, children=2, price=Decimal(410))
         self.assertEqual(410, booking.price)
-        print (type(booking.price))
         self.assertAlmostEqual(Decimal('10.24'), booking.tourist_tax, 1)
 
         lodging.daily_rate = 50
         booking = factories.BookingFactory.create(lodging=lodging, duration=8, adults=2, children=2)
         self.assertEqual(400, booking.price)
-        print (type(booking.price))
         self.assertAlmostEqual(Decimal('10.08'), booking.tourist_tax, 1)

@@ -77,6 +77,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             end_date=event.end.date(),
             duration=(event.end.date() - event.begin.date()).days,
             notes=event.description,
+            adults=2,
             price=0,
             deposit=0,
             custom_tourist_tax=0,  # OTA should collect tax for us

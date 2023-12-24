@@ -109,7 +109,6 @@
   "Impossible resend verification email: ": "Impossible de renvoyer l'email de vérification :",
   "Your first rentals": "Vos premières locations",
   "Everything for a tourist rental owner": "Tout pour le propriétaire d'une location touristique",
-  "Basic": "Basique",
   "Logo": "Logo",
   "Type": "Type",
   "Display": "Afficher",
@@ -117,5 +116,8 @@
   "Show only summary in tooltip": "Afficher uniquement un résumé dans l'info-bulle",
   "Booking uncancelled": "Réservation réactivée",
   "Edit": "Modifier",
-  "Open contract": "Ouvrir le contrat"
+  "Open contract": "Ouvrir le contrat",
+  "Modify a booking": "Modifier une réservation",
+  "Add a booking": "Ajouter une réservation",
+  "Basic features": "Fonctionnalités simples"
 }
