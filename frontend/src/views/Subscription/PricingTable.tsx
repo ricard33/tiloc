@@ -8,9 +8,10 @@ import Grid from "@mui/material/Unstable_Grid2";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Feature, Plan } from "./subscription_types";
+import { Plan } from "./subscription_types";
 import FeaturesList from "./FeaturesList";
 import { HighlightBadge } from "../../components";
+import { getIntervalLabel, getSubscriptionPlans } from "../../common/subscriptionPlans";
 
 
 type Props = {};
@@ -33,63 +34,6 @@ const PricingTable = (props: Props) => {
     setInterval(interval === "yearly" ? "monthly" : "yearly");
   }
 
-  const commonFeatures: Feature[] = [
-    { label: t("Global calendar"), available: true },
-    { label: t("Manual booking"), available: true },
-    { label: t("Generation of contracts"), available: true }
-  ];
-
-  const basicFeatures = [
-    ...commonFeatures,
-    { label: t("Synchronizing calendars"), available: false },
-    { label: t("Lodging"), count: 1 },
-    { label: t("User"), count: 1 },
-    { label: t("Premium support"), available: false }
-  ];
-
-  const ownerFeatures = [
-    ...commonFeatures,
-    { label: t("Synchronizing calendars"), available: true },
-    { label: t("Lodgings"), count: 3 },
-    { label: t("Users"), count: 1 },
-    { label: t("Premium support"), available: true }
-  ];
-
-  const proFeatures = [
-    ...commonFeatures,
-    { label: t("Synchronizing calendars"), available: true },
-    { label: t("Lodgings"), count: 10 },
-    { label: t("Users"), count: 10 },
-    { label: t("Premium support"), available: true }
-  ];
-
-  const plans = [
-    {
-      ref: "FREE",
-      title: t("Basic"), subtitle: t("Simple features"), slogan: t("Always free"),
-      price: { monthly: 0, yearly: 0 },
-      features: basicFeatures
-    },
-    {
-      ref: "OWNER",
-      title: t("Essential"), subtitle: t("All the tools to manage your rentals"), slogan: t("Few lodgings"),
-      price: { monthly: 10, yearly: 100 },
-      features: ownerFeatures
-    },
-    {
-      ref: "PRO10",
-      title: t("Professional"),
-      subtitle: t("Multi-property management, Concierge service"),
-      slogan: t("More lodgings?"),
-      price: { monthly: 25, yearly: 250 },
-      features: proFeatures
-    }
-  ];
-  const intervalLabel = {
-    monthly: t("month"),
-    yearly: t("year")
-  };
-
   function renderPlan(plan: Plan) {
     const mostPopular = plan.ref === "OWNER" && interval === "monthly";
     const isCurrentPlan = currentPlanRef === plan.ref || currentPlanRef === `${plan.ref}-${interval.toUpperCase()}`;
@@ -108,7 +52,7 @@ const PricingTable = (props: Props) => {
                 <span style={{ fontSize: "3em" }}>{t("{{ price }}€", { price: plan.price[interval] })}</span>
                 <Stack style={{ fontSize: "1.2em", paddingTop: "0.2em", marginLeft: "0.3em", textAlign: "left" }}>
                   <span style={{}}>{t("per")}</span>
-                  <span style={{}}>{intervalLabel[interval]}</span>
+                  <span style={{}}>{getIntervalLabel(interval, t)}</span>
                 </Stack>
               </Stack>
               :
@@ -148,7 +92,7 @@ const PricingTable = (props: Props) => {
         <Typography>{t("Yearly")}</Typography>
       </Stack>
       <Grid container spacing={2}>
-        {plans.map((plan, index) =>
+        {getSubscriptionPlans(t).map((plan, index) =>
           <Grid key={index} sm={4} xs={12}>
             {renderPlan(plan)}
           </Grid>

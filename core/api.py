@@ -192,19 +192,23 @@ class SignUpAPI(KnoxLoginView):
         login(request, user)
 
         plan_ref = serializer.validated_data.get("plan")
-        if plan_ref and models.Plan.objects.filter(ref=plan_ref).exists():
-            # STRIPE API START
-            customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
-            account.stripe_customer_id = customer.id
-            account.save(update_fields=("stripe_customer_id",))
-            subscription = stripe.Subscription.create(
-                customer=customer.id,
-                payment_behavior="default_incomplete",
-                items=[{"price": stripe_get_price(plan_ref)}],
-                trial_period_days=14,
-            )
-            # STRIPE API END
-            create_or_update_subscription(subscription)
+        if plan_ref is not None:
+            logger.debug("Looking up plan %s", plan_ref)
+            if models.Plan.objects.filter(ref=plan_ref).exists():
+                # STRIPE API START
+                customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
+                account.stripe_customer_id = customer.id
+                account.save(update_fields=("stripe_customer_id",))
+                subscription = stripe.Subscription.create(
+                    customer=customer.id,
+                    payment_behavior="default_incomplete",
+                    items=[{"price": stripe_get_price(plan_ref)}],
+                    trial_period_days=14,
+                )
+                # STRIPE API END
+                create_or_update_subscription(subscription)
+            else:
+                logger.warning("Subscription plan not found for %s", plan_ref)
 
         send_generic_email("welcome", request.user)
         return super(SignUpAPI, self).post(request, format=None)

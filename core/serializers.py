@@ -120,7 +120,7 @@ class SignUpSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField()
-    plan = serializers.CharField(required=False)
+    plan = serializers.CharField(required=False, allow_blank=True)
 
 
 class UserSerializer(serializers.ModelSerializer):
