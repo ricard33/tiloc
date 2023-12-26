@@ -49,6 +49,7 @@ export interface Account {
   created: Date;
   validity: Date;
   trial_is_over: boolean;
+  is_free_plan: boolean;
   invoice_label: string;
   deposit_label: string;
 }

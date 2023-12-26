@@ -78,9 +78,9 @@ function App(props: Props) {
       dispatch(auth.userLoaded(currentUser));
       // console.log(currentUser.account);
       // console.log("End fo validity: ", currentUser.account.validity);
-      if (currentUser.account.trial_is_over) {
-        showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
-      } else if (currentUser.account.current_subscription.status !== "active") {
+      if (currentUser.account.is_free_plan) {
+        // showInfo(t("You're on free plan. Upgrade your subscription to unleash Tiloc’s the full potential."));
+      } else if (currentUser.account.current_subscription.status === "trialing") {
         if (isValidDate(currentUser.account.validity)) {
           console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
         }
@@ -89,9 +89,9 @@ function App(props: Props) {
         if (currentUser.account.trial_is_over) {
           showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
         } else if (remainingDays < 14) {
-          console.log(`Your subscription will end in ${remainingDays} days.`);
+          console.log(`Your trial period will end in ${remainingDays} days.`);
           const showMessage = remainingDays < 5 ? showWarning : showInfo;
-          showMessage(t("Your subscription will end in {{ count }} days.", { count: remainingDays }));
+          showMessage(t("Your trial period will end in {{ count }} days.", { count: remainingDays }));
         }
       }
     }

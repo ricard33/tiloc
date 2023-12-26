@@ -77,6 +77,7 @@ class AccountSerializer(serializers.ModelSerializer):
             "current_plan",
             "current_subscription",
             "trial_is_over",
+            "is_free_plan",
             "created",
             "validity",
             "invoice_label",
