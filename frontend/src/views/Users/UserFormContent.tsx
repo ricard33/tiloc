@@ -115,7 +115,7 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
             </Grid2>
         )}
         <Grid2 sm={6} xs={12}>
-          <TextFieldElement name={"phone"} label={t("Phone")} fullWidth />
+          <TextFieldElement name={"phone"} label={t("Phone")} fullWidth helperText={t("Your telephone number and address will appear in your rental contracts sent to your travelers.")}/>
         </Grid2>
         <Grid2 sm={6} xs={12}>
           <TextFieldElement name={"address"} label={t("Address")} multiline rows={3} fullWidth />
@@ -158,13 +158,14 @@ export const UserFormContent: React.FC<Props> = ({ canChangeEmail, canChangePass
           </>
         )}
         <Grid2 xs={12}>
-          <Typography variant="h6">{t("Contracts")}</Typography>
+          <Typography variant="h6">{t("Filling rental contracts")}</Typography>
         </Grid2>
         <Grid2 xs={12}>
           <TextFieldElement
             name={"payment"} label={t("Payment information")} multiline
             fullWidth
-            helperText={t("How do you want to be paid (bank transfer, credit card, etc...). You can add your account number.")}
+            placeholder={t("The various payments will be made in cash, by credit card or by bank transfer (IBAN: XXXX XXXX XXXX XXXX XXXX XXXX XXX, BIC: XXXXXXXXXXX, Bank: ????).")}
+            helperText={t("This text will be inserted into rental contracts and should explain how you want to be paid (bank transfer, credit card, etc...). You can add your account number.")}
           />
         </Grid2>
         {/*<Grid2 xs={12}>*/}

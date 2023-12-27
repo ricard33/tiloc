@@ -193,7 +193,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     change_user_password_template = None
     fieldsets = (
         (None, {"fields": ("account", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "phone", "address", "verified")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "phone", "address", "tz", "verified")}),
         (
             _("Permissions"),
             {

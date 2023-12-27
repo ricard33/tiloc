@@ -123,5 +123,11 @@
   "Add a booking": "Add a booking",
   "Basic features": "",
   "{{plan}} plan": "",
-  "Formule:": ""
+  "Formule:": "",
+  "Your subscription will end in {{ count }} days._one": "",
+  "Your subscription will end in {{ count }} days._other": "",
+  "How do you want to be paid (bank transfer, credit card, etc...). You can add your account number.": "",
+  "Contracts": "",
+  "Filling contracts": "",
+  "Les différents versements seront effectués en espèces, par carte bancaire ou par virement bancaire (IBAN : FRXX XXXX XXXX XXXX XXXX XXXX XXX, BIC : XXXXXXXXXXX, Banque: ????).": ""
 }

@@ -32,6 +32,7 @@ import logger from "../../../common/logger";
 import { RootState } from "../../../store";
 import { User } from "../../../types";
 import NotificationButton from "../../../components/NotificationButton";
+import { useAuth } from "../../../common/authUtils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -73,6 +74,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   const navigate = useNavigate();
   const [doLogout] = useLogoutMutation();
   const { showError } = useAlert();
+  const {logout} = useAuth();
 
   const avatar = getGravatarUrl(user.email, {
     default: "mp"
@@ -88,18 +90,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
 
   const handleSignOut: React.MouseEventHandler = event => {
     event.preventDefault();
-    doLogout().then((result) => {
-      if ((result as any).error) {
-        const error = (result as any).error;
-        showError(t("Logout error: ") + fetchErrorDecode(error));
-        console.error(result);
-        logger.error(result);
-      } else {
-        dispatch(auth.logoutSuccessful());
-        console.log("Logged out!");
-        navigate("/logged-out");
-      }
-    });
+    logout();
   };
 
   return (

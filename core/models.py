@@ -300,7 +300,7 @@ class User(auth_models.AbstractUser):
         related_name="users",
         related_query_name="user",
     )
-    tz = TimeZoneField(default="America/Martinique")
+    tz = TimeZoneField(default="Europe/Paris", choices_display="WITH_GMT_OFFSET")
 
     # Contracts and billing details
     legal = models.TextField(_("legal mention"), blank=True, null=True, help_text=_("Legal mention on bills"))

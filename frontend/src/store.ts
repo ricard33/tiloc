@@ -12,7 +12,7 @@ export const store = configureStore({
   reducer: (state, action) => {
     // Clear all data in redux store to initial.
     if (action.type === LOGOUT_SUCCESSFUL)
-      state = undefined;
+      state = { appInfo: state.appInfo };
 
     return combineReducers({
       alert: reducers.alert,

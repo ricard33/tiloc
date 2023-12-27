@@ -122,6 +122,7 @@ class SignUpSerializer(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField()
     plan = serializers.CharField(required=False, allow_blank=True)
+    tz = serializers.CharField(required=False, allow_blank=True)
 
 
 class UserSerializer(serializers.ModelSerializer):

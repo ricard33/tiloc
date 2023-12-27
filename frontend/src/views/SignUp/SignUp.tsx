@@ -43,6 +43,8 @@ export function SignUp() {
   const query = queryString.parse(location.search) as { plan: string };
   const plan = query.plan && getSubscriptionPlan(query.plan.split("-")[0], t);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 
 
   const onSubmit = (formData: SignUpData) => {
@@ -101,6 +103,7 @@ export function SignUp() {
             </Paper>}
           <Paper sx={{ padding: "1em" }}>
             <input type="hidden" {...register("plan")} defaultValue={query.plan} />
+            <input type="hidden" {...register("tz")} defaultValue={tz} />
             <Grid2 container spacing={2}>
               <Grid2 xs={12}>
                 <Typography variant="h2">

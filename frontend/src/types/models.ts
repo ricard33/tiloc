@@ -4,6 +4,7 @@ export interface SignUpData {
   email: string;
   password: string;
   plan: string;
+  tz: string;
 }
 
 export interface LoginInfo {
