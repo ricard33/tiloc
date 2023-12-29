@@ -818,6 +818,10 @@ def stripe_webhook(request):
         # Invalid signature
         return HttpResponse(400)
 
+    # if settings.DEBUG and settings.ENV == "dev" and not settings.UNITTEST:
+    #     with open(os.path.join(settings.LOG_DIR, "stripe-event-%f-%s.txt" % (time.time(), event.type)), "tw") as f:
+    #         f.write(str(event))
+
     try:
         if event.type == "customer.subscription.created":
             logger.info("[%s]", event.type)
@@ -848,6 +852,7 @@ def stripe_webhook(request):
                 create_or_update_subscription(subscription)
             except models.Account.DoesNotExist:
                 logger.warning("Subscription update for unknown customer '%s'", subscription.customer)
+
         elif event.type == "customer.subscription.trial_will_end":
             logger.info("[%s]", event.type)
             subscription: StripeSubscription = event.data.object
@@ -876,6 +881,7 @@ def stripe_webhook(request):
                 # unknown customer
                 logger.warning("PaymentIntent for unkonwn customer '%s'", payment_intent.customer)
                 pass
+
         elif event.type == "invoice.created":
             logger.info("[%s]", event.type)
             stripe_invoice: StripeInvoice = event.data.object
@@ -936,22 +942,23 @@ def stripe_webhook(request):
         raise
 
 
-def create_or_update_subscription(subscription):
-    models.Subscription.objects.get_or_create(
-        id=subscription.id,
+def create_or_update_subscription(sub: StripeSubscription):
+    models.Subscription.objects.update_or_create(
+        id=sub.id,
         defaults=dict(
-            customer_id=subscription.customer,
-            plan_id=subscription["items"].data[0].price.lookup_key,
-            created=arrow.get(subscription.created).datetime,
-            start_date=arrow.get(subscription.start_date).datetime,
-            current_period_start=arrow.get(subscription.current_period_start).datetime,
-            current_period_end=arrow.get(subscription.current_period_end).datetime,
-            status=subscription.status,
-            latest_invoice=isinstance(subscription.latest_invoice, StripeInvoice)
-            and subscription.latest_invoice.id
-            or subscription.latest_invoice,
-            default_payment_method=subscription.default_payment_method,
-            cancel_at_period_end=subscription.cancel_at_period_end,
+            customer_id=sub.customer,
+            created=arrow.get(sub.created).datetime,
+            start_date=arrow.get(sub.start_date).datetime,
+            current_period_start=arrow.get(sub.current_period_start).datetime,
+            current_period_end=arrow.get(sub.current_period_end).datetime,
+            status=sub.status,
+            latest_invoice=isinstance(sub.latest_invoice, StripeInvoice)
+                           and sub.latest_invoice.id
+                           or sub.latest_invoice,
+            default_payment_method=sub.default_payment_method,
+            cancel_at_period_end=sub.cancel_at_period_end,
+            # special case for archived prices without lookup_key --> we don't update plan
+            **(sub["items"].data[0].price.lookup_key and dict(plan_id=sub["items"].data[0].price.lookup_key) or {})
         ),
     )
 
@@ -960,7 +967,7 @@ def create_or_update_invoice(stripe_invoice):
     if not models.Account.objects.filter(stripe_customer_id=stripe_invoice.customer).exists():
         logger.warning("Invoice for an unknown customer [%s]", stripe_invoice.customer)
         return
-    models.Invoice.objects.get_or_create(
+    models.Invoice.objects.update_or_create(
         id=stripe_invoice.id,
         defaults=dict(
             customer_id=stripe_invoice.customer,
@@ -970,7 +977,7 @@ def create_or_update_invoice(stripe_invoice):
             hosted_invoice_url=stripe_invoice.hosted_invoice_url,
             period_start=arrow.get(stripe_invoice.period_start).datetime,
             period_end=arrow.get(stripe_invoice.period_end).datetime,
-            next_payment_attempt=arrow.get(stripe_invoice.next_payment_attempt).datetime,
+            next_payment_attempt=stripe_invoice.next_payment_attempt and arrow.get(stripe_invoice.next_payment_attempt).datetime or None,
             created=arrow.get(stripe_invoice.created).datetime,
         ),
     )

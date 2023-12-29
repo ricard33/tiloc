@@ -181,11 +181,6 @@ class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
             account.name = models.generate_account_id()
             account.save(update_fields=["name"])
 
-    def admin_user(self, obj: models.Account):
-        user = obj.user_set.filter(groups__name="administrator").first()
-        if user:
-            return "%s <%s>" % (user.get_full_name(), user.email)
-
 
 @admin.register(models.User, site=site)
 class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):

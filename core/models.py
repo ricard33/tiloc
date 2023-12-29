@@ -246,6 +246,13 @@ class Account(models.Model):
             )
             pass
 
+    @property
+    def admin_user(self):
+        user = self.user_set.filter(groups__name="administrator").first()
+        if user:
+            return "%s <%s>" % (user.get_full_name(), user.email)
+
+
 
 class MyUserManager(UserManager.from_queryset(ForUserQuerySet)):
     # Inheritance needed to be able to use Manager.from_queryset() and Manager.use_in_migrations jointly
