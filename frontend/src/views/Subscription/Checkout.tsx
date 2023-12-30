@@ -24,16 +24,17 @@ import FeaturesList from "./FeaturesList";
 import { loadStripe, Stripe, StripeElementsOptions } from "@stripe/stripe-js";
 import axios from "axios";
 import { Elements } from "@stripe/react-stripe-js";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { useDispatch } from "react-redux";
+import { Account } from "../../types";
 import Paper from "@mui/material/Paper";
 import { parseISO } from "date-fns";
 import { formatDate } from "../../common/dateUtils";
 import { Label, Value } from "../../components";
-import { auth } from "../../actions";
+import { subscriptionUpdated } from "../../actions";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { useAlert } from "../../common/alertUtils";
+import { useAppSelector } from "../../app/hooks";
+
 
 type Props = {};
 
@@ -41,7 +42,7 @@ const Checkout = (props: Props) => {
   const location = useLocation();
   const plan = location.state?.plan as Plan;
   const interval = location.state?.interval as "monthly" | "yearly";
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const { t } = useTranslation();
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null>>();
   const [testMode, setTestMode] = useState(false);
@@ -65,14 +66,14 @@ const Checkout = (props: Props) => {
     if (!plan || !interval)
       navigate("..");
 
-    if (user.account.current_subscription && plan && interval) {
-      axios.get(`/api/subscription/${user.account.current_subscription.id}/preview/?plan=${plan.ref}-${interval.toUpperCase()}`)
+    if (account.current_subscription && plan && interval) {
+      axios.get(`/api/subscription/${account.current_subscription.id}/preview/?plan=${plan.ref}-${interval.toUpperCase()}`)
         .then((response) => {
           console.log("preview", response.data);
           setPreview(response.data);
         });
     }
-  }, [interval, navigate, plan, plan?.ref, user.account.current_subscription]);
+  }, [interval, navigate, plan, plan?.ref, account.current_subscription]);
 
   if (!plan || !interval)
     return <></>;
@@ -94,12 +95,12 @@ const Checkout = (props: Props) => {
       title: t("Chaging your subscription?"),
       description: t("Do you really want to change your Tiloc subscription ?")
     }).then(() => {
-      axios.post(`/api/subscription/${user.account.current_subscription.id}/change/`, {
+      axios.post(`/api/subscription/${account.current_subscription.id}/change/`, {
         plan: `${plan.ref}-${interval.toUpperCase()}`
       })
         .then(({ data, status }) => {
           showSuccess(t("Subscription changed"));
-          dispatch(auth.subscriptionUpdated(data));
+          dispatch(subscriptionUpdated(data));
           navigate("../subscription");
         })
         .catch((error) => {
@@ -139,7 +140,7 @@ const Checkout = (props: Props) => {
         </Grid2>
         <Grid2 md={6} sm={7} xs={12}>
           {isLoading ? <Skeleton variant={"rectangular"} height="100%" />
-            : !user.account.current_subscription ?
+            : !account.current_subscription ?
               <Elements stripe={stripePromise} options={options}>
                 <CheckoutForm plan={plan} interval={interval!} testMode={testMode} />
               </Elements>

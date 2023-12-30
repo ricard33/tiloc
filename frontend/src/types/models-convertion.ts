@@ -58,7 +58,6 @@ export function api2User(user: Record<string, any>): User {
   return {
     ...user as User,
     vat_rate: Number(user.vat_rate),
-    account: api2Account(user.account)
   };
 }
 
@@ -66,7 +65,7 @@ export function user2api(user: Partial<User>): Record<string, any> {
   const {
     logo, signature,
     lodgings,
-    account, permissions,
+    permissions,
     ...rest
   } = user;
   // console.log("REST", rest);

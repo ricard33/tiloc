@@ -15,10 +15,11 @@ import {
   Payment,
   Service,
   User,
-  Notification, SignUpData, Activity
+  Notification, SignUpData, Activity, Account
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
+  api2Account,
   api2Activity,
   api2Booking,
   api2CalendarSync,
@@ -303,11 +304,20 @@ export const api = createApi({
   ],
   // keepUnusedDataFor: 5,
   endpoints: (builder) => ({
-    // Sign in
-    currentUser: builder.query<User, void>({
-      query: () => `auth/user/`,
+
+    myAccount: builder.query<Account, void>({
+      query: () => `my-account/`,
       transformResponse: (response) => {
-        return api2User(response as ApiModel);
+        return api2Account(response as ApiModel);
+      }
+    }),
+
+    // Sign in
+    currentUser: builder.query<User&{account: Account}, void>({
+      query: () => `auth/user/`,
+      transformResponse: (response: ApiModel) => {
+        const {account, ...user} = response;
+        return {...api2User(user), account: api2Account(account)};
       }
     }),
     updateCurrentUser: builder.mutation<User, Partial<User>>({
@@ -333,6 +343,11 @@ export const api = createApi({
           method: "POST",
           data: args
         };
+      },
+      transformResponse: (response: ApiModel) => {
+        const {user: currentUser, ...rest} = response;
+        const {account, ...user} = currentUser;
+        return {...rest, user: {...api2User(user), account: api2Account(account)}} as LoginInfo;
       }
     }),
     logout: builder.mutation<LoginInfo, void>({
@@ -486,7 +501,7 @@ export const api = createApi({
 
     // activity
     listActivities: activityApi.list(builder),
-    getActivity: activityApi.get(builder),
+    getActivity: activityApi.get(builder)
 
   })
 });
@@ -495,6 +510,8 @@ export const api = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  useMyAccountQuery,
+
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,
   useLoginMutation,
@@ -577,5 +594,5 @@ export const {
   useReadAllNotificationsMutation,
 
   useListActivitiesQuery,
-  useGetActivityQuery,
+  useGetActivityQuery
 } = api;

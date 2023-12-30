@@ -13,12 +13,11 @@ import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningS
 import { useListBookingsQuery, useListLodgingsQuery } from "../../services/api";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import "./Planning.scss";
-import { useSelector } from "react-redux";
 import Page from "../../layouts/Main/Page";
-import { RootState } from "../../store";
-import { Booking, Lodging, User } from "../../types";
+import { Account, Booking, Lodging, User } from "../../types";
 import useWindowDimensions from "../../common/windowDimensions";
 import { getBookingStatuses } from "../../common/statusUtils";
+import { useAppSelector } from "../../app/hooks";
 
 
 const Planning = () => {
@@ -60,7 +59,8 @@ const Planning = () => {
   const bookingStatuses = getBookingStatuses();
   const navigate = useNavigate();
 
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const user = useAppSelector(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const canAdd = user.permissions.includes("core.add_booking");
   // const [manualFetching, setManualFetching] = useState(false);
 
@@ -129,7 +129,7 @@ const Planning = () => {
         <>
           <BookingScrollingTimeline
             bookings={bookings ?? []}
-            lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
+            lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
             endDate={dates.end}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
@@ -143,7 +143,7 @@ const Planning = () => {
           />
           <BookingFixedTimeline
             bookings={bookings ?? []}
-            lodgings={[...((lodgings && lodgings.slice(0, user.account.current_plan.max_lodgings)) ?? [])]}
+            lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
             beginDate={dates.start}
             onCreateBooking={canAdd ? onCreateBooking : undefined}
             settings={settings}

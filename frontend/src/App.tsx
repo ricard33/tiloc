@@ -23,7 +23,6 @@ import { useTranslation } from "react-i18next";
 import { formatDate, isValidDate } from "./common/dateUtils";
 import axios from "axios";
 import { useAppSelector } from "./app/hooks";
-import ChatwootWidget from "./components/ChatwootWidget";
 import LoadingInProgress from "./components/LoadingInProgress";
 
 validate.validators = {
@@ -76,17 +75,18 @@ function App(props: Props) {
     // console.log("useEffect user", currentUser);
     if (currentUser) {
       dispatch(auth.userLoaded(currentUser));
-      // console.log(currentUser.account);
-      // console.log("End fo validity: ", currentUser.account.validity);
-      if (currentUser.account.is_free_plan) {
+      const account = currentUser.account;
+      // console.log(account);
+      // console.log("End fo validity: ", account.validity);
+      if (account.is_free_plan) {
         // showInfo(t("You're on free plan. Upgrade your subscription to unleash Tiloc’s the full potential."));
-      } else if (currentUser.account.current_subscription.status === "trialing") {
-        if (isValidDate(currentUser.account.validity)) {
-          console.log("End fo validity: ", formatDistanceToNow(currentUser.account.validity));
+      } else if (account.current_subscription.status === "trialing") {
+        if (isValidDate(account.validity)) {
+          console.log("End fo validity: ", formatDistanceToNow(account.validity));
         }
-        const remainingDays = isValidDate(currentUser.account.validity) ?
-          differenceInCalendarDays(currentUser.account.validity, new Date()) : -1;
-        if (currentUser.account.trial_is_over) {
+        const remainingDays = isValidDate(account.validity) ?
+          differenceInCalendarDays(account.validity, new Date()) : -1;
+        if (account.trial_is_over) {
           showInfo(t("Your free trial is over. Upgrade to professional to unleash Tiloc’s the full potential."));
         } else if (remainingDays < 14) {
           console.log(`Your trial period will end in ${remainingDays} days.`);
@@ -112,7 +112,7 @@ function App(props: Props) {
           {initialised ?
             <ConfirmProvider>
               <Notifier />
-              <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} />
+              {/*<ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showBubble />*/}
               <BrowserRouter>
                 <Routes />
               </BrowserRouter>

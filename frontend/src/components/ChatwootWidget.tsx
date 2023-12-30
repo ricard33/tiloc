@@ -1,13 +1,17 @@
-import React, { useCallback, useEffect, Fragment } from "react";
+import React, { Fragment, useCallback, useEffect } from "react";
 import { AppInfo, User } from "../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../app/hooks";
+import { IconButton, Tooltip } from "@mui/material";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 
 export interface ChatwootProps {
   token: string;
   // currentUser?: User;
+  showBubble?: boolean;
+  showHelpIcon?: boolean;
 }
 
 declare global {
@@ -19,7 +23,7 @@ declare global {
 }
 
 function ChatwootScript(props: ChatwootProps) {
-  const { token} = props;
+  const { token, showBubble, showHelpIcon } = props;
   const { t } = useTranslation();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
   const BASE_URL = "https://support.tiloc.fr";
@@ -50,17 +54,17 @@ function ChatwootScript(props: ChatwootProps) {
   const checkExistingScript = useCallback((): HTMLScriptElement | null => document.querySelector(`script[src="${SCRIPT_URL}"]`), []);
 
   useEffect(() => {
-    if(!loaded)
+    if (!loaded)
       return;
     if (typeof token !== "string") {
       console.error("Chatwoot SDK requires token.");
     }
     window.chatwootSettings = {
-      hideMessageBubble: !useInAppChat,
+      hideMessageBubble: !showBubble,//!useInAppChat,
       position: "right", // This can be left or right
       locale: "fr", // Language to be set
       type: "standard", // [standard, expanded_bubble]
-      launcherTitle: t("Need help?"),
+      launcherTitle: t("Need help?")
 
     };
 
@@ -81,7 +85,7 @@ function ChatwootScript(props: ChatwootProps) {
       return () => scriptEl.removeEventListener("load", onLoadHandler);
     }
 
-  }, [SCRIPT_URL, checkExistingScript, loaded, onLoadHandler, t, token, useInAppChat]);
+  }, [SCRIPT_URL, checkExistingScript, loaded, onLoadHandler, showBubble, t, token, useInAppChat]);
 
   useEffect(() => {
     // console.log("Chatwoot: changing user", currentUser)
@@ -121,9 +125,24 @@ function ChatwootScript(props: ChatwootProps) {
   //     window.$chatwoot.toggleBubbleVisibility(useInAppChat ? "show" : "hide");
   // }, [useInAppChat]);
 
-  return (
-    <Fragment />
-  );
+  const handleHelp: React.MouseEventHandler = event => {
+    if (window.$chatwoot && window.chatwootSettings) {
+      // setShowHelp(!showHelp);
+      window.$chatwoot.toggle("open");
+      // window.$chatwoot.toggleBubbleVisibility(showHelp ? "show" : "hide");
+
+    }
+
+  };
+
+  return showHelpIcon ?
+    <Tooltip title={t("Need help?")}>
+      <IconButton color="inherit" size="large" onClick={handleHelp}>
+        <HelpOutlineOutlinedIcon />
+      </IconButton>
+    </Tooltip>
+    :
+    <Fragment />;
 }
 
 export default ChatwootScript;

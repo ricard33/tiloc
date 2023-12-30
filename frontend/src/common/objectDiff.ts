@@ -75,3 +75,5 @@ export const deepDiffMapper = function () {
 export function filterObject(obj: object, callback: (val: any, key: string) => boolean) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
 }
+
+export const deepDiff = (obj1: any, obj2: any) => filterObject(deepDiffMapper.map(obj1, obj2), (f) => f.type !== "unchanged");

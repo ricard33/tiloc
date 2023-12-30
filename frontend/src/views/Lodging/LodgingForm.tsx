@@ -10,6 +10,8 @@ import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
 import { LodgingFormContent } from "./LodgingFormContent";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 
 type Props = {
@@ -23,9 +25,21 @@ type Props = {
 export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCancel, onDelete }) => {
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-  const formContext = useForm<Lodging>({ defaultValues: lodging ?? {description: ""}});
+  const currentUser = useSelector<RootState>(store => store.auth.user) as User;
+  const formContext = useForm<Lodging>({
+    defaultValues: lodging ?? {
+      description: "",
+      tourist_tax_included_in_payment: true,
+      active: true,
+      shown: true,
+      owner_id: currentUser.id,
+      address: currentUser.address,
+      deposit_label: "deposit",
+      deposit_percent: 30
+    }
+  });
   const { control } = formContext;
-  const {isDirty} = useFormState({ control });
+  const { isDirty } = useFormState({ control });
   usePageUnloadAlert(isDirty);
 
   const onCancelHandler = () => {
@@ -45,7 +59,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
       <Card sx={{ maxWidth: "800px" }}>
         <CardHeader title={t("Lodging properties")} />
         <CardContent sx={{}}>
-          <LodgingFormContent lodging={lodging}  users={users}/>
+          <LodgingFormContent lodging={lodging} users={users} />
         </CardContent>
         <CardActions>
           <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>

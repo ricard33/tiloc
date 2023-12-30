@@ -1,9 +1,7 @@
 import React from "react";
 import Page from "../../layouts/Main/Page";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { Account, User } from "../../types";
 import { Link as RouterLink } from "react-router-dom";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HotelIcon from "@mui/icons-material/Hotel";
@@ -18,6 +16,7 @@ import Typography from "@mui/material/Typography";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import HtmlTooltip from "../../components/Tooltip/HtmlTooltip";
 import { PremiumFeature } from "../../components/PremiumFeature";
+import { useAppSelector } from "../../app/hooks";
 
 
 const BigButton = styled(ButtonBase)(({ theme }) => ({
@@ -109,8 +108,9 @@ const ImageMarked = styled("span")(({ theme }) => ({
 
 function SettingsIndex() {
   const { t } = useTranslation();
-  const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canViewUsers = user.permissions.includes("core.view_user") && user.account.current_plan.max_users > 1;
+  const user = useAppSelector(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
+  const canViewUsers = user.permissions.includes("core.view_user") && account.current_plan.max_users > 1;
 
   const pages = [
     {
@@ -149,7 +149,7 @@ function SettingsIndex() {
       title: t("Calendars sync"),
       href: "calendar-syncs",
       icon: CalendarMonthIcon,
-      premium: user.account.trial_is_over
+      premium: account.trial_is_over
     }
   ];
 

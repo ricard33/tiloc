@@ -15,18 +15,17 @@ import { UserFormContent } from "../Users/UserFormContent";
 
 
 type Props = {
-  onBack: () => void;
   onNext: () => void;
   canChangeEmail?: boolean;
   canChangePassword?: boolean;
 };
 
-export const FirstProfile: React.FC<Props> = (props) => {
+export const UserProfileWizardStep: React.FC<Props> = (props) => {
   const args = setDefaults<Props>(props, {
     canChangeEmail: true,
     canChangePassword: true
   });
-  const { onBack, onNext, canChangePassword, canChangeEmail } = args;
+  const { onNext, canChangePassword, canChangeEmail } = args;
 
   const { t } = useTranslation();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
@@ -56,13 +55,13 @@ export const FirstProfile: React.FC<Props> = (props) => {
       onSuccess={onSubmitHandler}
       // formContext={formContext}
     >
-      <Card sx={{ maxWidth: "800px" }}>
+      <Card sx={{ maxWidth: "none" }}>
         <CardHeader title={t("User")} />
         <CardContent sx={{}}>
-          <UserFormContent canChangeEmail={canChangeEmail} canChangePassword={canChangePassword} myProfileOnly />
+          <UserFormContent canChangeEmail={canChangeEmail} canChangePassword={canChangePassword} myProfileOnly isSetupWizard />
         </CardContent>
       </Card>
-      <WizardFooter onBack={onBack} onNext={() => null /*handleSubmit(onSubmitHandler)*/} onSkip={() => null} />
+      <WizardFooter />
     </FormContainer>
   );
 };

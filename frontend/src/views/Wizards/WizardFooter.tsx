@@ -4,24 +4,34 @@ import Button from "@mui/material/Button";
 import { WizardContext } from "./WizardContext";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
+import { MobileStepper } from "@mui/material";
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { useTheme } from "@mui/material/styles";
 
 type Props = {
-  onBack: () => void;
-  onNext: () => void;
-  onSkip: () => void;
+  onNext?: () => void;
+  onSkip?: () => void;
   onReset?: () => void;
 };
 
-export const WizardFooter: React.FC<Props> = ({ onBack, onNext, onSkip, onReset }: Props) => {
+export const WizardFooter: React.FC<Props> = ({ onNext, onSkip, onReset }: Props) => {
   const wizardContext = useContext(WizardContext);
   const { t } = useTranslation();
-  const { activeStep, steps, isStepOptional } = wizardContext;
+  const theme = useTheme();
+  const { activeStep, steps, isStepOptional, isMobile, onBack } = wizardContext;
   const formContext = useFormContext();
+  const nbSteps = steps.length;
 
-  return (
-    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+  return !isMobile ?
+    <Box
+      sx={{
+        display: "flex", flexDirection: "row", paddingTop: 2,
+        // paddingTop: 0, marginTop: "16px", position: "sticky", bottom: 1, background: "white", zIndex: 100,
+      }}
+    >
       <Button
         color="inherit"
+        variant="contained"
         disabled={activeStep === 0}
         onClick={onBack}
         sx={{ mr: 1 }}
@@ -30,24 +40,55 @@ export const WizardFooter: React.FC<Props> = ({ onBack, onNext, onSkip, onReset 
       </Button>
       <Box sx={{ flex: "1 1 auto" }} />
       {isStepOptional(activeStep) && (
-        <Button color="inherit" onClick={onSkip} sx={{ mr: 1 }}>
+        <Button color="inherit" onClick={onSkip} sx={{ mr: 1 }} variant="contained">
           {t("Skip")}
         </Button>
       )}
-      { onReset &&
-        <Button onClick={onReset}>
+      {onReset &&
+        <Button onClick={onReset} variant="contained">
           {t("Reset")}
         </Button>
       }
       {formContext ?
-        <Button type="submit">
+        <Button type="submit" variant="contained">
           {activeStep === steps.length - 1 ? t("Finish") : t("Next")}
         </Button>
         :
-        <Button onClick={onNext}>
+        <Button onClick={onNext} variant="contained">
           {activeStep === steps.length - 1 ? t("Finish") : t("Next")}
         </Button>
       }
     </Box>
-  );
+    :
+    <MobileStepper
+      variant="text"
+      steps={nbSteps}
+      position="static"
+      activeStep={activeStep}
+      nextButton={
+        <Button
+          size="small"
+          type={formContext ? "submit" : "button"}
+          onClick={formContext ? undefined : onNext}
+          disabled={activeStep === nbSteps - 1}
+        >
+          {activeStep === steps.length - 1 ? t("Finish") : t("Next")}
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowLeft />
+          ) : (
+            <KeyboardArrowRight />
+          )}
+        </Button>
+      }
+      backButton={
+        <Button size="small" onClick={onBack} disabled={activeStep === 0}>
+          {theme.direction === "rtl" ? (
+            <KeyboardArrowRight />
+          ) : (
+            <KeyboardArrowLeft />
+          )}
+          Back
+        </Button>
+      }
+    />;
 };

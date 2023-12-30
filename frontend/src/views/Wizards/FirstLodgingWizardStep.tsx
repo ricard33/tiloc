@@ -19,16 +19,15 @@ import { auth } from "../../actions";
 
 
 type Props = {
-  onBack: () => void;
   onNext: () => void;
 };
 
-export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
+export const FirstLodgingWizardStep: React.FC<Props> = ({ onNext }) => {
   const { t } = useTranslation();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
-  const defaultValues = {
+  const defaultValues: Partial<Lodging> = {
     active: true, shown: true, owner_id: currentUser.id, address: currentUser.address,
-    description: "",
+    description: "", tourist_tax_included_in_payment: true, deposit_label: "deposit", deposit_percent: 30,
   };
   const { data: lodgings, isLoading } = useListLodgingsQuery({}, { refetchOnMountOrArgChange: 20 });
   const { data: users, isLoading: isLoadingUsers } = useListUsersQuery();
@@ -71,13 +70,13 @@ export const FirstLodgingForm: React.FC<Props> = ({ onBack, onNext }) => {
       defaultValues={lodgings && lodgings.length > 0 ? lodgings[0] : defaultValues}
       onSuccess={onSubmitHandler}
     >
-      <Card sx={{ maxWidth: "800px" }}>
+      <Card sx={{ maxWidth: "none" }}>
         <CardHeader title={t("Lodging properties")} />
         <CardContent sx={{}}>
-          <LodgingFormContent users={users ?? []}/>
+          <LodgingFormContent users={users ?? []} isSetupWizard />
         </CardContent>
       </Card>
-      <WizardFooter onBack={onBack} onNext={() => null} onSkip={() => null} />
+      <WizardFooter />
     </FormContainer>
   );
 };

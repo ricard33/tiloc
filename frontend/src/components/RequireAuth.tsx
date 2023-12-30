@@ -1,17 +1,16 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import React from "react";
-import { User } from "../types";
+import { useAppSelector } from "../app/hooks";
+import { AuthState } from "../reducers/auth";
 
 export function RequireAuth() {
-  const auth = useSelector<RootState>(store => store.auth) as { isLoading: boolean, isAuthenticated: boolean, user: User };
+  const auth = useAppSelector(store => store.auth) as AuthState;
   const location = useLocation();
   if (!auth.isAuthenticated && auth.isLoading) {
     return <em>Loading...</em>;
   } else if (!auth.isAuthenticated) {
     return <Navigate to={"/login"} state={{ from: location }} replace />;
-  } else if (!auth.user.account.is_initialized && location.pathname !== "/setup") {
+  } else if (auth.account && !auth.account.is_initialized && location.pathname !== "/setup") {
     return <Navigate to={"/setup"} replace />;
   } else {
     return (

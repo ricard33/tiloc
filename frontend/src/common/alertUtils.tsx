@@ -14,14 +14,16 @@ export const useAlert = () => {
   const { t } = useTranslation();
 
   const makeAlert = (variant: VariantType) => {
-    return (message: string) =>
-      enqueueSnackbar(message, {
+    return (message: string) => {
+      const msg = message.length > 1000 ? (message.substring(0, 1000) + "...") : message;
+      return enqueueSnackbar(msg, {
         variant: variant,
         // eslint-disable-next-line react/display-name
         action: (key) => (
           <Button onClick={() => closeSnackbar(key)}>{t("dismiss")}</Button>
-        ),
+        )
       });
+    }
   };
 
   return {

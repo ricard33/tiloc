@@ -10,10 +10,9 @@ import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import queryString from "query-string";
 import CheckoutResult from "../../components/CheckoutResult";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { Account } from "../../types";
 import { differenceInCalendarDays } from "date-fns";
+import { useAppSelector } from "../../app/hooks";
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -46,7 +45,7 @@ const Main = () => {
     defaultMatches: true
   });
   const [openSidebar, setOpenSidebar] = useState(false);
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const query = queryString.parse(location.search) as { subscription_id: string };
   const { subscription_id } = query;
 
@@ -81,8 +80,8 @@ const Main = () => {
 
   const shouldOpenSidebar = isDesktop ? true : openSidebar;
   const pathnames = location.pathname.split("/").filter((x) => x);
-  const trialDaysLeft = user.account.current_subscription && user.account.current_subscription.status === "trialing"
-    ? differenceInCalendarDays(user.account.current_subscription.current_period_end, new Date())
+  const trialDaysLeft = account.current_subscription && account.current_subscription.status === "trialing"
+    ? differenceInCalendarDays(account.current_subscription.current_period_end, new Date())
     : -1
   ;
 

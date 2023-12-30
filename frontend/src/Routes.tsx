@@ -36,7 +36,7 @@ import Subscription from "./views/Subscription/Subscription";
 import PricingTable from "./views/Subscription/PricingTable";
 import Checkout from "./views/Subscription/Checkout";
 import CheckoutDone from "./views/Subscription/CheckoutDone";
-import Account from "./views/Subscription/Acccount";
+import MyAccount from "./views/Subscription/Acccount";
 import SubscriptionCancel from "./views/Subscription/SubscriptionCancel";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
@@ -81,7 +81,7 @@ const MyRoutes = () => {
               </React.Suspense>
             }
           />
-          <Route path="account" element={<Account />}>
+          <Route path="account" element={<MyAccount />}>
             <Route index element={<MyProfile />} />
             <Route path="subscription" element={<Subscription />} />
             <Route path="cancel" element={<SubscriptionCancel />} />

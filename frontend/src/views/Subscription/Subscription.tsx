@@ -1,29 +1,29 @@
 import React from "react";
 import { Alert, Button, Card, CardActions, CardContent, CardHeader, Chip, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { useDispatch } from "react-redux";
+import { Account } from "../../types";
 import { Link } from "react-router-dom";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import { formatDate } from "../../common/dateUtils";
 import { DecimalPrecision } from "../../common/priceUtils";
 import axios from "axios";
-import { auth } from "../../actions";
+import { subscriptionUpdated } from "../../actions";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { useAlert } from "../../common/alertUtils";
 import { Label, Value } from "../../components";
+import { useAppSelector } from "../../app/hooks";
 
 
 function Subscription() {
   const { t } = useTranslation();
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const confirm = useConfirm();
   const dispatch = useDispatch();
   const { showSuccess, showError } = useAlert();
 
   function openCustomerPortal() {
-    axios.post(`/api/subscription/${user.account.current_subscription.id}/create_customer_portal_session/`, {
+    axios.post(`/api/subscription/${account.current_subscription.id}/create_customer_portal_session/`, {
       return_url: window.location.href
     })
       .then(({ data, status }) => {
@@ -44,10 +44,10 @@ function Subscription() {
       description: t("Your subscription will be immediately reactivated without any service interruption. Renewal payments will take place at the same dates than before cancellation.")
     }).then(() => {
       console.info(`Reactivate subscription`);
-      axios.post(`/api/subscription/${user.account.current_subscription.id}/reactivate/`)
+      axios.post(`/api/subscription/${account.current_subscription.id}/reactivate/`)
         .then(({ data, status }) => {
           showSuccess(t("Subscription reactivated"));
-          dispatch(auth.subscriptionUpdated(data));
+          dispatch(subscriptionUpdated(data));
           // navigate("../subscription");
         })
         .catch((error) => {
@@ -62,42 +62,42 @@ function Subscription() {
       <Card sx={{ maxWidth: "500px" }}>
         <CardHeader title={t("Subscription")} />
         <CardContent>
-          {user.account.current_subscription ?
+          {account.current_subscription ?
             <Grid2 container spacing={2}>
               <Label xs={5}>{t("Current plan")}</Label>
               <Value xs={7}>
-                {user.account.current_subscription.status === "trialing" &&
+                {account.current_subscription.status === "trialing" &&
                   <Chip label={t("TRIAL PERIOD")} color="success" size="small" sx={{ marginRight: 1 }} />}
-                {user.account.current_plan.name}
+                {account.current_plan.name}
               </Value>
               <Label xs={5}>{t("Renewal")}</Label>
               <Value xs={7}>
-                {user.account.current_subscription.cancel_at_period_end ?
+                {account.current_subscription.cancel_at_period_end ?
                   <Alert severity="warning">
-                    {t("Will be cancelled on {{date}}", { date: formatDate(user.account.validity, "PPPP") })}
+                    {t("Will be cancelled on {{date}}", { date: formatDate(account.validity, "PPPP") })}
                   </Alert>
-                  : user.account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
+                  : account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
               <Label xs={5}>{t("Price")}</Label>
-              <Value xs={7}>{user.account.current_plan.interval === "monthly"
-                ? t("{{amount}} € / month", { amount: DecimalPrecision.round(user.account.current_plan.price) })
-                : t("{{amount}} € / year", { amount: DecimalPrecision.round(user.account.current_plan.price) })
+              <Value xs={7}>{account.current_plan.interval === "monthly"
+                ? t("{{amount}} € / month", { amount: DecimalPrecision.round(account.current_plan.price) })
+                : t("{{amount}} € / year", { amount: DecimalPrecision.round(account.current_plan.price) })
               }
               </Value>
-              {!user.account.current_subscription.cancel_at_period_end &&
+              {!account.current_subscription.cancel_at_period_end &&
                 <>
                   <Label xs={5}>{t("Next billing")}</Label>
-                  <Value xs={7}>{formatDate(user.account.validity, "PPPP")}</Value>
+                  <Value xs={7}>{formatDate(account.validity, "PPPP")}</Value>
                 </>
               }
-              {user.account.current_subscription.default_payment_method &&
+              {account.current_subscription.default_payment_method &&
                 <>
                   <Label xs={5}>{t("Credit card")}</Label>
                   <Value xs={7}>
                     <Stack direction={"column"}>
-                      {user.account.current_subscription.default_payment_method.description}
+                      {account.current_subscription.default_payment_method.description}
                       <span style={{fontWeight: "lighter" }}>{t("Expire: {{month}}/{{year}}", {
-                        month: user.account.current_subscription.default_payment_method.exp_month.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}),
-                        year: user.account.current_subscription.default_payment_method.exp_year,
+                        month: account.current_subscription.default_payment_method.exp_month.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}),
+                        year: account.current_subscription.default_payment_method.exp_year,
                       })}</span>
                     </Stack>
                   </Value>
@@ -116,10 +116,10 @@ function Subscription() {
         </CardContent>
         <CardActions>
           <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
-            {user.account.current_subscription ?
+            {account.current_subscription ?
               <>
                 <Button component={Link} to="../prices">{t("Change plan")}</Button>
-                {user.account.current_subscription.cancel_at_period_end
+                {account.current_subscription.cancel_at_period_end
                   ? <Button onClick={() => reactivateHandler()} color="primary">{t("Reactivate subscription")}</Button>
                   : <Button component={Link} to="../cancel" color="warning">{t("Cancel subscription")}</Button>
                 }

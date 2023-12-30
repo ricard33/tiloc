@@ -3,8 +3,8 @@ import * as actionTypes from "./actions/actionTypes";
 
 // const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
-function setAuthToken(action: {type: string, data:{token: string}}) {
-  localStorage.setItem("token", action.data.token);
+function setAuthToken(action: {type: string, token: string}) {
+  localStorage.setItem("token", action.token);
 }
 
 function deleteToken() {

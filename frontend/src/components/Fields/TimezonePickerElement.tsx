@@ -4,8 +4,8 @@ import { getTimeZoneOptions } from "../../common/timezones";
 import { FieldValues } from "react-hook-form/dist/types/fields";
 
 type AutoDefault = {
-    id: string | number;
-    label: string;
+  id: string | number;
+  label: string;
 };
 
 type TimezonePickerElementProps<TFieldValues extends FieldValues> = Omit<AutocompleteElementProps<TFieldValues, AutoDefault | string | any, boolean | undefined, boolean | undefined>, "options" | "autocompleteProps">
@@ -18,7 +18,16 @@ export function TimezonePickerElement<TFieldValues extends FieldValues>(props: T
   return (
     <AutocompleteElement
       options={timezones}
-      autocompleteProps={{ disableClearable: true }}
+      autocompleteProps={{
+        disableClearable: true,
+        onChange: (event, value, reason, details) => {
+          console.log(value);
+        },
+        isOptionEqualToValue: (option, value) => {
+          // console.log(option, value);
+          return option === value;
+        }
+      }}
       {...props}
     />
   );

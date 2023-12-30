@@ -1,9 +1,12 @@
 import * as actionTypes from "./actionTypes";
-import { LoginInfo, Subscription, User } from "../types";
+import { Account, LoginInfo, Subscription, User } from "../types";
 
 export interface AuthAction {
   type: string,
+  token?: string,
+  expiry?: string;
   user?: User,
+  account?: Account,
   data?: LoginInfo,
   subscription?: Subscription,
 }
@@ -15,17 +18,23 @@ export function userLoading() {
   };
 }
 
-export function userLoaded(user: User) {
+export function userLoaded(currentUser: User&{account: Account}) {
+  const {account,  ...user} = currentUser;
   return {
     type: actionTypes.USER_LOADED,
-    user
+    user,
+    account
   };
 }
 
 export function loginSuccessful(data: LoginInfo) {
+  const {account,  ...user} = data.user;
+
   return {
     type: actionTypes.LOGIN_SUCCESSFUL,
-    data,
+    ...data,
+    user,
+    account
   };
 }
 

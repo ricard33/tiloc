@@ -292,7 +292,7 @@ REST_KNOX = {
     "TOKEN_TTL": timedelta(days=30),
     # 'TOKEN_LIMIT_PER_USER': None,
     "AUTO_REFRESH": True,
-    "USER_SERIALIZER": "core.serializers.UserSerializer",
+    "USER_SERIALIZER": "core.serializers.CurrentUserSerializer",
 }
 
 APP_NAME = _("Tiloc")

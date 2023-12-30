@@ -1,4 +1,3 @@
-import React from "react";
 import { fetchErrorDecode } from "./apiUtils";
 import logger from "./logger";
 import { auth } from "../actions";

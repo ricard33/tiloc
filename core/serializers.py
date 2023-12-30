@@ -81,7 +81,6 @@ class AccountSerializer(serializers.ModelSerializer):
             "created",
             "validity",
             "invoice_label",
-            "deposit_label",
         ]
 
     def get_is_initialized(self, account):
@@ -127,7 +126,6 @@ class SignUpSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
-    account = AccountSerializer(read_only=True)
     logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     permissions = serializers.SerializerMethodField(read_only=True)
@@ -196,6 +194,16 @@ class UserSerializer(serializers.ModelSerializer):
         return identifier_hash
 
 
+class CurrentUserSerializer(UserSerializer):
+    account = AccountSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        read_only_fields = ("id", "verified")
+        exclude = ["user_permissions", "is_superuser", "is_staff"]
+        extra_kwargs = {"password": {"write_only": True}}
+
+
 class UserSubSerializer(UserSerializer):
     class Meta:
         model = User
@@ -251,6 +259,8 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "rank",
             "daily_rate",
             "balance_due_date",
+            "deposit_label",
+            "deposit_percent",
             "guaranty",
             "capacity",
             "information",

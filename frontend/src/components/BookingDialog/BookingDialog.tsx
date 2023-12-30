@@ -86,7 +86,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [totalPayment, setTotalPayment] = useState(Number(booking.total_payments));
   const variant = "outlined";
   const margin = "none";
-  const depositPercent = 30; // TODO load this from lodging preferences
   const bookingStatuses = getBookingStatuses();
   const [customizeTouristTax, setCustomizeTouristTax] = useState(typeof booking.custom_tourist_tax !== "undefined");
   const [showTitle, setShowTitle] = useState(true);
@@ -98,7 +97,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue(key as any, (object as any)[key]);
   });
 
-  let lodging: Lodging | undefined = booking.lodging;
+  let lodging: Lodging = booking.lodging;
 
   const initialState = initializeDefaults(booking);
 
@@ -134,13 +133,13 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
-  const leftToPay = fullPrice + (lodging?.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
+  const leftToPay = fullPrice + (lodging.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
   // console.log("options", options, fullPrice);
 
-  const depositLabel = user ? getDepositLabel(t, user.account.deposit_label) : t("Deposit");
+  const depositLabel = user ? getDepositLabel(t, lodging.deposit_label) : t("Deposit");
 
   function initializeDefaults(booking: Booking) {
-    lodging = booking.lodging_id ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : undefined;
+    lodging = booking.lodging_id ? { ...lodgings.filter(x => x.id === booking.lodging_id)[0] } : lodgings[0];
 
     // Only include editable fields because to make `isDirty` reseted to false working after a submit
     // ==> dirty state is computed comparing default values and stored values (output of getValues())
@@ -155,18 +154,18 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     initialState.begin_date = booking.begin_date || new Date();
     initialState.end_date = booking.end_date || addDays(initialState.begin_date, initialState.duration || 7);
     initialState.duration = booking.duration || differenceInCalendarDays(initialState.end_date, initialState.begin_date);
-    initialState.daily_rate = booking.daily_rate || (lodging ? lodging.daily_rate : 0);
+    initialState.daily_rate = booking.daily_rate || lodging.daily_rate;
     initialState.is_flat_rate = booking.is_flat_rate || false;
     if (initialState.price === undefined)
       Object.assign(initialState, computeBookingPrice(initialState.begin_date, initialState.end_date,
-        initialState.daily_rate, 0, 0, [], depositPercent).price);
-    initialState.guaranty = booking.guaranty || (lodging ? lodging.guaranty : 0);
+        initialState.daily_rate, 0, 0, [], lodging.deposit_percent).price);
+    initialState.guaranty = booking.guaranty || lodging.guaranty;
     initialState.commission_fees = booking.commission_fees || 0;
     initialState.adults = booking.adults || 2;
     initialState.children = booking.children || 0;
     initialState.babies = booking.babies || 0;
     initialState.source_id = booking.source_id || ("" as any);
-    initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging?.default_services.includes(o.reference)) : []);
+    initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging.default_services.includes(o.reference)) : []);
     initialState.arrival_details = booking.arrival_details ?? "";
     initialState.notes = booking.notes ?? "";
 
@@ -215,7 +214,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         value = Number(value);
         lodging = lodgings.filter(x => x.id === value)[0];
         if (!isFlatRate && formValues.daily_rate !== lodging.daily_rate) {
-          const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], depositPercent);
+          const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, lodging.daily_rate, 0, 0, [], lodging.deposit_percent);
           setMultipleValues(priceObj);
         }
         computeTouristTax();
@@ -239,7 +238,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       case "daily_rate":
         value = parseFloat(value as string);
         if (!isNaN(value)) {
-          const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], depositPercent);
+          const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], lodging.deposit_percent);
           setMultipleValues(priceObj);
           computeTouristTax();
         }
@@ -259,7 +258,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         else {
           const formValues = getValues();
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date,
-            formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent);
+            formValues.daily_rate ?? lodging.daily_rate, 0, 0, [], lodging.deposit_percent);
           setMultipleValues(priceObj);
           computeTouristTax();
           return false;
@@ -280,7 +279,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     const duration = Number(newValue);
     const endDate = addDays(formValues.begin_date, duration);
     const priceObj = formValues.is_flat_rate ? { daily_rate: (formValues.price ?? 0) / duration }
-      : computeBookingPrice(formValues.begin_date, endDate, formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent).price;
+      : computeBookingPrice(formValues.begin_date, endDate, formValues.daily_rate ?? lodging.daily_rate, 0, 0, [], lodging.deposit_percent).price;
     setMultipleValues(priceObj);
     setValue("end_date", endDate);
     return duration;
@@ -301,7 +300,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     };
     const duration = differenceInCalendarDays(newBooking.end_date, newBooking.begin_date);
     const priceObj = newBooking.is_flat_rate ? { daily_rate: (newBooking.price ?? 0) / duration }
-      : computeBookingPrice(newBooking.begin_date, newBooking.end_date, formValues.daily_rate ?? (lodging ? lodging.daily_rate : 0), 0, 0, [], depositPercent).price;
+      : computeBookingPrice(newBooking.begin_date, newBooking.end_date, formValues.daily_rate ?? lodging.daily_rate, 0, 0, [], lodging.deposit_percent).price;
     setMultipleValues(priceObj);
     setValue("duration", duration);
     computeTouristTax();

@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { Account } from "../../types";
 import { Button, Card, CardActions, CardContent, CardHeader, Chip, Stack, Switch } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -12,15 +10,16 @@ import { Plan } from "./subscription_types";
 import FeaturesList from "./FeaturesList";
 import { HighlightBadge } from "../../components";
 import { getIntervalLabel, getSubscriptionPlans } from "../../common/subscriptionPlans";
+import { useAppSelector } from "../../app/hooks";
 
 
 type Props = {};
 
 const PricingTable = (props: Props) => {
   const { t } = useTranslation();
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
-  const currentPlanRef = user.account.current_plan ? user.account.current_plan.ref : "FREE";
+  const currentPlanRef = account.current_plan ? account.current_plan.ref : "FREE";
 
   useEffect(() => {
     axios.get("/api/prices/")
@@ -73,7 +72,7 @@ const PricingTable = (props: Props) => {
               {
                 plan.ref === "FREE"
                   ? t("Choose")
-                  : (!user.account.current_subscription ? t("Subscribe") : t("Change"))
+                  : (!account.current_subscription ? t("Subscribe") : t("Change"))
               }</Button>
           }
         </CardActions>

@@ -2,13 +2,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useListUsersQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { User } from "../../types";
+import { Account, User } from "../../types";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Page from "../../layouts/Main/Page";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import GridToolbar from "../../components/GridToolbar";
 import Paper from "@mui/material/Paper";
+import { useAppSelector } from "../../app/hooks";
 
 type Props = {};
 
@@ -16,8 +15,9 @@ const UsersList: React.FunctionComponent<Props> = () => {
   const { t } = useTranslation();
   const { data } = useListUsersQuery({}, { refetchOnMountOrArgChange: 20 });
   const navigate = useNavigate();
-  const user = useSelector<RootState>((store) => store.auth.user) as User;
-  const canAdd = user.permissions.includes("core.add_user") && data && data.length < user.account.current_plan.max_users;
+  const user = useAppSelector((store) => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
+  const canAdd = user.permissions.includes("core.add_user") && data && data.length < account.current_plan.max_users;
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 70 },

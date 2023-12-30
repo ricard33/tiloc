@@ -6,24 +6,27 @@ import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
 import { Trans, useTranslation } from "react-i18next";
 import Paper from "@mui/material/Paper";
-import { FirstProfile } from "./FirstProfile";
+import { UserProfileWizardStep } from "./UserProfileWizardStep";
 import { WizardContext } from "./WizardContext";
 import { WizardFooter } from "./WizardFooter";
-import { FirstLodgingForm } from "./FirstLodgingForm";
+import { FirstLodgingWizardStep } from "./FirstLodgingWizardStep";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@mui/material";
+import useWindowDimensions from "../../common/windowDimensions";
+import { ContractWizardStep } from "./ContractWizardStep";
 
 
 export default function NewAccountWizard() {
   const { t } = useTranslation();
   const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set<number>());
   const navigate = useNavigate();
-
+  const { width } = useWindowDimensions();
+  const isMobile = width < 600;
 
   const steps = [
     t("Complete your profile"),
     t("Create your first lodging"),
+    t("Prefill your contracts"),
     t("Finished")
   ];
 
@@ -32,38 +35,12 @@ export default function NewAccountWizard() {
     return false;
   };
 
-  const isStepSkipped = (step: number) => {
-    return skipped.has(step);
-  };
-
   const handleNext = () => {
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
-    }
-
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
   };
 
   const handleReset = () => {
@@ -73,12 +50,14 @@ export default function NewAccountWizard() {
   const renderStep = () => {
     if (activeStep === 0)
       return (
-        <FirstProfile
-          onNext={() => handleNext()} onBack={handleBack} canChangeEmail={false}
+        <UserProfileWizardStep
+          onNext={() => handleNext()} canChangeEmail={false}
           canChangePassword={false}
         />);
     else if (activeStep === 1)
-      return <FirstLodgingForm onNext={() => handleNext()} onBack={handleBack} />;
+      return <FirstLodgingWizardStep onNext={() => handleNext()}  />;
+    else if (activeStep === 2)
+      return <ContractWizardStep onNext={() => handleNext()}  />;
     else if (activeStep === steps.length - 1) // Last one ?
       return (
         <>
@@ -96,47 +75,60 @@ export default function NewAccountWizard() {
             />
           </Typography>
 
-          <WizardFooter onBack={handleBack} onNext={() => navigate("/")} onSkip={() => null} onReset={handleReset} />
+          <WizardFooter onNext={() => navigate("/")} onReset={handleReset} />
         </>
       );
     else
       return (
         <>
           <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-          <WizardFooter onBack={handleBack} onNext={handleNext} onSkip={handleSkip} />
+          <WizardFooter onNext={handleNext} />
         </>
       );
   };
 
   return (
-    <WizardContext.Provider value={{ steps, activeStep, isStepOptional }}>
-      <Container maxWidth={"md"}>
-        <Paper sx={{ padding: "1em" }}>
+    <WizardContext.Provider value={{ steps, activeStep, isStepOptional, isMobile, onBack: handleBack }}>
+      <Container maxWidth={false} style={isMobile ? {padding: 0} : {}}>
+        <Paper sx={{ padding: isMobile ? 0 : "1em" }}>
           <Box sx={{ width: "100%" }}>
-            <Stepper activeStep={activeStep}>
-              {steps.map((label, index) => {
-                const stepProps: { completed?: boolean } = {};
-                const labelProps: {
-                  optional?: React.ReactNode;
-                } = {};
-                if (isStepOptional(index)) {
-                  labelProps.optional = (
-                    <Typography variant="caption">Optional</Typography>
+            {!isMobile ?
+              <Stepper activeStep={activeStep}>
+                {steps.map((label, index) => {
+                  const stepProps: { completed?: boolean } = {};
+                  const labelProps: {
+                    optional?: React.ReactNode;
+                  } = {};
+                  if (isStepOptional(index)) {
+                    labelProps.optional = (
+                      <Typography variant="caption">Optional</Typography>
+                    );
+                  }
+                  return (
+                    <Step key={label} {...stepProps}>
+                      <StepLabel {...labelProps}>{label}</StepLabel>
+                    </Step>
                   );
-                }
-                if (isStepSkipped(index)) {
-                  stepProps.completed = false;
-                }
-                return (
-                  <Step key={label} {...stepProps}>
-                    <StepLabel {...labelProps}>{label}</StepLabel>
-                  </Step>
-                );
-              })}
-            </Stepper>
-            <React.Fragment>
+                })}
+              </Stepper>
+              :
+              <Paper
+                square
+                elevation={0}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  height: 50,
+                  pl: 2,
+                  bgcolor: "background.default"
+                }}
+              >
+                <Typography>{steps[activeStep]}</Typography>
+              </Paper>
+            }
+            <Container maxWidth={"md"} style={{padding: isMobile ? "0" : "2px 0"}}>
               {renderStep()}
-            </React.Fragment>
+            </Container>
           </Box>
         </Paper>
       </Container>

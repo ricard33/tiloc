@@ -13,11 +13,10 @@ import { SidebarNav, UpgradePlan } from "./components";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../../store";
-import { AppInfo, User } from "../../../../types";
+import { Account, AppInfo } from "../../../../types";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import { useAppSelector } from "../../../../app/hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -64,8 +63,8 @@ const Sidebar: React.FC<Props> = props => {
   const { t } = useTranslation();
   const location = useLocation();
   const locationPathname = location.pathname;
-  const user = useSelector<RootState>(store => store.auth.user) as User;
-  const appInfo = useSelector<RootState>(store => store.appInfo) as AppInfo;
+  const account = useAppSelector(store => store.auth.account) as Account;
+  const appInfo = useAppSelector(store => store.appInfo) as AppInfo;
   // const canViewUsers = user.permissions.includes("core.view_user");
 
   const menus = [
@@ -112,10 +111,10 @@ const Sidebar: React.FC<Props> = props => {
         //   disabled: false,
         //   external: true
         // },
-        { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon />, premium: user.account.trial_is_over },
+        { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon />, premium: account.trial_is_over },
         // { title: t("Reports"), href: "/reports", icon: <MovingIcon />, disabled: true, premium: true },
         // { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
-        { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false, premium: user.account.trial_is_over },
+        { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false, premium: account.trial_is_over },
         { title: t("Settings"), href: "/settings", icon: <SettingsIcon /> }
       ]
     }
@@ -142,7 +141,7 @@ const Sidebar: React.FC<Props> = props => {
           pages={currentMenu.pages}
           onClick={onClose}
         />
-        {user.account.trial_is_over && <UpgradePlan />}
+        {account.trial_is_over && <UpgradePlan />}
         <div className={classes.version}>
           <div>{t("version")} {appInfo.version}</div>
           <div>{t("build on")} {appInfo.buildDate}</div>

@@ -7,7 +7,7 @@ import {
   useMoveUpLodgingMutation
 } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Lodging, User } from "../../types";
+import { Account, Lodging, User } from "../../types";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -18,14 +18,13 @@ import {
 } from "@mui/x-data-grid";
 import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import GridToolbar from "../../components/GridToolbar";
 import Paper from "@mui/material/Paper";
+import { useAppSelector } from "../../app/hooks";
 
 type Props = {};
 
@@ -37,8 +36,9 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
   const [moveDown] = useMoveDownLodgingMutation();
   const navigate = useNavigate();
   const { showError, showSuccess } = useAlert();
-  const user = useSelector<RootState>(store => store.auth.user) as User;
-  const canAdd = user.permissions.includes("core.add_lodging") && data && data.length < user.account.current_plan.max_lodgings;
+  const user = useAppSelector(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
+  const canAdd = user.permissions.includes("core.add_lodging") && data && data.length < account.current_plan.max_lodgings;
   const canChange = user.permissions.includes("core.change_lodging");
 
   const onRankUpDown = React.useCallback((lodging: Lodging, direction: "up" | "down") => {

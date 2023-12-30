@@ -250,7 +250,7 @@ msgid "When the balance should be paid (in days before arrival)"
 msgstr "Date de paiement du solde (en jours avant l'arrivée)"
 
 #: core/models.py:329
-msgid "guaranty deposit"
+msgid "security deposit"
 msgstr "dépôt de garantie"
 
 #: core/models.py:330

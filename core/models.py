@@ -107,10 +107,6 @@ def generate_account_id():
 
 
 class Account(models.Model):
-    class DepositOrDownPayment(models.TextChoices):
-        DEPOSIT = "deposit", _("Deposit")
-        DOWN_PAYMENT = "down_payment", _("Down payment")
-
     class InvoiceLabel(models.TextChoices):
         INVOICE = "invoice", _("Invoice")
         NOTE = "note", _("Note")
@@ -126,12 +122,6 @@ class Account(models.Model):
     )
     invoice_label = models.CharField(
         _("invoice label"), max_length=30, choices=InvoiceLabel.choices, default=InvoiceLabel.RECEIPT
-    )
-    deposit_label = models.CharField(
-        _("deposit or down payment"),
-        max_length=30,
-        choices=DepositOrDownPayment.choices,
-        default=DepositOrDownPayment.DEPOSIT,
     )
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -339,6 +329,10 @@ class User(auth_models.AbstractUser):
 
 
 class Lodging(models.Model):
+    class DepositOrDownPayment(models.TextChoices):
+        DEPOSIT = "deposit", _("Deposit")
+        DOWN_PAYMENT = "down_payment", _("Down payment")
+
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     owner = models.ForeignKey(
@@ -366,7 +360,14 @@ class Lodging(models.Model):
         default=0,
         help_text=_("When the balance should be paid (in days before arrival)"),
     )
-    guaranty = models.DecimalField(_("guaranty deposit"), max_digits=20, decimal_places=2, null=True, blank=True)
+    deposit_label = models.CharField(
+        _("deposit or down payment"),
+        max_length=30,
+        choices=DepositOrDownPayment.choices,
+        default=DepositOrDownPayment.DEPOSIT,
+    )
+    deposit_percent = models.IntegerField(_("deposit rate"), default=30)
+    guaranty = models.DecimalField(_("security deposit"), max_digits=20, decimal_places=2, null=True, blank=True)
     capacity = models.IntegerField(_("capacity"), null=True, blank=True)
     information = models.TextField(_("information"), blank=True)
     is_flat_rate_tourist_tax = models.BooleanField(_("flat rate tourist tax"), default=True)
@@ -536,7 +537,7 @@ class Booking(models.Model):
         _("flat rate?"), default=False, help_text=_("Use flat rate price instead of daily price computation if true")
     )
     deposit = models.DecimalField(_("deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
-    guaranty = models.DecimalField(_("guaranty"), max_digits=20, decimal_places=2, blank=True, null=True)
+    guaranty = models.DecimalField(_("security deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
     custom_tourist_tax = models.DecimalField(
         _("personalized tourist tax"),

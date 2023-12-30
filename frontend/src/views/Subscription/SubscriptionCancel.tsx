@@ -1,9 +1,8 @@
 import React from "react";
 import { Alert, Button, Card, CardActions, CardContent, CardHeader, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { useDispatch } from "react-redux";
+import { Account } from "../../types";
 import { useNavigate } from "react-router-dom";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import { formatDate } from "../../common/dateUtils";
@@ -13,13 +12,14 @@ import FeaturesList from "./FeaturesList";
 import { useConfirm } from "../../libs/MuiConfirm";
 import axios from "axios";
 import { useAlert } from "../../common/alertUtils";
-import { auth } from "../../actions";
+import { subscriptionUpdated } from "../../actions";
 import { Label, Value } from "../../components";
+import { useAppSelector } from "../../app/hooks";
 
 
 function SubscriptionCancel() {
   const { t } = useTranslation();
-  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const navigate = useNavigate();
   const confirm = useConfirm();
   const dispatch = useDispatch();
@@ -31,10 +31,10 @@ function SubscriptionCancel() {
       description: t("Do you really want to cancel your Tiloc subscription ?")
     }).then(() => {
       console.warn(`Cancelling subscription`);
-      axios.post(`/api/subscription/${user.account.current_subscription.id}/cancel/`)
+      axios.post(`/api/subscription/${account.current_subscription.id}/cancel/`)
         .then(({ data, status }) => {
           showSuccess(t("Subscription cancelled"));
-          dispatch(auth.subscriptionUpdated(data));
+          dispatch(subscriptionUpdated(data));
           navigate("../subscription");
         })
         .catch((error) => {
@@ -50,7 +50,7 @@ function SubscriptionCancel() {
       <Card sx={{ maxWidth: "500px" }}>
         <CardHeader title={t("Canceling your Subscription")} />
         {
-          user.account.current_subscription.cancel_at_period_end ?
+          account.current_subscription.cancel_at_period_end ?
             <>
               <CardContent>
                 <Alert severity="info">{t("Subscription already canceled")}</Alert>
@@ -80,19 +80,19 @@ function SubscriptionCancel() {
                     />
                   </Grid2>
                   <Label xs={5}>{t("Current plan")}</Label>
-                  <Value xs={7}>{user.account.current_plan.name}</Value>
+                  <Value xs={7}>{account.current_plan.name}</Value>
                   <Label xs={5}>{t("Renewal")}</Label>
-                  <Value xs={7}>{user.account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
+                  <Value xs={7}>{account.current_plan.interval === "monthly" ? t("Monthly") : t("Yearly")}</Value>
                   <Label xs={5}>{t("Price")}</Label>
-                  <Value xs={7}>{user.account.current_plan.interval === "monthly"
-                    ? t("{{amount}} € / month", { amount: DecimalPrecision.round(user.account.current_plan.price) })
-                    : t("{{amount}} € / year", { amount: DecimalPrecision.round(user.account.current_plan.price) })
+                  <Value xs={7}>{account.current_plan.interval === "monthly"
+                    ? t("{{amount}} € / month", { amount: DecimalPrecision.round(account.current_plan.price) })
+                    : t("{{amount}} € / year", { amount: DecimalPrecision.round(account.current_plan.price) })
                   }
                   </Value>
                   <Grid2 xs={12}>
                     <Typography variant="body1">
                       {t("Your subscription will be cancelled at the end of the current billing period:")}
-                      <strong>{formatDate(user.account.validity, "PPPP")}</strong>
+                      <strong>{formatDate(account.validity, "PPPP")}</strong>
                     </Typography>
                   </Grid2>
                 </Grid2>

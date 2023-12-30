@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link, Link as RouterLink } from "react-router-dom";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
 import {
@@ -21,18 +21,15 @@ import MenuIcon from "@mui/icons-material/Menu";
 import InputIcon from "@mui/icons-material/Input";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import LogoTiloc from "../../../assets/images/logos/logo-tiloc-with-name.png";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { getGravatarUrl } from "../../../components/Gravatar";
 import { useTranslation } from "react-i18next";
-import { auth } from "../../../actions";
-import { useLogoutMutation } from "../../../services/api";
-import { fetchErrorDecode } from "../../../common/apiUtils";
-import { useAlert } from "../../../common/alertUtils";
-import logger from "../../../common/logger";
 import { RootState } from "../../../store";
-import { User } from "../../../types";
+import { Account, User } from "../../../types";
 import NotificationButton from "../../../components/NotificationButton";
 import { useAuth } from "../../../common/authUtils";
+import ChatwootWidget from "../../../components/ChatwootWidget";
+import { useAppSelector } from "../../../app/hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -70,10 +67,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null);
   const user = useSelector<RootState>(store => store.auth.user) as User;
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [doLogout] = useLogoutMutation();
-  const { showError } = useAlert();
+  const account = useAppSelector(store => store.auth.account) as Account;
   const {logout} = useAuth();
 
   const avatar = getGravatarUrl(user.email, {
@@ -118,6 +112,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           {/*<span className={classes.appName}>Tiloc</span>*/}
         </RouterLink>
         <div className={classes.flexGrow} />
+        <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showHelpIcon />
         <NotificationButton />
         <Avatar
           alt="Person"
@@ -153,7 +148,7 @@ const Topbar: React.FC<TopbarProps> = (props) => {
             <Stack direction={"column"}>
               <span style={{ fontSize: "1.25em", fontWeight: "bold" }}>{user.full_name}</span>
               <span style={{ fontSize: "0.8em" }}>{user.email}</span>
-              <span style={{ fontSize: "0.7em" }}>{t("ID:")}&nbsp;{user.account.id}</span>
+              <span style={{ fontSize: "0.7em" }}>{t("ID:")}&nbsp;{account.id}</span>
             </Stack>
           </Stack>
           <Divider />

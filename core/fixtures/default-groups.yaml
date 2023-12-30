@@ -3,7 +3,7 @@
         name: administrator
         permissions:
             - [ "administrator", "core", "account" ]
-            #            - [ "view_account", "core", "account" ]
+            - [ "view_account", "core", "account" ]
             - [ "delete_account", "core", "account" ]
             - [ "view_activity", "core", "activity" ]
             - [ "add_bookedservice", "core", "bookedservice" ]

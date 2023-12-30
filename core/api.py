@@ -53,6 +53,7 @@ from .serializers import (
     ContractSerializer,
     ContractTemplateSerializer,
     CreateUserSerializer,
+    CurrentUserSerializer,
     GuestSerializer,
     HolidaysSerializer,
     LodgingSerializer,
@@ -215,7 +216,7 @@ class SignUpAPI(KnoxLoginView):
 
 
 class AccountViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsSuperUserPermission]
+    # permission_classes = [IsSuperUserPermission]
     queryset = models.Account.objects.all()
     serializer_class = AccountSerializer
 
@@ -276,7 +277,7 @@ class CurrentUserAPI(generics.RetrieveUpdateAPIView):
     permission_classes = [
         permissions.IsAuthenticated,
     ]
-    serializer_class = UserSerializer
+    serializer_class = CurrentUserSerializer
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
@@ -953,12 +954,12 @@ def create_or_update_subscription(sub: StripeSubscription):
             current_period_end=arrow.get(sub.current_period_end).datetime,
             status=sub.status,
             latest_invoice=isinstance(sub.latest_invoice, StripeInvoice)
-                           and sub.latest_invoice.id
-                           or sub.latest_invoice,
+            and sub.latest_invoice.id
+            or sub.latest_invoice,
             default_payment_method=sub.default_payment_method,
             cancel_at_period_end=sub.cancel_at_period_end,
             # special case for archived prices without lookup_key --> we don't update plan
-            **(sub["items"].data[0].price.lookup_key and dict(plan_id=sub["items"].data[0].price.lookup_key) or {})
+            **(sub["items"].data[0].price.lookup_key and dict(plan_id=sub["items"].data[0].price.lookup_key) or {}),
         ),
     )
 
@@ -977,7 +978,9 @@ def create_or_update_invoice(stripe_invoice):
             hosted_invoice_url=stripe_invoice.hosted_invoice_url,
             period_start=arrow.get(stripe_invoice.period_start).datetime,
             period_end=arrow.get(stripe_invoice.period_end).datetime,
-            next_payment_attempt=stripe_invoice.next_payment_attempt and arrow.get(stripe_invoice.next_payment_attempt).datetime or None,
+            next_payment_attempt=stripe_invoice.next_payment_attempt
+            and arrow.get(stripe_invoice.next_payment_attempt).datetime
+            or None,
             created=arrow.get(stripe_invoice.created).datetime,
         ),
     )

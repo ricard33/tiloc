@@ -10,8 +10,7 @@ export interface SignUpData {
 export interface LoginInfo {
   expiry: string;
   token: string;
-  user: User;
-  account: Account;
+  user: User&{account: Account};
 }
 
 export interface Subscription {
@@ -57,7 +56,7 @@ export interface Account {
 
 export interface User {
   id: number;
-  account: Account;
+  // account: Account;
   is_active: boolean;
   first_name: string;
   last_name: string;
@@ -91,6 +90,8 @@ export interface Lodging {
   address: string;
   daily_rate: number;
   balance_due_date: number;
+  deposit_label: "deposit"|"down_payment";
+  deposit_percent: number;
   guaranty: number;
   capacity: number;
   information: string;
