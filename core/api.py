@@ -41,7 +41,7 @@ from .filters import BookingFilter, CommentFilter, PaymentFilter
 from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
 from .pdf_tools import generate_pdf
-from .permissions import IsCompanyAdminPermissions, IsSuperUserPermission
+from .permissions import IsCompanyAdminPermissions
 from .serializers import (
     AccountSerializer,
     ActivitySerializer,

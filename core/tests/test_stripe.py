@@ -1,10 +1,8 @@
-import unittest
 from unittest.mock import patch
 
 import arrow
 import stripe
 from django.http import HttpRequest
-from rest_framework import status
 from rest_framework.test import APITestCase
 
 from core import api, models
@@ -22,7 +20,6 @@ class StripeSimulatorTestCase(APITestCase):
     fixtures = ["default-groups"]
 
     def setUp(self) -> None:
-        plan = factories.PlanFactory.create(ref="OWNER", name="Essentiel", max_lodgings=3, max_users=1, price=10)
         self.account = factories.AccountFactory.create(stripe_customer_id=customer_id, subscription_set=[])
         self.user = factories.AdminUserFactory.create(account=self.account)
         self.header = force_login(self.user)
