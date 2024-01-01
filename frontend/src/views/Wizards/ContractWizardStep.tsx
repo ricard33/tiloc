@@ -44,8 +44,9 @@ export const ContractWizardStep: React.FC<Props> = ({ onNext }) => {
         console.error("Error during template saving", error);
         showError(t("Impossible to save template: ") + fetchErrorDecode(error));
       } else {
-        const data = (result as any).data as ContractTemplate;
+        // const data = (result as any).data as ContractTemplate;
         showSuccess(t("Template saved"));
+        onNext();
       }
     });
   };

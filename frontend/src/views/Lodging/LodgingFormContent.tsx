@@ -70,10 +70,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
                   helpContent={t("If you are not the owner of the accommodation but only the intermediary, you can link each property to an owner in order to have detailed activity monitoring and create a private co-management space for them. You remain the main user of the Tiloc account.")}
                   fullWidth
                 >
-                  <SelectElement
-                    name={"owner_id"} label={t("Owner")} options={usersOptions}
-                    fullWidth
-                  />
+                  <SelectElement name={"owner_id"} label={t("Owner")} options={usersOptions} fullWidth />
                 </HelpTooltip>
                 <SwitchElement name={"active"} label={t("Active ?")} />
                 <SwitchElement name={"shown"} label={t("Shown ?")} />
@@ -82,9 +79,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
           </Grid2>
           <Grid2 sm={6} xs={12}>
             <HelpTooltip helpContent={t("Number of people who can sleep in the accommodation.")} fullWidth>
-              <TextFieldElement
-                label={t("Capacity")} name={"capacity"} required type={"number"} fullWidth
-              />
+              <TextFieldElement label={t("Capacity")} name={"capacity"} required type={"number"} fullWidth />
             </HelpTooltip>
           </Grid2>
         </Grid2>
