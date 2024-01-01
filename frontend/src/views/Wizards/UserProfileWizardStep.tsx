@@ -2,16 +2,16 @@ import React from "react";
 import { Card, CardContent, CardHeader } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { FormContainer } from "react-hook-form-mui";
-import { User } from "../../types";
+import { Account, User } from "../../types";
 import { useUpdateUserMutation } from "../../services/api";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { useDispatch } from "react-redux";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import { auth } from "../../actions";
 import setDefaults from "../../common/set.defaults";
 import { WizardFooter } from "./WizardFooter";
 import { UserFormContent } from "../Users/UserFormContent";
+import { useAppSelector } from "../../app/hooks";
 
 
 type Props = {
@@ -28,7 +28,8 @@ export const UserProfileWizardStep: React.FC<Props> = (props) => {
   const { onNext, canChangePassword, canChangeEmail } = args;
 
   const { t } = useTranslation();
-  const currentUser = useSelector<RootState>(store => store.auth.user) as User;
+  const currentUser = useAppSelector(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const [updateUser] = useUpdateUserMutation();
   const { showError, showSuccess } = useAlert();
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export const UserProfileWizardStep: React.FC<Props> = (props) => {
         showError(t("Impossible to update your profile: ") + fetchErrorDecode(error));
       } else {
         const user = (result as any).data;
-        dispatch(auth.userLoaded(user));
+        dispatch(auth.userLoaded({ ...user, account }));
         showSuccess(t("Profile updated"));
         onNext();
       }

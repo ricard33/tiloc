@@ -6,15 +6,16 @@ import { useTranslation } from "react-i18next";
 import { UserForm } from "./UserForm";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { User } from "../../types";
+import { useDispatch } from "react-redux";
+import { Account, User } from "../../types";
 import { auth } from "../../actions";
+import { useAppSelector } from "../../app/hooks";
 
 export function MyProfile() {
   const { t } = useTranslation();
   const [updateUser] = useUpdateCurrentUserMutation();
-  const currentUser = useSelector<RootState>(store => store.auth.user) as User;
+  const currentUser = useAppSelector(store => store.auth.user) as User;
+  const account = useAppSelector(store => store.auth.account) as Account;
   const canChange = currentUser.permissions.includes("core.change_user");
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export function MyProfile() {
       } else {
         showSuccess(t("Profile updated"));
         const user = (result as any).data;
-        dispatch(auth.userLoaded(user));
+        dispatch(auth.userLoaded({ ...user, account }));
         navigate(-1);
       }
     });

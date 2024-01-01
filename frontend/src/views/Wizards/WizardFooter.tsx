@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import { WizardContext } from "./WizardContext";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
-import { MobileStepper } from "@mui/material";
+import { MobileStepper, Stack } from "@mui/material";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 
@@ -23,12 +23,7 @@ export const WizardFooter: React.FC<Props> = ({ onNext, onSkip, onReset }: Props
   const nbSteps = steps.length;
 
   return !isMobile ?
-    <Box
-      sx={{
-        display: "flex", flexDirection: "row", paddingTop: 2,
-        // paddingTop: 0, marginTop: "16px", position: "sticky", bottom: 1, background: "white", zIndex: 100,
-      }}
-    >
+    <Stack direction={"row"} spacing={2} sx={{ paddingTop: 2, }}>
       <Button
         color="inherit"
         variant="contained"
@@ -58,7 +53,7 @@ export const WizardFooter: React.FC<Props> = ({ onNext, onSkip, onReset }: Props
           {activeStep === steps.length - 1 ? t("Finish") : t("Next")}
         </Button>
       }
-    </Box>
+    </Stack>
     :
     <MobileStepper
       variant="text"

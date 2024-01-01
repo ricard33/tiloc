@@ -18,7 +18,7 @@ export function userLoading() {
   };
 }
 
-export function userLoaded(currentUser: User&{account: Account}) {
+export function userLoaded(currentUser: User & { account: Account }) {
   const {account,  ...user} = currentUser;
   return {
     type: actionTypes.USER_LOADED,

@@ -11,7 +11,7 @@ import { WizardContext } from "./WizardContext";
 import { WizardFooter } from "./WizardFooter";
 import { FirstLodgingWizardStep } from "./FirstLodgingWizardStep";
 import { Link, useNavigate } from "react-router-dom";
-import { Container } from "@mui/material";
+import { Button, Container } from "@mui/material";
 import useWindowDimensions from "../../common/windowDimensions";
 import { ContractWizardStep } from "./ContractWizardStep";
 
@@ -43,10 +43,6 @@ export default function NewAccountWizard() {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
   const renderStep = () => {
     if (activeStep === 0)
       return (
@@ -69,13 +65,13 @@ export default function NewAccountWizard() {
               i18nKey="Now, you can have a look to your <link1>planning</link1>
                   or go to your <link2>dashboard</link2>"
               components={{
-                link1: <Link to="/planning" title={t("Planning")}> </Link>,
-                link2: <Link to="/" title={t("Dashboard")}> </Link>
+                link1: <Button component={Link} to="/planning" title={t("Planning")} variant="contained"> </Button>,
+                link2: <Button component={Link} to="/" title={t("Dashboard")} variant="contained"> </Button>
               }}
             />
           </Typography>
 
-          <WizardFooter onNext={() => navigate("/")} onReset={handleReset} />
+          <WizardFooter onNext={() => navigate("/")} />
         </>
       );
     else
