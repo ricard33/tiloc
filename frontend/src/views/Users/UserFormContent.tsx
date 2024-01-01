@@ -233,6 +233,7 @@ export const UserFormContent: React.FC<Props> = ({
             <ImageUploadElement
               name="signature" label={t("Signature")}
               helperText={t("Owner signature, used in contracts")}
+              withCrop resizeImage={{ maxWidth: 250, maxHeight: 200 }}
             />
           </Grid2>
         </Grid2>

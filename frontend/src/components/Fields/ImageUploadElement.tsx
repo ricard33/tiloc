@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import { Path, useFormContext } from "react-hook-form";
 import { FieldValues } from "react-hook-form/dist/types/fields";
 import { useTranslation } from "react-i18next";
@@ -6,6 +6,8 @@ import { Button, FormControl, FormHelperText, FormLabel, Paper, Stack, TextField
 import DeleteIcon from "@mui/icons-material/Delete";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import NoImage from "../../assets/images/no-image.png";
+import CropImageDialog from "../CropImageDialog";
+import Resizer from "react-image-file-resizer";
 
 
 type ImageUploadElementProps<T extends FieldValues = FieldValues> = Omit<
@@ -20,6 +22,8 @@ type ImageUploadElementProps<T extends FieldValues = FieldValues> = Omit<
   width?: string | number,
   height?: string | number,
   noImageUrl?: string,
+  withCrop?: boolean,
+  resizeImage?: { maxWidth: number, maxHeight: number },
 };
 
 const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues extends FieldValues = FieldValues>({
@@ -31,6 +35,8 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
   width = 200,
   height = 200,
   noImageUrl = NoImage,
+  withCrop,
+  resizeImage,
   variant,
   className,
   helperText,
@@ -39,24 +45,57 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
   const { t } = useTranslation();
   const { setValue, getValues, register } = useFormContext();
   const initialValue = getValues(name);
-  const [imgUrl, setImgUrl] = useState(initialValue || "");
+  const [imgToCrop, setImgToCrop] = useState("");
+  const [imgSrc, setImgSrc] = useState(initialValue || "");
+  const [fileInfo, setFileInfo] = useState<{ name: string, type: string, lastModified: number }>();
 
-  const handleUploadClick = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) {
-      return;
+  function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      var file = e.target.files[0];
+      setFileInfo({ name: file.name, type: file.type, lastModified: file.lastModified });
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        if (withCrop)
+          setImgToCrop(reader.result?.toString() || "");
+        else
+          setImgSrc(reader.result?.toString() || "");
+      });
+      reader.readAsDataURL(file);
     }
-    var file = event.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    reader.onloadend = function(e) {
-      setImgUrl(reader.result as string);
-    };
-  };
+  }
 
   const handleClearLogoClick = () => {
     setValue(name, null as any, { shouldDirty: true });
-    setImgUrl("");
+    setImgSrc("");
+    setValue(name, "" as any);
+  };
+
+  const resizeFile = (file: Blob, maxWidth: number, maxHeight: number) =>
+    new Promise<Blob>((resolve) => {
+      Resizer.imageFileResizer(
+        file,
+        maxWidth,
+        maxHeight,
+        "JPEG",
+        90,
+        0,
+        (uri) => {
+          resolve(uri as Blob);
+        },
+        "blob"
+      );
+    });
+
+  const handleOnCrop = async (croppedImageUrl: string) => {
+    console.log("croppedImageUrl", croppedImageUrl);
+    setImgSrc(croppedImageUrl);
+    setImgToCrop("");
+    const blob = await fetch(croppedImageUrl).then(r => r.blob());
+    const resizedBlob = resizeImage ? await resizeFile(blob, resizeImage.maxWidth, resizeImage.maxHeight) : blob;
+    const dataTransfer = new DataTransfer();
+    const file = new File([resizedBlob], fileInfo!.name /*{type: fileInfo!.type, lastModified: fileInfo!.lastModified}*/);
+    dataTransfer.items.add(file);
+    setValue(name, dataTransfer.files as any, { shouldDirty: true });
   };
 
   return (
@@ -64,14 +103,17 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
       <Stack spacing={1}>
         <FormLabel>{label}</FormLabel>
         <Paper sx={{ width: width, height: height }}>
-          <img width={width} height={height} style={{ objectFit: "scale-down" }} src={imgUrl || noImageUrl} alt={name} />
+          <img
+            width={width} height={height} style={{ objectFit: "scale-down" }}
+            src={imgSrc || noImageUrl} alt={name}
+          />
         </Paper>
         <Stack direction="row">
           <Button
             variant="outlined"
             startIcon={<DeleteIcon />}
             sx={{ marginRight: "1rem" }}
-            disabled={!imgUrl}
+            disabled={!imgSrc}
             onClick={e => handleClearLogoClick()}
           >
             {t("Remove")}
@@ -84,7 +126,7 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
           >
             {t("Upload")}
             <input
-              {...register(name, { required: false, onChange: (e) => handleUploadClick(e) })}
+              {...register(name, { required: false, onChange: (e) => onSelectFile(e) })}
               type="file"
               name={name}
               hidden
@@ -94,6 +136,12 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
         </Stack>
         <FormHelperText>{helperText}</FormHelperText>
       </Stack>
+      {imgToCrop &&
+        <CropImageDialog
+          imgSrc={imgToCrop}
+          onCancel={() => setImgToCrop("")}
+          onCrop={handleOnCrop}
+        />}
     </FormControl>
   );
 };

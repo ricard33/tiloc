@@ -55,7 +55,7 @@ const PricingTable = (props: Props) => {
                 </Stack>
               </Stack>
               :
-              <span style={{ fontSize: "3em" }}>{t("Free")}</span>
+              <span style={{ fontSize: "3em" }}>{t("Free", {context: "price"})}</span>
             }
           </div>
           {/*<Typography variant="body2">{plan.slogan}</Typography>*/}

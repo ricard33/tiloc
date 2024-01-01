@@ -458,7 +458,7 @@ class BookingSubSerializer(BookingSerializer):
             "guests",
             "adults",
             "children",
-            "babies"
+            "babies",
         ]
 
 
