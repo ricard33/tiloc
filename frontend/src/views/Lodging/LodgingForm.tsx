@@ -62,7 +62,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
           <LodgingFormContent lodging={lodging} users={users} />
         </CardContent>
         <CardActions>
-          <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }}>
+          <Stack direction="row" justifyContent="space-between" style={{ width: "100%" }} margin={2}>
             {onDelete && lodging &&
               <Button
                 type="button"

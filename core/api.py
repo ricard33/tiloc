@@ -516,7 +516,7 @@ class ContractTemplateViewSet(viewsets.ModelViewSet):
             template_content = template_content
         lodging_id = self.request.data.get("lodging_id")
         if lodging_id:
-            lodging =  models.Lodging.objects.for_user(request.user).get(pk=lodging_id)
+            lodging = models.Lodging.objects.for_user(request.user).get(pk=lodging_id)
         else:
             lodging = template.account.lodging_set.first()
         full_path = os.path.join(settings.MEDIA_ROOT, template.account.name, "templates", "%d" % template.id, "preview_contract.pdf")

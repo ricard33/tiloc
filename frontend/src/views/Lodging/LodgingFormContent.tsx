@@ -57,7 +57,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
               helpContent={t("Choose an evocative name to designate your accommodation. This name will also appear in contracts.")}
               fullWidth
             >
-              <TextFieldElement name={"name"} label={t("Name")} fullWidth required />
+              <TextFieldElement name={"name"} label={t("Lodging name")} fullWidth required />
             </HelpTooltip>
           </Grid2>
           <Grid2 sm={6} xs={12}>
