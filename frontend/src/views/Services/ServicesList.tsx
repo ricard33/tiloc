@@ -4,7 +4,7 @@ import { useListServicesQuery } from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import { Service, User } from "../../types";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { formatPercent, formatPrice } from "../../common/priceUtils";
+import { formatPrice } from "../../common/priceUtils";
 import Page from "../../layouts/Main/Page";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";

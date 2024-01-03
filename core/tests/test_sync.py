@@ -134,15 +134,17 @@ class SyncBookingsTestCase(TestCase):
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
     def test_booking_cancelled_by_ota(self):
+        factories.BookingFactory(lodging=self.lodging, source=self.sync.channel, source_uid="123")
+        # not created from OTA, but manually affected to this source. Should not be canceled.
         factories.BookingFactory(lodging=self.lodging, source=self.sync.channel)
         synchronize_bookings(self.sync, empty_ical)
-        self.assertEqual(models.Booking.objects.all().count(), 1)
+        self.assertEqual(models.Booking.objects.all().count(), 2)
         # not canceled at first synchro
-        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 1)
+        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 2)
         synchronize_bookings(self.sync, empty_ical)
         synchronize_bookings(self.sync, empty_ical)
         # but at third
-        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 0)
+        self.assertEqual(models.Booking.objects.filter(cancelled=0).count(), 1)
 
     def test_missing_count_reseted(self):
         updated_ical = airbnb_ical.replace("VALUE=DATE:2020", "VALUE=DATE:%d" % (arrow.utcnow().date().year + 1))
