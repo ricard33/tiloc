@@ -32,6 +32,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useConfirm } from "../../libs/MuiConfirm";
 import { makePDF } from "../../common/pdf-tools";
+import { getCookie } from "../../common/cookies";
 
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
@@ -53,7 +54,7 @@ const ContractTemplateEdit = (/*props*/) => {
   const confirm = useConfirm();
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const canChange = user.permissions.includes("core.change_contracttemplate");
-  const canDelete = user.permissions.includes("core.delete_contrattemplate");
+  const canDelete = user.permissions.includes("core.delete_contracttemplate");
 
   // console.assert(!!templateId, "Template id not initialized");
 
@@ -64,6 +65,10 @@ const ContractTemplateEdit = (/*props*/) => {
       setContent(template.content);
     }
   }, [template]);
+
+  useEffect(() => {
+    if (lodgings && lodgings.length > 0) setLodgingId(lodgings[0].id);
+  }, [lodgings]);
 
   function onChange(newContent: string) {
     if (canChange)
@@ -112,7 +117,7 @@ const ContractTemplateEdit = (/*props*/) => {
         .catch(() => { /* ... */
         });
     }
-  }
+  };
 
   function onSave() {
     _onSave();
@@ -191,54 +196,55 @@ const ContractTemplateEdit = (/*props*/) => {
               />}
           </Suspense>
         </Box>
+        {
+          lodgings &&
+          <Stack direction={"row"} justifyContent={"center"}>
+            <Stack direction={"row"} spacing={2}>
+              <form
+                method="post" action={`${window.location.origin}/api/contract_template/${template!.id}/preview_pdf/`}
+                target="_blank"
+              >
+                <input type="hidden" name="template" value={content} />
+                <input type="hidden" name="lodging_id" value={lodgingId} />
+                <input type="hidden" name="csrfmiddlewaretoken" value={getCookie("csrftoken") ?? ""} />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  disabled={!template}
+                >{t("Preview")}</Button>
+              </form>
+              <FormControl sx={{ width: "100%" }} variant="outlined">
+                <InputLabel htmlFor="booking-lodging">{t("Using lodging")}</InputLabel>
+                <Select
+                  name="lodging_id"
+                  label={t("Using lodging")}
+                  margin="dense"
+                  value={lodgingId}
+                  onChange={(event) => onLodgingChange(event.target.value)}
+                >
+                  {lodgings.map(lodging => (
+                    <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+          </Stack>
+        }
         <Grid container justifyContent="space-between" alignItems="flex-start" style={{ flex: 0 }}>
           <Grid item>
             {template && template.id &&
               <Button
                 type="button"
-                sx={{ color: "red", margin: (theme) => theme.spacing(1) }}
-                color="secondary"
+                sx={{ margin: (theme) => theme.spacing(1) }}
+                color="error"
                 startIcon={<DeleteIcon />}
                 onClick={() => onDelete(template)}
                 disabled={!canDelete}
               >{t("Delete")}</Button>}
           </Grid>
           <Grid item>
-            <FormControl sx={{ width: "100%" }} variant="outlined">
-              <InputLabel htmlFor="booking-lodging">{t("Lodging")}</InputLabel>
-              <Select
-                name="lodging_id"
-                label={t("Lodging")}
-                margin="dense"
-                // native
-                value={lodgingId}
-                onChange={(event) => onLodgingChange(event.target.value)}
-              >
-                <MenuItem key={0} value={0}>{t("--- select a lodging ---")}</MenuItem>
-                {lodgings && lodgings.map(lodging => (
-                  <MenuItem key={lodging.id} value={lodging.id}>{lodging.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
-              type="button"
-              sx={{ margin: (theme) => theme.spacing(1) }}
-              startIcon={<PdfIcon />}
-              onClick={_makePDF}
-              disabled={!lodgingId}
-              title={t("PDF")}
-            >{t("PDF")}</Button>
-            <Button
-              type="button"
-              sx={{ margin: (theme) => theme.spacing(1) }}
-              startIcon={<PdfIcon />}
-              onClick={onSaveAndMakePDF}
-              disabled={!lodgingId || !canChange}
-              title={t("PDF")}
-            >{t("Save and make PDF")}</Button>
-          </Grid>
-          <Grid item>
-            <Button type="button" onClick={onCancel}>{t("Cancel")}</Button>
+            <Button type="button" color="secondary" onClick={onCancel}>{t("Cancel")}</Button>
             <Button
               type="submit"
               color="primary"

@@ -171,5 +171,7 @@
   "Si vous activez cette option, la taxe de séjour sera automatiquement calculée et ajoutée lors de la réservation des locataires. Vous aurez accès à un décompte mensuel pour déclarer vos taxes à votre commune.": "",
   "Payment information": "Payment information",
   "Cette section vous permet de modifier le modèle de contrat de location que nous vous proposons. A chaque nouvelle réservation, un nouveau contrat sera généré et mis à jour automatiquement. Vous pouvez utiliser le bouton ”variables” du menu afin de personnaliser automatiquement le contrat. Elles seront remplacées par les données au moment de la génération du document.": "",
-  "ATTENTION ! Il est indispensable de lire et de compléter le modèle proposé avec vos propres conditions au moins la première fois. En effet certains passages sont à adapter à votre situation.": ""
+  "ATTENTION ! Il est indispensable de lire et de compléter le modèle proposé avec vos propres conditions au moins la première fois. En effet certains passages sont à adapter à votre situation.": "",
+  "--- select a lodging ---": "--- select a lodging ---",
+  "Show payment status on bookings": "Show payment status on bookings"
 }

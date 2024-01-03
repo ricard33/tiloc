@@ -150,5 +150,7 @@
   "Private personal notes": "Notes personnelles privées",
   "Additional services": "Services supplémentaires",
   "Contract template": "Modèle de contrat",
-  "Payment information": "Informations de paiement"
+  "Payment information": "Informations de paiement",
+  "--- select a lodging ---": "--- choisir un hébergement ---",
+  "Show payment status on bookings": "Afficher l'indicateur de paiement sur les réservations"
 }
