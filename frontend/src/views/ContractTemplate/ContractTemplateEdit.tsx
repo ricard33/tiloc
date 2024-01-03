@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { DeleteForever as DeleteIcon, PictureAsPdf as PdfIcon, Save as SaveIcon } from "@mui/icons-material";
+import { DeleteForever as DeleteIcon, Save as SaveIcon } from "@mui/icons-material";
 import {
   Backdrop,
   Box,
@@ -31,7 +31,6 @@ import { ContractTemplate, User } from "../../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useConfirm } from "../../libs/MuiConfirm";
-import { makePDF } from "../../common/pdf-tools";
 import { getCookie } from "../../common/cookies";
 
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
@@ -80,11 +79,6 @@ const ContractTemplateEdit = (/*props*/) => {
     setLodgingId(value as number);
   }
 
-  function _makePDF() {
-    if (template)
-      makePDF("/api/lodging/" + lodgingId + "/empty_contract_pdf/?template_id=" + template.id, "empty-contract.pdf");
-  }
-
   function onClose() {
     navigate(-1);
   }
@@ -125,10 +119,6 @@ const ContractTemplateEdit = (/*props*/) => {
 
   function onSaveAndClose() {
     _onSave(onClose);
-  }
-
-  function onSaveAndMakePDF() {
-    _onSave(_makePDF);
   }
 
   function _onSave(callback?: (template: ContractTemplate) => void) {
