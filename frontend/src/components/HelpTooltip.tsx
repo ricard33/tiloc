@@ -17,7 +17,7 @@ export default function HelpTooltip(props: PropsWithChildren<Props>) {
   const [open, setOpen] = useState(false);
 
   return (
-    <Tooltip title={helpContent} open={open} onClose={() => setOpen(false)} arrow>
+    <Tooltip title={helpContent} open={open} onClose={() => setOpen(false)} arrow disableTouchListener>
       <Badge
         badgeContent={"?"} onClick={() => setOpen(!open)} color="primary"
         style={{ cursor: "pointer", ...(fullWidth && { width: "100%" }) }}

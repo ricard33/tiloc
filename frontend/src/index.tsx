@@ -16,6 +16,7 @@ import { SnackbarProvider } from "notistack";
 import { dispatchError } from "./common/alertUtils";
 import "vite/modulepreload-polyfill";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { getCookie } from "./common/cookies";
 
 const browserHistory = createBrowserHistory();
 
@@ -26,11 +27,18 @@ axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
     // console.log("axios.interceptors.request", config)
+    if (typeof config.headers === "undefined") config.headers = {};
+
     const token = localStorage.getItem("token");
     if (token) {
-      if (typeof config.headers === "undefined") config.headers = {};
       config.headers.Authorization = `Token ${token}`;
     }
+
+    const csrftoken = getCookie("csrftoken");
+    if (csrftoken) {
+      config.headers["X-CSRFToken"] = csrftoken;
+    }
+
     return config;
   },
   function (error) {

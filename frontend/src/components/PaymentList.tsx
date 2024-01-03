@@ -36,7 +36,7 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onMo
             <TableCell>{formatDate(p.date)}</TableCell>
             <TableCell>{p.description}</TableCell>
             <TableCell>{paymentLabels[p.method]}</TableCell>
-            <TableCell>{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>
+            <TableCell align="right">{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>
             <TableCell>
               {onModify &&
                 <IconButton
@@ -69,8 +69,8 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onMo
         ))}
         <TableRow>
           <TableCell rowSpan={2} />
-          <TableCell colSpan={2}>{t("Total")}</TableCell>
-          <TableCell align="right">{ccyFormat(paymentsTotal)} &euro;</TableCell>
+          <TableCell colSpan={2} sx={{fontWeight: "bold"}}>{t("Total")}</TableCell>
+          <TableCell align="right" sx={{fontWeight: "bold"}}>{ccyFormat(paymentsTotal)} &euro;</TableCell>
         </TableRow>
       </TableBody>
     </Table>

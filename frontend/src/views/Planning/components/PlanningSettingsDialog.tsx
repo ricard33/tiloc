@@ -3,6 +3,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from "@mui/material";
 import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
 
 export type PlanningSettings = {
   showPaymentStatus: boolean;
@@ -46,13 +48,13 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
           // defaultValues={lodging}
           onSuccess={onSubmit}
         >
-          <Stack>
-            <CheckboxElement
-              control={control}
-              name="showPaymentStatus"
-              label={t<string>("Show payment status on bookings")}
-              // defaultChecked={settings.showPaymentStatus}
-            />
+          <Stack margin={1}>
+            {/*<CheckboxElement*/}
+            {/*  control={control}*/}
+            {/*  name="showPaymentStatus"*/}
+            {/*  label={t<string>("Show payment status on bookings")}*/}
+            {/*  // defaultChecked={settings.showPaymentStatus}*/}
+            {/*/>*/}
             <TextFieldElement
               control={control}
               name="monthsToDisplay"
@@ -76,10 +78,10 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
         </FormContainer>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose()}>
+        <Button onClick={() => onClose()} color="secondary" startIcon={<CancelIcon />}>
           {t("Cancel")}
         </Button>
-        <Button onClick={handleSubmit(onSubmit)} color="primary" type="submit">
+        <Button onClick={handleSubmit(onSubmit)} color="primary" type="submit" startIcon={<SaveIcon />}>
           {t("Save")}
         </Button>
       </DialogActions>

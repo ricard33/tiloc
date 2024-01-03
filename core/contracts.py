@@ -1,6 +1,8 @@
 import logging
+import random
 import re
 from datetime import date
+from decimal import Decimal
 from typing import List
 
 import arrow
@@ -8,6 +10,7 @@ from babel.dates import format_date as babel_format_date
 from babel.numbers import format_decimal as babel_format_decimal
 from django.conf import settings
 from django.utils.translation import gettext as _
+from faker import Faker
 
 from core.models import BookedService, Booking, Contract
 
@@ -120,17 +123,17 @@ def make_context(booking, url_server):
     }
 
 
-def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True):
+def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True, template_content=None):
     if not booking.lodging:
         logger.warning("Lodging not set, can't generate a contract")
         return None
     if not Contract.objects.filter(booking=booking).exists():
         booking.contract = Contract(booking=booking)
-    if booking.lodging.contract_template:
+    if booking.lodging.contract_template or template_content:
         from core.jinja2_tools import render_template
 
         content = render_template(
-            booking.lodging.contract_template.content,
+            template_content or booking.lodging.contract_template.content,
             make_context(booking, url_server),
         ).replace(
             '"placeholder"', '"variable"'
@@ -161,3 +164,26 @@ def generate_empty_contract(lodging, url_server="http://127.0.0.1:8000"):
         price=0,
     )
     return generate_contract(booking, url_server=url_server, save=False).content
+
+
+def generate_preview_contract(template_content, lodging, url_server="http://127.0.0.1:8000"):
+    fake = Faker("fr_FR")
+    begin_date = fake.date_between(start_date="+1m", end_date="+1y")
+    duration = random.randint(7, 21)
+    end_date = arrow.get(begin_date).shift(days=duration).date()
+    booking = Booking(
+        lodging=lodging,
+        begin_date=begin_date,
+        end_date=end_date,
+        duration=duration,
+        guest_name=fake.name(),
+        guest_contact="%s\n%s" % (fake.phone_number(), fake.email()),
+        guest_address=fake.address(),
+        adults=random.randrange(2, lodging.capacity + 1),
+        children=random.choices([0, 1, 2], weights=(10, 1, 1))[0],
+        babies=random.choices([0, 1], weights=(10, 1))[0],
+        price=lodging.daily_rate * duration,
+        deposit=Decimal(round(float(lodging.daily_rate) * duration * 0.3, -1)),
+        guaranty=lodging.guaranty,
+    )
+    return generate_contract(booking, url_server=url_server, save=False, template_content=template_content).content

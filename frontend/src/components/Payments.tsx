@@ -17,7 +17,7 @@ import { fetchErrorDecode } from "../common/apiUtils";
 import { shiftUTCDateToLocalDate } from "../common/tzUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { IconButton } from "@mui/material";
+import { Button } from "@mui/material";
 
 type PaymentListProps = {
   bookingId: number;
@@ -123,15 +123,14 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
     <div>
       {showPayments && <>
         <PaymentList payments={data ? data.results : []} onModify={onEditPayment} onDelete={onDeletePayment} />
-        <IconButton
-          edge="end"
+        <Button
           aria-label="delete"
           color="primary"
           onClick={onAddPayment}
-          size="large"
+          startIcon={<AddIcon />}
         >
-          <AddIcon />{t("Add payment")}
-        </IconButton>
+          {t("Add payment")}
+        </Button>
         {edited !== null &&
           <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose} />}
       </>}</div>

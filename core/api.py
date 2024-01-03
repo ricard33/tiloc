@@ -36,7 +36,7 @@ from notifier.models import SentNotification
 from notifier.shortcuts import send_notification
 
 from . import models
-from .contracts import generate_contract, generate_empty_contract
+from .contracts import generate_contract, generate_empty_contract, generate_preview_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
 from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
@@ -506,6 +506,40 @@ class ContractTemplateViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
+
+    @action(detail=True, methods=["post"])
+    @transaction.atomic
+    def preview_pdf(self, request, pk=None):
+        template: models.ContractTemplate = self.get_object()
+        template_content = self.request.data.get("template")
+        if not template_content:
+            template_content = template_content
+        lodging = template.account.lodging_set.first()
+        full_path = os.path.join(settings.MEDIA_ROOT, template.account.name, "templates", "%d" % template.id, "preview_contract.pdf")
+        os.makedirs(os.path.split(full_path)[0], exist_ok=True)
+
+        sid = transaction.savepoint()
+        try:
+            generate_pdf(
+                generate_preview_contract(template_content, lodging, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
+                full_path,
+                request.user.account.is_free_plan,
+            )
+        except jinja2.exceptions.TemplateError as ex:
+            logger.exception("Template generation error")
+            raise APIException(detail="Template error: " + ex.message)
+        except Exception as ex:
+            logger.exception("Unknown error during template generation")
+            raise APIException(detail=str(ex))
+
+        transaction.savepoint_rollback(sid)
+
+        if os.path.exists(full_path):
+            with open(full_path, "rb") as fh:
+                response = HttpResponse(fh.read(), content_type="application/pdf")
+                response["Content-Disposition"] = "inline; filename=" + os.path.basename(full_path)
+                return response
+        raise Http404
 
 
 class ContractViewSet(viewsets.ModelViewSet):

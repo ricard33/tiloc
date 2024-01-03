@@ -470,6 +470,15 @@ export const api = createApi({
     createContractTemplate: contractTemplateApi.create(builder),
     updateContractTemplate: contractTemplateApi.update(builder),
     deleteContractTemplate: contractTemplateApi.delete(builder),
+    previewContractTemplate: builder.mutation<ContractTemplate, { templateId: number, content: string; }>({
+      query({ templateId, content }) {
+        return {
+          url: `contract_template/${templateId}/preview_pdf/`,
+          method: "POST",
+          data: {template: content}
+        };
+      }
+    }),
 
     // Services
     listServices: serviceApi.list(builder),
@@ -575,6 +584,7 @@ export const {
   useCreateContractTemplateMutation,
   useUpdateContractTemplateMutation,
   useDeleteContractTemplateMutation,
+  usePreviewContractTemplateMutation,
 
   useGetServiceQuery,
   useListServicesQuery,

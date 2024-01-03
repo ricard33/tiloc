@@ -19,7 +19,7 @@ import { TimezonePickerElement } from "../../components/Fields/TimezonePickerEle
 import { Section } from "../../components/Section";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import EditIcon from "@mui/icons-material/Edit";
-import HelpTooltip from "../../components/Fields/HelpTooltip";
+import HelpTooltip from "../../components/HelpTooltip";
 
 type Props = {
   canChangeEmail: boolean;

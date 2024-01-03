@@ -85,7 +85,7 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework",
     "dbbackup",
-    "corsheaders",
+    # "corsheaders",
     "import_export",
     "knox",
     "simple_history",
@@ -100,7 +100,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    # "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -261,7 +261,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "knox.auth.TokenAuthentication",
-        # 'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.SessionAuthentication'
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "core.permissions.TilocPermissions",

@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { Alert, Box, Card, CardContent, CardHeader, Stack } from "@mui/material";
+import { Alert, Box, Button, Card, CardActions, CardContent, CardHeader, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { FormContainer } from "react-hook-form-mui";
 import { ContractTemplate } from "../../types";
@@ -7,6 +7,7 @@ import { WizardFooter } from "./WizardFooter";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useListContractTemplatesQuery, useUpdateContractTemplateMutation } from "../../services/api";
 import { useAlert } from "../../common/alertUtils";
+import { getCookie } from "../../common/cookies";
 
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
@@ -80,6 +81,19 @@ export const ContractWizardStep: React.FC<Props> = ({ onNext }) => {
 
           </Stack>
         </CardContent>
+        <CardActions sx={{ justifyContent: "center" }}>
+          <form
+            method="post" action={`${window.location.origin}/api/contract_template/${template!.id}/preview_pdf/`}
+            target="_blank"
+          >
+            <input type="hidden" name="template" value={content}/>
+            <input type="hidden" name="csrfmiddlewaretoken" value={getCookie("csrftoken") ?? ""}/>
+            <Button
+              type="submit"
+              variant="contained"
+            >{t("Preview")}</Button>
+          </form>
+        </CardActions>
       </Card>
       <WizardFooter />
     </FormContainer>

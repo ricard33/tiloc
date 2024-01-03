@@ -6,7 +6,7 @@ import { MultiSelectElement, SelectElement, SwitchElement, TextFieldElement } fr
 import { Lodging, User } from "../../types";
 import { useFormContext } from "react-hook-form";
 import { useListContractTemplatesQuery, useListServicesQuery } from "../../services/api";
-import HelpTooltip from "../../components/Fields/HelpTooltip";
+import HelpTooltip from "../../components/HelpTooltip";
 import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
 import RoomServiceOutlinedIcon from "@mui/icons-material/RoomServiceOutlined";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";

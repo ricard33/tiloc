@@ -4,7 +4,6 @@ import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
 import { Booking, BookingStatus, Service, User } from "../types";
 import "./BookingQuickView.scss";
-import PaymentList from "./PaymentList";
 import { useLazyGetPaymentsForBookingQuery } from "../services/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -17,6 +16,7 @@ import { green } from "@mui/material/colors";
 import { Typography } from "@mui/material";
 import Comments from "./Comments";
 import { getBookingStatus } from "../common/statusUtils";
+import Payments from "./Payments";
 
 type BookingQuickViewProps = {
   booking: Booking;
@@ -148,8 +148,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             </Grid>
           </Grid>
 
-          {displayField(showPayments && data != null && data.results.length > 0,
-            t("Payment:"), <PaymentList payments={data && data.results ? data.results : []} />)}
+          {displayField(showPayments && data != null,
+            t("Payment:"), <Payments bookingId={booking.id!} />
+          )}
         </Grid>
       </Grid>
       {showComments &&
