@@ -126,7 +126,6 @@ class SignUpSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
-    logo = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     permissions = serializers.SerializerMethodField(read_only=True)
     groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
@@ -138,7 +137,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         # fields = ('id', 'first_name', 'last_name', 'full_name', 'email', 'is_active')
         read_only_fields = ("id", "verified")
-        exclude = ["user_permissions", "is_superuser", "is_staff"]
+        exclude = ["user_permissions", "is_superuser", "is_staff", "logo"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data: dict):
@@ -200,7 +199,7 @@ class CurrentUserSerializer(UserSerializer):
     class Meta:
         model = User
         read_only_fields = ("id", "verified")
-        exclude = ["user_permissions", "is_superuser", "is_staff"]
+        exclude = ["user_permissions", "is_superuser", "is_staff", "logo"]
         extra_kwargs = {"password": {"write_only": True}}
 
 
