@@ -15,6 +15,7 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
+import HelpTooltip from "../../components/HelpTooltip";
 
 
 type Props = {
@@ -28,8 +29,9 @@ export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDe
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<Service>({ defaultValues: service });
-  const { control } = formContext;
+  const { control, watch } = formContext;
   const { isDirty } = useFormState({ control });
+  const isFlatRate = watch("is_flat_rate", service?.is_flat_rate);
 
   usePageUnloadAlert(isDirty);
 
@@ -55,30 +57,39 @@ export const ServiceForm: React.FC<Props> = ({ service, onSubmit, onCancel, onDe
               <TextFieldElement name={"designation"} label={t("Designation")} fullWidth required />
             </Grid2>
             <Grid2 sm={6} xs={12}>
-              <TextFieldElement name={"reference"} label={t("Reference")} required />
+              <TextFieldElement name={"reference"} label={t("Reference")} fullWidth required />
             </Grid2>
-            <Grid2 sm={3} xs={6}>
+            <Grid2 sm={3} xs={12}>
               <TextFieldElement
                 name={"unit_price"}
-                label={t("Unit price")}
+                label={isFlatRate ? t("Unit price") : t("Daily unit price")}
                 type={"number"}
+                fullWidth
                 required
                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
               />
             </Grid2>
-            <Grid2 sm={3} xs={6}>
-              <TextFieldElement
-                name={"vat"}
-                label={t("VAT")}
-                type={"number"}
-                InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
-              />
+            {/*<Grid2 sm={3} xs={6}>*/}
+            {/*  <TextFieldElement*/}
+            {/*    name={"vat"}*/}
+            {/*    label={t("VAT")}*/}
+            {/*    type={"number"}*/}
+            {/*    InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}*/}
+            {/*  />*/}
+            {/*</Grid2>*/}
+            <Grid2 sm={6} xs={12}>
+              <HelpTooltip
+                helpContent={t("If set, the price is fixed whatever the duration of the booking.")}
+              >
+                <SwitchElement name={"is_flat_rate"} label={t("Is flat rate?")} />
+              </HelpTooltip>
             </Grid2>
             <Grid2 sm={6} xs={12}>
-              <SwitchElement name={"is_flat_rate"} label={t("Is flat rate?")} />
-            </Grid2>
-            <Grid2 sm={6} xs={12}>
-              <SwitchElement name={"not_included_in_price"} label={t("Not included in price")} />
+              <HelpTooltip
+                helpContent={t("Service provided by external partner. The service price wont be included in booking price because it have to be paid directly to the provider.")}
+              >
+                <SwitchElement name={"not_included_in_price"} label={t("External provider")} />
+              </HelpTooltip>
             </Grid2>
           </Grid2>
         </CardContent>

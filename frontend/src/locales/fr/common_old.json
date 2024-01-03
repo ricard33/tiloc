@@ -152,5 +152,6 @@
   "Contract template": "Modèle de contrat",
   "Payment information": "Informations de paiement",
   "--- select a lodging ---": "--- choisir un hébergement ---",
-  "Show payment status on bookings": "Afficher l'indicateur de paiement sur les réservations"
+  "Show payment status on bookings": "Afficher l'indicateur de paiement sur les réservations",
+  "Not included in price": "Non-inclus dans le prix"
 }

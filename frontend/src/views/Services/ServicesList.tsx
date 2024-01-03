@@ -27,10 +27,10 @@ const ServicesList: React.FunctionComponent<Props> = () => {
       field: "unit_price", headerName: t("Unit price"), type: "number", width: 90,
       valueFormatter: formatPrice
     },
-    {
-      field: "vat", headerName: t("VAT"), type: "number", width: 90,
-      valueFormatter: formatPercent
-    },
+    // {
+    //   field: "vat", headerName: t("VAT"), type: "number", width: 90,
+    //   valueFormatter: formatPercent
+    // },
     { field: "is_flat_rate", headerName: t("Is flat rate?"), type: "boolean", width: 70 }
   ];
 
