@@ -90,7 +90,7 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
       setAnchorEl(null);
       if (bookingUpdated) bookingUpdated();
     });
-  }, [onCancelBooking, uncancelBooking, cancelBooking, bookingUpdated]);
+  }, [deleteBooking, bookingUpdated]);
 
   const handleClick = () => {
     console.log("item click", getBoundingClientRect());

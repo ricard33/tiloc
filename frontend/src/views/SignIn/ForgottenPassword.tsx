@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { Alert, AlertTitle, Button, Container, Link, Paper, Stack, Typography } from "@mui/material";
-
-import { auth } from "../../actions";
 import { useTranslation } from "react-i18next";
-import { QueryError, useLoginMutation, useResetPasswordMutation } from "../../services/api";
+import { QueryError, useResetPasswordMutation } from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
-import { RootState } from "../../store";
 import { useForm, useFormState } from "react-hook-form";
-import { LoginInfo } from "../../types";
-import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import { SerializedError } from "@reduxjs/toolkit";
-import { useAppSelector } from "../../app/hooks";
 
 
 type LoginData = {
@@ -21,12 +15,8 @@ type LoginData = {
 }
 
 function ForgottenPassword() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { isDemo } = useAppSelector((store) => store.appInfo);
   const [resetPassword] = useResetPasswordMutation();
   const [done, setDone] = useState(false);
-  let location = useLocation();
 
   const formContext = useForm<LoginData>();
   const { control, getValues } = formContext;
@@ -37,7 +27,7 @@ function ForgottenPassword() {
 
   const handleSubmit = (formData: LoginData) => {
     resetPassword(formData.email).then((result: { data: any } | { error: QueryError | SerializedError }) => {
-      const { data, error } = result as any;
+      const { error } = result as any;
       if (error) {
         showError(t("Reset password error: ") + fetchErrorDecode(error));
         console.log(result);
