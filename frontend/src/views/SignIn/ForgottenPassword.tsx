@@ -62,9 +62,8 @@ function ForgottenPassword() {
             </Typography>
             {done ?
               <Alert variant="filled" severity="info">
-                <AlertTitle>{t("Envoi du lien de réinitialisation du mot de passe")}</AlertTitle>
-                {t("Veuillez vérifier votre courrier électronique {{email}} pour réinitialiser votre mot de passe",
-                  {email: getValues().email})}
+                <AlertTitle>{t("Sending password reset link")}</AlertTitle>
+                {t("Please check your email {{email}} to reset your password", {email: getValues().email})}
               </Alert>
               :
               <>

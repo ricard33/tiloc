@@ -33,7 +33,7 @@ export function SignUp() {
   const { t } = useTranslation();
   const { showError } = useAlert();
   const formContext = useForm<SignUpData>({});
-  const { formState, register } = formContext;
+  const { formState, register, setError } = formContext;
   const { isDirty } = formState;
   const [doSignup] = useSignupMutation();
   const dispatch = useDispatch();
@@ -56,7 +56,11 @@ export function SignUp() {
     }) => {
       const { data, error } = result as any;
       if (error) {
-        showError(t("SignUp error: ") + fetchErrorDecode(error));
+        if(error.data.code === "EMAIL_ALREADY_IN_USE") {
+          setError("email", { type: "in_use", message: t("This email is already in use") } )
+        }
+        else
+          showError(t("SignUp error: ") + fetchErrorDecode(error));
         console.log(result);
         setIsSubmitting(false);
       } else {

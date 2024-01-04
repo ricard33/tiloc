@@ -178,7 +178,7 @@ class SignUpAPI(KnoxLoginView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
         if models.User.objects.filter(email=email):
-            return Response({"error": "This email is already in use."}, status=status.HTTP_409_CONFLICT)
+            return Response({"detail": "This email is already in use.", "code": "EMAIL_ALREADY_IN_USE"}, status=status.HTTP_409_CONFLICT)
 
         account = models.Account.objects.create()
         user = models.User.objects.create_user(
