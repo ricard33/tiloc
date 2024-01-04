@@ -26,6 +26,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Paper from "@mui/material/Paper";
 import { useBookingActions } from "../common/bookingActions";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 
 type BookingActionsProps = {
@@ -38,7 +39,7 @@ type BookingActionsProps = {
   onCancelBooking: () => void;
   onUncancelBooking: () => void;
   onConfirmCancellation?: (confirm: boolean) => void;
-  // onDelete: () => void;
+  onDelete?: () => void;
   onOpenContract?: (booking: Booking) => void;
   primaryColor?: "inherit" | "primary" | "secondary" | "error" | "info" | "success" | "warning";
 };
@@ -56,7 +57,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
     onCancelBooking,
     onUncancelBooking,
     onConfirmCancellation,
-    // onDelete,
+    onDelete,
     onOpenContract,
     primaryColor
   } = props;
@@ -68,7 +69,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const hasMenu = isDirty && onOpenContract && canViewContract;
   const [confirmCancel, setConfirmCancel] = useState(false);
-  const { cancelBooking, uncancelBooking } = useBookingActions();
+  const { cancelBooking, uncancelBooking, deleteBooking } = useBookingActions();
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -94,6 +95,12 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
   function handleUncancel(booking: Booking) {
     uncancelBooking(booking).then(() => {
       onUncancelBooking();
+    });
+  }
+
+  function handleDelete(booking: Booking) {
+    deleteBooking(booking).then(() => {
+      if(onDelete) onDelete();
     });
   }
 
@@ -224,6 +231,10 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
                 </Grow>
               )}
             </Popper>
+          }
+          {
+            booking.cancelled &&
+            <IconButton title={t("")} color="error" onClick={() => handleDelete(booking)}><DeleteIcon /></IconButton>
           }
         </>
       }

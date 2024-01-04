@@ -413,6 +413,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               booking={booking} isDirty={isDirty} onReset={reset}
               onSave={handleSave}
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
+              onDelete={() => onClose()}
               onOpenContract={onOpenContract}
               onConfirmCancellation={(confirm) => setShowTitle(!confirm)}
               primaryColor="inherit"
@@ -921,9 +922,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               booking={booking} isDirty={isDirty} onReset={reset}
               onSave={handleSave}
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
+              onDelete={() => onClose()}
               onOpenContract={onOpenContract}
             />
-            {width < 1100 && <div style={{ width: "50px" }} />}
+            {width < 1360 && <div style={{ width: "50px" }} />}
           </Stack>
         </DialogActions>}
     </Dialog>

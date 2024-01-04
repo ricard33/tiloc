@@ -6,7 +6,7 @@ import { Booking, BookingStatus } from "../types";
 import { formatDate } from "../common/dateUtils";
 import { useTranslation } from "react-i18next";
 import { getBookingStatus, otaBranding, OtaIconProps } from "../common/statusUtils";
-import { Divider, Popover, PopoverProps } from "@mui/material";
+import { Divider, IconButton, Popover, PopoverProps, Stack } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -22,6 +22,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import useMousePosition from "../common/useMousePosition";
 import { useLocation } from "react-router-dom";
 import { useBookingActions } from "../common/bookingActions";
+import DeleteIcon from "@mui/icons-material/DeleteForever";
 
 const statusColors = {
   CHECKIN: "#3b4aff",
@@ -58,7 +59,8 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
     openBooking,
     editBooking,
     cancelBooking,
-    uncancelBooking
+    uncancelBooking,
+    deleteBooking
   } = useBookingActions(location.pathname.startsWith("/planning") ? "/planning" : undefined);
 
   const getBoundingClientRect = () => {
@@ -79,7 +81,14 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
     if (onCancelBooking) return onCancelBooking(booking);
     (booking.cancelled ? uncancelBooking(booking) : cancelBooking(booking)).then(() => {
       setAnchorEl(null);
-      if(bookingUpdated) bookingUpdated();
+      if (bookingUpdated) bookingUpdated();
+    });
+  }, [onCancelBooking, uncancelBooking, cancelBooking, bookingUpdated]);
+
+  const handleDeleteBooking = useCallback((booking: Booking) => {
+    (deleteBooking(booking)).then(() => {
+      setAnchorEl(null);
+      if (bookingUpdated) bookingUpdated();
     });
   }, [onCancelBooking, uncancelBooking, cancelBooking, bookingUpdated]);
 
@@ -162,54 +171,48 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
           <Grid2 xs={12}>
             <Divider />
           </Grid2>
-
+        </Grid2>
+        <Stack direction={"row"} margin={1} spacing={1} justifyContent={"space-between"}>
           {
             confirmCancel ?
               <>
-                <Grid2 xs={8}>
-                  <Button
-                    startIcon={<EventBusyIcon />} size="small" color="error"
-                    onClick={() => handleCancelBooking(booking)}
-                  >{t("Confirm cancellation")}</Button>
-                </Grid2>
-                <Grid2 xs={4}>
-                  <Button
-                    startIcon={<ReplayIcon />} size="small" color="primary"
-                    onClick={() => setConfirmCancel(false)}
-                  >{t("Discard")}</Button>
-                </Grid2>
+                <Button
+                  startIcon={<EventBusyIcon />} size="small" color="error"
+                  onClick={() => handleCancelBooking(booking)}
+                >{t("Confirm cancellation")}</Button>
+                <Button
+                  startIcon={<ReplayIcon />} size="small" color="primary"
+                  onClick={() => setConfirmCancel(false)}
+                >{t("Discard")}</Button>
               </>
               :
               <>
-                <Grid2 xs={4}>
-                  <Button
-                    startIcon={<InfoOutlinedIcon />} size="small" color="primary"
-                    onClick={() => handleOpenBooking(booking)}
-                  >{t("Details")}</Button>
-                </Grid2>
-                <Grid2 xs={4}>
-                  <Button
-                    startIcon={<EditNoteOutlinedIcon />} size="small"
-                    onClick={() => handleEditBooking(booking)}
-                  >{t("Modify")}</Button>
-                </Grid2>
-                <Grid2 xs={4}>
-                  {
-                    booking.cancelled ?
+                <Button
+                  startIcon={<InfoOutlinedIcon />} size="small" color="primary"
+                  onClick={() => handleOpenBooking(booking)}
+                >{t("Details")}</Button>
+                <Button
+                  startIcon={<EditNoteOutlinedIcon />} size="small"
+                  onClick={() => handleEditBooking(booking)}
+                >{t("Modify")}</Button>
+                {
+                  booking.cancelled ?
+                    <>
                       <Button
                         startIcon={<EventAvailableIcon />} size="small" color="success"
                         onClick={() => handleCancelBooking(booking)}
                       >{t("Book again")}</Button>
-                      :
-                      <Button
-                        startIcon={<EventBusyIcon />} size="small" color="error"
-                        onClick={() => setConfirmCancel(true)}
-                      >{t("Cancel")}</Button>
-                  }
-                </Grid2>
+                      <IconButton title={t("")} color="error" onClick={() => handleDeleteBooking(booking)}><DeleteIcon /></IconButton>
+                    </>
+                    :
+                    <Button
+                      startIcon={<EventBusyIcon />} size="small" color="error"
+                      onClick={() => setConfirmCancel(true)}
+                    >{t("Cancel")}</Button>
+                }
               </>
           }
-        </Grid2>
+        </Stack>
       </Popover>
     </>
 
