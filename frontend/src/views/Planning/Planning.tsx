@@ -82,7 +82,10 @@ const Planning = () => {
   }, [navigate]);
 
   const handleCloseEdit = useCallback(() => {
-    navigate(-1);
+    if (window.history.state.idx > 0)
+      navigate(-1);
+    else
+      navigate("/planning");
     refetch();
   }, [navigate, refetch]);
 
