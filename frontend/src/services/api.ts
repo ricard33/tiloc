@@ -375,6 +375,15 @@ export const api = createApi({
         };
       }
     }),
+    resetPassword: builder.mutation<string, string>({
+      query(email) {
+        return {
+          url: `auth/reset_password/`,
+          method: "POST",
+          data: {email}
+        };
+      }
+    }),
 
     // BookingChannel
     listBookingChannels: bookingChannelApi.list(builder),
@@ -527,6 +536,7 @@ export const {
   useLogoutMutation,
   useSignupMutation,
   useResendVerificationMutation,
+  useResetPasswordMutation,
 
   useListBookingChannelsQuery,
   useGetBookingChannelQuery,

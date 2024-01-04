@@ -357,14 +357,14 @@ EMAIL_MAIL_PAGE_TEMPLATE = "signup/email_success_template.html"
 EMAIL_MAIL_CALLBACK = email_verified_callback
 
 # Password Recovery Settings (mandatory for email sending)
-EMAIL_PASSWORD_SUBJECT = "Change your password {{ user.firstname }}"
-EMAIL_PASSWORD_HTML = "signup/password_body.html"
-EMAIL_PASSWORD_PLAIN = "signup/password_body.txt"
+EMAIL_PASSWORD_SUBJECT = "Vos informations de connexion {{ user.firstname }}"
+EMAIL_PASSWORD_HTML = "password/password_body.html"
+EMAIL_PASSWORD_PLAIN = "password/password_body.txt"
 EMAIL_PASSWORD_TOKEN_LIFE = 60 * 10  # 10 minutes
 
 # Password Recovery Settings (mandatory for builtin view)
-EMAIL_PASSWORD_PAGE_TEMPLATE = "signup/password_changed_template.html"
-EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = "signup/password_change_template.html"
+EMAIL_PASSWORD_PAGE_TEMPLATE = "password/password_changed_template.html"
+EMAIL_PASSWORD_CHANGE_PAGE_TEMPLATE = "password/password_change_template.html"
 EMAIL_PASSWORD_CALLBACK = password_change_callback
 
 # For Django Email Backend

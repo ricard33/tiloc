@@ -127,7 +127,7 @@ function SignIn() {
               fullWidth
               size="large"
               type="submit"
-              // variant="contained"
+              variant="contained"
             >
               {t("Sign in now")}
             </Button>

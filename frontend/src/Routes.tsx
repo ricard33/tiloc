@@ -38,6 +38,7 @@ import Checkout from "./views/Subscription/Checkout";
 import CheckoutDone from "./views/Subscription/CheckoutDone";
 import MyAccount from "./views/Subscription/Acccount";
 import SubscriptionCancel from "./views/Subscription/SubscriptionCancel";
+import ForgottenPassword from "./views/SignIn/ForgottenPassword";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -51,6 +52,7 @@ const MyRoutes = () => {
         <Route path="/not-found" element={<NotFoundView />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/email-verified" element={<EmailVerified />} />
+        <Route path="/reset-password" element={<ForgottenPassword />} />
         {/*<Route path="*" element={<NotFoundView />} />*/}
       </Route>
       <Route element={<RequireAuth />}>

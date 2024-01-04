@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django_email_verification import send_email as send_verification_email
+from django_email_verification import send_password as send_reset_password
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
@@ -213,6 +214,24 @@ class SignUpAPI(KnoxLoginView):
 
         send_generic_email("welcome", request.user)
         return super(SignUpAPI, self).post(request, format=None)
+
+
+class ResetPasswordAPI(generics.GenericAPIView):
+    """
+    Create a new user and login it in restricted (or creation) mode
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        email = request.data["email"]
+        try:
+            user = models.User.objects.get(email=email)
+            send_reset_password(user, context={"request": request})
+        except models.User.DoesNotExist:
+            logger.warning("Reset password: user not found for %s", email)
+        return Response({"message": "Reset link successfully sent"}, status=status.HTTP_200_OK)
 
 
 class AccountViewSet(viewsets.ModelViewSet):

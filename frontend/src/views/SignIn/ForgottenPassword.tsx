@@ -1,0 +1,121 @@
+import React, { useEffect, useState } from "react";
+import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Alert, AlertTitle, Button, Container, Link, Paper, Stack, Typography } from "@mui/material";
+
+import { auth } from "../../actions";
+import { useTranslation } from "react-i18next";
+import { QueryError, useLoginMutation, useResetPasswordMutation } from "../../services/api";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useAlert } from "../../common/alertUtils";
+import { RootState } from "../../store";
+import { useForm, useFormState } from "react-hook-form";
+import { LoginInfo } from "../../types";
+import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
+import { SerializedError } from "@reduxjs/toolkit";
+import { useAppSelector } from "../../app/hooks";
+
+
+type LoginData = {
+  email: string,
+}
+
+function ForgottenPassword() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isDemo } = useAppSelector((store) => store.appInfo);
+  const [resetPassword] = useResetPasswordMutation();
+  const [done, setDone] = useState(false);
+  let location = useLocation();
+
+  const formContext = useForm<LoginData>();
+  const { control, getValues } = formContext;
+  const { isDirty, errors } = useFormState({ control });
+
+  const { t } = useTranslation();
+  const { showError } = useAlert();
+
+  const handleSubmit = (formData: LoginData) => {
+    resetPassword(formData.email).then((result: { data: any } | { error: QueryError | SerializedError }) => {
+      const { data, error } = result as any;
+      if (error) {
+        showError(t("Reset password error: ") + fetchErrorDecode(error));
+        console.log(result);
+      } else {
+        setDone(true);
+      }
+    });
+  };
+
+  return (
+    <Container maxWidth="sm" sx={{ display: "flex", height: "100%", alignItems: "center", width: "fit-content" }}>
+      <FormContainer
+        onSuccess={handleSubmit}
+        formContext={formContext}
+      >
+        <Paper sx={{ padding: "1em", width: "500px" }}>
+          <Stack direction="column" spacing={2} style={{ width: "100%" }}>
+            <Typography
+              variant="h2"
+            >
+              {t("Reset password")}
+            </Typography>
+            {done ?
+              <Alert variant="filled" severity="info">
+                <AlertTitle>{t("Envoi du lien de réinitialisation du mot de passe")}</AlertTitle>
+                {t("Veuillez vérifier votre courrier électronique {{email}} pour réinitialiser votre mot de passe",
+                  {email: getValues().email})}
+              </Alert>
+              :
+              <>
+                <Typography
+                  color="textSecondary"
+                  gutterBottom
+                >
+                  {t("Please enter your email address so we can send you a link to reset your password.")}
+                </Typography>
+                <TextFieldElement
+                  control={control}
+                  name="email"
+                  required
+                  fullWidth
+                  error={!!errors.email}
+                  label={t("Email address")}
+                  type="email"
+                  variant="outlined"
+                  autoComplete="username"
+                />
+                <Button
+                  color="primary"
+                  disabled={!isDirty}
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                >
+                  {t("Send reset link")}
+                </Button>
+              </>
+            }
+            <hr />
+            <Typography
+              color="textSecondary"
+              variant="body1"
+            >
+              {t("Don't have an account?")}{" "}
+              <Link
+                component={RouterLink}
+                to="/signup"
+                variant="h6"
+              >
+                {t("Sign up")}
+              </Link>
+            </Typography>
+          </Stack>
+        </Paper>
+      </FormContainer>
+    </Container>
+  );
+}
+
+export default ForgottenPassword;

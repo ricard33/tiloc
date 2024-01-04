@@ -56,6 +56,7 @@ urlpatterns = [
     re_path("^api/auth/login/$", api.LoginAPI.as_view()),
     re_path("^api/auth/logout/$", api.LogoutAPI.as_view()),
     re_path("^api/auth/user/$", api.CurrentUserAPI.as_view()),
+    re_path("^api/auth/reset_password/$", api.ResetPasswordAPI.as_view()),
     re_path(r"^api/auth/resend_verification/$", api.resend_verification),
     re_path(r"^api/auth/", include("knox.urls")),
 
@@ -81,6 +82,8 @@ urlpatterns = [
     re_path("preview/verif/", views.preview_verification_email),
     re_path("preview/verified/", views.preview_verified),
     re_path("preview/welcome/", views.preview_welcome),
+    re_path("preview/reset/", views.preview_reset_password),
+    re_path("preview/reseted/", views.preview_password_changed),
 ]
 
 if settings.ENV == "dev":

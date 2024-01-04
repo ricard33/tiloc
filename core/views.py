@@ -203,3 +203,13 @@ def get_base_url(request):
 @permission_classes([IsAdminUser])
 def preview_welcome(request):
     return render(request, "signup/welcome_body.html", {"user": request.user, "base_url": get_base_url(request)})
+
+
+@permission_classes([IsAdminUser])
+def preview_reset_password(request):
+    return render(request, "password/password_change_template.html", {"user": request.user, "base_url": get_base_url(request)})
+
+
+@permission_classes([IsAdminUser])
+def preview_password_changed(request):
+    return render(request, "password/password_changed_template.html", {"user": request.user, "base_url": get_base_url(request)})

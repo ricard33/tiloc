@@ -174,5 +174,6 @@
   "ATTENTION ! Il est indispensable de lire et de compléter le modèle proposé avec vos propres conditions au moins la première fois. En effet certains passages sont à adapter à votre situation.": "",
   "--- select a lodging ---": "--- select a lodging ---",
   "Show payment status on bookings": "Show payment status on bookings",
-  "Not included in price": "Not included in price"
+  "Not included in price": "Not included in price",
+  "Service provided by external partner. The service price shouldn't be included in booking price because it have to be paid directly to the provider.": ""
 }

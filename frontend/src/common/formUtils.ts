@@ -42,3 +42,8 @@ export const usePageUnloadAlert = (isDirty: boolean) => {
 
 };
 
+const t = (s: string) => s;
+
+export const translations = [
+  t("Please enter a valid email address")
+]

@@ -1,0 +1,33 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Tiloc{% endblock %}</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+</head>
+<body>
+<link
+    href="https://fonts.googleapis.com/css2?family=Biryani:wght@400;700&display=swap" rel="stylesheet"
+    type="text/css"
+>
+<header class="app-bar">
+    <a href="/"><img
+        alt="Logo" src="{% static 'images/logos/logo-tiloc-with-name.png' %}" width="110"
+        style="vertical-align: text-bottom;"
+    ></a>
+</header>
+
+<div class="content">
+    {% block body %}{% endblock %}
+</div>
+</body>
+</html>
