@@ -21,7 +21,7 @@ class ExportCalendarTestCase(TestCase):
         self.lodging = factories.LodgingFactory.create()
 
     def test_simple_export(self):
-        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")
         r = self.client.get("/calendar/%s/" % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
@@ -38,19 +38,19 @@ class ExportCalendarTestCase(TestCase):
         # subscription.plan = plan
         # subscription.save()
         self.lodging.account.subscription_set.all().delete()
-        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")
         self.assertTrue(self.lodging.account.is_free_plan)
         r = self.client.get("/calendar/%s/" % self.lodging.uid)
         self.assertEqual(r.status_code, 403)
 
     def test_secondary_export_url(self):
-        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")
         r = self.client.get("/calendar/%s.ics" % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
 
     def test_event_uid_are_reliable(self):
-        factories.BookingFactory(lodging=self.lodging, guest_name="Cédric")
+        factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")
         r = self.client.get("/calendar/%s/" % self.lodging.uid)
         c = Calendar(r.content.decode())
         e1 = c.events.pop()
@@ -62,8 +62,8 @@ class ExportCalendarTestCase(TestCase):
     def test_exclude_bookings_from_requesting_channel(self):
         channel = factories.BookingChannelFactory(name="airbnb")
         sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
-        factories.BookingFactory(lodging=self.lodging, source=channel)
-        factories.BookingFactory(lodging=self.lodging)
+        factories.BookingFactory(lodgings=self.lodging, source=channel)
+        factories.BookingFactory(lodgings=self.lodging)
         r = self.client.get("/calendar/%s/?s=%d" % (self.lodging.uid, sync.id))
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
@@ -71,8 +71,8 @@ class ExportCalendarTestCase(TestCase):
     def test_exclude_deleted_bookings(self):
         channel = factories.BookingChannelFactory(name="airbnb")
         sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
-        factories.BookingFactory(lodging=self.lodging, deleted=True)
-        factories.BookingFactory(lodging=self.lodging)
+        factories.BookingFactory(lodgings=self.lodging, deleted=True)
+        factories.BookingFactory(lodgings=self.lodging)
         r = self.client.get("/calendar/%s/?s=%d" % (self.lodging.uid, sync.id))
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
@@ -80,8 +80,8 @@ class ExportCalendarTestCase(TestCase):
     def test_exclude_cancelled_bookings(self):
         channel = factories.BookingChannelFactory(name="airbnb")
         sync = factories.BookingChannelSyncFactory(lodging=self.lodging, channel=channel)
-        factories.BookingFactory(lodging=self.lodging, cancelled=True)
-        factories.BookingFactory(lodging=self.lodging)
+        factories.BookingFactory(lodgings=self.lodging, cancelled=True)
+        factories.BookingFactory(lodgings=self.lodging)
         r = self.client.get("/calendar/%s/?s=%d" % (self.lodging.uid, sync.id))
         c = Calendar(r.content.decode())
         self.assertEqual(len(c.events), 1)
@@ -90,7 +90,7 @@ class ExportCalendarTestCase(TestCase):
         now = arrow.now()
         year_ = now.date().year + 1
         factories.BookingFactory(
-            lodging=self.lodging,
+            lodgings=self.lodging,
             guest_name="Cédric",
             begin_date=arrow.get("%d-08-02" % year_).date(),
             end_date=arrow.get("%d-08-12" % year_).date(),
@@ -111,8 +111,8 @@ class ExportFullPlanningTestCase(TestCase):
     def setUp(self) -> None:
         self.lodging1 = factories.LodgingFactory()
         self.lodging2 = factories.LodgingFactory()
-        factories.BookingFactory(lodging=self.lodging1, guest_name="Cédric")
-        factories.BookingFactory(lodging=self.lodging2, guest_name="Daniel")
+        factories.BookingFactory(lodgings=self.lodging1, guest_name="Cédric")
+        factories.BookingFactory(lodgings=self.lodging2, guest_name="Daniel")
 
     def test_full_export_by_admin(self):
         admin = factories.SuperUserFactory()
@@ -137,7 +137,7 @@ class FillingRateTestCase(APITestCase):
         now = arrow.now()
         for i in range(24):
             date = now.shift(months=-i).replace(day=5)
-            factories.BookingFactory(lodging=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
+            factories.BookingFactory(lodgings=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
         response = self.client.get("/stats/filling_rate/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
@@ -159,9 +159,9 @@ class FillingRateTestCase(APITestCase):
         self.user.lodgings.add(lodging)
         now = arrow.now()
         date = now.shift(months=-10).replace(day=5)
-        factories.BookingFactory(lodging=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
+        factories.BookingFactory(lodgings=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
         date = now.shift(months=-5).replace(day=5)
-        factories.BookingFactory(lodging=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
+        factories.BookingFactory(lodgings=lodging, begin_date=date.date(), end_date=date.shift(weeks=1).date())
 
         response = self.client.get("/stats/filling_rate/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -172,7 +172,7 @@ class FillingRateTestCase(APITestCase):
         lodging = factories.LodgingFactory()
         self.user.lodgings.add(lodging)
         factories.BookingFactory(
-            lodging=lodging,
+            lodgings=lodging,
             begin_date=arrow.get("2020-08-02").date(),
             end_date=arrow.get("2020-08-18").date(),
         )
@@ -187,7 +187,7 @@ class FillingRateTestCase(APITestCase):
         account = factories.AccountFactory(name="another")
         lodging = factories.LodgingFactory(account=account)
         factories.BookingFactory(
-            lodging=lodging,
+            lodgings=lodging,
             begin_date=arrow.get("2020-08-02").date(),
             end_date=arrow.get("2020-08-18").date(),
         )
@@ -199,7 +199,7 @@ class FillingRateTestCase(APITestCase):
     def test_multiple_lodgings_are_filtered(self):
         lodging = factories.LodgingFactory()
         factories.BookingFactory(
-            lodging=lodging,
+            lodgings=lodging,
             begin_date=arrow.get("2020-08-02").date(),
             end_date=arrow.get("2020-08-18").date(),
         )
@@ -224,10 +224,10 @@ class ChannelsDistributionTestCase(APITestCase):
         lodging = factories.LodgingFactory()
         self.user.lodgings.add(lodging)
         factories.BookingFactory(
-            lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date()
+            lodgings=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date()
         )
         factories.BookingFactory(
-            lodging=lodging,
+            lodgings=lodging,
             begin_date=arrow.get("2020-07-02").date(),
             end_date=arrow.get("2020-07-18").date(),
             source=models.BookingChannel.objects.get(name="airbnb"),
@@ -244,10 +244,10 @@ class ChannelsDistributionTestCase(APITestCase):
     def test_multiple_lodgings_are_filtered(self):
         lodging = factories.LodgingFactory()
         factories.BookingFactory(
-            lodging=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date()
+            lodgings=lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-18").date()
         )
         factories.BookingFactory(
-            lodging=lodging,
+            lodgings=lodging,
             begin_date=arrow.get("2020-07-02").date(),
             end_date=arrow.get("2020-07-18").date(),
             source=models.BookingChannel.objects.get(name="airbnb"),

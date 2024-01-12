@@ -362,8 +362,10 @@ class CommentSubSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    lodging = LodgingSubSerializer(read_only=True)
-    lodging_id = serializers.PrimaryKeyRelatedField(source="lodging", queryset=models.Lodging.objects.all())
+    lodgings = LodgingSubSerializer(read_only=True, many=True)
+    lodging_ids = serializers.PrimaryKeyRelatedField(
+        source="lodgings", many=True, queryset=models.Lodging.objects.all()
+    )
     source = BookingChannelSerializer(read_only=True)
     source_id = serializers.PrimaryKeyRelatedField(
         source="source", queryset=models.BookingChannel.objects.all(), required=False, allow_null=True
@@ -382,6 +384,11 @@ class BookingSerializer(serializers.ModelSerializer):
         model = models.Booking
         fields = "__all__"
 
+    def validate_lodging_ids(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError("Bookings need at least one lodging")
+        return value
+
     def create(self, validated_data: dict):
         options = validated_data.pop("bookedservice_set", [])
         instance = super().create(validated_data)
@@ -394,14 +401,11 @@ class BookingSerializer(serializers.ModelSerializer):
             )
         return instance
 
-    def get_updated_fields(self, instance, validated_data, updated_fields=[]):
+    def get_updated_fields(self, instance, validated_data):
         updated_fields = []
         for field, value in validated_data.items():
-            if not isinstance(value, dict):
-                if value != getattr(instance, field, None):
-                    updated_fields.append(field)
-            else:
-                self.get_updated_fields(getattr(instance, field), validated_data[field], updated_fields)
+            if value != getattr(instance, field, None):
+                updated_fields.append(field)
         return updated_fields
 
     def update(self, instance, validated_data):
@@ -438,8 +442,7 @@ class BookingSubSerializer(BookingSerializer):
         fields = [
             "id",
             "status",
-            "lodging",
-            "lodging_id",
+            "lodgings",
             "guest_name",
             "source",
             "source_id",

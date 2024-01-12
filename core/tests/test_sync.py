@@ -128,15 +128,15 @@ class SyncBookingsTestCase(TestCase):
 
     def test_update_existing_booking_with_same_dates(self):
         factories.BookingFactory(
-            lodging=self.lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-12").date()
+            lodgings=self.lodging, begin_date=arrow.get("2020-08-02").date(), end_date=arrow.get("2020-08-12").date()
         )
         synchronize_bookings(self.sync, airbnb_ical)
         self.assertEqual(models.Booking.objects.all().count(), 1)
 
     def test_booking_cancelled_by_ota(self):
-        factories.BookingFactory(lodging=self.lodging, source=self.sync.channel, source_uid="123")
+        factories.BookingFactory(lodgings=self.lodging, source=self.sync.channel, source_uid="123")
         # not created from OTA, but manually affected to this source. Should not be canceled.
-        factories.BookingFactory(lodging=self.lodging, source=self.sync.channel)
+        factories.BookingFactory(lodgings=self.lodging, source=self.sync.channel)
         synchronize_bookings(self.sync, empty_ical)
         self.assertEqual(models.Booking.objects.all().count(), 2)
         # not canceled at first synchro

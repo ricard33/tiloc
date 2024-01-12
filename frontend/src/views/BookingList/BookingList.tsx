@@ -17,7 +17,7 @@ import {
   GridSortModel,
   GridValueFormatterParams
 } from "@mui/x-data-grid";
-import { Booking, User } from "../../types";
+import { Booking, Lodging, User } from "../../types";
 import { formatPrice } from "../../common/priceUtils";
 import { RootState } from "../../store";
 import { DateRange } from "../../components/DateRangeSelector";
@@ -70,12 +70,12 @@ const BookingList = () => {
     { field: "end_date", headerName: t("To"), width: 130, valueFormatter: dateFormatter, filterable: false },
     { field: "guest_name", headerName: t("Guest"), minWidth: 130, flex: 1, filterable: false },
     {
-      field: "lodging",
+      field: "lodgings",
       type: "singleSelect",
       headerName: t("Lodging"),
       minWidth: 130,
       flex: 1,
-      valueFormatter: (params) => params.value.name,
+      valueFormatter: (params) => params.value.map((l: Lodging) => l.name).join("+"),
       valueOptions: lodgings && [...lodgings.map((l) => {
         return { value: l.id, label: l.name };
       })]

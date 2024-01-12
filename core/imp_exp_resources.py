@@ -7,7 +7,7 @@ from core import models
 
 
 class BookingResource(resources.ModelResource):
-    lodging = fields.Field(column_name="lodging", attribute="lodging", widget=ForeignKeyWidget(models.Lodging, "name"))
+    lodgings = fields.Field(column_name="lodgings", attribute="lodgings", widget=ManyToManyWidget(models.Lodging, separator=","))
     source = fields.Field(
         column_name="source", attribute="source", widget=ForeignKeyWidget(models.BookingChannel, "name")
     )
@@ -22,7 +22,7 @@ class BookingResource(resources.ModelResource):
         fields = (
             "id",
             "uid",
-            "lodging",
+            "lodgings",
             "guest_name",
             "guest_contact",
             "guest_address",
@@ -53,7 +53,7 @@ class BookingResource(resources.ModelResource):
         export_order = (
             "id",
             "uid",
-            "lodging",
+            "lodgings",
             "guest_name",
             "guest_contact",
             "guest_address",

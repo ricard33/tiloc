@@ -153,7 +153,5 @@
   "Payment information": "Informations de paiement",
   "--- select a lodging ---": "--- choisir un hébergement ---",
   "Show payment status on bookings": "Afficher l'indicateur de paiement sur les réservations",
-  "Not included in price": "Non-inclus dans le prix",
-  "Sending password reset link": "Envoi du lien de réinitialisation du mot de passe",
-  "Please check your email {{email}} to reset your password": "Veuillez vérifier votre courrier électronique {{email}} pour réinitialiser votre mot de passe"
+  "Not included in price": "Non-inclus dans le prix"
 }

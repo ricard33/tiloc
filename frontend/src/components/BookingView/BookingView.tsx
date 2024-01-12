@@ -50,7 +50,7 @@ const BookingView: React.FunctionComponent<BookingViewProps> = ({
       booking.guest_name,
       booking.guest_address,
       booking.guest_contact,
-      t("Lodging:") + " " + booking.lodging.name,
+      t("Lodging:") + " " + booking.lodgings.map(l => l.name).join("+"),
       t("Status:") + " " + getBookingStatus(booking.status).getLabel(t),
       t("Price:") + " " + formatCurrency(booking.price_with_options),
       t("Check-in:") + " " + formatDate(booking.begin_date, "PPPP"),

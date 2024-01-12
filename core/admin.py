@@ -66,9 +66,9 @@ class RestrictedModelAdminMixIn(object):
             if isinstance(account_field, list):
                 import operator
 
-                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field)))
+                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field))).distinct()
 
-            return qs.filter(**{account_field + "__id": account["id"]})
+            return qs.filter(**{account_field + "__id": account["id"]}).distinct()
         return qs
 
     def get_field_queryset(self, db, db_field, request):
@@ -388,7 +388,7 @@ class CommentInlineAdmin(RestrictedInlineModelAdminMixIn, TabularInline):
 class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "id",
-        "lodging",
+        "get_lodgings",
         "status",
         "guest_name",
         "begin_date",
@@ -409,7 +409,7 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "deleted",
     )
     list_filter = (
-        "lodging",
+        "lodgings",
         "status",
         "begin_date",
         "source",
@@ -591,7 +591,7 @@ class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
 
 class ContractAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("booking", "created", "modified", "pdf_created")
-    list_filter = ("booking__lodging", "created", "modified")
+    list_filter = ("booking__lodgings", "created", "modified")
 
 
 class BookedServiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
@@ -601,8 +601,8 @@ class BookedServiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 
 @admin.register(models.Plan, site=site)
 class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = ("ref", "name", "lookup_key", "price", "interval", "max_lodgings", "max_users")
-    list_editable = ("name", "lookup_key", "price", "interval", "max_lodgings", "max_users")
+    list_display = ("ref", "name", "lookup_key", "price", "interval", "max_lodgings", "max_users", "grouped_bookings")
+    list_editable = ("name", "lookup_key", "price", "interval", "max_lodgings", "max_users", "grouped_bookings")
 
 
 @admin.register(models.Subscription, site=site)

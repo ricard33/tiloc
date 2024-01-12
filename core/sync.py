@@ -42,7 +42,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
 
         if event.uid:
             qs = models.Booking.objects.filter(
-                lodging=lodging, source_uid=event.uid, cancelled=False, deleted=False
+                lodgings=lodging, source_uid=event.uid, cancelled=False, deleted=False
             )
             if qs.exists():
                 logger.debug("Ignoring existing event [%s -> %s: %s]", event.begin, event.end, event.summary)
@@ -50,7 +50,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
                 continue
 
         same_bookings = models.Booking.objects.filter(
-            lodging=lodging,
+            lodgings=lodging,
             source_uid__isnull=True,
             begin_date=event.begin.date(),
             end_date=event.end.date(),
@@ -67,8 +67,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             continue
 
         logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.summary)
-        models.Booking.objects.create(
-            lodging=lodging,
+        booking = models.Booking.objects.create(
             source=channel,
             source_uid=event.uid,
             guest_name=event.summary,
@@ -82,10 +81,11 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             deposit=0,
             custom_tourist_tax=0,  # OTA should collect tax for us
         )
+        booking.lodgings.add(lodging)
 
     # try to detect booking that were cancelled by OTA
     for booking in models.Booking.objects.filter(
-        source=channel, lodging=lodging, end_date__gt=arrow.utcnow().date(), cancelled=False, deleted=False,
+        source=channel, lodgings=lodging, end_date__gt=arrow.utcnow().date(), cancelled=False, deleted=False,
         source_uid__isnull=False
     ):
         if booking.source_uid and booking.source_uid not in event_uids:

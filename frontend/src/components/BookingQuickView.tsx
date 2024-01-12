@@ -94,7 +94,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             ? getBookingStatus(booking.status).getLabel(t)
             : booking.source?.name
           )}
-          {displayField(showPayments, t("Lodging:"), booking.lodging ? booking.lodging.name : t("Cancellation / Waiting"), true)}
+          {displayField(showPayments, t("Lodging:"), booking.lodgings.map(l => l.name).join("+"), true)}
           {displayField(showPayments, t("Price:"), formatCurrency(booking.price_with_options), true)}
         </Grid>
         <Grid xs={8}>
@@ -138,7 +138,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             </Grid>
             {/* Removed because value is not reliable with the one (maybe modified) in contract */}
             <Grid xs={1}>
-              {displayField(showPayments && booking.lodging && booking.tourist_tax > 0,
+              {displayField(showPayments && booking.tourist_tax > 0,
                 t("Tourist tax:"),
                 formatCurrency(booking.tourist_tax || 0)
               )}

@@ -199,10 +199,10 @@ class Account(models.Model):
         super().delete(using, keep_parents)
 
     def cleanup_account(self, using=None, keep_parents=False):
-        Payment.objects.filter(booking__lodging__account=self).delete()
-        Contract.objects.filter(booking__lodging__account=self).delete()
-        BookedService.objects.filter(booking__lodging__account=self).delete()
-        Booking.objects.filter(lodging__account=self).delete()
+        Payment.objects.filter(booking__lodgings__account=self).delete()
+        Contract.objects.filter(booking__lodgings__account=self).delete()
+        BookedService.objects.filter(booking__lodgings__account=self).delete()
+        Booking.objects.filter(lodgings__account=self).delete()
         BookingChannelSync.objects.filter(lodging__account=self).delete()
         Lodging.objects.filter(account=self).delete()
         ContractTemplate.objects.filter(account=self).delete()
@@ -501,7 +501,7 @@ class Booking(models.Model):
         FULL = "full", _("Full board")
 
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
-    lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
+    lodgings = models.ManyToManyField(Lodging)
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
     guest_address = models.TextField(_("guest address"), blank=True, null=True)
@@ -524,6 +524,7 @@ class Booking(models.Model):
     adults = models.PositiveSmallIntegerField(_("adults"), default=1)
     children = models.PositiveSmallIntegerField(_("children"), default=0)
     babies = models.PositiveSmallIntegerField(_("babies"), default=0)
+    guests_distribution = models.JSONField(_("guests distribution"), null=True, blank=True)
     catering = models.CharField(_("catering"), choices=Catering.choices, default=Catering.NONE, max_length=20)
     daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     price = models.DecimalField(
@@ -567,16 +568,31 @@ class Booking(models.Model):
         ]
 
     objects = ForUserQuerySet.as_manager()
-    _account_qs_path = "lodging__account"
-    _lodging_qs_path = "lodging"
+    _account_qs_path = "lodgings__account"
+    _lodging_qs_path = "lodgings"
 
     def __str__(self):
         return "%s (%s: %s -> %s)" % (
             self.guest_name,
-            self.lodging and self.lodging.name or "--",
+            self.id and "|".join([lodging.name for lodging in self.lodgings.all()]) or "?",
             self.begin_date,
             self.end_date,
         )
+
+    @property
+    def lodging(self):
+        if not hasattr(self, "_lodging"):
+            self._lodging = self.lodgings.first()
+        return self._lodging
+
+    @lodging.setter
+    def lodging(self, lodging):
+        self._lodging = lodging
+
+    def get_lodgings(self):
+        return "\n".join([lodging.name for lodging in self.lodgings.all()])
+
+    get_lodgings.short_description = _("Lodgings")
 
     @property
     def price_with_options(self):
@@ -624,7 +640,9 @@ class Booking(models.Model):
         return self.adults + self.children + self.babies
 
     def computed_tourist_tax(self):
-        if self.lodging.is_flat_rate_tourist_tax:
+        if not self.lodging:
+            return 0
+        elif self.lodging.is_flat_rate_tourist_tax:
             daily_rate = self.lodging.max_daily_tourist_tax or Decimal(0)
         elif self.adults + self.children + self.babies > 0:
             daily_rate = round_half_up(
@@ -656,8 +674,8 @@ class Contract(models.Model):
     class Meta:
         verbose_name = _("Contract")
 
-    _account_qs_path = "booking__lodging__account"
-    _lodging_qs_path = "booking__lodging"
+    _account_qs_path = "booking__lodgings__account"
+    _lodging_qs_path = "booking__lodgings"
     objects = ForUserQuerySet.as_manager()
 
     def __str__(self):
@@ -807,8 +825,8 @@ class Payment(models.Model):
             ("reconciliation", "Can do account reconciliation"),
         ]
 
-    _account_qs_path = "booking__lodging__account"
-    _lodging_qs_path = "booking__lodging"
+    _account_qs_path = "booking__lodgings__account"
+    _lodging_qs_path = "booking__lodgings"
     objects = ForUserQuerySet.as_manager()
 
 
@@ -822,8 +840,8 @@ class Comment(models.Model):
     class Meta:
         ordering = ["created_on"]
 
-    _account_qs_path = "booking__lodging__account"
-    _lodging_qs_path = "booking__lodging"
+    _account_qs_path = "booking__lodgings__account"
+    _lodging_qs_path = "booking__lodgings"
     objects = ForUserQuerySet.as_manager()
 
 
@@ -838,8 +856,10 @@ class Plan(models.Model):
     lookup_key = models.CharField(max_length=255, unique=True, null=True, blank=True)
     price = models.PositiveSmallIntegerField()
     interval = models.CharField(max_length=10, choices=Intervals.choices)
+    # Features
     max_lodgings = models.PositiveSmallIntegerField(null=True, blank=True)
     max_users = models.PositiveSmallIntegerField(null=True, blank=True)
+    grouped_bookings = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -949,8 +969,8 @@ class Activity(models.Model):
         ordering = ("-date",)
 
     objects = ForUserQuerySet.as_manager()
-    _account_qs_path = "booking__lodging__account"
-    _lodging_qs_path = "booking__lodging"
+    _account_qs_path = "booking__lodgings__account"
+    _lodging_qs_path = "booking__lodgings"
 
 
 # class AddOn(models.Model):

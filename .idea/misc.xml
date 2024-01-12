@@ -11,6 +11,9 @@
   <component name="PythonCompatibilityInspectionAdvertiser">
     <option name="version" value="3" />
   </component>
+  <component name="TaskProjectConfiguration">
+    <server type="JIRA" url="https://ti-gecko.atlassian.net" />
+  </component>
   <component name="WebPackConfiguration">
     <option name="mode" value="MANUAL" />
     <option name="path" value="$PROJECT_DIR$/frontend/config/webpack.config.js" />

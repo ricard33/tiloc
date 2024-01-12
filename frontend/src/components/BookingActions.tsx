@@ -169,13 +169,13 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
             {
               (isDirty && canEdit && onSave) ?
                 <Button
-                  autoFocus color={primaryColor} onClick={() => onSave(true)}
+                  color={primaryColor} onClick={() => onSave(true)}
                   startIcon={<SaveIcon />}
                 >{t("Save")}</Button>
                 :
                 onOpenContract &&
                 <Button
-                  autoFocus color={primaryColor} onClick={() => onOpenContract(booking)}
+                  color={primaryColor} onClick={() => onOpenContract(booking)}
                   startIcon={<PdfIcon />}
                   disabled={!onOpenContract || !canViewContract}
                 >{t("Contract")}</Button>

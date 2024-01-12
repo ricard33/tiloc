@@ -82,10 +82,10 @@ class Command(BaseCommand):
             admin.save()
 
         # purge bookings
-        Payment.objects.filter(booking__lodging__account=demo_account).delete()
-        Contract.objects.filter(booking__lodging__account=demo_account).delete()
-        BookedService.objects.filter(booking__lodging__account=demo_account).delete()
-        Booking.objects.filter(lodging__account=demo_account).delete()
+        Payment.objects.filter(booking__lodgings__account=demo_account).delete()
+        Contract.objects.filter(booking__lodgings__account=demo_account).delete()
+        BookedService.objects.filter(booking__lodgings__account=demo_account).delete()
+        Booking.objects.filter(lodgings__account=demo_account).delete()
 
         default_template = ContractTemplate.objects.filter(account=demo_account).first()
         # create lodgings
@@ -121,7 +121,7 @@ class Command(BaseCommand):
                     duration = random.randint(7, 21)
                     end_date = arrow.get(begin_date).shift(days=duration).date()
                     if not Booking.objects.filter(
-                        lodging=lodging, begin_date__lte=end_date, end_date__gte=begin_date
+                        lodgings=lodging, begin_date__lte=end_date, end_date__gte=begin_date
                     ).exists():
                         if begin_date < arrow.now().date():
                             status = random.choices(

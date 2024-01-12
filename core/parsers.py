@@ -9,6 +9,7 @@ from rest_framework.parsers import BaseParser, DataAndFiles
 
 
 class MultiPartJSONParser(BaseParser):
+    """Special parser to handle multipart POST with nested related objects"""
     media_type = "multipart/form-data"
 
     def parse(self, stream, media_type=None, parser_context=None):
@@ -24,18 +25,23 @@ class MultiPartJSONParser(BaseParser):
             data, files = parser.parse()
             data = data.copy()
             for key in data:
-                value = data[key]
-                if value:
+                values = data.getlist(key)
+                new_values = []
+                for value in values:
                     try:
                         value = json.loads(value)
-                        if isinstance(value, list):
-                            data.setlist(key, value)
+                        if isinstance(value, list) and len(values) == 1:
+                            new_values = value
                         else:
-                            data[key] = value
+                            new_values.append(value)
                     except ValueError:
+                        new_values.append(value)
                         pass
                     except Exception:
                         logging.getLogger("parsers").exception("Error in JSON decoding")
+                        new_values.append(value)
+                data.setlist(key, new_values)
+
             return DataAndFiles(data, files)
         except MultiPartParserError as exc:
             raise ParseError("Multipart form parse error - %s" % exc)

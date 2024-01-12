@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
@@ -21,20 +21,22 @@ def get_current_user():
     return None
 
 
-def get_listening_users_for_lodging(lodging, current_user):
+def get_listening_users_for_lodging(lodgings, current_user):
     current_user_id = current_user and current_user.id or 0
-    return (
-        lodging.account.user_set.filter(groups__name="administrator")
-        .exclude(id=current_user_id)
-        .union(lodging.users.exclude(id=current_user_id))
-    )
+    users = models.User.objects.filter(account=lodgings.first().account, groups__name="administrator").exclude(id=current_user_id)
+    for lodging in lodgings.all():
+        users = users.union(lodging.users.exclude(id=current_user_id))
+    return users
 
 
 @receiver(post_save, sender=models.Booking)
 def on_booking_saved(sender, instance: models.Booking, created: bool, update_fields: List[str], **kwargs):
-    lodging = instance.lodging
+    lodgings = instance.lodgings
+    if not lodgings.exists():
+        # Booking instance is just created, no lodging added yet.
+        return
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodging, user)
+    users = get_listening_users_for_lodging(lodgings, user)
     if created:
         logger.info("booking_created [%s] %s" % (instance.id, instance))
         models.Activity.objects.create(type=models.Activity.ActivityType.add_booking, author=user, booking=instance)
@@ -94,6 +96,12 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
                     "/bookings/%d" % instance.id,
                     context={"booking": instance},
                 )
+
+
+@receiver(m2m_changed, sender=models.Booking.lodgings.through)
+def booking_lodging_changed(sender, instance, action, reverse, model, **kwargs):
+    if action == "post_add":
+        on_booking_saved(sender, instance, created=True, update_fields=[])
 
 
 @receiver(post_save, sender=models.Comment)

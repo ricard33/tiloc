@@ -95,7 +95,7 @@ const ActivityFeed: React.FC<Props> = props => {
                 <Sep /><BookingSource booking={activity.booking} />
               </Stack>
               <Stack direction={"row"} style={{ flexWrap: "wrap" }}>
-                <HomeOutlinedIcon fontSize="small" />&nbsp;{activity.booking.lodging.name}
+                <HomeOutlinedIcon fontSize="small" />&nbsp;{activity.booking.lodgings.map(l => l.name).join("+")}
                 <Sep /><PersonOutlineIcon fontSize="small" />&nbsp;{activity.booking.guest_name}
                 <Sep /><CalendarMonthOutlinedIcon fontSize="small" />&nbsp;
                 <span>{formatDate(activity.booking.begin_date, "P")}</span>

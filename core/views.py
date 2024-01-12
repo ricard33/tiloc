@@ -98,7 +98,7 @@ def export_full_planning(request):
     logger.info("Full planning requested")
 
     c = Calendar(creator="-//Ti'Gecko//Location")
-    for booking in qs.order_by("begin_date", "lodging__rank"):
+    for booking in qs.order_by("begin_date", "lodgings__rank"):
         e = Event()
         e.uid = str(booking.uid)
         e.name = booking.guest_name
@@ -142,9 +142,9 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     data = []
     dates_range = [begin.date(), end.date()]
     filter = Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range)
-    filter &= Q(booking__lodging__account=request.user.account)
+    filter &= Q(booking__lodgings__account=request.user.account)
     if not request.user.has_perm("core.administrator"):
-        filter &= Q(booking__lodging__in=request.user.lodgings.all())
+        filter &= Q(booking__lodgings__in=request.user.lodgings.all())
 
     booking_count = Count(
         "booking",

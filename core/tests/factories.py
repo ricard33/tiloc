@@ -6,6 +6,7 @@ import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.db.models import signals
 
 from core import models
 
@@ -133,6 +134,7 @@ class LodgingFactory(factory.django.DjangoModelFactory):
     owner = factory.SubFactory(StandardUserFactory)
     rank = factory.Sequence(lambda n: n)
     address = factory.Faker("address")
+    capacity = 4
     daily_rate = 50
 
     description = """<strong>Capacity:</strong> 4 adults</br>
@@ -163,11 +165,11 @@ class BookingChannelSyncFactory(factory.django.DjangoModelFactory):
     source_url = factory.Faker("uri")
 
 
+@factory.django.mute_signals(signals.pre_save, signals.post_save)
 class BookingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Booking
 
-    lodging = factory.SubFactory(LodgingFactory)
     guest_name = factory.Faker("name")
     guest_contact = factory.Faker("email")
     guest_address = factory.Faker("address")
@@ -175,8 +177,35 @@ class BookingFactory(factory.django.DjangoModelFactory):
     begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
     duration = factory.LazyAttribute(lambda b: random.randint(7, 21))
     end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=b.duration).date())
-    daily_rate = factory.LazyAttribute(lambda b: b.lodging and b.lodging.daily_rate or 50)
-    price = factory.LazyAttribute(lambda b: b.daily_rate * b.duration)
+    daily_rate = 0  # factory.LazyAttribute(lambda b: b.lodgings.first() and b.lodgings.first().daily_rate or 50)
+    price = 0  # factory.LazyAttribute(lambda b: b.daily_rate * b.duration)
+
+    @factory.post_generation
+    def lodgings(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, or nothing to add, do nothing.
+            return
+
+        if extracted:
+            # Add the iterable of lodgings using bulk addition
+            if isinstance(extracted, (tuple, list)):
+                self.lodgings.add(*extracted)
+            else:
+                self.lodgings.add(extracted)
+        else:
+            self.lodgings.add(LodgingFactory.create(**kwargs))
+
+    @factory.post_generation
+    def daily_rates_and_price(self, create, extracted, **kwargs):
+        update_fields = []
+        if not self.daily_rate:
+            self.daily_rate = self.lodgings.first() and self.lodgings.first().daily_rate or 50
+            update_fields.append("daily_rate")
+        if not self.price:
+            self.price = self.daily_rate * self.duration
+            update_fields.append("price")
+        if update_fields:
+            self.save(update_fields=update_fields)
 
 
 class ContractTemplateFactory(factory.django.DjangoModelFactory):

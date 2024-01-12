@@ -32,7 +32,7 @@ export type TimelineGroup = {
 };
 
 export type TimelineItem = {
-  id: number,
+  id: number|string,
   group: number,
   title: string,
   start_time: number,
@@ -164,9 +164,9 @@ function getIconAndBgColor(booking: Booking): OtaIconProps {
 }
 
 export function makeItems(bookings: Booking[]): TimelineItem[] {
-  return (bookings ?? []).map(booking => ({
-    id: booking.id!,
-    group: !booking.cancelled ? booking.lodging_id : -3,
+  const bookingToItem = (booking: Booking, groupId: number) => ({
+    id: booking.id! + "_" + groupId,
+    group: groupId,
     title: booking.guest_name!,
     status: booking.status,
     start_time: add(booking.begin_date, { hours: 12 }).valueOf(),
@@ -192,7 +192,19 @@ export function makeItems(bookings: Booking[]): TimelineItem[] {
       // },
     },
     booking
-  }));
+  });
+  let items: TimelineItem[] = [];
+  if(bookings) {
+    for (let i = 0; i < bookings.length; i++) {
+      const booking = bookings[i];
+      if (booking.cancelled) items.push(bookingToItem(booking, -3));
+      else
+        for (let j = 0; j < booking.lodgings.length; j++) {
+          items.push(bookingToItem(booking, booking.lodgings[j].id));
+        }
+    }
+  }
+  return items;
 }
 
 // eslint-disable-next-line react/no-multi-comp,react/prop-types
@@ -226,7 +238,7 @@ export function makeRenderItem(
       style: {
         color: item.color,
         background: backgroundColor,
-        opacity: item.booking.lodging_id > 0 && !item.booking.cancelled ? undefined : "50%",
+        opacity: !item.booking.cancelled ? undefined : "50%",
         borderRadius: 4,
         borderLeftWidth: itemContext.selected ? 3 : 1,
         borderRightWidth: itemContext.selected ? 3 : 1

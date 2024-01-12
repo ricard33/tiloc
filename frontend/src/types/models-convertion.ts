@@ -129,7 +129,7 @@ export function api2Lodging(lodging: Record<string, any>): Lodging {
 export function api2Booking(booking: Record<string, any>): Booking {
   return {
     ...booking as Booking,
-    lodging: api2Lodging(booking.lodging),
+    lodgings: booking.lodgings.map(api2Lodging),
     begin_date: parseISO(booking.begin_date),
     end_date: parseISO(booking.end_date),
     daily_rate: Number(booking.daily_rate),

@@ -16,26 +16,28 @@ class BookingTestCase(APITestCase):
 
     def setUp(self) -> None:
         self.lodging = factories.LodgingFactory.create()
+        self.lodging2 = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)
+        self.user.lodgings.add(self.lodging2)
         self.header = force_login(self.user)
 
     def test_need_authentication(self):
-        booking = factories.BookingFactory.create(lodging=self.lodging)
+        booking = factories.BookingFactory.create(lodgings=self.lodging)
         response = self.client.get("/api/booking/%d/" % booking.id)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_booking(self):
-        booking = factories.BookingFactory.create(lodging=self.lodging)
+        booking = factories.BookingFactory.create(lodgings=self.lodging)
         response = self.client.get("/api/booking/%d/" % booking.id, **self.header)
-        print(self.user.groups)
-        print(models.Booking.objects.filter(id=booking.id).values())
+        # print(self.user.groups)
+        # print(models.Booking.objects.filter(id=booking.id).values())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(obj["id"], booking.id)
 
     def test_get_booking_with_services(self):
-        booking = factories.BookingWithServiceFactory.create(lodging=self.lodging)
+        booking = factories.BookingWithServiceFactory.create(lodgings=self.lodging)
         response = self.client.get("/api/booking/%d/" % booking.id, **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
@@ -50,7 +52,7 @@ class BookingTestCase(APITestCase):
 
     def test_create_booking(self):
         data = {
-            "lodging_id": self.lodging.id,
+            "lodging_ids": [self.lodging.id],
             "status": models.BookingStatus.Option.value,
             "guest_name": "John DOE",
             "begin_date": "2021-02-05",
@@ -62,7 +64,7 @@ class BookingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
 
     def test_update_cancelled_booking(self):
-        booking = factories.BookingFactory.create(lodging=self.lodging, cancelled=True, daily_rate=50)
+        booking = factories.BookingFactory.create(lodgings=self.lodging, cancelled=True, daily_rate=50)
         data = {
             "notes": "something",
         }
@@ -72,7 +74,7 @@ class BookingTestCase(APITestCase):
         self.assertEqual("something", instance.notes)
 
     def test_delete_cancelled_booking(self):
-        booking = factories.BookingFactory.create(lodging=self.lodging, cancelled=True, daily_rate=50)
+        booking = factories.BookingFactory.create(lodgings=self.lodging, cancelled=True, daily_rate=50)
         response = self.client.delete("/api/booking/%d/" % booking.id, format="json", **self.header)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.data)
         self.assertFalse(models.Booking.objects.filter(id=booking.id, deleted=False).exists())
@@ -81,7 +83,7 @@ class BookingTestCase(APITestCase):
         # factories.ServiceFactory.create_batch(5)
         service = factories.ServiceFactory.create()
         data = {
-            "lodging_id": self.lodging.id,
+            "lodging_ids": [self.lodging.id],
             "status": models.BookingStatus.Option.value,
             "guest_name": "John DOE",
             "begin_date": "2021-02-05",
@@ -110,7 +112,7 @@ class BookingTestCase(APITestCase):
         self.assertEqual(len(obj["options"]), 1)
 
     def test_update_booking_with_services(self):
-        booking = factories.BookingWithServiceFactory.create(lodging=self.lodging)
+        booking = factories.BookingWithServiceFactory.create(lodgings=self.lodging)
         service = factories.ServiceFactory.create()
         self.assertNotEqual(booking.options.first().id, service.id)
         self.assertEqual(models.Service.objects.count(), 2)
@@ -141,7 +143,7 @@ class BookingTestCase(APITestCase):
         self.assertEqual(models.Service.objects.count(), 2)
 
     def test_update_price_for_booking_option(self):
-        booking = factories.BookingWithServiceFactory.create(lodging=self.lodging)
+        booking = factories.BookingWithServiceFactory.create(lodgings=self.lodging)
         service = booking.options.first()
         self.assertNotEqual(service.unit_price, 123)
         data = {
@@ -170,6 +172,66 @@ class BookingTestCase(APITestCase):
         self.assertEqual(obj["options"][0]["is_flat_rate"], not service.is_flat_rate)
         self.assertEqual(booking.bookedservice_set.first().unit_price, 123)
 
+    def test_create_with_multiple_lodgings(self):
+        data = {
+            "lodging_ids": [self.lodging.id, self.lodging2.id],
+            "status": models.BookingStatus.Option.value,
+            "guest_name": "John DOE",
+            "begin_date": "2021-02-05",
+            "end_date": "2021-02-25",
+            "duration": 10,
+            "price": 345,
+        }
+        response = self.client.post("/api/booking/", data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+        booking = models.Booking.objects.get(id=response.data["id"])
+        self.assertEqual(2, booking.lodgings.count())
+
+    def test_create_without_lodging_should_fail(self):
+        data = {
+            "lodging_ids": [],
+            "status": models.BookingStatus.Option.value,
+            "guest_name": "John DOE",
+            "begin_date": "2021-02-05",
+            "end_date": "2021-02-25",
+            "duration": 10,
+            "price": 345,
+        }
+        response = self.client.post("/api/booking/", data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
+        self.assertEqual(0, models.Booking.objects.all().count())
+
+    def test_update_with_multiple_lodgings(self):
+        booking = factories.BookingFactory.create(lodgings=self.lodging)
+        data = {
+            "lodging_ids": [self.lodging.id, self.lodging2.id],
+            "price": 345,
+        }
+        response = self.client.patch("/api/booking/%d/" % booking.id, data, format="json", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        booking = models.Booking.objects.get(id=response.data["id"])
+        self.assertEqual(2, booking.lodgings.count())
+
+        data = {
+            "lodging_ids": [self.lodging2.id],
+            "price": 345,
+        }
+        response = self.client.patch("/api/booking/%d/" % booking.id, data, format="json", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        booking = models.Booking.objects.get(id=response.data["id"])
+        self.assertEqual(1, booking.lodgings.count())
+
+    def test_update_without_lodging_should_fail(self):
+        booking = factories.BookingFactory.create(lodgings=self.lodging)
+        data = {
+            "lodging_ids": [],
+            "price": 345,
+        }
+        response = self.client.patch("/api/booking/%d/" % booking.id, data, format="json", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, response.data)
+        booking = models.Booking.objects.get(id=booking.id)
+        self.assertEqual(1, booking.lodgings.count())
+
 
 class BookingQueriesTestCase(APITestCase):
     fixtures = ["default-groups"]
@@ -182,7 +244,7 @@ class BookingQueriesTestCase(APITestCase):
 
     def testAllGuests(self):
         for name in ["Alain DELON", "Franck HERBERT", "Pablo PICASSO"]:
-            factories.BookingFactory.create(guest_name=name, lodging=self.lodging)
+            factories.BookingFactory.create(guest_name=name, lodgings=self.lodging)
 
         response = self.client.get("/api/booking/all_guests/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
@@ -192,7 +254,7 @@ class BookingQueriesTestCase(APITestCase):
 
     def testAllGuestsDeduplicate(self):
         for name in ["Alain DELON", "Franck HERBERT", "Pablo PICASSO", "Franck HERBERT"]:
-            factories.BookingFactory.create(guest_name=name, lodging=self.lodging)
+            factories.BookingFactory.create(guest_name=name, lodgings=self.lodging)
 
         response = self.client.get("/api/booking/all_guests/", **self.header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
@@ -210,7 +272,7 @@ class BookingQueriesTestCase(APITestCase):
                 guest_name=name,
                 begin_date=arrow.utcnow().shift(days=days).date(),
                 guest_address=address,
-                lodging=self.lodging,
+                lodgings=self.lodging,
             )
 
         response = self.client.get("/api/booking/all_guests/", **self.header)
@@ -221,7 +283,7 @@ class BookingQueriesTestCase(APITestCase):
 
     def testAllGuestsOnlyForOwnedLodgings(self):
         for name in ["Alain DELON", "Franck HERBERT", "Pablo PICASSO"]:
-            factories.BookingFactory.create(guest_name=name, lodging=self.lodging)
+            factories.BookingFactory.create(guest_name=name, lodgings=self.lodging)
         factories.BookingFactory.create()  # for another lodging
 
         response = self.client.get("/api/booking/all_guests/", **self.header)
@@ -255,7 +317,7 @@ class BookingQueriesTestCase(APITestCase):
                 begin_date=date.date(),
                 duration=duration,
                 guest_name="guest %d" % (i + 1),
-                lodging=self.lodging,
+                lodgings=self.lodging,
             )
 
         response = self.client.get("/api/booking/next_events/?count=5", **self.header)
@@ -290,7 +352,7 @@ class BookingModelTestCase(TestCase):
             is_flat_rate_tourist_tax=True,
             max_daily_tourist_tax=1.5,
         )
-        booking = factories.BookingFactory.create(lodging=lodging, duration=5, adults=2, children=2)
+        booking = factories.BookingFactory.create(lodgings=lodging, duration=5, adults=2, children=2)
         self.assertEqual(5 * 60, booking.price)
         self.assertEqual(5 * 1.5 * 2, booking.tourist_tax)
 
@@ -301,11 +363,14 @@ class BookingModelTestCase(TestCase):
             max_daily_tourist_tax=1.8,
             tourist_tax_rate=5,
         )
-        booking = factories.BookingFactory.create(lodging=lodging, duration=4, adults=2, children=2, price=Decimal(410))
+        booking = factories.BookingFactory.create(
+            lodgings=lodging, duration=4, adults=2, children=2, price=Decimal(410)
+        )
         self.assertEqual(410, booking.price)
-        self.assertAlmostEqual(Decimal('10.24'), booking.tourist_tax, 1)
+        self.assertAlmostEqual(Decimal("10.24"), booking.tourist_tax, 1)
 
         lodging.daily_rate = 50
-        booking = factories.BookingFactory.create(lodging=lodging, duration=8, adults=2, children=2)
+        lodging.save(update_fields=["daily_rate"])
+        booking = factories.BookingFactory.create(lodgings=lodging, duration=8, adults=2, children=2)
         self.assertEqual(400, booking.price)
-        self.assertAlmostEqual(Decimal('10.08'), booking.tourist_tax, 1)
+        self.assertAlmostEqual(Decimal("10.08"), booking.tourist_tax, 1)

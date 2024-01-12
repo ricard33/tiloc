@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from core.contracts import generate_contract, generate_empty_contract
+from core.contracts import generate_contract, generate_preview_contract
 from core.tests import factories
 from core.tests.helpers import force_login
 
@@ -16,14 +16,14 @@ class ContractTestCase(APITestCase):
         contract_template = factories.ContractTemplateFactory.create(
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
         )
-        booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
+        booking = factories.BookingFactory.create(lodgings__contract_template=contract_template)
         generate_contract(booking)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
         self.assertIn(booking.lodging.name, booking.contract.content)
 
     def test_generate_contract_without_template(self):
-        booking = factories.BookingFactory.create(lodging__contract_template=None)
+        booking = factories.BookingFactory.create(lodgings__contract_template=None)
         generate_contract(booking)
         self.assertIsNotNone(booking.contract)
         self.assertIsNotNone(booking.contract.id)
@@ -34,7 +34,7 @@ class ContractTestCase(APITestCase):
         contract_template = factories.ContractTemplateFactory.create(
             content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date }} to {{ booking.end_date }}..."
         )
-        booking = factories.BookingFactory.create(lodging__contract_template=contract_template)
+        booking = factories.BookingFactory.create(lodgings__contract_template=contract_template)
         user.lodgings.add(booking.lodging)
         header = force_login(user)
         response = self.client.post("/api/booking/%d/generate_contract/" % booking.id, **header)
@@ -56,9 +56,16 @@ class ContractTemplateTestCase(APITestCase):
 
     def test_generate_contract(self):
         contract_template = factories.ContractTemplateFactory.create(
-            content="{{ lodging.name }}: {{ booking.guest_name }} from {{ booking.begin_date|format_date('full') }} to {{ booking.end_date|format_date('full') }}..."
+            content="{{ Logement_NOM }}: {{ Voyageur_NOM_COMPLET }} from {{ Réservation_DATE_ARRIVEE }} to {{ Réservation_DATE_DEPART }}..."
         )
         lodging = factories.LodgingFactory.create(contract_template=contract_template)
-        content = generate_empty_contract(lodging)
+        booking = factories.BookingFactory.create(lodgings=lodging)
+        content = generate_contract(booking, lodgings=[lodging]).content
         self.assertIn(lodging.name, content)
-        self.assertIn("......../......../................", content)
+        self.assertIn(booking.guest_name, content)
+
+    def test_generate_preview_contract(self):
+        content = "{{ Logement_NOM }}: {{ Voyageur_NOM_COMPLET }} from {{ Réservation_DATE_ARRIVEE }} to {{ Réservation_DATE_DEPART }}..."
+        lodging = factories.LodgingFactory.create()
+        content = generate_preview_contract(content, lodging)
+        self.assertIn(lodging.name, content)

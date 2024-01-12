@@ -25,11 +25,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   table: {
     "& .MuiTableCell-sizeSmall": {
       padding: "6px 2px 6px 2px"
-    }
+    },
+    fontSize: "small",
   },
   cell: {},
   optionPriceInput: {
-    fontSize: "medium",
+    fontSize: "small",
     width: "5em"
   },
   formControl: {
@@ -125,7 +126,8 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                     }}
                     InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                     margin="dense"
-                    // variant={variant}
+                    size="small"
+                    variant={"standard"}
                   />}
               </TableCell>
               <TableCell>
@@ -136,7 +138,8 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                     label={t<string>("Flat rate")}
                     defaultValue={option.is_flat_rate}
                     color="primary"
-                    labelProps={{ labelPlacement: "start" }}
+                    size="small"
+                    labelProps={{ labelPlacement: "start", sx: {fontSize: "small", "& .MuiFormControlLabel-label": {fontSize: "small"}} }}
                   />}
               </TableCell>
               <TableCell>

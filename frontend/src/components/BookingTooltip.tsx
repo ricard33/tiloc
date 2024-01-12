@@ -152,7 +152,7 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
           </Grid2>
           <Grid2 xs={6}>
             <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-              <HomeOutlinedIcon fontSize="small" style={{ marginRight: "10px" }} />&nbsp;{booking.lodging.name}
+              <HomeOutlinedIcon fontSize="small" style={{ marginRight: "10px" }} />&nbsp;{booking.lodgings.map(l => l.name).join("+")}
             </div>
           </Grid2>
           <Grid2 xs={6}>
@@ -202,7 +202,7 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
                         startIcon={<EventAvailableIcon />} size="small" color="success"
                         onClick={() => handleCancelBooking(booking)}
                       >{t("Book again")}</Button>
-                      <IconButton title={t("")} color="error" onClick={() => handleDeleteBooking(booking)}><DeleteIcon /></IconButton>
+                      <IconButton title={t("Definitively delete booking")} color="error" onClick={() => handleDeleteBooking(booking)}><DeleteIcon /></IconButton>
                     </>
                     :
                     <Button

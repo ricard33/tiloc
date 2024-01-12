@@ -10,7 +10,7 @@ export interface SignUpData {
 export interface LoginInfo {
   expiry: string;
   token: string;
-  user: User&{account: Account};
+  user: User & { account: Account };
 }
 
 export interface Subscription {
@@ -43,7 +43,8 @@ export interface Account {
     max_lodgings: number;
     max_users: number;
     price: number;
-    interval: "monthly" | "yearly"
+    interval: "monthly" | "yearly";
+    grouped_bookings: boolean;
   };
   current_subscription: Subscription;
   created: Date;
@@ -90,7 +91,7 @@ export interface Lodging {
   address: string;
   daily_rate: number;
   balance_due_date: number;
-  deposit_label: "deposit"|"down_payment";
+  deposit_label: "deposit" | "down_payment";
   deposit_percent: number;
   guaranty: number;
   capacity: number;
@@ -131,8 +132,8 @@ export interface Comment {
 
 export interface Booking {
   id?: number;
-  lodging_id: number;
-  lodging: Lodging;
+  lodging_ids: number[];
+  lodgings: Lodging[];
   guest_name?: string;
   guest_contact?: string;
   guest_address?: string;
@@ -146,6 +147,11 @@ export interface Booking {
   adults: number;
   children: number;
   babies: number;
+  guests_distribution: Record<number, {
+    adults: number;
+    children: number;
+    babies: number;
+  }>;
   catering: string;
   daily_rate?: number;
   is_flat_rate: boolean;

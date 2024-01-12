@@ -39,12 +39,12 @@ def format_services(services: List[BookedService], booking):
     )
 
 
-def make_context(booking, url_server):
+def make_context(booking, lodgings, url_server):
     signature_img = (
-        booking.lodging.owner.signature
+        lodgings[0].owner.signature
         and (
             '<img style="max-width: 200px; max-height: 100px" '
-            'src="%s" alt="Signature"' % (url_server + booking.lodging.owner.signature.url)
+            'src="%s" alt="Signature"' % (url_server + lodgings[0].owner.signature.url)
         )
         or ""
     )
@@ -55,8 +55,8 @@ def make_context(booking, url_server):
     return {
         # Old context
         "booking": booking,
-        "lodging": booking.lodging,
-        "owner": booking.lodging.owner,
+        "lodging": lodgings[0],
+        "owner": lodgings[0].owner,
         "options": booking.id and list(booking.bookedservice_set.all()) or [],
         "included_options": booking.id and booking.bookedservice_set.filter(service__not_included_in_price=False) or [],
         "third_party_options": booking.id
@@ -68,30 +68,30 @@ def make_context(booking, url_server):
         "page_break": page_break,
         # New context
         "DATE": format_date(date.today()),
-        "Propriétaire_NOM": booking.lodging.owner.last_name,
-        "Propriétaire_PRENOM": booking.lodging.owner.first_name,
-        "Propriétaire_ADRESSE_POSTALE": ", ".join(booking.lodging.owner.address.splitlines()),
-        "Propriétaire_TELEPHONE": booking.lodging.owner.phone,
-        "Propriétaire_EMAIL": booking.lodging.owner.email,
+        "Propriétaire_NOM": lodgings[0].owner.last_name,
+        "Propriétaire_PRENOM": lodgings[0].owner.first_name,
+        "Propriétaire_ADRESSE_POSTALE": ", ".join(lodgings[0].owner.address.splitlines()),
+        "Propriétaire_TELEPHONE": lodgings[0].owner.phone,
+        "Propriétaire_EMAIL": lodgings[0].owner.email,
         "Voyageur_NOM_COMPLET": booking.guest_name,
         "Voyageur_ADRESSE_POSTALE": " - ".join(booking.guest_address.splitlines()),
         "Voyageur_CONTACT": " - ".join(booking.guest_contact.splitlines()),
         "Voyageur_TELEPHONE": len(phones) > 0 and phones[0] or "",
         "Voyageur_EMAIL": len(emails) > 0 and emails[0] or "",
-        "Logement_NOM": booking.lodging.name,
+        "Logement_NOM": " + ".join([lodging.name for lodging in lodgings]),
         # "Logement_PAGE_WEB_ANNONCE",
-        "Logement_ADRESSE_POSTALE": ", ".join(booking.lodging.address.splitlines()),
-        # "Logement_GPS": booking.lodging.,
-        # "Logement_TYPE": booking.lodging.,
+        "Logement_ADRESSE_POSTALE": ", ".join(lodgings[0].address.splitlines()),
+        # "Logement_GPS": lodgings[0].,
+        # "Logement_TYPE": lodgings[0].,
         # "Logement_NBS_CHAMBRES": booking,
         # "Logement_SURFACE": booking,
         # "Logement_CLASSEMENT": booking,
-        "Logement_CAPACITE": booking.lodging.capacity,
+        "Logement_CAPACITE": sum([lodging.capacity for lodging in lodgings]),
         # "Logement_DESCRIPTIF": booking,
-        "Logement_DEPOT_GARANTIE": format_decimal(booking.lodging.guaranty),
+        "Logement_DEPOT_GARANTIE": format_decimal(lodgings[0].guaranty),
         # "Logement_HORAIRE_ARRIVEE": booking,
         # "Logement_HORAIRE_DEPART": booking,
-        "Logement_MODALITE_PAIEMENT": booking.lodging.owner.payment or "",
+        "Logement_MODALITE_PAIEMENT": lodgings[0].owner.payment or "",
         # "Logement_METHODE_PAIEMENT": booking,
         # "Logement_DEPOT_G_MONTANT": booking,
         # "Logement_DEPOT_G_DELAI": booking,
@@ -116,54 +116,46 @@ def make_context(booking, url_server):
         "Réservation_TAXE_DE_SEJOUR_PAR_NUIT_PAR_PERSONNE": format_decimal(booking.daily_tourist_tax_per_adult),
         "Réservation_TAXE_DE_SEJOUR": format_decimal(booking.tourist_tax),
         "Réservation_ECHEANCE_DU_SOLDE": booking.begin_date
-        and format_date(arrow.get(booking.begin_date).shift(days=-booking.lodging.balance_due_date).date(), "short")
+        and format_date(arrow.get(booking.begin_date).shift(days=-lodgings[0].balance_due_date).date(), "short")
         or "___/___/______",
         # "Signature_LOCATAIRE": booking,
         "Signature_BAILLEUR": signature_img,
     }
 
 
-def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True, template_content=None):
-    if not booking.lodging:
+def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True, template_content=None, lodgings=None):
+    if not lodgings:
+        lodgings = booking.lodgings
+    if not lodgings:
         logger.warning("Lodging not set, can't generate a contract")
         return None
+    if not isinstance(lodgings, (list, tuple)):
+        lodgings = lodgings.all()
+    lodging = lodgings[0]
     if not Contract.objects.filter(booking=booking).exists():
         booking.contract = Contract(booking=booking)
-    if booking.lodging.contract_template or template_content:
+    if lodging.contract_template or template_content:
         from core.jinja2_tools import render_template
 
         content = render_template(
-            template_content or booking.lodging.contract_template.content,
-            make_context(booking, url_server),
+            template_content or lodging.contract_template.content,
+            make_context(booking, lodgings, url_server),
         ).replace(
             '"placeholder"', '"variable"'
         )  # To avoid problems with CKEditor Placeholder plugin
         page_break = '<div style="display: block; page-break-before: always;"></div>'
-        if booking.lodging.description:
-            content += page_break + booking.lodging.description
+        for lodging in lodgings:
+            if lodging.description:
+                content += page_break + lodging.description
         booking.contract.content = content
     else:
-        logger.warning("Contract template not set for lodging '%s', can't generate a contract", booking.lodging)
+        logger.warning("Contract template not set for lodging '%s', can't generate a contract", lodging)
         booking.contract.content = _(
             "Contract template not set for lodging '%(lodging)s', can't generate a contract"
-        ) % {"lodging": booking.lodging.name}
+        ) % {"lodging": lodging.name}
     if save:
         booking.contract.save()
     return booking.contract
-
-
-def generate_empty_contract(lodging, url_server="http://127.0.0.1:8000"):
-    booking = Booking(
-        lodging=lodging,
-        guest_name="........................................",
-        guest_contact="email: .................................@.................... - tel: ...................................",
-        guest_address="........................................\n........................................\n........................................",
-        guaranty=lodging.guaranty,
-        duration=0,
-        adults=0,
-        price=0,
-    )
-    return generate_contract(booking, url_server=url_server, save=False).content
 
 
 def generate_preview_contract(template_content, lodging, url_server="http://127.0.0.1:8000"):
@@ -172,7 +164,6 @@ def generate_preview_contract(template_content, lodging, url_server="http://127.
     duration = random.randint(7, 21)
     end_date = arrow.get(begin_date).shift(days=duration).date()
     booking = Booking(
-        lodging=lodging,
         begin_date=begin_date,
         end_date=end_date,
         duration=duration,
@@ -186,4 +177,5 @@ def generate_preview_contract(template_content, lodging, url_server="http://127.
         deposit=Decimal(round(float(lodging.daily_rate) * duration * 0.3, -1)),
         guaranty=lodging.guaranty,
     )
-    return generate_contract(booking, url_server=url_server, save=False, template_content=template_content).content
+    booking.lodging = lodging
+    return generate_contract(booking, lodgings=[lodging], url_server=url_server, save=False, template_content=template_content).content

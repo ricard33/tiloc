@@ -53,7 +53,7 @@ const InOutEvent: React.FC<Props> = props => {
                 fontSize: "smaller"
               }}
             >
-              <HomeOutlinedIcon fontSize="small" />&nbsp;{event.lodging.name}
+              <HomeOutlinedIcon fontSize="small" />&nbsp;{event.lodgings.map(l => l.name).join("+")}
               <Sep /><NightsStayOutlinedIcon fontSize="small" />&nbsp;{event.duration}
               <Sep /><Groups2OutlinedIcon fontSize="small" />&nbsp;{event.guests}
               <Sep /><PersonOutlineIcon fontSize="small" />&nbsp;{event.guest_name}

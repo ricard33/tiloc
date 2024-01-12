@@ -37,7 +37,7 @@ from notifier.models import SentNotification
 from notifier.shortcuts import send_notification
 
 from . import models
-from .contracts import generate_contract, generate_empty_contract, generate_preview_contract
+from .contracts import generate_contract, generate_preview_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
 from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
@@ -321,7 +321,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = (
         models.Booking.objects.filter(deleted=False)
         .order_by("-begin_date")
-        .prefetch_related("lodging", "source", "options")
+        .prefetch_related("lodgings", "source", "options")
     )
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
@@ -461,38 +461,6 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
         if self.get_queryset().count() >= limit:
             raise OverLimitError(detail="The maximum number of lodgings has been reached.")
         return super().create(request, *args, **kwargs)
-
-    @action(detail=True, methods=["get"])
-    @transaction.atomic
-    def empty_contract_pdf(self, request, pk=None):
-        lodging = self.get_object()
-        full_path = os.path.join(settings.MEDIA_ROOT, "lodging_%d" % lodging.id, "empty_contract.pdf")
-        os.makedirs(os.path.split(full_path)[0], exist_ok=True)
-
-        sid = transaction.savepoint()
-        if request.GET.get("template_id"):
-            lodging.contract_template_id = request.GET.get("template_id")
-        try:
-            generate_pdf(
-                generate_empty_contract(lodging, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
-                full_path,
-                request.user.account.is_free_plan,
-            )
-        except jinja2.exceptions.TemplateError as ex:
-            logger.exception("Template generation error")
-            raise APIException(detail="Template error: " + ex.message)
-        except Exception as ex:
-            logger.exception("Unknown error during template generation")
-            raise APIException(detail=str(ex))
-
-        transaction.savepoint_rollback(sid)
-
-        if os.path.exists(full_path):
-            with open(full_path, "rb") as fh:
-                response = HttpResponse(fh.read(), content_type="application/pdf")
-                response["Content-Disposition"] = "inline; filename=" + os.path.basename(full_path)
-                return response
-        raise Http404
 
 
 class HolidaysViewSet(viewsets.ModelViewSet):

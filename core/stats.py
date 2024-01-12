@@ -19,7 +19,7 @@ def aggregate_month_for_range(
     dates_range = [begin.date(), end.date()]
     bookings = models.Booking.objects.filter(
         Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
-        lodging_id__in=lodging_ids,
+        lodgings__id__in=lodging_ids,
         cancelled=False,
         deleted=False,
     ).exclude(status__in=status_no_stats)
@@ -60,7 +60,7 @@ def get_filling_rate_and_turnover(
         if not value:
             value = {"date": month, "days": 0, "capacity": days_in_month * lodging_count, "lodgings": lodging_ids}
         fill_rate_and_turnover(value, booking, booked_days, days_in_month * lodging_count, with_turnover)
-        lodging_value = value.setdefault(str(booking.lodging_id), {"days": 0})
+        lodging_value = value.setdefault(str(booking.lodging.id), {"days": 0})
         fill_rate_and_turnover(lodging_value, booking, booked_days, days_in_month, with_turnover)
 
         return value

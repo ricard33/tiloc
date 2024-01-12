@@ -92,7 +92,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
   const payments = data ? (data.results as never as Payment[]).map((p: Payment) => {
     return {
       ...p,
-      lodging: p.booking.lodging,
+      lodgings: p.booking.lodgings,
       guest_name: p.booking.guest_name
     };
   }) : [];
@@ -189,8 +189,8 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
         // valueFormatter: (params: GridValueFormatterParams<Date>) => formatDate(params.value, "PPP")
       },
       {
-        field: "lodging", headerName: t("Lodging"), width: 110, type: "singleSelect",
-        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>>) => params.value ? params.value.name ?? "" : "",
+        field: "lodgings", headerName: t("Lodging"), width: 110, type: "singleSelect",
+        valueFormatter: (params: GridValueFormatterParams<Partial<Lodging>[]>) => params.value ? params.value.map(l => l.name).join("+") ?? "" : "",
         valueOptions: lodgings && [...lodgings.map((l) => {
           return { value: l.id, label: l.name };
         })]
