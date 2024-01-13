@@ -3,6 +3,7 @@ import os
 import re
 import uuid
 from decimal import Decimal
+from functools import reduce
 from random import choice
 
 import arrow
@@ -521,10 +522,10 @@ class Booking(models.Model):
     duration = models.PositiveSmallIntegerField(
         _("duration"),
     )
-    adults = models.PositiveSmallIntegerField(_("adults"), default=1)
-    children = models.PositiveSmallIntegerField(_("children"), default=0)
-    babies = models.PositiveSmallIntegerField(_("babies"), default=0)
-    guests_distribution = models.JSONField(_("guests distribution"), null=True, blank=True)
+    # adults = models.PositiveSmallIntegerField(_("adults"), default=1)
+    # children = models.PositiveSmallIntegerField(_("children"), default=0)
+    # babies = models.PositiveSmallIntegerField(_("babies"), default=0)
+    guests_distribution = models.JSONField(_("guests distribution"), blank=True, null=True)
     catering = models.CharField(_("catering"), choices=Catering.choices, default=Catering.NONE, max_length=20)
     daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
     price = models.DecimalField(
@@ -638,6 +639,24 @@ class Booking(models.Model):
     @property
     def guests(self):
         return self.adults + self.children + self.babies
+
+    def _get_total_occupants(self, name):
+        if self.guests_distribution:
+            return reduce(lambda a, v: a + v.get(name, 0), self.guests_distribution.values(), 0)
+        else:
+            return 0
+
+    @property
+    def adults(self):
+        return self._get_total_occupants("adults")
+
+    @property
+    def children(self):
+        return self._get_total_occupants("children")
+
+    @property
+    def babies(self):
+        return self._get_total_occupants("babies")
 
     def computed_tourist_tax(self):
         if not self.lodging:

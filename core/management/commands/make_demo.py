@@ -159,9 +159,13 @@ class Command(BaseCommand):
                             guest_name=fake.name(),
                             guest_contact="%s\n%s" % (fake.phone_number(), fake.email()),
                             guest_address=fake.address(),
-                            adults=random.randrange(2, lodging.capacity + 1),
-                            children=random.choices([0, 1, 2], weights=(10, 1, 1))[0],
-                            babies=random.choices([0, 1], weights=(10, 1))[0],
+                            guests_distribution={
+                                lodging.id: {
+                                    "adults": random.randrange(2, lodging.capacity + 1),
+                                    "children": random.choices([0, 1, 2], weights=(10, 1, 1))[0],
+                                    "babies": random.choices([0, 1], weights=(10, 1))[0],
+                                }
+                            },
                             daily_rate=lodging.daily_rate,
                             price=lodging.daily_rate * duration,
                             deposit=round(float(lodging.daily_rate) * duration * 0.3, -1),

@@ -207,6 +207,33 @@ class BookingFactory(factory.django.DjangoModelFactory):
         if update_fields:
             self.save(update_fields=update_fields)
 
+    @factory.post_generation
+    def adults(self, create, extracted, **kwargs):
+        if not self.guests_distribution:
+            self.guests_distribution = {}
+        if extracted:
+            self.guests_distribution.setdefault(self.lodgings.first().id, {})["adults"] = extracted
+        else:
+            self.guests_distribution.setdefault(self.lodgings.first().id, {})["adults"] = 1
+
+    @factory.post_generation
+    def children(self, create, extracted, **kwargs):
+        if not self.guests_distribution:
+            self.guests_distribution = {}
+        if extracted:
+            self.guests_distribution.setdefault(self.lodgings.first().id, {})["children"] = extracted
+        else:
+            self.guests_distribution.setdefault(self.lodgings.first().id, {})["children"] = 0
+
+    @factory.post_generation
+    def babies(self, create, extracted, **kwargs):
+        if not self.guests_distribution:
+            self.guests_distribution = {}
+        if extracted:
+            self.guests_distribution.setdefault(self.lodgings.first().id, {})["babies"] = extracted
+        else:
+            self.guests_distribution.setdefault(self.lodgings.first().id, {})["babies"] = 0
+
 
 class ContractTemplateFactory(factory.django.DjangoModelFactory):
     class Meta:

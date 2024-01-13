@@ -363,9 +363,16 @@ class BookingModelTestCase(TestCase):
             max_daily_tourist_tax=1.8,
             tourist_tax_rate=5,
         )
+        booking = factories.BookingFactory.create()
+        booking = factories.BookingFactory.create()
         booking = factories.BookingFactory.create(
             lodgings=lodging, duration=4, adults=2, children=2, price=Decimal(410)
         )
+        booking = factories.BookingFactory.create(
+            lodgings=lodging, duration=4, adults=2, children=2, price=Decimal(410)
+        )
+        self.assertEqual(2, booking.adults, booking.guests_distribution)
+        self.assertEqual(2, booking.children)
         self.assertEqual(410, booking.price)
         self.assertAlmostEqual(Decimal("10.24"), booking.tourist_tax, 1)
 
