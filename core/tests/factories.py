@@ -170,6 +170,7 @@ class BookingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Booking
 
+    account = factory.SubFactory(AccountFactory)
     guest_name = factory.Faker("name")
     guest_contact = factory.Faker("email")
     guest_address = factory.Faker("address")

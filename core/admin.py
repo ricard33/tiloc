@@ -407,6 +407,7 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "source_uid_",
         "cancelled",
         "deleted",
+        "account",
     )
     list_filter = (
         "lodgings",
@@ -500,6 +501,7 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "tourist_tax_rate",
         "max_daily_tourist_tax",
         "contract_template",
+        "account",
     )
     list_editable = (
         "name",

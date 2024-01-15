@@ -382,7 +382,7 @@ class BookingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Booking
-        fields = "__all__"
+        exclude = ["account"]
 
     def validate_lodging_ids(self, value):
         if len(value) == 0:
@@ -390,6 +390,8 @@ class BookingSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data: dict):
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
         options = validated_data.pop("bookedservice_set", [])
         instance = super().create(validated_data)
         for option in options:

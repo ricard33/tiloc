@@ -38,7 +38,7 @@ class ExportCalendarTestCase(TestCase):
         # subscription.plan = plan
         # subscription.save()
         self.lodging.account.subscription_set.all().delete()
-        factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")
+        factories.BookingFactory(account=self.lodging.account, lodgings=self.lodging, guest_name="Cédric")
         self.assertTrue(self.lodging.account.is_free_plan)
         r = self.client.get("/calendar/%s/" % self.lodging.uid)
         self.assertEqual(r.status_code, 403)
@@ -187,6 +187,7 @@ class FillingRateTestCase(APITestCase):
         account = factories.AccountFactory(name="another")
         lodging = factories.LodgingFactory(account=account)
         factories.BookingFactory(
+            account=account,
             lodgings=lodging,
             begin_date=arrow.get("2020-08-02").date(),
             end_date=arrow.get("2020-08-18").date(),

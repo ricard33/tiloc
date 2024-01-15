@@ -138,7 +138,7 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         for i in range(5):
             lodgings.append(factories.LodgingFactory.create(account=account))
         for i in range(50):
-            b = factories.BookingFactory.create(lodgings=random.choice(lodgings))
+            b = factories.BookingFactory.create(account=account, lodgings=random.choice(lodgings))
             bookings.append(b)
             factories.ContractFactory.create(booking=b)
         for i in range(25):
@@ -150,7 +150,7 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         factories.ServiceFactory.create(account=account)
         channel = factories.BookingChannelFactory.create(account=account)
         lodging = factories.LodgingFactory.create(account=account)
-        booking = factories.BookingFactory.create(lodgings=lodging)
+        booking = factories.BookingFactory.create(account=account, lodgings=lodging)
         factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
         factories.ContractTemplateFactory.create(account=account)
         pricing = factories.PricingFactory.create(account=account)
@@ -184,7 +184,7 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         channel = models.BookingChannel.objects.filter(account=account).first()
         lodging = factories.LodgingFactory.create(account=account)
         user.lodgings.add(lodging)
-        booking = factories.BookingFactory.create(lodgings=lodging)
+        booking = factories.BookingFactory.create(account=account, lodgings=lodging)
         factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
         factories.PaymentFactory.create(booking=booking)
         factories.ContractFactory.create(booking=booking)

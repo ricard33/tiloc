@@ -66,6 +66,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
 
         logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.summary)
         booking = models.Booking.objects.create(
+            account=lodging.account,
             source=channel,
             source_uid=event.uid,
             guest_name=event.summary,

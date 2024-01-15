@@ -150,7 +150,7 @@ class Command(BaseCommand):
                         else:
                             source = channel_website
                         booking = Booking.objects.create(
-                            lodging=lodging,
+                            account=demo_account,
                             status=status.value,
                             source=source,
                             begin_date=begin_date,
@@ -174,6 +174,7 @@ class Command(BaseCommand):
                             ),
                             guaranty=300,
                         )
+                        booking.lodgings.add(lodging)
                         if status in [BookingStatus.DepositPaid, BookingStatus.Paid]:
                             Payment.objects.create(
                                 booking=booking,

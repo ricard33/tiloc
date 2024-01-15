@@ -502,6 +502,7 @@ class Booking(models.Model):
         FULL = "full", _("Full board")
 
     uid = models.UUIDField(default=uuid.uuid4, unique=True)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
     lodgings = models.ManyToManyField(Lodging)
     guest_name = models.CharField(_("guest name"), max_length=256)
     guest_contact = models.TextField(_("guest contact"), blank=True, null=True)
@@ -569,7 +570,7 @@ class Booking(models.Model):
         ]
 
     objects = ForUserQuerySet.as_manager()
-    _account_qs_path = "lodgings__account"
+    _account_qs_path = "account"
     _lodging_qs_path = "lodgings"
 
     def __str__(self):

@@ -99,7 +99,14 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
 
 
 @receiver(m2m_changed, sender=models.Booking.lodgings.through)
-def booking_lodging_changed(sender, instance, action, reverse, model, **kwargs):
+def booking_lodging_changed(sender, instance, action, reverse, model, pk_set, **kwargs):
+    if action == "pre_add":
+        if sender is models.Booking.lodgings.through and reverse == False and model is models.Lodging:
+            for lodging in models.Lodging.objects.filter(id__in=pk_set):
+                # lodging = models.Lodging.objects.get(id=pk)
+                if instance.account.id != lodging.account.id:
+                    from django.db import IntegrityError
+                    raise IntegrityError("Cannot add lodging from another account")
     if action == "post_add":
         on_booking_saved(sender, instance, created=True, update_fields=[])
 
