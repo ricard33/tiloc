@@ -150,7 +150,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
           }
 
           {onEdit &&
-            <Tooltip title={t("Modify contract")}>
+            <Tooltip title={t("Modify booking")}>
               <IconButton aria-label="edit" onClick={() => onEdit()} color={primaryColor}>
                 <EditIcon />
               </IconButton>

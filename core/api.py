@@ -321,7 +321,10 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = (
         models.Booking.objects.filter(deleted=False)
         .order_by("-begin_date")
-        .prefetch_related("lodgings", "source", "options")
+        .prefetch_related("lodgings__owner",
+                          "source", "payment_set", "comments",
+                          "bookedservice_set__service"
+                          )
     )
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination

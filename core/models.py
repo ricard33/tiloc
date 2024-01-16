@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse as drf_reverse
@@ -601,8 +601,9 @@ class Booking(models.Model):
         total = self.price
         if self.id:
             # this is a real db instance, we can follow relations
-            for option in self.bookedservice_set.filter(service__not_included_in_price=False):
-                if option.unit_price:
+            # Manual computation to avoid new request
+            for option in self.bookedservice_set.all():
+                if option.unit_price and not option.service.not_included_in_price:
                     total += option.unit_price * (option.is_flat_rate and 1 or self.duration)
         return total
 
@@ -613,7 +614,11 @@ class Booking(models.Model):
     @property
     def total_payments(self):
         """Returns the sum of the payments already made."""
-        return self.payment_set.aggregate(total_payments=Sum("amount"))["total_payments"] or Decimal(0)
+        # Manual computation to avoid new request
+        sum = 0
+        for payment in self.payment_set.all():
+            sum += payment.amount
+        return sum
 
     @property
     def left_to_pay(self):
