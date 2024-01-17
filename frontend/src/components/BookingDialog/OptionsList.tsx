@@ -180,7 +180,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                 {allOptions && allOptions.map((option: Service) => (
                   <option
                     key={option.id} value={option.id}
-                    disabled={options.filter((o: Service) => Number(o.id) === option.id).length > 0}
+                    // disabled={options.filter((o: Service) => Number(o.id) === option.id).length > 0}
                   >
                     {getDesignation(option)}
                   </option>
