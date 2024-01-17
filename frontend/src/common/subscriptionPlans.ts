@@ -11,6 +11,7 @@ export function getSubscriptionPlans(t: TFunction<"translation">) {
   const basicFeatures = [
     ...commonFeatures,
     { label: t("Synchronizing calendars"), available: false },
+    { label: t("Block bookings"), available: false },
     { label: t("Lodging"), count: 1 },
     { label: t("User"), count: 1 },
     { label: t("Premium support"), available: false }
@@ -19,6 +20,7 @@ export function getSubscriptionPlans(t: TFunction<"translation">) {
   const ownerFeatures = [
     ...commonFeatures,
     { label: t("Synchronizing calendars"), available: true },
+    { label: t("Block bookings"), available: false },
     { label: t("Lodgings"), count: 3 },
     { label: t("Users"), count: 1 },
     { label: t("Premium support"), available: true }
@@ -27,6 +29,7 @@ export function getSubscriptionPlans(t: TFunction<"translation">) {
   const proFeatures = [
     ...commonFeatures,
     { label: t("Synchronizing calendars"), available: true },
+    { label: t("Block bookings"), available: true },
     { label: t("Lodgings"), count: 10 },
     { label: t("Users"), count: 10 },
     { label: t("Premium support"), available: true }
