@@ -130,7 +130,7 @@ const BookingActions: React.FunctionComponent<BookingActionsProps> = ({
         </>
         :
         <>
-          {canDelete && !isDirty &&
+          {canDelete && !isDirty && booking.id &&
             (
               booking.cancelled ?
                 <Tooltip title={t("Book again")}>

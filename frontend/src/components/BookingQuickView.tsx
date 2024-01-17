@@ -78,6 +78,17 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
   };
 
   const showComments = booking.comments.length > 0 || !readonly;
+
+  function getGuestsDistribution(distribution: {
+    adults: number;
+    children: number;
+    babies: number;
+  }) {
+    return t("{{count}} adults", { count: distribution.adults }) +
+      (distribution.children ? t(" and {{count}} children", { count: distribution.children }) : "") +
+      (distribution.babies ? t(" and {{count}} babies", { count: distribution.babies }) : "");
+  }
+
   return (
     <Grid container spacing={1} className="booking-quick-view">
       <Grid container spacing={1} xs={12} md={showComments ? 8 : 12}>
@@ -85,11 +96,16 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
           {displayField(true, t("Check-in:"), formatDate(booking.begin_date, "PPPP"))}
           {displayField(true, t("Check-out:"), formatDate(booking.end_date, "PPPP"))}
           {displayField(true, t("Length of stay:"), t("{{count}} nights", { count: booking.duration }))}
-          {displayField(true, t("Total guests:"),
-            t("{{count}} adults", { count: booking.adults }) +
-            (booking.children ? t(" and {{count}} children", { count: booking.children }) : "") +
-            (booking.babies ? t(" and {{count}} babies", { count: booking.babies }) : "")
-          )}
+          {
+            booking.lodgings.length > 1 ?
+
+              booking.lodgings.map(l => displayField(true, l.name,
+                getGuestsDistribution(booking.guests_distribution[l.id])
+              ))
+              :
+              displayField(true, t("Total guests:"),
+                getGuestsDistribution(booking.guests_distribution[booking.lodgings[0].id])
+              )}
           {displayField(true, t("Status:"), booking.status !== BookingStatus.External.name
             ? getBookingStatus(booking.status).getLabel(t)
             : booking.source?.name

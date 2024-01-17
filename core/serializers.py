@@ -379,6 +379,9 @@ class BookingSerializer(serializers.ModelSerializer):
     tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     computed_tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     guests = serializers.IntegerField(read_only=True)
+    adults = serializers.IntegerField(read_only=True)
+    children = serializers.IntegerField(read_only=True)
+    babies = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = models.Booking

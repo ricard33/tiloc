@@ -162,7 +162,6 @@ export function booking2api(booking: Partial<Booking>): Record<string, any> {
     custom_tourist_tax: typeof booking.custom_tourist_tax === "undefined" ?
       null : booking.custom_tourist_tax.toFixed(2)
   };
-  console.log("booking2api:  ", newVar);
   return newVar;
 
 }

@@ -110,6 +110,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   let lodging: Lodging = booking.lodgings[0];  // first lodging for defaults values like taxes
 
+  const defaultDistribution = { adults: 2, children: 0, babies: 0 };
   const initialState = initializeDefaults(booking);
 
   const formContext = useForm<Booking>({
@@ -176,15 +177,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         initialState.daily_rate, 0, 0, [], lodging.deposit_percent).price);
     initialState.guaranty = booking.guaranty || lodging.guaranty;
     initialState.commission_fees = booking.commission_fees || 0;
-    initialState.adults = booking.adults || 2;
-    initialState.children = booking.children || 0;
-    initialState.babies = booking.babies || 0;
+    // initialState.adults = booking.adults || 2;
+    // initialState.children = booking.children || 0;
+    // initialState.babies = booking.babies || 0;
     initialState.guests_distribution = booking.guests_distribution ?? {
-      [lodging.id]: {
-        adults: booking.adults,
-        children: booking.children,
-        babies: booking.babies
-      }
+      [lodging.id]: defaultDistribution
     };
     initialState.source_id = booking.source_id || ("" as any);
     initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging.default_services.includes(o.reference)) : []);
@@ -222,13 +219,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   /**
    * Handle values AFTER validation. This fonction can't change the type or the value, except using setValue().
-   * NOTE: this is true when using rhf-mui fields only.
-   * TODO: upgrade all input to rhf-mui.
    * @param fieldName
    * @param value
    */
   function handleChange(fieldName: string, value: string | number | boolean) {
-    // here, value is always a string or a boolean. Why ?
     // console.log("VALUE", fieldName, value, typeof value, parseFloat(value as string), Number(value));
     switch (fieldName) {
       case "status_id": {
@@ -288,8 +282,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     }
   }
 
-  const defaultDistribution = { adults: 0, children: 0, babies: 0 };
-
   function handleLodgingsChange(value: number[] | number | string) {
     const ids = typeof value === "string"
       ? value.split(",").map(Number)
@@ -299,12 +291,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       return ids;
     }
     if (typeof value === "number") { // SelectElement case
-      setValue("lodging_ids", ids);
+      setValue("lodging_ids", ids, {shouldDirty: true});
     }
     const formValues = getValues();
     lodging = lodgings.filter(x => ids.includes(x.id))[0];
     const daily_rate = lodgings.filter(x => ids.includes(x.id)).reduce((pValue, lodging) => pValue + lodging.daily_rate, 0);
-    console.log(daily_rate);
     if (!isFlatRate && formValues.daily_rate !== daily_rate) {
       const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, daily_rate, 0, 0, [], lodging.deposit_percent);
       setMultipleValues(priceObj);
@@ -317,8 +308,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         [id]: (guestsDistribution && guestsDistribution[id]) ?? defaultDistribution
       };
     }, {});
-    setValue("guests_distribution", newDistribution);
-    // TODO should be removed
+    setValue("guests_distribution", newDistribution, {shouldDirty: true});
     ["adults", "children", "babies"].forEach((fieldName) =>
       // @ts-ignore
       setValue(fieldName as any, lodging_ids.reduce((acc, id) => acc + ((newDistribution[id] && newDistribution[id][fieldName]) ?? 0), 0))
@@ -326,8 +316,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   }
 
-  console.log(getValues("adults"), getValues("children"), getValues("babies"));
-  console.log(guestsDistribution);
   function handleDistributionChange(lodging: Lodging, fieldName: "adults" | "children" | "babies", value: number) {
     let newDistribution = structuredClone(guestsDistribution);
     if (!newDistribution)
@@ -336,8 +324,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       guestsDistribution[lodging.id] = defaultDistribution;
     }
     guestsDistribution[lodging.id][fieldName] = value;
-    setValue("guests_distribution", guestsDistribution);
-    // TODO should be removed
+    setValue("guests_distribution", guestsDistribution, {shouldDirty: true});
     setValue(fieldName, lodging_ids.reduce((acc, id) => acc + ((guestsDistribution[id] && guestsDistribution[id][fieldName]) ?? 0), 0));
   }
 
@@ -375,12 +362,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function handleSave(closeDialog: boolean) {
-    console.log("handleSave");
     return new Promise<Booking>((resolve) => {
-      console.log("promise : run async funtion");
       formContext.handleSubmit(
         async (data: Booking) => await saveBooking(data).then((booking) => {
-          console.log("Booking saved");
           resolve(booking);
           closeDialog && onClose();
         }))();
@@ -434,10 +418,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const fullScreen = width < 800;
 
   function onCustomizeTouristTaxHandler() {
-    console.log("onCustomizeTouristTaxHandler");
     setCustomizeTouristTax(!customizeTouristTax);
     if (customizeTouristTax) {
-      console.log("set custom_tourist_tax to undefined");
       setValue("custom_tourist_tax", undefined, { shouldDirty: true });
       setValue("tourist_tax", getValues()["computed_tourist_tax"]);
     }
@@ -534,8 +516,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         label={t("Booking status")}
                         className="booking-status-select"
                         {...field}
-                        // TODO fix type
-                        onChange={event => field.onChange(event as never)}
                       >
                         {bookingStatuses.map(status => (
                           <MenuItem key={status.name} value={status.name}>
@@ -565,7 +545,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       options={lodgings.map(lodging => (
                         { id: lodging.id, label: lodging.name }
                       ))}
-                      // onChange={(e) => handleChange("lodging_ids", e.target.value as number[])}
                       onChange={(event) => handleLodgingsChange(event.target.value)}
                     />
                     :
@@ -902,75 +881,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         </TableContainer>
 
                       </Grid>
-                      {/*{*/}
-                      {/*  lodging_ids.length <= 1 ?*/}
-                      {/*    <Grid item sm={6} xs={12} className="flex-box-align-left">*/}
-                      {/*      <SelectElement*/}
-                      {/*        control={control}*/}
-                      {/*        name="adults"*/}
-                      {/*        label={t("Adults")}*/}
-                      {/*        variant={variant}*/}
-                      {/*        margin={margin}*/}
-                      {/*        type="number"*/}
-                      {/*        sx={{ width: "5em" }}*/}
-                      {/*        options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}*/}
-                      {/*        onChange={(value) => handleChange("adults", value)}*/}
-                      {/*      />*/}
-                      {/*      <div className="spacer" />*/}
-                      {/*      <SelectElement*/}
-                      {/*        control={control}*/}
-                      {/*        name="children"*/}
-                      {/*        label={t("Children")}*/}
-                      {/*        variant={variant}*/}
-                      {/*        margin={margin}*/}
-                      {/*        type="number"*/}
-                      {/*        sx={{ width: "5em" }}*/}
-                      {/*        options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}*/}
-                      {/*        onChange={(value) => handleChange("children", value)}*/}
-                      {/*      />*/}
-                      {/*      <div className="spacer" />*/}
-                      {/*      <SelectElement*/}
-                      {/*        control={control}*/}
-                      {/*        name="babies"*/}
-                      {/*        label={t("Babies")}*/}
-                      {/*        variant={variant}*/}
-                      {/*        margin={margin}*/}
-                      {/*        type="number"*/}
-                      {/*        sx={{ width: "5em" }}*/}
-                      {/*        options={[...Array(10).keys()].map(n => ({ id: n, label: n }))}*/}
-                      {/*        onChange={(value) => handleChange("babies", value)}*/}
-                      {/*      />*/}
-                      {/*    </Grid>*/}
-                      {/*    :*/}
-                      {/*    selectedLodgings.map(l =>*/}
-                      {/*      <Grid item xs={12} key={l.id} className="flex-box-align-left">*/}
-                      {/*        <span style={{ flex: "1" }}>{l.name}</span>*/}
-                      {/*        {[["adults", t("Adults")], ["children", t("Children")], ["babies", t("Babies")]].map(([name, label]) =>*/}
-                      {/*          <React.Fragment key={name}>*/}
-                      {/*            <div className="spacer" />*/}
-                      {/*            <FormControl fullWidth>*/}
-                      {/*              <InputLabel id={`${l.id}-${label}`}>{label}</InputLabel>*/}
-                      {/*              <Select*/}
-                      {/*                // name={name}*/}
-                      {/*                label={label}*/}
-                      {/*                variant={variant}*/}
-                      {/*                size="small"*/}
-                      {/*                margin={margin}*/}
-                      {/*                type="number"*/}
-                      {/*                sx={{ width: "5em" }}*/}
-                      {/*                value={(guestsDistribution && guestsDistribution[l.id] && guestsDistribution[l.id][name as "adults" | "children" | "babies"]) ?? 0}*/}
-                      {/*                onChange={(event) => handleDistributionChange(l, name as any, event.target.value as number)}*/}
-                      {/*              >*/}
-                      {/*                {[...Array(10).keys()].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}*/}
-                      {/*              </Select>*/}
-                      {/*            </FormControl>*/}
-                      {/*          </React.Fragment>)}*/}
-                      {/*      </Grid>*/}
-                      {/*    )*/}
-                      {/*}*/}
-                      {/*<Grid item sm={6} xs={12} className="flex-box-align-left">*/}
-                      {/*  <Button>{t("Distribution")}</Button>*/}
-                      {/*</Grid>*/}
                     </Grid>
                   </AccordionDetails>
                 </Accordion>
@@ -1089,13 +999,13 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       {!fullScreen &&
         <DialogActions>
           <Stack direction="row" justifyContent={"flex-end"}>
-            <Button type="button" onClick={onCloseHandler}>{t("Close")}</Button>
+            <Button type="button" onClick={onCloseHandler} color="secondary">{t("Close")}</Button>
             <BookingActions
               booking={booking} isDirty={isDirty} onReset={reset}
               onSave={handleSave}
               onCancelBooking={onCancelBooking} onUncancelBooking={onUncancelBooking}
               onDelete={() => onClose()}
-              onOpenContract={onOpenContract}
+              onOpenContract={booking.id ? onOpenContract : undefined}
             />
             {width < 1360 && <div style={{ width: "50px" }} />}
           </Stack>
