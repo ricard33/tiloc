@@ -46,6 +46,7 @@ export type TimelineItem = {
   bgColor: string,
   selectedBgColor?: string,
   icon?: ReactElement,
+  linked?: boolean,
 };
 
 export type ItemContext = {
@@ -168,6 +169,7 @@ export function makeItems(bookings: Booking[]): TimelineItem[] {
     id: booking.id! + "_" + groupId,
     group: groupId,
     title: booking.guest_name!,
+    linked: booking.lodgings.length > 1,
     status: booking.status,
     start_time: add(booking.begin_date, { hours: 12 }).valueOf(),
     end_time: add(booking.end_date, { hours: 6 }).valueOf(),
@@ -258,7 +260,7 @@ export function makeRenderItem(
                 style={{ maxHeight: `${itemContext.dimensions.height}` }}
               >
                 {item.icon ? item.icon : ""}
-                <div className="item-title">{itemContext.title}</div>
+                <div className="item-title">{item.linked && <span>{'\uD83D'}{'\uDD17'} </span>}{itemContext.title}</div>
                 {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 ?
                   <EuroIcon
                     className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
