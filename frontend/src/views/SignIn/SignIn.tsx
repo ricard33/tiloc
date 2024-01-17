@@ -49,7 +49,7 @@ function SignIn() {
   useEffect(() => {
     if (isAuthenticated) {
       console.debug("Redirect to", from);
-      navigate(from, { replace: true });
+      navigate(from, { replace: false });
     }
   }, [from, navigate, isAuthenticated]);
 

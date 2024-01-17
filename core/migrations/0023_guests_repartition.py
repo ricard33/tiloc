@@ -18,6 +18,7 @@ def fill_guests_repartition_field(apps, schema_editor):
                 "babies": booking.babies,
             }
         }
+        booking.save(update_fields=["guests_distribution"])
 
 
 class Migration(migrations.Migration):

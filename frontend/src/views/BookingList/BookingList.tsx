@@ -108,10 +108,7 @@ const BookingList = () => {
   };
 
   const handleCloseEdit = () => {
-    if (window.history.state.idx > 0)
-      navigate(-1);
-    else
-      navigate("/bookings");
+    navigate(-1);
   };
 
   const onEditContract = (booking: Booking) => {
