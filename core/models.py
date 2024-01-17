@@ -551,7 +551,14 @@ class Booking(models.Model):
     )
 
     arrival_details = models.CharField(
-        _("arrival details"), max_length=100, blank=True, null=True, help_text=_("Arrival time, flight number, etc...")
+        _("arrival details"), max_length=100, blank=True, null=True, help_text=_("Check-in time, flight number, etc...")
+    )
+    departure_details = models.CharField(
+        _("departure details"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text=_("Check-out time, flight number, etc..."),
     )
     notes = models.TextField(_("Notes"), blank=True, null=True)
     options = models.ManyToManyField(Service, through="BookedService")

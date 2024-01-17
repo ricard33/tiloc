@@ -186,6 +186,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     initialState.source_id = booking.source_id || ("" as any);
     initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging.default_services.includes(o.reference)) : []);
     initialState.arrival_details = booking.arrival_details ?? "";
+    initialState.departure_details = booking.departure_details ?? "";
     initialState.notes = booking.notes ?? "";
 
     // console.debug("initialState", initialState);
@@ -936,11 +937,21 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           />}
                       </Grid>
                       {/* arrival_details */}
-                      <Grid item xs={12}>
+                      <Grid item sm={6} xs={12}>
                         <TextFieldElement
                           control={control}
                           name={"arrival_details"}
-                          label={t("Arrival details")}
+                          label={t("Check-in info")}
+                          margin={margin}
+                          variant={variant}
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item sm={6} xs={12}>
+                        <TextFieldElement
+                          control={control}
+                          name={"departure_details"}
+                          label={t("Check-out info")}
                           margin={margin}
                           variant={variant}
                           fullWidth

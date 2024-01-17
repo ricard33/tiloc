@@ -153,5 +153,8 @@
   "Payment information": "Informations de paiement",
   "--- select a lodging ---": "--- choisir un hébergement ---",
   "Show payment status on bookings": "Afficher l'indicateur de paiement sur les réservations",
-  "Not included in price": "Non-inclus dans le prix"
+  "Not included in price": "Non-inclus dans le prix",
+  "Modify contract": "Modifier le contrat",
+  "Arrival details": "Informations sur l'arrivée'",
+  "Arrival:": "Arrivée :"
 }

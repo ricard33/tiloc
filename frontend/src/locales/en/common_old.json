@@ -177,5 +177,8 @@
   "Not included in price": "Not included in price",
   "Service provided by external partner. The service price shouldn't be included in booking price because it have to be paid directly to the provider.": "",
   "Envoi du lien de réinitialisation du mot de passe": "",
-  "Veuillez vérifier votre courrier électronique {{email}} pour réinitialiser votre mot de passe": ""
+  "Veuillez vérifier votre courrier électronique {{email}} pour réinitialiser votre mot de passe": "",
+  "Modify contract": "",
+  "Arrival details": "Arrival details",
+  "Arrival:": "Arrival:"
 }

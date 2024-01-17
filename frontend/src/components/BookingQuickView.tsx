@@ -123,7 +123,8 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               // <div key={index} dangerouslySetInnerHTML={{ __html: detectPhoneAndMail(s) }} />)}</div>
               <div key={index}>{detectPhoneAndMail(s)}</div>
             )))}
-          {displayField(booking.arrival_details != null, t("Arrival:"), booking.arrival_details)}
+          {displayField(booking.arrival_details != null, t("Check-in info:"), booking.arrival_details)}
+          {displayField(booking.departure_details != null, t("Check-out info:"), booking.departure_details)}
           {displayField(booking.notes != null, t("Remarks:"),
             booking.notes && booking.notes.match(/[^\r\n]+/g)!.map((s, index) => (
               <React.Fragment key={index}>

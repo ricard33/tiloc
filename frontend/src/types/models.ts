@@ -160,6 +160,7 @@ export interface Booking {
   guaranty?: number;
   commission_fees?: number;
   arrival_details?: string;
+  departure_details?: string;
   notes?: string;
   options: Service[];
   total_payments: number;
