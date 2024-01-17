@@ -69,6 +69,7 @@ django-email-verification = "^0.3.3"
 stripe = "^7.5.0"
 django-timezone-field = "^6.1.0"
 django-anymail = {extras = ["mailjet", "sendinblue"], version = "^10.2"}
+django-user-visit = "^2.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.3.2"

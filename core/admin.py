@@ -1,5 +1,7 @@
 from functools import reduce
 
+import user_visit.admin
+import user_visit.models
 from constance.admin import Config, ConstanceAdmin
 from django.conf import settings
 from django.contrib import admin, messages
@@ -646,3 +648,5 @@ site.register(notifier.models.Notification, notifier.admin.NotificationAdmin)
 site.register(notifier.models.GroupPrefs, notifier.admin.GroupPrefsAdmin)
 site.register(notifier.models.UserPrefs, notifier.admin.UserPrefsAdmin)
 site.register(notifier.models.SentNotification, notifier.admin.SentNotifcationAdmin)
+
+site.register(user_visit.models.UserVisit, user_visit.admin.UserVisitAdmin)

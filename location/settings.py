@@ -94,8 +94,9 @@ INSTALLED_APPS = [
     "notifier",
     "core",
     # 'frontend',
-    'anymail',
+    "anymail",
     "django.contrib.admin",  # after to allow templates override
+    "user_visit",
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "user_visit.middleware.UserVisitMiddleware",
 ]
 
 ROOT_URLCONF = "location.urls"
@@ -261,7 +263,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "knox.auth.TokenAuthentication",
-        'rest_framework.authentication.SessionAuthentication'
+        "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "core.permissions.TilocPermissions",
