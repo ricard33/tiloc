@@ -100,6 +100,7 @@ export interface Lodging {
   tourist_tax_included_in_payment: boolean;
   max_daily_tourist_tax: number;
   tourist_tax_rate: number;
+  registration_number: string;
   description: string;
   default_services: string[];  // list of refs
   contract_template: number;

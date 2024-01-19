@@ -244,6 +244,7 @@ class LodgingSubSerializer(serializers.ModelSerializer):
             "tourist_tax_included_in_payment",
             "tourist_tax_rate",
             "max_daily_tourist_tax",
+            "registration_number",
         ]
 
 

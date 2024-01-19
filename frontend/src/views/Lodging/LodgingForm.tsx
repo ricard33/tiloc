@@ -26,17 +26,21 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
+  const defaultValues = {
+    ...lodging,
+    remote_calendars: undefined  // remove this field
+  } ?? {
+    description: "",
+    tourist_tax_included_in_payment: true,
+    active: true,
+    shown: true,
+    owner_id: currentUser.id,
+    address: currentUser.address,
+    deposit_label: "deposit",
+    deposit_percent: 30
+  };
   const formContext = useForm<Lodging>({
-    defaultValues: lodging ?? {
-      description: "",
-      tourist_tax_included_in_payment: true,
-      active: true,
-      shown: true,
-      owner_id: currentUser.id,
-      address: currentUser.address,
-      deposit_label: "deposit",
-      deposit_percent: 30
-    }
+    defaultValues: defaultValues
   });
   const { control } = formContext;
   const { isDirty } = useFormState({ control });
@@ -49,7 +53,13 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
       });
   };
 
-  // console.log("redraw", dirtyFields, touchedFields);
+  // console.log("redraw", isDirty, dirtyFields, touchedFields);
+  // console.log("isDirty: ", isDirty, dirtyFields);
+  // console.log("defaultValues: ", defaultValues);
+  // console.log("values: ", getValues());
+  // console.log("DIFF", filterObject(deepDiffMapper.map(defaultValues, getValues()),
+  //   (value) => value?.type !== "unchanged"));
+
   return (
     <FormContainer
       defaultValues={lodging}

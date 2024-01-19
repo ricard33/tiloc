@@ -380,6 +380,7 @@ class Lodging(models.Model):
     tourist_tax_rate = models.DecimalField(
         _("tourist tax rate"), max_digits=10, decimal_places=2, null=True, blank=True
     )
+    registration_number = models.CharField(_("registration number"), max_length=100, null=True, blank=True)
 
     contract_template = models.ForeignKey("ContractTemplate", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(_("description"), blank=True, help_text=_("Used by contracts generation"))
@@ -408,7 +409,6 @@ class Lodging(models.Model):
 
     def get_calendar_url(self, request):
         return drf_reverse("calendar_sync", kwargs={"uid": self.uid}, request=request)
-
 
 
 class Service(models.Model):

@@ -54,7 +54,7 @@ function App(props: Props) {
   }, [refetchUser, isNeedToReloadUser]);
 
   const loadAppInfo = useCallback(() => {
-    console.log("Request info");
+    // console.log("Request info");
     axios.get("/api/info/")
       .then(response => {
         // console.debug(response);
@@ -73,7 +73,7 @@ function App(props: Props) {
       });
   }, [appInfo.frontendVersion, appInfo.loaded, dispatch, showError, t]);
 
-  useInterval(loadAppInfo, 10*1000);
+  useInterval(loadAppInfo, 60*1000);
 
   useEffect(() => {
     if (!initialised) {

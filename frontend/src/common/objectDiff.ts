@@ -1,4 +1,4 @@
-export const deepDiffMapper = function () {
+export const deepDiffMapper = function() {
   return {
     VALUE_CREATED: 'created',
     VALUE_UPDATED: 'updated',
@@ -36,6 +36,19 @@ export const deepDiffMapper = function () {
         diff[key] = this.map(undefined, obj2[key]);
       }
 
+      // for (var key in diff) {
+      //   if (diff[key].type !== this.VALUE_UNCHANGED) {
+      //     console.log('key = ', key);
+      //     return {
+      //       type: this.VALUE_UPDATED,
+      //       data: diff
+      //     };
+      //   }
+      // }
+      // return {
+      //   type: this.VALUE_UNCHANGED,
+      //   data: diff
+      // };
       return diff;
 
     },
