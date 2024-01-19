@@ -406,6 +406,10 @@ class Lodging(models.Model):
 
     natural_key.dependencies = ["core.account"]
 
+    def get_calendar_url(self, request):
+        return drf_reverse("calendar_sync", kwargs={"uid": self.uid}, request=request)
+
+
 
 class Service(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
@@ -491,7 +495,7 @@ class BookingChannelSync(models.Model):
     objects = ForUserQuerySet.as_manager()
 
     def url_for_remote(self, request):
-        return drf_reverse("calendar_sync", kwargs={"uid": self.lodging.uid}, request=request) + "?s=%d" % self.id
+        return self.lodging.get_calendar_url(request=request) + "?s=%d" % self.id
 
 
 class Booking(models.Model):

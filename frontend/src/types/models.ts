@@ -103,6 +103,8 @@ export interface Lodging {
   description: string;
   default_services: string[];  // list of refs
   contract_template: number;
+  calendar_url: string;
+  remote_calendars: Omit<CalendarSync, "lodging"|"lodging_id">[];
 }
 
 export interface Service {
@@ -118,6 +120,7 @@ export interface Service {
 export interface BookingChannel {
   id: number;
   name: string;
+  read_only: boolean;
 }
 
 export interface Comment {

@@ -92,7 +92,7 @@ const ActivityFeed: React.FC<Props> = props => {
               <Stack direction={"row"}>
                 {formatDate(activity.date, "P")}
                 <Sep />{getActivityLabel(activity)}
-                <Sep /><BookingSource booking={activity.booking} />
+                <Sep /><BookingSource name={activity.booking.source?.name} defaultBgColor="#41F7936b" />
               </Stack>
               <Stack direction={"row"} style={{ flexWrap: "wrap" }}>
                 <HomeOutlinedIcon fontSize="small" />&nbsp;{activity.booking.lodgings.map(l => l.name).join("+")}

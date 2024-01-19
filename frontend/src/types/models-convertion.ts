@@ -120,7 +120,8 @@ export function api2Lodging(lodging: Record<string, any>): Lodging {
     daily_rate: Number(lodging.daily_rate),
     guaranty: Number(lodging.guaranty),
     max_daily_tourist_tax: Number(lodging.max_daily_tourist_tax),
-    tourist_tax_rate: Number(lodging.tourist_tax_rate)
+    tourist_tax_rate: Number(lodging.tourist_tax_rate),
+    remote_calendars: lodging.remote_calendars ? lodging.remote_calendars.map(api2CalendarSync) : [],
   };
 }
 

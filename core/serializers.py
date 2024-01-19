@@ -219,29 +219,6 @@ class ServiceSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class LodgingSerializer(serializers.ModelSerializer):
-    owner = UserSubSerializer(read_only=True)
-    owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.User.objects.all())
-    rank = serializers.IntegerField(required=False)
-    default_services = FilteredSlugRelatedField(
-        slug_field="reference", many=True, required=False, queryset=models.Service.objects.all()
-    )
-
-    class Meta:
-        model = models.Lodging
-        exclude = ["account"]
-
-    def create(self, validated_data: dict):
-        if "account" not in validated_data:
-            validated_data["account"] = self.context["request"].user.account
-        rank = validated_data.pop("rank", -1)
-        if rank < 0:
-            rank = (models.Lodging.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
-        validated_data["rank"] = rank
-        instance = super().create(validated_data)
-        return instance
-
-
 class LodgingSubSerializer(serializers.ModelSerializer):
     owner = UserSubSerializer(read_only=True)
 
@@ -271,6 +248,8 @@ class LodgingSubSerializer(serializers.ModelSerializer):
 
 
 class BookingChannelSerializer(serializers.ModelSerializer):
+    read_only = serializers.SerializerMethodField()
+
     class Meta:
         model = models.BookingChannel
         exclude = ["account"]
@@ -280,6 +259,9 @@ class BookingChannelSerializer(serializers.ModelSerializer):
             validated_data["account"] = self.context["request"].user.account
         instance = super().create(validated_data)
         return instance
+
+    def get_read_only(self, instance):
+        return instance.account is None
 
 
 class BookingChannelSyncSerializer(serializers.ModelSerializer):
@@ -316,6 +298,60 @@ class BookingChannelSyncSerializer(serializers.ModelSerializer):
 
     def get_url_for_remote(self, obj: models.BookingChannelSync):
         return obj.url_for_remote(self.context["request"])
+
+
+class BookingChannelSyncSubSerializerForLodging(BookingChannelSyncSerializer):
+    class Meta:
+        model = models.BookingChannelSync
+        fields = [
+            "id",
+            "channel_id",
+            "channel",
+            "source_url",
+            "url_for_remote",
+            "active",
+            "last_import",
+            "last_export",
+            "last_import_error",
+        ]
+        read_only_fields = [
+            "id",
+            "channel",
+            "url_for_remote",
+            "last_import",
+            "last_export",
+            "last_import_error",
+        ]
+
+
+class LodgingSerializer(serializers.ModelSerializer):
+    owner = UserSubSerializer(read_only=True)
+    owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.User.objects.all())
+    rank = serializers.IntegerField(required=False)
+    default_services = FilteredSlugRelatedField(
+        slug_field="reference", many=True, required=False, queryset=models.Service.objects.all()
+    )
+    calendar_url = serializers.SerializerMethodField()
+    remote_calendars = BookingChannelSyncSubSerializerForLodging(
+        source="bookingchannelsync_set", many=True, required=False, read_only=True
+    )
+
+    class Meta:
+        model = models.Lodging
+        exclude = ["account"]
+
+    def create(self, validated_data: dict):
+        if "account" not in validated_data:
+            validated_data["account"] = self.context["request"].user.account
+        rank = validated_data.pop("rank", -1)
+        if rank < 0:
+            rank = (models.Lodging.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
+        validated_data["rank"] = rank
+        instance = super().create(validated_data)
+        return instance
+
+    def get_calendar_url(self, obj: models.Lodging):
+        return obj.get_calendar_url(self.context["request"])
 
 
 class BookedServiceSerializer(serializers.ModelSerializer):

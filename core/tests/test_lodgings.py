@@ -97,6 +97,34 @@ class LodgingAdminUserTestCase(APITestCase):
         lodging = models.Lodging.objects.first()
         self.assertEqual(service.id, lodging.default_services.first().id)
 
+    def test_create_with_channel_sync(self):
+        owner = factories.StandardUserFactory()
+        channel = factories.BookingChannelFactory.create(name="airbnb")
+        data = {
+            "name": "my beautiful lodge",
+            "owner_id": owner.id,
+            "address": "here",
+            "daily_rate": 30,
+            "remote_calendars": [
+                {
+                    "channel_id": channel.id,
+                    "source_url": "https://airbnb2",
+                    "active": True,
+                },
+                {
+                    "channel_id": channel.id,
+                    "source_url": "https://airbnb.com/channels",
+                    "active": True,
+                },
+            ],
+        }
+        # serializer = serializers.LodgingSerializer(data=data)
+        # serializer.is_valid(raise_exception=True)
+        response = self.client.post("/api/lodging/", data, **self.header)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
+        lodging = models.Lodging.objects.first()
+        self.assertEqual(1, lodging.bookingchannelsync_set.count())
+
     def test_update_default_services(self):
         owner = factories.StandardUserFactory.create()
         service = factories.ServiceFactory.create()

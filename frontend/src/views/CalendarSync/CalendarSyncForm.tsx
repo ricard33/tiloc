@@ -4,7 +4,10 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardHeader, Stack,
+  CardHeader,
+  Stack,
+  TextField,
+  Typography,
   Unstable_Grid2 as Grid2
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -15,6 +18,7 @@ import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { Save as SaveIcon } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
+import HelpTooltip from "../../components/HelpTooltip";
 
 
 type Props = {
@@ -38,8 +42,10 @@ export const CalendarSyncForm: React.FC<Props> = ({
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const formContext = useForm<CalendarSync>({ defaultValues: calendarSync });
-  const { control } = formContext;
+  const { control, watch } = formContext;
   const { isDirty } = useFormState({ control });
+  const lodging_id = watch("lodging_id", calendarSync?.lodging_id);
+  const lodging = lodging_id && lodgings ? lodgings.filter(l => l.id === lodging_id)[0] : undefined;
 
   usePageUnloadAlert(isDirty);
 
@@ -84,23 +90,37 @@ export const CalendarSyncForm: React.FC<Props> = ({
               />
             </Grid2>
             <Grid2 sm={6} xs={12}>
-              <SelectElement
-                name={"channel_id"}
-                label={t("Booking channel")}
-                options={[
-                  ...channelsOptions
-                ]}
+              <HelpTooltip
+                helpContent={t("Select the booking platform you want to import the calendar from")}
                 fullWidth
-              />
+              >
+                <SelectElement
+                  name={"channel_id"}
+                  label={t("Booking platform")}
+                  options={[
+                    ...channelsOptions
+                  ]}
+                  fullWidth
+                />
+              </HelpTooltip>
             </Grid2>
             <Grid2 sm={6} xs={12}>
               <SwitchElement name={"active"} label={t("Active ?")} />
             </Grid2>
             <Grid2 xs={12}>
-              <TextFieldElement name={"source_url"} label={t("Source URL")} fullWidth />
+              <Typography variant="body1">
+                {t("Copy and paste the link above into other booking platforms.")}
+              </Typography>
+              <TextField
+                value={lodging?.calendar_url ?? ""} label={t("Tiloc URL")} disabled
+                fullWidth sx={{ marginTop: 1 }}
+              />
             </Grid2>
             <Grid2 xs={12}>
-              <TextFieldElement name={"url_for_remote"} label={t("Tiloc URL")} disabled fullWidth />
+              <Typography variant="body1">
+                {t("Get the address (URL) of the calendar from this booking platform and add it below.")}
+              </Typography>
+              <TextFieldElement name={"source_url"} label={t("Source URL")} fullWidth sx={{ marginTop: 1 }} />
             </Grid2>
           </Grid2>
         </CardContent>

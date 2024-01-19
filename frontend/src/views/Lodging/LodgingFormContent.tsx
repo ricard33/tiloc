@@ -1,18 +1,50 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { Alert, InputAdornment, Unstable_Grid2 as Grid2 } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Divider,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Stack,
+  Typography,
+  Unstable_Grid2 as Grid2
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { MultiSelectElement, SelectElement, SwitchElement, TextFieldElement } from "react-hook-form-mui";
-import { Lodging, User } from "../../types";
+import { CalendarSync, Lodging, User } from "../../types";
 import { useFormContext } from "react-hook-form";
-import { useListContractTemplatesQuery, useListServicesQuery } from "../../services/api";
+import {
+  useDeleteCalendarSyncMutation,
+  useListContractTemplatesQuery,
+  useListServicesQuery
+} from "../../services/api";
 import HelpTooltip from "../../components/HelpTooltip";
 import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
 import RoomServiceOutlinedIcon from "@mui/icons-material/RoomServiceOutlined";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import EuroOutlinedIcon from "@mui/icons-material/EuroOutlined";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import { Section } from "../../components/Section";
+import Paper from "@mui/material/Paper";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { ChannelIcon } from "../../common/statusUtils";
+import { formatDistanceToNow } from "../../common/dateUtils";
+import { useAlert } from "../../common/alertUtils";
+import ImportCalendarDialog from "./ImportCalendarDialog";
+import { fetchErrorDecode } from "../../common/apiUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { useConfirm } from "../../libs/MuiConfirm";
 
 
 type Props = {
@@ -30,6 +62,15 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
   const { data: templates } = useListContractTemplatesQuery();
   const template = watch("contract_template", lodging?.contract_template);
   // const [expanded, setExpanded] = React.useState<string | false>("description");
+  const [openImportCalDialog, setOpenImportCalDialog] = useState<Partial<CalendarSync> | undefined>(undefined);
+  const [deleteCalendarSync] = useDeleteCalendarSyncMutation();
+  const { showError, showSuccess } = useAlert();
+  const confirm = useConfirm();
+  const user = useSelector<RootState>(store => store.auth.user) as User;
+  const canChange = user.permissions.includes("core.change_bookingchannelsync");
+  const canDelete = user.permissions.includes("core.delete_bookingchannelsync");
+
+  const [remoteCalendars, setRemoteCalendars] = useState(lodging?.remote_calendars ?? []);
 
   useEffect(() => {
     if (!template && templates)
@@ -44,6 +85,52 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
   //   (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
   //     setExpanded(isExpanded ? panel : false);
   //   };
+
+  const copyCalendarUrlToClipboard = () => {
+    navigator.clipboard.writeText(lodging!.calendar_url).then(function() {
+      showSuccess(t("Copied to clipboard"));
+    }, function() {
+      console.warn("FAILED to copy to clipboard");
+      showError(t("Failed to copy URL to clipboard!"));
+    });
+  };
+
+  function onValidateCalendarSync(value: CalendarSync) {
+    console.log(value);
+    if (remoteCalendars.filter(c => c.id === value.id).length > 0) {
+      setRemoteCalendars(remoteCalendars.map(c => c.id === value.id ? value : c));
+    } else {
+      setRemoteCalendars([...remoteCalendars, value]);
+    }
+
+    setOpenImportCalDialog(undefined);
+  }
+
+
+  const onDeleteCalendar = async (calendar: Partial<CalendarSync>) => {
+    if (!canDelete) return await Promise.resolve();
+    return confirm({
+      title: t("Delete calendar synchronization for {{ lodging }} on {{ channel }}", {
+        lodging: lodging?.name,
+        channel: calendar.channel?.name
+      }),
+      description: t("Do you really want to permanently delete this calendar synchronization?")
+    })
+      .then(() => {
+        return deleteCalendarSync(calendar).then((result) => {
+          if ((result as any).error) {
+            const error = (result as any).error;
+            console.error("Error deleting calendarSync", error);
+            showError(t("Impossible to delete the calendar synchronization: ") + fetchErrorDecode(error));
+          } else {
+            showSuccess(t("Calendar synchronization deleted"));
+            setRemoteCalendars(remoteCalendars.filter(c => c.id !== calendar.id));
+          }
+        });
+      })
+      .catch(() => { /* ... */
+      });
+  };
 
   return (
     <>
@@ -84,6 +171,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
           </Grid2>
         </Grid2>
       </Section>
+
       <Section header={t("Options")} icon={<RoomServiceOutlinedIcon />}>
         <HelpTooltip
           helpContent={t("Indicate here the options you want to automatically add when making a new reservation. You can always modify the list of options for each reservation.")}
@@ -100,7 +188,8 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
             showChips
           />
         </HelpTooltip>
-      </Section >
+      </Section>
+
       <Section header={t("Payments")} icon={<PaymentOutlinedIcon />}>
         <Grid2 container spacing={4}>
           <Grid2 sm={6} xs={12}>
@@ -138,7 +227,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
               />
             </HelpTooltip>
           </Grid2>
-          <Grid2 sm={6} xs={12}/>
+          <Grid2 sm={6} xs={12} />
           <Grid2 sm={6} xs={12}>
             <HelpTooltip helpContent={t("When the balance should be paid?")} fullWidth>
               <SelectElement
@@ -156,6 +245,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
           </Grid2>
         </Grid2>
       </Section>
+
       <Section header={t("Prices")} icon={<EuroOutlinedIcon />}>
         <Grid2 container spacing={4}>
           <Grid2 sm={6} xs={12}>
@@ -169,6 +259,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
           </Grid2>
         </Grid2>
       </Section>
+
       <Section header={t("Taxes and legislation")} icon={<AccountBalanceIcon />}>
         <Grid2 container spacing={4}>
           <Grid2 xs={12}>
@@ -225,6 +316,103 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
           </Grid2>
         </Grid2>
       </Section>
+
+      {lodging && lodging.id &&
+        <Section header={t("Synchronization")} icon={<SyncAltIcon />}>
+          <Stack spacing={2}>
+            <Alert
+              severity="info"
+            >{t("To reduce the risk of double bookings (overbooking), Tiloc allows you to synchronize your calendar with booking platforms. Your calendars sync regularly and whenever someone is about to make a reservation.")}</Alert>
+            <Typography variant="body1">{t("Export your calendar")}</Typography>
+            <HelpTooltip
+              helpContent={t("Copy and paste the link above into other booking platforms.")}
+              fullWidth
+            >
+              <Paper
+                sx={{ p: "2px 4px", display: "flex", alignItems: "center", width: "100%" }}
+              >
+                <InputBase
+                  sx={{ ml: 1, flex: 1 }}
+                  value={lodging?.calendar_url}
+                  disabled
+                />
+                <IconButton
+                  type="button" sx={{ p: "10px" }} aria-label="copy"
+                  title={t("Copy URL to clipboard")}
+                  onClick={() => copyCalendarUrlToClipboard()}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+                {/*<Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />*/}
+                {/*<IconButton color="primary" sx={{ p: "10px" }} aria-label="directions">*/}
+                {/*  <DirectionsIcon />*/}
+                {/*</IconButton>*/}
+              </Paper>
+            </HelpTooltip>
+            <Typography variant="body1">{t("Import your calendars")}</Typography>
+            <HelpTooltip
+              helpContent={t("List of calendars currently imported from booking platforms.")}
+              fullWidth
+            >
+              <Paper sx={{ width: "100%" }}>
+                <List
+                  subheader={<ListSubheader>External calendars</ListSubheader>}
+                >
+                  {remoteCalendars.map((s) =>
+                    <React.Fragment key={s.id}>
+                      <Divider />
+                      <ListItem
+                        secondaryAction={
+                          <>
+                            <IconButton
+                              edge="end" aria-label="edit" color="primary"
+                              disabled={!canChange}
+                              onClick={() => setOpenImportCalDialog(s)}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              edge="end" aria-label="delete" color="error"
+                              disabled={!canDelete}
+                              onClick={() => onDeleteCalendar(s)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </>
+                        }
+                      >
+                        <ListItemIcon>
+                          <ChannelIcon channel={s.channel} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={s.channel.name}
+                          secondary={
+                            <React.Fragment>
+                              {t("Last import: {{date}}", { date: formatDistanceToNow(s.last_import) })}<br />
+                              {t("Last export: {{date}}", { date: formatDistanceToNow(s.last_export) })}
+                            </React.Fragment>
+                          }
+                        />
+                      </ListItem>
+                    </React.Fragment>
+                  )}
+                </List>
+              </Paper>
+            </HelpTooltip>
+            <div>
+              <Button
+                variant="contained" onClick={() => setOpenImportCalDialog({})}
+              >{t("Import new calendar")}</Button>
+            </div>
+            {(typeof openImportCalDialog !== "undefined") &&
+              <ImportCalendarDialog
+                calendarSync={openImportCalDialog} lodgingId={lodging.id} onValidate={onValidateCalendarSync}
+                onClose={() => setOpenImportCalDialog(undefined)}
+              />
+            }
+          </Stack>
+        </Section>
+      }
 
       {/*<hr style={{ margin: "16px" }} />*/}
       <Grid2 container spacing={4}>

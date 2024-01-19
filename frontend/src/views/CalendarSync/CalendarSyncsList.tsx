@@ -51,7 +51,7 @@ const CalendarSyncsList: React.FunctionComponent<Props> = () => {
         })
       },
       {
-        field: "channel", headerName: t("Booking channel"), width: 200, type: "singleSelect",
+        field: "channel", headerName: t("Booking platform"), width: 200, type: "singleSelect",
         valueGetter: (params: GridValueGetterParams<Partial<BookingChannel>>) => {
           return { ...params.value, value: params.value.id };
         },

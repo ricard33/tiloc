@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import { Booking, BookingStatus } from "../types";
+import { Booking, BookingChannel, BookingStatus } from "../types";
 import React, { ReactElement } from "react";
 import FontAwesomeSvgIcon from "../components/FontAwesomeSvgIcon";
 import { faAirbnb } from "@fortawesome/free-brands-svg-icons/faAirbnb";
@@ -8,6 +8,7 @@ import { ReactComponent as HomeawayIcon } from "../assets/icones/homeaway.svg";
 import { ReactComponent as TripadvisorIcon } from "../assets/icones/tripadvisor.svg";
 import { darken } from "@mui/system";
 import { useTranslation } from "react-i18next";
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 
 export const getBookingStatus = (name: string) => {
   for (let key in BookingStatus) {
@@ -86,24 +87,25 @@ export const otaBranding: {
   }
 };
 
-export const BookingSource = ({ booking }: { booking: Booking }) => {
+export const BookingSource = ({ name, defaultBgColor, fullWidth }: { name?: string, defaultBgColor?: string, fullWidth?: boolean }) => {
   const { t } = useTranslation();
   const statusDisplay: OtaIconProps & {
     label: string
-  } = booking.source && booking.source.name in otaBranding
-    ? { label: booking.source.name, ...otaBranding[booking.source.name] }
-    : { label: booking.source ? booking.source.name : t("Direct booking"), bgColor: "#41F7936b" };
+  } = name && name in otaBranding
+    ? { label: name, ...otaBranding[name] }
+    : { label: name ? name : t("Direct booking"), bgColor: defaultBgColor ?? "" };
 
   return (
     <div
       style={{
         background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
         display: "flex", alignItems: "center", flexWrap: "wrap",
-        padding: "0 4px"
+        padding: "0 4px",
+        ...(fullWidth ? {width: "100%"} : {})
       }}
     >
       {statusDisplay.icon}
-      <span style={{ verticalAlign: "text-bottom" }}>
+      <span style={{ verticalAlign: "text-bottom", height: "1.4rem" }}>
         {statusDisplay.label}
       </span>
     </div>
@@ -133,3 +135,8 @@ export const BookingStatusLabel = ({ booking }: { booking: Booking }) => {
     </div>
   );
 };
+
+export const ChannelIcon = ({ channel }: { channel: BookingChannel }) => {
+  const icon = (channel && channel.name in otaBranding) ? otaBranding[channel.name].icon : undefined;
+  return icon ?? <QuestionMarkIcon />;
+}
