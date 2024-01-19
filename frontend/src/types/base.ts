@@ -10,6 +10,7 @@ export interface Pagination<T> {
 export interface AppInfo {
   loaded: boolean;
   version: string;
+  frontendVersion: string;
   buildDate: string;
   canRegister: boolean;
   useInAppChat: boolean;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import validate from "validate.js";
@@ -24,6 +24,8 @@ import { formatDate, isValidDate } from "./common/dateUtils";
 import axios from "axios";
 import { useAppSelector } from "./app/hooks";
 import LoadingInProgress from "./components/LoadingInProgress";
+import useInterval from "./common/useInterval";
+import { AppInfo } from "./types";
 
 validate.validators = {
   ...validate.validators,
@@ -35,6 +37,7 @@ type Props = {};
 function App(props: Props) {
   const dispatch = useDispatch();
   const token = useAppSelector((store) => store.auth.token);
+  const appInfo = useAppSelector(store => store.appInfo) as AppInfo;
   const isNeedToReloadUser = useAppSelector((store) => store.auth.needToReload);
   const { data: currentUser, error: userLoadingError, refetch: refetchUser } = useCurrentUserQuery();
   const { showInfo, showWarning, showError } = useAlert();
@@ -50,26 +53,34 @@ function App(props: Props) {
       refetchUser();
   }, [refetchUser, isNeedToReloadUser]);
 
+  const loadAppInfo = useCallback(() => {
+    console.log("Request info");
+    axios.get("/api/info/")
+      .then(response => {
+        // console.debug(response);
+        dispatch(appInfoLoaded({
+          loaded: true,
+          version: response.data.version,
+          frontendVersion: appInfo.loaded ? appInfo.frontendVersion : response.data.version,
+          buildDate: formatDate(parseISO(response.data.build_date)),
+          canRegister: response.data.can_register,
+          useInAppChat: response.data.use_inapp_chat,
+          isDemo: response.data.is_demo
+        }));
+      })
+      .catch(() => {
+        showError(t("Server error. Can't load application information."));
+      });
+  }, [appInfo.frontendVersion, appInfo.loaded, dispatch, showError, t]);
+
+  useInterval(loadAppInfo, 10*1000);
+
   useEffect(() => {
-    if (!initialised)
-      axios.get("/api/info/")
-        .then(response => {
-          // console.debug(response);
-          dispatch(appInfoLoaded({
-            loaded: true,
-            version: response.data.version,
-            buildDate: formatDate(parseISO(response.data.build_date)),
-            canRegister: response.data.can_register,
-            useInAppChat: response.data.use_inapp_chat,
-            isDemo: response.data.is_demo
-          }));
-          setInitialised(true);
-        })
-        .catch(() => {
-          showError(t("Server error. Can't load application information."));
-          setInitialised(true);
-        });
-  }, [dispatch, initialised, showError, t]);
+    if (!initialised) {
+      setInitialised(true);
+      loadAppInfo();
+    }
+  }, [initialised, loadAppInfo]);
 
   useEffect(() => {
     // console.log("useEffect user", currentUser);
@@ -109,7 +120,7 @@ function App(props: Props) {
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
         <DateProvider locale={frLocale}>
-          {initialised ?
+          {appInfo.loaded ?
             <ConfirmProvider>
               <Notifier />
               {/*<ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showBubble />*/}

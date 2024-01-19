@@ -5,6 +5,7 @@ import { AppInfoAction } from "../actions";
 const initialState: AppInfo = {
   loaded: false,
   version: "?",
+  frontendVersion: "?",
   buildDate: "-",
   canRegister: false,
   useInAppChat: false,

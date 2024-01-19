@@ -4,13 +4,13 @@ import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
 import { useTheme } from "@mui/material/styles";
-import { Alert, Breadcrumbs, Link, Theme, Typography, useMediaQuery } from "@mui/material";
+import { Alert, Breadcrumbs, Button, Link, Theme, Typography, useMediaQuery } from "@mui/material";
 import { Footer, Sidebar, Topbar } from "./components";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import queryString from "query-string";
 import CheckoutResult from "../../components/CheckoutResult";
-import { Account } from "../../types";
+import { Account, AppInfo } from "../../types";
 import { differenceInCalendarDays } from "date-fns";
 import { useAppSelector } from "../../app/hooks";
 
@@ -46,6 +46,7 @@ const Main = () => {
   });
   const [openSidebar, setOpenSidebar] = useState(false);
   const account = useAppSelector(store => store.auth.account) as Account;
+  const appInfo = useAppSelector(store => store.appInfo) as AppInfo;
   const query = queryString.parse(location.search) as { subscription_id: string };
   const { subscription_id } = query;
 
@@ -99,6 +100,20 @@ const Main = () => {
         variant={isDesktop ? "permanent" : "temporary"}
       />
       <main className={classes.content}>
+        {appInfo.version !== appInfo.frontendVersion &&
+          <Alert severity="warning">
+            <Trans
+              i18nKey="A newer version of Tiloc has been deployed. Please <link1>click here</link1> to reload the application."
+              components={{
+                link1:
+                  <Button
+                    onClick={() => window.location.reload()}
+                    title={t("Reload the application")}
+                  > </Button>
+              }}
+            />
+          </Alert>
+        }
         <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
           <Link color="inherit" component={RouterLink} to="/">
             {t("Home")}
