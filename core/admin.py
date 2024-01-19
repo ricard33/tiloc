@@ -12,6 +12,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
+from django.contrib.sessions.models import Session
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.db.models import Q, Sum
@@ -21,9 +22,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext
+from django.utils.translation import gettext, gettext_lazy as _, ngettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django_cron.admin import CronJobLogAdmin
@@ -68,7 +67,9 @@ class RestrictedModelAdminMixIn(object):
             if isinstance(account_field, list):
                 import operator
 
-                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field))).distinct()
+                return qs.filter(
+                    reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field))
+                ).distinct()
 
             return qs.filter(**{account_field + "__id": account["id"]}).distinct()
         return qs
@@ -611,17 +612,48 @@ class PlanAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 
 @admin.register(models.Subscription, site=site)
 class SubscriptionAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = ("id", "customer", "plan", "created", "start_date", "current_period_start", "current_period_end", "status", "cancel_at_period_end", "latest_invoice")
+    list_display = (
+        "id",
+        "customer",
+        "plan",
+        "created",
+        "start_date",
+        "current_period_start",
+        "current_period_end",
+        "status",
+        "cancel_at_period_end",
+        "latest_invoice",
+    )
 
 
 @admin.register(models.Invoice, site=site)
 class InvoiceAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
-    list_display = ("id", "customer", "subscription", "total", "status", "hosted_invoice_url", "period_start", "period_end", "next_payment_attempt", "created")
+    list_display = (
+        "id",
+        "customer",
+        "subscription",
+        "total",
+        "status",
+        "hosted_invoice_url",
+        "period_start",
+        "period_end",
+        "next_payment_attempt",
+        "created",
+    )
 
 
 @admin.register(models.Activity, site=site)
 class ActivityAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     list_display = ("id", "type", "booking", "author")
+
+
+@admin.register(Session, site=site)
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+
+    list_display = ["session_key", "_session_data", "expire_date"]
+    readonly_fields = ["_session_data"]
 
 
 site.register(models.Booking, BookingAdmin)
