@@ -8,7 +8,6 @@
   "{count} selected_plural": "{count} selected",
   "You can create a new booking": "You can create a new booking",
   "Please specify the guest name": "Please specify the guest name",
-  "Guest name": "Guest name",
   "You can change booking details": "You can change booking details",
   "Account": "Account",
   "Deposit can't be negative": "Deposit can't be negative",
@@ -184,5 +183,18 @@
   "Adresse du calendrier (URL)": "",
   "Besoin d’aide pour trouver l’URL du calendrier ?": "",
   "Click the button below to add a link to a calendar from a booking platform.": "",
-  "Booking channel": "Booking channel"
+  "Booking channel": "Booking channel",
+  "Total guests:": "",
+  "Guest name:": "Guest name:",
+  "Check-in info:": "",
+  "Check-out info:": "",
+  "Remarks:": "Remarks:",
+  "Deposit:": "Deposit:",
+  "Left to pay:": "Left to pay:",
+  "Too perceived:": "Too perceived:",
+  "Commission fees:": "Commission fees:",
+  "Tourist tax:": "Tourist tax:",
+  "Channel:": "Channel:",
+  "Payment:": "Payment:",
+  "Comments:": ""
 }

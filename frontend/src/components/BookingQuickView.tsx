@@ -93,9 +93,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
     <Grid container spacing={1} className="booking-quick-view">
       <Grid container spacing={1} xs={12} md={showComments ? 8 : 12}>
         <Grid xs={4}>
-          {displayField(true, t("Check-in:"), formatDate(booking.begin_date, "PPPP"))}
-          {displayField(true, t("Check-out:"), formatDate(booking.end_date, "PPPP"))}
-          {displayField(true, t("Length of stay:"), t("{{count}} nights", { count: booking.duration }))}
+          {displayField(true, t("Check-in"), formatDate(booking.begin_date, "PPPP"))}
+          {displayField(true, t("Check-out"), formatDate(booking.end_date, "PPPP"))}
+          {displayField(true, t("Length of stay"), t("{{count}} nights", { count: booking.duration }))}
           {
             booking.lodgings.length > 1 ?
 
@@ -103,18 +103,18 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
                 getGuestsDistribution(booking.guests_distribution[l.id])
               ))
               :
-              displayField(true, t("Total guests:"),
+              displayField(true, t("Total guests"),
                 getGuestsDistribution(booking.guests_distribution[booking.lodgings[0].id])
               )}
-          {displayField(true, t("Status:"), booking.status !== BookingStatus.External.name
+          {displayField(true, t("Status"), booking.status !== BookingStatus.External.name
             ? getBookingStatus(booking.status).getLabel(t)
             : booking.source?.name
           )}
-          {displayField(showPayments, t("Lodging:"), booking.lodgings.map(l => l.name).join("+"), true)}
-          {displayField(showPayments, t("Price:"), formatCurrency(booking.price_with_options), true)}
+          {displayField(showPayments, t("Lodging"), booking.lodgings.map(l => l.name).join("+"), true)}
+          {displayField(showPayments, t("Price"), formatCurrency(booking.price_with_options), true)}
         </Grid>
         <Grid xs={8}>
-          {displayField(true, t("Guest name:"), booking.guest_name, true)}
+          {displayField(true, t("Guest name"), booking.guest_name, true)}
 
           {displayField(booking.guest_address != null, undefined, booking.guest_address)}
           {displayField(booking.guest_contact != null, undefined,
@@ -123,9 +123,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               // <div key={index} dangerouslySetInnerHTML={{ __html: detectPhoneAndMail(s) }} />)}</div>
               <div key={index}>{detectPhoneAndMail(s)}</div>
             )))}
-          {displayField(booking.arrival_details != null, t("Check-in info:"), booking.arrival_details)}
-          {displayField(booking.departure_details != null, t("Check-out info:"), booking.departure_details)}
-          {displayField(booking.notes != null, t("Remarks:"),
+          {displayField(booking.arrival_details != null, t("Check-in info"), booking.arrival_details)}
+          {displayField(booking.departure_details != null, t("Check-out info"), booking.departure_details)}
+          {displayField(booking.notes != null, t("Remarks"),
             booking.notes && booking.notes.match(/[^\r\n]+/g)!.map((s, index) => (
               <React.Fragment key={index}>
                 {s}
@@ -133,7 +133,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               </React.Fragment>
             )))}
 
-          {displayField(booking.options.length > 0, t("Options:"),
+          {displayField(booking.options.length > 0, t("Options"),
             booking.options.map((option: Service) => (
               <li key={option.id}>{option.designation}</li>
             ))
@@ -141,38 +141,38 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
 
           <Grid container columns={{ xs: 2, sm: 3, md: 4, lg: 6 }}>
             <Grid xs={1}>
-              {displayField(showPayments, t("Price:"), formatCurrency(booking.price_with_options))}
+              {displayField(showPayments, t("Price"), formatCurrency(booking.price_with_options))}
             </Grid>
             <Grid xs={1}>
-              {displayField(showPayments && booking.deposit! > 0, t("Deposit:"), formatCurrency(booking.deposit || 0))}
+              {displayField(showPayments && booking.deposit! > 0, t("Deposit"), formatCurrency(booking.deposit || 0))}
             </Grid>
             <Grid xs={1}>
-              {displayField(showPayments && booking.left_to_pay > 0, t("Left to pay:"), formatCurrency(booking.left_to_pay), true)}
-              {displayField(showPayments && booking.left_to_pay < 0, t("Too perceived:"), formatCurrency(-booking.left_to_pay))}
+              {displayField(showPayments && booking.left_to_pay > 0, t("Left to pay"), formatCurrency(booking.left_to_pay), true)}
+              {displayField(showPayments && booking.left_to_pay < 0, t("Too perceived"), formatCurrency(-booking.left_to_pay))}
             </Grid>
             <Grid xs={1}>
-              {displayField(showPayments && booking.commission_fees! > 0, t("Commission fees:"), formatCurrency(booking.commission_fees || 0))}
+              {displayField(showPayments && booking.commission_fees! > 0, t("Commission fees"), formatCurrency(booking.commission_fees || 0))}
             </Grid>
             {/* Removed because value is not reliable with the one (maybe modified) in contract */}
             <Grid xs={1}>
               {displayField(showPayments && booking.tourist_tax > 0,
-                t("Tourist tax:"),
+                t("Tourist tax"),
                 formatCurrency(booking.tourist_tax || 0)
               )}
             </Grid>
             <Grid xs={1}>
-              {displayField(booking.source !== null, t("Channel:"), booking.source?.name)}
+              {displayField(booking.source !== null, t("Channel"), booking.source?.name)}
             </Grid>
           </Grid>
 
           {displayField(showPayments && data != null,
-            t("Payment:"), <Payments bookingId={booking.id!} />
+            t("Payment"), <Payments bookingId={booking.id!} />
           )}
         </Grid>
       </Grid>
       {showComments &&
         <Grid xs={12} md={4}>
-          <Typography variant="h5" sx={{ marginBottom: "10px" }}>{t("Comments:")}</Typography>
+          <Typography variant="h5" sx={{ marginBottom: "10px" }}>{t("Comments")}</Typography>
           <Comments booking={booking} readonly={readonly} />
         </Grid>}
     </Grid>

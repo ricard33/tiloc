@@ -177,12 +177,12 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         initialState.daily_rate, 0, 0, [], lodging.deposit_percent).price);
     initialState.guaranty = booking.guaranty || lodging.guaranty;
     initialState.commission_fees = booking.commission_fees || 0;
-    // initialState.adults = booking.adults || 2;
-    // initialState.children = booking.children || 0;
-    // initialState.babies = booking.babies || 0;
     initialState.guests_distribution = booking.guests_distribution ?? {
       [lodging.id]: defaultDistribution
     };
+    initialState.adults = booking.adults || defaultDistribution.adults;
+    initialState.children = booking.children || defaultDistribution.children;
+    initialState.babies = booking.babies || defaultDistribution.babies;
     initialState.source_id = booking.source_id || ("" as any);
     initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging.default_services.includes(o.reference)) : []);
     initialState.arrival_details = booking.arrival_details ?? "";
@@ -199,6 +199,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function computeTouristTax(values: Pick<Booking, "adults" | "children" | "babies" | "price" | "duration">) {
+    console.log("computeTouristTax", values);
     if (typeof lodging === "undefined")
       return 0;
     let daily_rate = lodging.max_daily_tourist_tax;

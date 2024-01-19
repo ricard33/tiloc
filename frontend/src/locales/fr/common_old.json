@@ -7,7 +7,6 @@
   "{count} selected_plural": "{count} sélectionnés",
   "You can create a new booking": "Vous pouvez créer une nouvelle réservation",
   "Please specify the guest name": "Précisez le nom du locataire",
-  "Guest name": "Nom",
   "You can change booking details": "Vous pouvez modifier les détails de la réservation",
   "Account": "Compte",
   "Deposit can't be negative": "Deposit can't be negative",
@@ -158,5 +157,18 @@
   "Arrival details": "Informations sur l'arrivée'",
   "Arrival:": "Arrivée :",
   "Click the button below to add a link to a calendar from a booking platform.": "Cliquez sur le bouton ci-dessous afin d’ajouter un lien vers un calendrier provenant d'une plateforme de réservation.",
-  "Booking channel": "Canal de réservation"
+  "Booking channel": "Canal de réservation",
+  "Total guests:": "Nombre de personnes :",
+  "Guest name:": "Nom du client :",
+  "Check-in info:": "Informations sur l'arrivée :",
+  "Check-out info:": "Informations sur le départ :",
+  "Remarks:": "Remarques :",
+  "Deposit:": "Arrhes :",
+  "Left to pay:": "Reste à payer :",
+  "Too perceived:": "Trop perçu:",
+  "Commission fees:": "Frais de commission :",
+  "Tourist tax:": "Taxe de séjour :",
+  "Channel:": "Canal :",
+  "Payment:": "Paiement:",
+  "Comments:": "Commentaires :"
 }
