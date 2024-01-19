@@ -649,11 +649,16 @@ class ActivityAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 
 @admin.register(Session, site=site)
 class SessionAdmin(admin.ModelAdmin):
+    list_display = ["session_key", "user", "_session_data", "expire_date"]
+    readonly_fields = ["_session_data"]
+
     def _session_data(self, obj):
         return obj.get_decoded()
 
-    list_display = ["session_key", "_session_data", "expire_date"]
-    readonly_fields = ["_session_data"]
+    def user(self, obj):
+        user_id = obj.get_decoded().get("_auth_user_id")
+        return models.User.objects.filter(id=user_id).first()
+
 
 
 site.register(models.Booking, BookingAdmin)

@@ -262,7 +262,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "knox.auth.TokenAuthentication",
+        # "knox.auth.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -280,11 +280,13 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.MultiPartParser",
         # "core.parsers.MultiPartJSONParser",
     ],
+    "EXCEPTION_HANDLER": "core.views.exception_handler",
+
 }
 
-if ENV == "dev":
-    # needed to allow access to /api/ pages
-    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
+# if ENV == "dev" and "rest_framework.authentication.SessionAuthentication" not in REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]:
+#     # needed to allow access to /api/ pages
+#     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
 
 REST_KNOX = {
     "SECURE_HASH_ALGORITHM": UNITTEST

@@ -292,7 +292,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CurrentUserAPI(generics.RetrieveUpdateAPIView):
-    # authentication_classes = (TokenAuthentication,)
     permission_classes = [
         permissions.IsAuthenticated,
     ]

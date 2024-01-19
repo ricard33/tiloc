@@ -24,7 +24,7 @@ sagaMiddleware.run(rootSaga);
 
 // Add a request interceptor
 axios.interceptors.request.use(
-  function (config) {
+  function(config) {
     // Do something before request is sent
     // console.log("axios.interceptors.request", config)
     if (typeof config.headers === "undefined") config.headers = {};
@@ -41,7 +41,7 @@ axios.interceptors.request.use(
 
     return config;
   },
-  function (error) {
+  function(error) {
     // Do something with request error
     logger.error(error);
     return Promise.reject(error);
@@ -50,12 +50,12 @@ axios.interceptors.request.use(
 
 // Response interceptor.
 axios.interceptors.response.use(
-  function (response) {
+  function(response) {
     // Do something with response data
     // console.debug("set-cookie", response.headers["set-cookie"]);
     return response;
   },
-  function (error) {
+  function(error) {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
@@ -64,7 +64,9 @@ axios.interceptors.response.use(
         error.response.data
       );
 
-      if (error.response.status === 401) {
+      if (error.response.status === 401
+        || (error.response.status === 403 && error.response.data.code === "not_authenticated")
+      ) {
         if (["/login", "/logged-out"].indexOf(browserHistory.location.pathname) < 0) {
           // const location = { ...browserHistory.location };
           // dispatchError(error.response.data.detail);
@@ -74,14 +76,13 @@ axios.interceptors.response.use(
         } else return Promise.reject(error);
       } else {
         if (error.response.data.detail) dispatchError(error.response.data.detail);
-        else if(error.response.data instanceof Blob) {
+        else if (error.response.data instanceof Blob) {
           error.response.data.text().then((content: string) => {
             const data = JSON.parse(content);
             if (data.detail) dispatchError(data.detail);
             else dispatchError(data);
-          })
-        }
-        else dispatchError("Server error");
+          });
+        } else dispatchError("Server error");
       }
     } else if (error.request) {
       // The request was made but no response was received

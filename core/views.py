@@ -2,6 +2,7 @@ import logging
 
 import arrow
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse, HttpResponseForbidden
@@ -16,15 +17,51 @@ from django_email_verification import default_token_generator
 from django_email_verification.errors import NotAllFieldCompiled
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
+from rest_framework import exceptions as drf_exceptions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import set_rollback
 
 from core import models
 from core.models import status_no_stats
 from core.stats import get_filling_rate_and_turnover
 
 logger = logging.getLogger("view")
+
+
+# Same as default DRF handler, only adding `code` field from `APIException`
+def exception_handler(exc, context):
+    """
+    Returns the response that should be used for any given exception.
+
+    By default, we handle the REST framework `APIException`, and also
+    Django's built-in `Http404` and `PermissionDenied` exceptions.
+
+    Any unhandled exceptions may return `None`, which will cause a 500 error
+    to be raised.
+    """
+    if isinstance(exc, Http404):
+        exc = drf_exceptions.NotFound()
+    elif isinstance(exc, PermissionDenied):
+        exc = drf_exceptions.PermissionDenied()
+
+    if isinstance(exc, drf_exceptions.APIException):
+        headers = {}
+        if getattr(exc, 'auth_header', None):
+            headers['WWW-Authenticate'] = exc.auth_header
+        if getattr(exc, 'wait', None):
+            headers['Retry-After'] = '%d' % exc.wait
+
+        if isinstance(exc.detail, (list, dict)):
+            data = exc.detail
+        else:
+            data = {'detail': exc.detail, 'code': exc.detail.code}
+
+        set_rollback()
+        return Response(data, status=exc.status_code, headers=headers)
+
+    return None
 
 
 class IndexPage(TemplateView):
