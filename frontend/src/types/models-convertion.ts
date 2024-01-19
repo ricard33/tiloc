@@ -14,6 +14,15 @@ import {
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
 
+export function toNumberOrUndefined(value?: number|string) {
+  return value ? Number(value) : undefined;
+}
+
+export function toDecimal(value?: number, fractionDigits?: number) {
+  return typeof value === "undefined" ? null : value.toFixed(fractionDigits ?? 2);
+}
+
+
 
 // ----- PAYMENT -----
 
@@ -141,8 +150,10 @@ export function api2Booking(booking: Record<string, any>): Booking {
     total_payments: Number(booking.total_payments),
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
+    max_daily_tourist_tax: Number(booking.max_daily_tourist_tax),
+    tourist_tax_rate: Number(booking.tourist_tax_rate),
     tourist_tax: Number(booking.tourist_tax),
-    custom_tourist_tax: booking.custom_tourist_tax ? Number(booking.custom_tourist_tax) : undefined,
+    custom_tourist_tax: toNumberOrUndefined(booking.custom_tourist_tax),
     options: booking.options ? booking.options.map(api2Service) : [],
     comments: booking.comments ? booking.comments.map(api2Comment) : [],
     created: parseISO(booking.created),
@@ -160,8 +171,9 @@ export function booking2api(booking: Partial<Booking>): Record<string, any> {
     deposit: booking.deposit!.toFixed(2),
     guaranty: booking.guaranty!.toFixed(2),
     commission_fees: booking.commission_fees!.toFixed(2),
-    custom_tourist_tax: typeof booking.custom_tourist_tax === "undefined" ?
-      null : booking.custom_tourist_tax.toFixed(2)
+    max_daily_tourist_tax: toDecimal(booking.max_daily_tourist_tax),
+    tourist_tax_rate: toDecimal(booking.tourist_tax_rate),
+    custom_tourist_tax: toDecimal(booking.custom_tourist_tax)
   };
   return newVar;
 

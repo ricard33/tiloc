@@ -545,6 +545,16 @@ class Booking(models.Model):
     deposit = models.DecimalField(_("deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("security deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
     commission_fees = models.DecimalField(_("commission fees"), max_digits=20, decimal_places=2, blank=True, null=True)
+    is_flat_rate_tourist_tax = models.BooleanField(_("flat rate tourist tax"), default=True)
+    tourist_tax_included_in_payment = models.BooleanField(
+        _("tourist tax included in payment"), default=True, help_text="An hidden feature for internal use only"
+    )
+    max_daily_tourist_tax = models.DecimalField(
+        _("max daily tourist tax"), max_digits=20, decimal_places=2, null=True, blank=True
+    )
+    tourist_tax_rate = models.DecimalField(
+        _("tourist tax rate"), max_digits=10, decimal_places=2, null=True, blank=True
+    )
     custom_tourist_tax = models.DecimalField(
         _("personalized tourist tax"),
         max_digits=20,
@@ -620,7 +630,7 @@ class Booking(models.Model):
 
     @property
     def price_with_options_and_taxes(self):
-        return self.price_with_options + (self.lodging.tourist_tax_included_in_payment and self.tourist_tax or 0)
+        return self.price_with_options + (self.tourist_tax_included_in_payment and self.tourist_tax or 0)
 
     @property
     def total_payments(self):
@@ -636,7 +646,7 @@ class Booking(models.Model):
         """Returns the left to pay, with options included in price, but not excluded options."""
         return (
             self.price_with_options
-            + (self.lodging.tourist_tax_included_in_payment and self.tourist_tax or Decimal(0))
+            + (self.tourist_tax_included_in_payment and self.tourist_tax or Decimal(0))
             - self.total_payments
             - (self.commission_fees or Decimal(0))
         )
@@ -676,20 +686,18 @@ class Booking(models.Model):
         return self._get_total_occupants("babies")
 
     def computed_tourist_tax(self):
-        if not self.lodging:
-            return 0
-        elif self.lodging.is_flat_rate_tourist_tax:
-            daily_rate = self.lodging.max_daily_tourist_tax or Decimal(0)
+        if self.is_flat_rate_tourist_tax:
+            daily_rate = self.max_daily_tourist_tax or Decimal(0)
         elif self.adults + self.children + self.babies > 0:
             daily_rate = round_half_up(
                 Decimal(self.price)
                 / self.duration
                 / (self.adults + self.children + self.babies)
-                * self.lodging.tourist_tax_rate
+                * self.tourist_tax_rate
                 / 100,
                 2,
             )
-            daily_rate = min(daily_rate, self.lodging.max_daily_tourist_tax)
+            daily_rate = min(daily_rate, self.max_daily_tourist_tax)
         else:
             daily_rate = 0
         return daily_rate * self.duration * self.adults

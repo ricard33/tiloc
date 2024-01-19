@@ -22,7 +22,9 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
-from django.utils.translation import gettext, gettext_lazy as _, ngettext
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django_cron.admin import CronJobLogAdmin
@@ -658,7 +660,6 @@ class SessionAdmin(admin.ModelAdmin):
     def user(self, obj):
         user_id = obj.get_decoded().get("_auth_user_id")
         return models.User.objects.filter(id=user_id).first()
-
 
 
 site.register(models.Booking, BookingAdmin)

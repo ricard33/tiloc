@@ -413,6 +413,7 @@ class BookingSerializer(serializers.ModelSerializer):
     total_payments = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     left_to_pay = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     price_with_options = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    price_with_options_and_taxes = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     computed_tourist_tax = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     guests = serializers.IntegerField(read_only=True)
@@ -492,6 +493,8 @@ class BookingSubSerializer(BookingSerializer):
             "end_date",
             "duration",
             "price",
+            "price_with_options",
+            "price_with_options_and_taxes",
             "deposit",
             "guaranty",
             "commission_fees",
@@ -522,7 +525,9 @@ class BookingNoPriceSerializer(BookingSerializer):
 
     class Meta:
         model = models.Booking
-        exclude = ["price", "daily_rate", "is_flat_rate", "deposit", "guaranty", "commission_fees"]
+        exclude = ["price", "daily_rate", "is_flat_rate", "deposit", "guaranty", "commission_fees",
+                   "is_flat_rate_tourist_tax", "tourist_tax_included_in_payment", "max_daily_tourist_tax", "tourist_tax_rate",
+                   "custom_tourist_tax"]
 
 
 class HolidaysSerializer(serializers.ModelSerializer):

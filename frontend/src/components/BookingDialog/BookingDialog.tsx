@@ -116,7 +116,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const formContext = useForm<Booking>({
     defaultValues: initialState
   });
-  const { register, control, setValue, getValues, watch, formState, reset, setError } = formContext;
+  const { register, control, setValue, getValues, watch, formState, reset, setError, clearErrors } = formContext;
   const { errors, isDirty /*isValid*/ } = formState;
   const { dirtyFields } = useFormState({
     control
@@ -177,6 +177,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         initialState.daily_rate, 0, 0, [], lodging.deposit_percent).price);
     initialState.guaranty = booking.guaranty || lodging.guaranty;
     initialState.commission_fees = booking.commission_fees || 0;
+    initialState.is_flat_rate_tourist_tax = booking.is_flat_rate_tourist_tax ?? lodging.is_flat_rate_tourist_tax;
+    initialState.tourist_tax_included_in_payment = booking.tourist_tax_included_in_payment ?? lodging.tourist_tax_included_in_payment;
+    initialState.max_daily_tourist_tax = booking.max_daily_tourist_tax ?? (lodging.max_daily_tourist_tax || 0);
+    initialState.tourist_tax_rate = booking.tourist_tax_rate ?? (lodging.tourist_tax_rate || 0);
     initialState.guests_distribution = booking.guests_distribution ?? {
       [lodging.id]: defaultDistribution
     };
@@ -194,25 +198,30 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function updateTouristTax() {
+    if (typeof lodging !== "undefined") {
+      setValue("is_flat_rate_tourist_tax", lodging.is_flat_rate_tourist_tax);
+      setValue("tourist_tax_included_in_payment", lodging.tourist_tax_included_in_payment);
+      setValue("max_daily_tourist_tax", lodging.max_daily_tourist_tax);
+      setValue("tourist_tax_rate", lodging.tourist_tax_rate);
+    }
     const value = computeTouristTax(getValues());
     setValue("tourist_tax", value);
   }
 
-  function computeTouristTax(values: Pick<Booking, "adults" | "children" | "babies" | "price" | "duration">) {
-    console.log("computeTouristTax", values);
-    if (typeof lodging === "undefined")
-      return 0;
-    let daily_rate = lodging.max_daily_tourist_tax;
-    if (!lodging.is_flat_rate_tourist_tax) {
+  function computeTouristTax(values: Pick<Booking, "adults" | "children" | "babies" | "price" | "duration" | "max_daily_tourist_tax" | "is_flat_rate_tourist_tax" |"tourist_tax_rate" >) {
+    // console.log("computeTouristTax", filterObject(values, (v, k) => ["adults", "children", "babies", "price", "duration", "max_daily_tourist_tax"].includes(k)));
+    // console.log("computeTouristTax", filterObject(values, (v, k) => ["max_daily_tourist_tax", "is_flat_rate_tourist_tax", "tourist_tax_rate"].includes(k)));
+    let daily_rate = values.max_daily_tourist_tax ?? 0;
+    if (!values.is_flat_rate_tourist_tax) {
       if (values.adults + values.children + values.babies > 0) {
 
         daily_rate = Math.round(values.price!
             / values.duration
             / (values.adults + values.children + values.babies)
-            * lodging.tourist_tax_rate)
+            * (values.tourist_tax_rate ?? 0))
           / 100;
 
-        daily_rate = Math.min(daily_rate, lodging.max_daily_tourist_tax);
+        daily_rate = Math.min(daily_rate, values.max_daily_tourist_tax ?? 0);
       } else
         daily_rate = 0;
     }
@@ -285,12 +294,16 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function handleLodgingsChange(value: number[] | number | string) {
+    // console.log("handleLodgingsChange", value);
     const ids = typeof value === "string"
       ? value.split(",").map(Number)
       : typeof value === "number" ? [value] : value;
     if (ids.length === 0) {
       setError("lodging_ids", { type: "required", message: t("At least one lodging should be selected") });
       return ids;
+    }
+    else if(errors.lodging_ids?.type === "required") {
+      clearErrors("lodging_ids");
     }
     if (typeof value === "number") { // SelectElement case
       setValue("lodging_ids", ids, {shouldDirty: true});
@@ -302,7 +315,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, daily_rate, 0, 0, [], lodging.deposit_percent);
       setMultipleValues(priceObj);
     }
-    updateTouristTax();
 
     const newDistribution = ids.reduce((d, id) => {
       return {
@@ -313,9 +325,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue("guests_distribution", newDistribution, {shouldDirty: true});
     ["adults", "children", "babies"].forEach((fieldName) =>
       // @ts-ignore
-      setValue(fieldName as any, lodging_ids.reduce((acc, id) => acc + ((newDistribution[id] && newDistribution[id][fieldName]) ?? 0), 0))
+      setValue(fieldName as any, ids.reduce((acc, id) => acc + ((newDistribution[id] && newDistribution[id][fieldName]) ?? 0), 0))
     );
 
+    updateTouristTax();
   }
 
   function handleDistributionChange(lodging: Lodging, fieldName: "adults" | "children" | "babies", value: number) {
@@ -328,6 +341,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     guestsDistribution[lodging.id][fieldName] = value;
     setValue("guests_distribution", guestsDistribution, {shouldDirty: true});
     setValue(fieldName, lodging_ids.reduce((acc, id) => acc + ((guestsDistribution[id] && guestsDistribution[id][fieldName]) ?? 0), 0));
+    updateTouristTax();
   }
 
   function onDurationChange(newValue: number) {
