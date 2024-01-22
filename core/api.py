@@ -116,6 +116,7 @@ def info_view(request, *args, **kwargs):
         {
             "version": __version__,
             "build_date": __date__.isoformat(timespec="seconds"),
+            "is_debug": settings.DEBUG,
             "is_demo": settings.IS_DEMO,
             "can_register": config.CAN_SIGNUP and not settings.IS_DEMO,
             "use_inapp_chat": config.USE_INAPP_CHAT,
@@ -196,7 +197,8 @@ class SignUpAPI(KnoxLoginView):
         plan_ref = serializer.validated_data.get("plan")
         if plan_ref is not None:
             logger.debug("Looking up plan %s", plan_ref)
-            if models.Plan.objects.filter(ref=plan_ref).exists():
+            plan = models.Plan.objects.filter(ref=plan_ref).first()
+            if plan and plan.lookup_key:
                 # STRIPE API START
                 customer = stripe.Customer.create(email=user.email, name=user.get_full_name())
                 account.stripe_customer_id = customer.id
@@ -209,7 +211,7 @@ class SignUpAPI(KnoxLoginView):
                 )
                 # STRIPE API END
                 create_or_update_subscription(subscription)
-            else:
+            elif not plan:
                 logger.warning("Subscription plan not found for %s", plan_ref)
 
         send_generic_email("welcome", request.user)
