@@ -31,3 +31,12 @@ export function formatDistanceToNow(date: number | Date, options = {}) {
     ...options,
   })
 }
+
+export function getMonthName(date: number | Date) {
+  return format(date, "MMMM", { locale: locales[getLanguage()] })
+}
+
+export function getWeekdayName(date: number | Date) {
+  return format(date, "eeeeee", { locale: locales[getLanguage()] })
+}
+

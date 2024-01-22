@@ -87,6 +87,16 @@ export const otaBranding: {
   }
 };
 
+export function getIconAndBgColor(booking: Booking): OtaIconProps {
+  if (booking.status === BookingStatus.External.name && booking.source && booking.source.name in otaBranding) {
+    return otaBranding[booking.source.name];
+  } else
+    return {
+      bgColor: getBookingStatus(booking.status).color,
+      selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1)
+    };
+}
+
 export const BookingSource = ({ name, defaultBgColor, fullWidth }: { name?: string, defaultBgColor?: string, fullWidth?: boolean }) => {
   const { t } = useTranslation();
   const statusDisplay: OtaIconProps & {

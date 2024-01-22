@@ -2,7 +2,7 @@ import React, { ReactElement } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
 import { TFunction } from "react-i18next";
 import { add } from "date-fns";
-import { getBookingStatus, otaBranding, OtaIconProps } from "../../../common/statusUtils";
+import { getBookingStatus, getIconAndBgColor } from "../../../common/statusUtils";
 import { darken } from "@mui/system";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -153,16 +153,6 @@ export function makeGroups(lodgings: Lodging[], t: TFunction<"translation">) {
   return groups;
 }
 
-
-function getIconAndBgColor(booking: Booking): OtaIconProps {
-  if (booking.status === BookingStatus.External.name && booking.source && booking.source.name in otaBranding) {
-    return otaBranding[booking.source.name];
-  } else
-    return {
-      bgColor: getBookingStatus(booking.status).color,
-      selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1)
-    };
-}
 
 export function makeItems(bookings: Booking[]): TimelineItem[] {
   const bookingToItem = (booking: Booking, groupId: number) => ({

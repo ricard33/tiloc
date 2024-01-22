@@ -103,6 +103,7 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Dashboard"), href: "/", icon: <DashboardIcon /> },
         { title: t("Planning"), href: "/planning", icon: <CalendarIcon /> },
+        ...(appInfo.isDebug ? [{ title: "Planning bêta", href: "/planning2", icon: <CalendarIcon /> }] : []),
         { title: t("Bookings"), href: "/bookings", icon: <ListIcon /> },
         // {
         //   title: t("Cleanings"),

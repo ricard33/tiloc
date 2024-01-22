@@ -65,6 +65,7 @@ function App(props: Props) {
           buildDate: formatDate(parseISO(response.data.build_date)),
           canRegister: response.data.can_register,
           useInAppChat: response.data.use_inapp_chat,
+          isDebug: response.data.is_debug,
           isDemo: response.data.is_demo
         }));
       })

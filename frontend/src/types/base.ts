@@ -14,6 +14,7 @@ export interface AppInfo {
   buildDate: string;
   canRegister: boolean;
   useInAppChat: boolean;
+  isDebug: boolean;
   isDemo: boolean;
 }
 

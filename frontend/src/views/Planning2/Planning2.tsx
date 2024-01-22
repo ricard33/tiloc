@@ -1,28 +1,29 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { add, parse, startOfMonth, sub } from "date-fns";
-import { BookingFixedTimeline, BookingScrollingTimeline } from "./components";
+import { add, format, parse, startOfMonth, sub } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IconButton } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import queryString from "query-string";
-import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import { useLocalStorage } from "../../common/useLocalStorage";
-import PlanningSettingsDialog, { PlanningSettings } from "./components/PlanningSettingsDialog";
 import { useListBookingsQuery, useListLodgingsQuery } from "../../services/api";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
-import "./Planning.scss";
+import "./Planning2.scss";
 import Page from "../../layouts/Main/Page";
 import { Account, Booking, Lodging, User } from "../../types";
 import useWindowDimensions from "../../common/windowDimensions";
 import { getBookingStatuses } from "../../common/statusUtils";
 import { useAppSelector } from "../../app/hooks";
+import { TimelineView } from "./components/TimelineView";
+import PlanningSettingsDialog, { PlanningSettings } from "../Planning/components/PlanningSettingsDialog";
 
 
 const Planning = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  console.log("search", searchParams);
   const query = queryString.parse(location.search);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
@@ -30,8 +31,9 @@ const Planning = () => {
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
   const [monthsToDisplay, setMonthsToDisplay] = useLocalStorage("planning.monthsToDisplay", 12);
-  const [scrollingTimeline, setScrollingTimeline] = useLocalStorage("planning.scrollingTimeline", false);
-  const initialZoomLevel = isDesktop ? 2 : 1;
+  // const [scrollingTimeline, setScrollingTimeline] = useLocalStorage("planning.scrollingTimeline", false);
+  // const initialZoomLevel = isDesktop ? 2 : 1;
+  const scrollingTimeline = true;
 
   let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
   if (isNaN(requestedDate.valueOf()))
@@ -40,7 +42,7 @@ const Planning = () => {
   // const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
   const [dates, setDates] = useState({
     start: requestedDate,
-    end: scrollingTimeline ? add(requestedDate, { months: initialZoomLevel }) : add(requestedDate, { years: 1 })
+    end: sub(add(requestedDate, { years: 1 }), {days: 1})
   });
   const dateFilter = scrollingTimeline
     ? formatISO(sub(dates.start, { months: 3 })) + ":" + formatISO(add(dates.end, { months: 5 }))
@@ -51,9 +53,9 @@ const Planning = () => {
     isFetching: IsFetchingBooking,
     refetch
   } = useListBookingsQuery({ for_dates: dateFilter }, {
-    // pollingInterval: 60000,
+    pollingInterval: 60000,
     // refetchOnMountOrArgChange: 20,
-    // refetchOnReconnect: true
+    refetchOnReconnect: true
   });
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const bookingStatuses = getBookingStatuses();
@@ -70,10 +72,11 @@ const Planning = () => {
     // console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
   }, [IsFetchingBooking]);
 
-  const onBoundsChange = useCallback((canvasTimeStart: number, canvasTimeEnd: number) => {
-    console.info(new Date(canvasTimeStart).toDateString(), new Date(canvasTimeEnd).toDateString());
+  const onBoundsChange = useCallback((start: Date, end: Date, current: Date) => {
+    console.info("onBoundsChange", start.toDateString(), end.toDateString());
     // const delta = canvasTimeEnd - canvasTimeStart;
-    setDates({ start: new Date(canvasTimeStart), end: new Date(canvasTimeEnd) });
+    setDates({ start, end});
+    setSearchParams({ start: format(current, "yyyy-MM") })
   }, []);
 
   const onCreateBooking = useCallback((lodging: Lodging, begin_date: Date) => {
@@ -95,9 +98,9 @@ const Planning = () => {
     if (typeof newSettings !== "undefined") {
       setShowPaymentStatus(newSettings.showPaymentStatus);
       setMonthsToDisplay(newSettings.monthsToDisplay);
-      setScrollingTimeline(newSettings.scrollingTimeline);
+      // setScrollingTimeline(newSettings.scrollingTimeline);
     }
-  }, [setMonthsToDisplay, setScrollingTimeline, setShowPaymentStatus]);
+  }, [setMonthsToDisplay, setShowPaymentStatus]);
 
   const settings: PlanningSettings = {
     showPaymentStatus,
@@ -106,7 +109,7 @@ const Planning = () => {
   };
 
   return (
-    <Page className="planning">
+    <Page className="planning2">
       <Routes>
         <Route
           path=":bookingId"
@@ -117,41 +120,15 @@ const Planning = () => {
             />}
         />
       </Routes>
-      <div className="toolbar">
-        <IconButton
-          type="button"
-          color="default"
-          onClick={() => setSettingsOpened(true)}
-          size="large"
-        ><SettingsIcon /></IconButton>
-      </div>
-      {scrollingTimeline ?
-        <>
-          <BookingScrollingTimeline
-            bookings={bookings ?? []}
-            lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
-            beginDate={dates.start}
-            endDate={dates.end}
-            onCreateBooking={canAdd ? onCreateBooking : undefined}
-            onBoundsChange={onBoundsChange}
-            settings={settings}
-            disabled={isLoadingBookings}
-          />
-        </> : <>
-          <DateNavBar
-            date={dates.start} onChange={(newDate) => setDates({ start: newDate, end: add(newDate, { years: 1 }) })}
-          />
-          <BookingFixedTimeline
-            bookings={bookings ?? []}
-            lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
-            beginDate={dates.start}
-            onCreateBooking={canAdd ? onCreateBooking : undefined}
-            settings={settings}
-            disabled={isLoadingBookings}
-          />
-        </>
-      }
-
+      <TimelineView
+        bookings={bookings ?? []}
+        lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
+        defaultBeginDate={dates.start}
+        onCreateBooking={canAdd ? onCreateBooking : undefined}
+        onBoundsChange={onBoundsChange}
+        settings={settings}
+        disabled={isLoadingBookings}
+      />
       <br />
       {/*<Card className="planning-legend">*/}
       <p>
