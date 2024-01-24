@@ -139,7 +139,7 @@ const Planning = () => {
           />
         </> : <>
           <DateNavBar
-            date={dates.start} onChange={(newDate) => setDates({ start: newDate, end: add(newDate, { years: 1 }) })}
+            date={dates.start} onChange={(newDate) => setDates({ start: startOfMonth(newDate), end: add(startOfMonth(newDate), { years: 1 }) })}
           />
           <BookingFixedTimeline
             bookings={bookings ?? []}

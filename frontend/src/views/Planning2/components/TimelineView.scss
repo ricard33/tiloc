@@ -142,7 +142,7 @@ $primary-red: #f45b69;
         position: absolute;
         top: 0;
         right: 0;
-        font-size: small;
+        font-size: 0.7rem;
         color: $primary-grey;
 
       }
@@ -252,7 +252,7 @@ $primary-red: #f45b69;
     border-left: 1px solid $border-color;
     min-width: 100px;
     overflow-x: clip;
-    text-wrap: avoid;
+    white-space: nowrap;
 
     a {
       text-decoration: none;
@@ -263,6 +263,13 @@ $primary-red: #f45b69;
 
   .lodging-name.cancelled {
     font-style: italic;
+  }
+
+  .valign {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    /* vendor prefixes omitted due to brevity */
   }
 
   th.day,
@@ -292,11 +299,15 @@ $primary-red: #f45b69;
     //margin: 2px;
     vertical-align: bottom;
 
-    &:hover {
+    &:hover:not(:has(*:hover)) {
       //border: 2px solid $border-color;
       box-shadow: inset 0px 0px 0px 2px $border-color;
       //margin: 2px;
       //border-right: 1px solid $border-color;
+    }
+
+    &.available {
+      cursor: copy;
     }
 
     .guestName {
@@ -325,8 +336,8 @@ $primary-red: #f45b69;
     z-index: 80;
     border-radius: 4px;
     box-sizing: border-box;
-    height: 20px;
-    line-height: 20px;
+    height: 30px;
+    line-height: 30px;
     left: 10px;
     //bottom: 4px;
 

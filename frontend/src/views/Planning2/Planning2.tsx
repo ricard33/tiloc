@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { add, format, parse, startOfMonth, sub } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { IconButton } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import queryString from "query-string";
 import { formatISO } from "../../common/tzUtils";
@@ -17,16 +17,18 @@ import { getBookingStatuses } from "../../common/statusUtils";
 import { useAppSelector } from "../../app/hooks";
 import { TimelineView } from "./components/TimelineView";
 import PlanningSettingsDialog, { PlanningSettings } from "../Planning/components/PlanningSettingsDialog";
+import { DateNavBar } from "../Planning/components";
 
 
 const Planning = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log("search", searchParams);
+  // console.log("search", searchParams);
   const query = queryString.parse(location.search);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 900;
+  const [goToDate, setGoToDate] = useState<Date | undefined>(undefined);
 
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [showPaymentStatus, setShowPaymentStatus] = useLocalStorage("planning.showPaymentStatus", true);
@@ -39,10 +41,10 @@ const Planning = () => {
   if (isNaN(requestedDate.valueOf()))
     requestedDate = startOfMonth(new Date());
 
-  // const [beginDate, setBeginDate] = useState(startOfMonth(requestedDate));
+  const [beginDate, setBeginDate] = useState(requestedDate);
   const [dates, setDates] = useState({
     start: requestedDate,
-    end: sub(add(requestedDate, { years: 1 }), {days: 1})
+    end: sub(add(requestedDate, { years: 1 }), { days: 1 })
   });
   const dateFilter = scrollingTimeline
     ? formatISO(sub(dates.start, { months: 3 })) + ":" + formatISO(add(dates.end, { months: 5 }))
@@ -72,11 +74,15 @@ const Planning = () => {
     // console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
   }, [IsFetchingBooking]);
 
-  const onBoundsChange = useCallback((start: Date, end: Date, current: Date) => {
+  const onScroll = useCallback((start: Date, end: Date) => {
+    setBeginDate(start);
+    setSearchParams({ start: format(start, "yyyy-MM") });
+  }, [setSearchParams]);
+
+  const onBoundsChange = useCallback((start: Date, end: Date) => {
     console.info("onBoundsChange", start.toDateString(), end.toDateString());
     // const delta = canvasTimeEnd - canvasTimeStart;
-    setDates({ start, end});
-    setSearchParams({ start: format(current, "yyyy-MM") })
+    setDates({ start, end });
   }, []);
 
   const onCreateBooking = useCallback((lodging: Lodging, begin_date: Date) => {
@@ -120,11 +126,27 @@ const Planning = () => {
             />}
         />
       </Routes>
+      <Stack direction={"row"}>
+        <IconButton
+          type="button"
+          color="default"
+          onClick={() => setSettingsOpened(true)}
+          size="small"
+        ><SettingsIcon /></IconButton>
+        <DateNavBar
+          date={beginDate}
+          // onChange={(newDate) => setDates({ start: newDate, end: add(newDate, { years: 1 }) })}
+          onChange={(newDate) => setGoToDate(newDate)}
+          hideMonthNav
+        />
+      </Stack>
       <TimelineView
         bookings={bookings ?? []}
         lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
-        defaultBeginDate={dates.start}
+        defaultBeginDate={beginDate}
+        goToDate={goToDate}
         onCreateBooking={canAdd ? onCreateBooking : undefined}
+        onScroll={onScroll}
         onBoundsChange={onBoundsChange}
         settings={settings}
         disabled={isLoadingBookings}

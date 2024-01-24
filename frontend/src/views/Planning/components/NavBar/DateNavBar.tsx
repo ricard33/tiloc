@@ -28,12 +28,14 @@ const NavButton: React.FC<NavButtonProps> = (props) => {
 type NavBarProps = {
   date: Date,
   onChange: (newDate: Date) => void,
+  hideMonthNav?: boolean,
 };
 
 
 const DateNavBar: React.FC<NavBarProps> = props => {
-  const {date, onChange} = props;
-  const [currentDate, setCurrentDate] = useState(startOfMonth(date));
+  const {date, onChange, hideMonthNav} = props;
+  // const [currentDate, setCurrentDate] = useState(startOfMonth(date));
+  const currentDate = startOfMonth(date);
   const { t } = useTranslation();
   const { width: windowWidth } = useWindowDimensions();
   const isPhone = windowWidth < 600;
@@ -42,7 +44,7 @@ const DateNavBar: React.FC<NavBarProps> = props => {
   const onPrevNextClick = (months: number) => {
     console.log(performance.now().toFixed(2), "onPrevNextClick");
     const newDate = add(date, {months: months});
-    setCurrentDate(newDate)
+    // setCurrentDate(newDate)
     onChange(newDate);
   };
 
@@ -51,13 +53,16 @@ const DateNavBar: React.FC<NavBarProps> = props => {
       <Grid item className="backward-buttons">
         {!isPhone && <NavButton onClick={() => onPrevNextClick(-12)}>&larr;{isPhone ? t("12 m") : t("12 months")}</NavButton>}
         <NavButton onClick={() => onPrevNextClick(-6)}>&larr;{isPhone ? t("6 m") : t("6 months")}</NavButton>
-        <NavButton onClick={() => onPrevNextClick(-1)}>&larr;{formatDate(add(currentDate, {months: -1}), monthFormat)}
-        </NavButton>
+        {!hideMonthNav && <NavButton onClick={() => onPrevNextClick(-1)}>&larr;{formatDate(add(currentDate, {months: -1}), monthFormat)}
+        </NavButton>}
+      </Grid>
+      <Grid item className="" sx={{alignSelf: "center"}}>
+        <NavButton onClick={() => onChange(new Date())}>{t("Today")}</NavButton>
       </Grid>
       <Grid item className="forward-buttons" sx={{alignSelf: "right"}}>
-        <NavButton onClick={() => onPrevNextClick(1)}>
+        {!hideMonthNav && <NavButton onClick={() => onPrevNextClick(1)}>
           {formatDate(add(currentDate, {months: 1}), monthFormat)}&rarr;
-        </NavButton>
+        </NavButton>}
         <NavButton onClick={() => onPrevNextClick(6)}>{isPhone ? t("6 m") : t("6 months")}&rarr;</NavButton>
         {!isPhone && <NavButton onClick={() => onPrevNextClick(12)}>{isPhone ? t("12 m") : t("12 months")}&rarr;</NavButton>}
       </Grid>

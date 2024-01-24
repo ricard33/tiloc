@@ -61,7 +61,8 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
     cancelBooking,
     uncancelBooking,
     deleteBooking
-  } = useBookingActions(location.pathname.startsWith("/planning") ? "/planning" : undefined);
+  } = useBookingActions(location.pathname.startsWith("/planning2") ? "/planning2" :
+    location.pathname.startsWith("/planning") ? "/planning" : undefined);
 
   const getBoundingClientRect = () => {
     return new DOMRect(mousePosition.x, mousePosition.y, 1, 10);

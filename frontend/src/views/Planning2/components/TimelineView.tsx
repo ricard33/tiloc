@@ -10,7 +10,7 @@ import {
   format,
   getDaysInMonth, isSameDay,
   isWeekend,
-  isWithinInterval,
+  isWithinInterval, startOfDay,
   startOfMonth, sub
 } from "date-fns";
 import { DateRange } from "../../../components/DateRangeSelector";
@@ -22,30 +22,44 @@ import { getBookingStatus, getIconAndBgColor, otaBranding, OtaIconProps } from "
 import { darken } from "@mui/system";
 import EuroIcon from "@mui/icons-material/Euro";
 import { useTranslation } from "react-i18next";
+import BookingTooltip from "../../../components/BookingTooltip";
 
+type Day = {
+  date: Date,
+  label: string,
+  weekDay: string,
+  isWeekend: boolean,
+  isToday: boolean,
+  booking?: Booking,
+  bookingOffset?: number,
+  isBusy?: boolean,
+}
 
 type Props = {
   defaultBeginDate?: Date,
+  goToDate?: Date,    // special property: make an action on value change
   bookings: Booking[],
   disabled: boolean,
   lodgings: Lodging[],
   buffer?: number,
   onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
-  onBoundsChange: (canvasStart: Date, canvasEnd: Date, current: Date) => void,
+  onScroll?: (visibleStart: Date, visibleEnd: Date) => void,
+  onBoundsChange: (canvasStart: Date, canvasEnd: Date) => void,
   settings: PlanningSettings,
 };
 
 export const TimelineView: React.FC<Props> = props => {
-  const { defaultBeginDate, bookings, lodgings, buffer } = {
+  const { defaultBeginDate, goToDate, bookings, lodgings, buffer } = {
     defaultBeginDate: startOfMonth(new Date()),
-    buffer: 5,
+    buffer: 9,
     ...props
   };
   const { t } = useTranslation();
-  const dayWidth = 40;
-  const dayHeight = 30;
+  const dayWidth = 30;
+  const dayHeight = 40;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const visibleWidth = dimensions.width;  //2000;
+  const visibleWidth = dimensions.width;
+  const startDate = startOfDay(defaultBeginDate);  // TODO change it
   const [range, setRange] = useState({
     startDate: sub(startOfMonth(defaultBeginDate), { months: (buffer - 1) / 2 }),
     endDate: endOfMonth(add(defaultBeginDate, { months: (buffer - 1) / 2 }))
@@ -55,9 +69,18 @@ export const TimelineView: React.FC<Props> = props => {
   const [scrollPosUpdate, setScrollPosUpdate] = useState(scrollPos);
   const [loadedPos, setLoadedPos] = useState({ date: defaultBeginDate, pos: scrollPos });
   const ref = useRef<HTMLDivElement>(null);
-  const commonDayStyle = {
+  const heightStyle = {
     height: `${dayHeight}px`,
     minHeight: `${dayHeight}px`
+  };
+  const widthStyle = {
+    width: `${dayWidth}px`,
+    minWidth: `${dayWidth}px`,
+    maxWidth: `${dayWidth}px`
+  };
+  const widthAndHeightStyle = {
+    ...widthStyle,
+    ...heightStyle,
   };
 
   useEffect(() => {
@@ -66,6 +89,16 @@ export const TimelineView: React.FC<Props> = props => {
       ref.current.scrollLeft = scrollPosUpdate;
     }
   }, [scrollPosUpdate]);
+
+  useEffect(() => {
+    if (ref.current && goToDate) {
+      console.info("Go to date  ", goToDate.toDateString());
+      console.info("loaded date ", loadedPos.date.toDateString());
+      console.info("Go to pos   ", differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth);
+      updateBounds({ startDate: goToDate, endDate: add(goToDate, { days: visibleWidth / dayWidth }) });
+      // ref.current.scrollLeft = differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth;
+    }
+  }, [goToDate]);
 
   useLayoutEffect(() => {
     console.log("useLayoutEffect");
@@ -81,26 +114,43 @@ export const TimelineView: React.FC<Props> = props => {
     };
   }, []);
 
-  function updateBounds(visibleArea: { left: number, right: number }) {
-    console.log("updateBounds", visibleArea, "width=", visibleWidth);
-    const start = add(loadedPos.date, { days: (visibleArea.left - loadedPos.pos) / dayWidth });
-    const end = add(loadedPos.date, { days: (visibleArea.right - loadedPos.pos) / dayWidth });
-    console.info("updateBounds", start.toDateString(), end.toDateString());
-    const width = (visibleArea.right - visibleArea.left) / dayWidth;
-    const offsetInDays = width * (buffer - 1) / 2;
+  const posToDate = (pos: number): Date => {
+    return add(loadedPos.date, { days: (pos - loadedPos.pos) / dayWidth });
+  };
+
+  function updateBounds(visibleRange: { startDate: Date, endDate: Date }) {
+    console.info("updateBounds", visibleRange.startDate.toDateString(), visibleRange.endDate.toDateString());
+    const widthInDays = visibleWidth / dayWidth;
+    const offsetInDays = widthInDays * (buffer - 1) / 2;
+    console.log(`widthInDays=${widthInDays}  offsetInDays=${offsetInDays}`);
     const newRange = {
-      startDate: startOfMonth(sub(start, { days: offsetInDays })),
-      endDate: endOfMonth(add(end, { days: offsetInDays }))
+      startDate: startOfMonth(sub(visibleRange.startDate, { days: offsetInDays })),
+      endDate: endOfMonth(add(visibleRange.endDate, { days: offsetInDays }))
     };
     props.onBoundsChange && props.onBoundsChange(
       newRange.startDate,
-      newRange.endDate,
-      start
+      newRange.endDate
     );
     setRange(newRange);
-    const newScrollPos = differenceInCalendarDays(start, newRange.startDate) * dayWidth;
-    setLoadedPos({ date: start, pos: newScrollPos });
+    const newScrollPos = differenceInCalendarDays(visibleRange.startDate, newRange.startDate) * dayWidth;
+    setLoadedPos({ date: visibleRange.startDate, pos: newScrollPos });
     setScrollPosUpdate(newScrollPos);
+  }
+
+  function handleScroll(event: React.UIEvent<HTMLDivElement, UIEvent>) {
+    const pos = event.currentTarget.scrollLeft;
+    // console.log("handleScroll", pos);
+    setScrollPos(pos);
+    const limit = (buffer - 1) * visibleWidth / 2 / 2;
+    // console.log("handleScroll", limit);
+    if (props.onScroll) props.onScroll(posToDate(pos), posToDate(pos + visibleWidth));
+    if (pos < loadedPos.pos - limit || pos > loadedPos.pos + limit) {
+      updateBounds({ startDate: posToDate(pos), endDate: posToDate(pos + visibleWidth) });
+    }
+  }
+
+  function handleDayClick(lodging: Lodging, day: Day) {
+    if (!day.isBusy && props.onCreateBooking) props.onCreateBooking(lodging, day.date);
   }
 
   function getMonths(range: DateRange) {
@@ -113,7 +163,7 @@ export const TimelineView: React.FC<Props> = props => {
     });
   }
 
-  function getDays(range: DateRange) {
+  function getDays(range: DateRange): Day[] {
     const today = new Date();
     return eachDayOfInterval({ start: range.startDate, end: range.endDate }).map(d => {
       return {
@@ -126,25 +176,27 @@ export const TimelineView: React.FC<Props> = props => {
     });
   }
 
-  function getDaysWithBookings(lodging?: Lodging) {
-    return getDays(range).map(e => {
+  function getDaysWithBookings(lodging?: Lodging): Day[] {
+    return getDays(range).map((day, index) => {
       const booking = bookings
         .find(b =>
           (
             lodging
               ? b.lodgings.find(l => l.id === lodging.id) && !b.cancelled
               : b.cancelled)
-          && isWithinInterval(e.date, { start: b.begin_date, end: b.end_date })
+          && isWithinInterval(day.date, { start: b.begin_date, end: b.end_date })
         );
+      const sameDay = booking && isSameDay(booking.begin_date, day.date);
       return {
-        ...e,
-        booking: booking && isSameDay(booking.begin_date, e.date) ? booking : undefined,
-        isBusy: booking && !isSameDay(booking.end_date, e.date)
+        ...day,
+        booking: (sameDay || index === 0) ? booking : undefined,
+        bookingOffset: (booking && !sameDay && index === 0) ? differenceInCalendarDays(day.date, booking.begin_date) : undefined,
+        isBusy: booking && !isSameDay(booking.end_date, day.date)
       };
     });
   }
 
-  function getBookingItem(booking: Booking) {
+  function renderBookingItem(booking: Booking, offsetInDays: number) {
     const statusProp = booking.status === BookingStatus.External.name
       ? getIconAndBgColor(booking)
       : {
@@ -154,37 +206,29 @@ export const TimelineView: React.FC<Props> = props => {
       };
 
     return (
-      <div
-        className="item"
-        style={{
-          width: (dayWidth * booking.duration - 0.1 * dayWidth) + "px",
-          // color: "black",
-          color: statusProp.color,
-          backgroundColor: statusProp.bgColor,
-          opacity: !booking.cancelled ? undefined : "50%"
-        }}
-      >
-        {statusProp.icon ? statusProp.icon : ""}
-        <div className="item-title">{booking.lodgings.length > 1 &&
-          <span>{"\uD83D"}{"\uDD17"} </span>}{booking.guest_name}</div>
-        {booking.price && booking.price > 0 ?
-          <EuroIcon
-            className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
-            style={{ height: `100%` }}
-          /> : ""}
-      </div>
+      <BookingTooltip booking={booking}>
+        <div
+          className="item"
+          style={{
+            width: (dayWidth * booking.duration - 0.1 * dayWidth) + "px",
+            // color: "black",
+            color: statusProp.color,
+            backgroundColor: statusProp.bgColor,
+            opacity: !booking.cancelled ? undefined : "50%",
+            left: `${0.25 * dayWidth - offsetInDays * dayWidth}px`
+          }}
+        >
+          {statusProp.icon ? statusProp.icon : ""}
+          <div className="item-title">{booking.lodgings.length > 1 &&
+            <span>{"\uD83D"}{"\uDD17"} </span>}{booking.guest_name}</div>
+          {booking.price && booking.price > 0 ?
+            <EuroIcon
+              className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
+              style={{ height: `100%` }}
+            /> : ""}
+        </div>
+      </BookingTooltip>
     );
-  }
-
-  function handleScroll(event: React.UIEvent<HTMLDivElement, UIEvent>) {
-    const pos = event.currentTarget.scrollLeft;
-    // console.log("handleScroll", pos);
-    setScrollPos(pos);
-    const limit = (buffer - 1) * visibleWidth / 2 / 2;
-    console.log("handleScroll", limit);
-    if (pos < loadedPos.pos - limit || pos > loadedPos.pos + limit) {
-      updateBounds({ left: pos, right: pos + visibleWidth });
-    }
   }
 
   return (
@@ -203,21 +247,21 @@ export const TimelineView: React.FC<Props> = props => {
               })}
             </tr>
             <tr className="second-tr">
-              <th className="lodging-name"></th>
+              <th className="lodging-name" />
               {getDays(range).map((d) => {
                 return <th
                   key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
-                  style={commonDayStyle}
+                  style={widthStyle}
                 >{d.label}</th>;
               })}
             </tr>
             <tr className="third-tr">
-              <th className="lodging-name"></th>
+              <th className="lodging-name" />
               {getDays(range).map((d) => {
                 return (
                   <th
                     key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
-                    style={commonDayStyle}
+                    style={widthStyle}
                   >{d.weekDay}</th>
                 );
               })}
@@ -226,15 +270,24 @@ export const TimelineView: React.FC<Props> = props => {
           <tbody>
             {lodgings.map(l =>
               <tr key={l.id}>
-                <td className="lodging-name" style={commonDayStyle} title={l.name}>{l.name}</td>
+                <td className="lodging-name" style={heightStyle} title={l.name}>
+                  <div className="valign">{l.name}</div>
+                </td>
                 {getDaysWithBookings(l).map((d) => {
                   return (
                     <td
-                      key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
-                      style={commonDayStyle}
+                      key={d.date.valueOf()}
+                      className={clsx("day", {
+                        weekend: d.isWeekend,
+                        today: d.isToday,
+                        available: !d.isBusy,
+                        busy: d.isBusy
+                      })}
+                      style={widthAndHeightStyle}
+                      onClick={() => handleDayClick(l, d)}
                     >
                       {!d.isBusy && <div className="day-price">{l.daily_rate} €</div>}
-                      {d.booking && getBookingItem(d.booking)}
+                      {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}
                     </td>
                   );
                 })}
@@ -242,15 +295,17 @@ export const TimelineView: React.FC<Props> = props => {
             )}
             <tr key={-1}>
               <td
-                className="lodging-name cancelled" style={commonDayStyle} title={t("Cancellation / Waiting")}
-              >{t("Cancellation")}</td>
+                className="lodging-name cancelled" style={heightStyle} title={t("Cancellation / Waiting")}
+              >
+                <div className="valign">{t("Cancellation")}</div>
+              </td>
               {getDaysWithBookings().map((d) => {
                 return (
                   <td
                     key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
-                    style={commonDayStyle}
+                    style={widthAndHeightStyle}
                   >
-                    {d.booking && getBookingItem(d.booking)}
+                    {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}
                   </td>
                 );
               })}
@@ -261,8 +316,9 @@ export const TimelineView: React.FC<Props> = props => {
         {/*<div className="item">This is an item</div>*/}
       </div>
       <pre>
-        <div>Start : {defaultBeginDate.toDateString()}</div>
-        <div>range : {range.startDate.toDateString()} {range.endDate.toDateString()}</div>
+        <div>Start     : {defaultBeginDate.toDateString()}</div>
+        <div>goToDate  : {goToDate?.toDateString()}</div>
+        <div>range     : {range.startDate.toDateString()} {range.endDate.toDateString()}</div>
         <div>loadedPos : {loadedPos.date.toDateString()} {loadedPos.pos}</div>
         <div>ScrollPos : {scrollPos}</div>
         <div>Width : {visibleWidth}</div>
