@@ -12,7 +12,7 @@ import {
   getDaysInMonth, isLastDayOfMonth,
   isSameDay,
   isWeekend,
-  isWithinInterval,
+  isWithinInterval, max, min,
   startOfMonth,
   sub
 } from "date-fns";
@@ -41,6 +41,9 @@ type Day = {
   booking?: Booking,
   bookingOffset?: number,
   isBusy?: boolean,
+  isSelected?: boolean,
+  isSelectionStart?: boolean,
+  isSelectionEnd?: boolean,
 }
 
 type Props = {
@@ -50,7 +53,7 @@ type Props = {
   disabled: boolean,
   lodgings: Lodging[],
   buffer?: number,
-  onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
+  onCreateBooking?: (lodging: Lodging, startDate: Date, endDate: Date) => void,
   onScroll?: (visibleStart: Date, visibleEnd: Date) => void,
   onBoundsChange: (canvasStart: Date, canvasEnd: Date) => void,
   settings: PlanningSettings,
@@ -78,6 +81,8 @@ export const TimelineView: React.FC<Props> = props => {
   const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
   const [scrollPosUpdate, setScrollPosUpdate] = useState(scrollPos);
   const [loadedPos, setLoadedPos] = useState({ date: defaultBeginDate, pos: scrollPos });
+  const [selectStart, setSelectStart] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
+  const [selectionEnd, setSelectionEnd] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const { width: screenWidth } = useWindowDimensions();
   const isDesktop = screenWidth >= 900;
   const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
@@ -137,7 +142,7 @@ export const TimelineView: React.FC<Props> = props => {
     console.info("updateBounds", visibleRange.startDate.toDateString(), visibleRange.endDate.toDateString());
     const widthInDays = visibleWidth / dayWidth;
     const offsetInDays = widthInDays * (buffer - 1) / 2;
-    console.log(`widthInDays=${widthInDays}  offsetInDays=${offsetInDays}`);
+    // console.log(`widthInDays=${widthInDays}  offsetInDays=${offsetInDays}`);
     const newRange = {
       startDate: startOfMonth(sub(visibleRange.startDate, { days: offsetInDays })),
       endDate: endOfMonth(add(visibleRange.endDate, { days: offsetInDays }))
@@ -165,7 +170,15 @@ export const TimelineView: React.FC<Props> = props => {
   }
 
   function handleDayClick(lodging: Lodging, day: Day) {
-    if (!day.isBusy && props.onCreateBooking) props.onCreateBooking(lodging, day.date);
+    if (selectStart && selectStart.lodging.id === lodging.id) {
+      if (!isSameDay(day.date, selectStart.date) && (!day.isBusy || day.booking)) {
+        props.onCreateBooking && props.onCreateBooking(lodging, min([day.date, selectStart.date]), max([day.date, selectStart.date]));
+      }
+      setSelectStart(undefined);
+    } else if (!day.isBusy) {
+      setSelectStart({ date: day.date, lodging: lodging });
+      setSelectionEnd({ date: day.date, lodging: lodging });
+    }
   }
 
   function getMonths(range: DateRange) {
@@ -178,22 +191,34 @@ export const TimelineView: React.FC<Props> = props => {
     });
   }
 
-  function getDays(range: DateRange): Day[] {
+  function getDays(range: DateRange, lodging?: Lodging): Day[] {
     const today = new Date();
     return eachDayOfInterval({ start: range.startDate, end: range.endDate }).map(d => {
+      const start = selectStart && selectionEnd && min([selectStart.date, selectionEnd.date]);
+      const end = selectStart && selectionEnd && max([selectStart.date, selectionEnd.date]);
+      const isSelected = selectStart && lodging && lodging.id === selectStart.lodging.id
+        && (isSameDay(selectStart.date, d)
+          || (selectionEnd && isWithinInterval(d, {
+            start: start!,
+            end: end!
+          }))
+        );
       return {
         date: d,
         label: format(d, "dd"),
         weekDay: getWeekdayName(d),
         isWeekend: isWeekend(d),
         isLastDayOfMonth: isLastDayOfMonth(d),
-        isToday: isSameDay(today, d)
+        isToday: isSameDay(today, d),
+        isSelected: isSelected,
+        isSelectionStart: isSelected && isSameDay(d, start!),
+        isSelectionEnd: isSelected && isSameDay(d, end!)
       };
     });
   }
 
   function getDaysWithBookings(lodging?: Lodging): Day[] {
-    return getDays(range).map((day, index) => {
+    return getDays(range, lodging).map((day, index) => {
       const booking = bookings
         .find(b =>
           (
@@ -213,7 +238,14 @@ export const TimelineView: React.FC<Props> = props => {
   }
 
   function getDayClasses(d: Day) {
-    return { weekend: d.isWeekend, "end-of-month": d.isLastDayOfMonth, today: d.isToday };
+    return {
+      weekend: d.isWeekend,
+      "end-of-month": d.isLastDayOfMonth,
+      today: d.isToday,
+      selected: d.isSelected,
+      "selection-start": d.isSelectionStart,
+      "selection-end": d.isSelectionEnd
+    };
   }
 
   function renderBookingItem(booking: Booking, offsetInDays: number) {
@@ -235,12 +267,13 @@ export const TimelineView: React.FC<Props> = props => {
             color: statusProp.color,
             backgroundColor: statusProp.bgColor,
             opacity: !booking.cancelled ? undefined : "50%",
-            left: `${0.25 * dayWidth - offsetInDays * dayWidth}px`
+            left: `${0.5 * dayWidth - offsetInDays * dayWidth}px`
           }}
         >
           {statusProp.icon ? statusProp.icon : ""}
           {booking.lodgings.length > 1 &&
-            <AllInclusiveIcon fontSize="small"
+            <AllInclusiveIcon
+              fontSize="small"
               style={{
                 height: "100%"
               }}
@@ -318,6 +351,11 @@ export const TimelineView: React.FC<Props> = props => {
                         })}
                       style={widthAndHeightStyle}
                       onClick={() => handleDayClick(l, d)}
+                      onMouseEnter={() => selectStart && selectStart.lodging.id === l.id && setSelectionEnd({
+                        date: d.date,
+                        lodging: l
+                      })}
+                      onMouseLeave={() => selectionEnd && setSelectionEnd(selectStart)}
                     >
                       {settings.showPrices && !d.isBusy && <div className="day-price">{l.daily_rate} €</div>}
                       {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}

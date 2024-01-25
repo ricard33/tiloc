@@ -24,7 +24,8 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const newBooking = bookingId === "new" ? {
     lodging_ids: [lodging_id],
     lodgings: lodgings ? lodgings.filter(l => l.id === lodging_id) : undefined,
-    begin_date: parseISO(query.begin_date as string)
+    begin_date: parseISO(query.begin_date as string),
+    end_date: query.end_date ? parseISO(query.end_date as string) : undefined,
   } : undefined;
   const { data: loadedBooking, isLoading, error: bookingError } = useGetBookingQuery(Number(bookingId), {
     skip: bookingId === "new",

@@ -78,9 +78,10 @@ const Planning = () => {
     setDates({ start, end });
   }, []);
 
-  const onCreateBooking = useCallback((lodging: Lodging, begin_date: Date) => {
-    console.debug("CREATE ", lodging ? lodging.id : null, begin_date);
-    navigate(`new?lodging_id=${lodging.id}&begin_date=${formatISO(begin_date)}`);
+  const onCreateBooking = useCallback((lodging: Lodging, beginDate: Date, endDate?: Date) => {
+    console.debug(`CREATE ${lodging ? lodging.id : null}, ${beginDate.toDateString()}, ${endDate?.toDateString()}`);
+    navigate(`new?lodging_id=${lodging.id}&begin_date=${formatISO(beginDate)}`
+      + (endDate ? `&end_date=${formatISO(endDate)}` : ""));
   }, [navigate]);
 
   const handleCloseEdit = useCallback(() => {

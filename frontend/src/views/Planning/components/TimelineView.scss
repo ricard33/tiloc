@@ -336,8 +336,25 @@ $collapsed-width: 30px;
       //border-right: 1px solid $border-color;
     }
 
+    &.selected.selection-start.selection-end {
+      box-shadow: inset 0 0 0 2px $primary-black !important;
+    }
+    &.selected.selection-start {
+      box-shadow: inset 2px 0 0 2px $primary-black !important;
+      cursor: no-drop !important;
+    }
+
+    &.selected {
+      box-shadow: inset 0 2px 0 0 $primary-black, inset 0 -2px 0 0 $primary-black !important;
+      cursor: copy !important;
+    }
+
+    &.selected.selection-end {
+      box-shadow: inset -2px 0 0 2px $primary-black !important;
+    }
+
     &.available {
-      cursor: copy;
+      cursor: pointer;
     }
 
     .guestName {

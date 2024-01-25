@@ -692,7 +692,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             margin={margin}
                             size="small"
                             type="number"
-                            sx={{ width: "4em" }}
+                            sx={{ width: "6em" }}
                             onChange={(value) => handleChange("duration", Number(value))}
                             options={[
                               ...Array.from({ length: 31 }, (_, k) => k + 1).map(n => ({
