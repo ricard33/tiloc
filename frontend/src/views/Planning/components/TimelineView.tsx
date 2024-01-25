@@ -1,28 +1,34 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
-import { PlanningSettings } from "../../Planning/components/PlanningSettingsDialog";
+import { PlanningSettings } from "./PlanningSettingsDialog";
 import {
   add,
-  differenceInCalendarDays, differenceInDays,
+  differenceInCalendarDays,
+  differenceInDays,
   eachDayOfInterval,
   eachMonthOfInterval,
   endOfMonth,
   format,
-  getDaysInMonth, isSameDay,
+  getDaysInMonth,
+  isSameDay,
   isWeekend,
-  isWithinInterval, startOfDay,
-  startOfMonth, sub
+  isWithinInterval,
+  startOfMonth,
+  sub
 } from "date-fns";
 import { DateRange } from "../../../components/DateRangeSelector";
 import "./TimelineView.scss";
 import { getMonthName, getWeekdayName } from "../../../common/dateUtils";
 import clsx from "clsx";
-import bookingView from "../../../components/BookingView";
-import { getBookingStatus, getIconAndBgColor, otaBranding, OtaIconProps } from "../../../common/statusUtils";
+import { getBookingStatus, getIconAndBgColor } from "../../../common/statusUtils";
 import { darken } from "@mui/system";
 import EuroIcon from "@mui/icons-material/Euro";
 import { useTranslation } from "react-i18next";
 import BookingTooltip from "../../../components/BookingTooltip";
+import { Button } from "@mui/material";
+import useWindowDimensions from "../../../common/windowDimensions";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 type Day = {
   date: Date,
@@ -49,7 +55,10 @@ type Props = {
 };
 
 export const TimelineView: React.FC<Props> = props => {
-  const { defaultBeginDate, goToDate, bookings, lodgings, buffer } = {
+  const {
+    defaultBeginDate, goToDate, bookings, lodgings, buffer,
+    settings
+  } = {
     defaultBeginDate: startOfMonth(new Date()),
     buffer: 9,
     ...props
@@ -59,7 +68,6 @@ export const TimelineView: React.FC<Props> = props => {
   const dayHeight = 40;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const visibleWidth = dimensions.width;
-  const startDate = startOfDay(defaultBeginDate);  // TODO change it
   const [range, setRange] = useState({
     startDate: sub(startOfMonth(defaultBeginDate), { months: (buffer - 1) / 2 }),
     endDate: endOfMonth(add(defaultBeginDate, { months: (buffer - 1) / 2 }))
@@ -68,6 +76,10 @@ export const TimelineView: React.FC<Props> = props => {
   const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
   const [scrollPosUpdate, setScrollPosUpdate] = useState(scrollPos);
   const [loadedPos, setLoadedPos] = useState({ date: defaultBeginDate, pos: scrollPos });
+  const { width: screenWidth } = useWindowDimensions();
+  const isDesktop = screenWidth >= 900;
+  const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
+  const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
   const ref = useRef<HTMLDivElement>(null);
   const heightStyle = {
     height: `${dayHeight}px`,
@@ -80,7 +92,7 @@ export const TimelineView: React.FC<Props> = props => {
   };
   const widthAndHeightStyle = {
     ...widthStyle,
-    ...heightStyle,
+    ...heightStyle
   };
 
   useEffect(() => {
@@ -92,12 +104,13 @@ export const TimelineView: React.FC<Props> = props => {
 
   useEffect(() => {
     if (ref.current && goToDate) {
-      console.info("Go to date  ", goToDate.toDateString());
-      console.info("loaded date ", loadedPos.date.toDateString());
-      console.info("Go to pos   ", differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth);
+      // console.info("Go to date  ", goToDate.toDateString());
+      // console.info("loaded date ", loadedPos.date.toDateString());
+      // console.info("Go to pos   ", differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth);
       updateBounds({ startDate: goToDate, endDate: add(goToDate, { days: visibleWidth / dayWidth }) });
       // ref.current.scrollLeft = differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goToDate]);
 
   useLayoutEffect(() => {
@@ -233,11 +246,18 @@ export const TimelineView: React.FC<Props> = props => {
 
   return (
     <div className="timeline-view">
-      <div className="table-responsive" onScroll={handleScroll} ref={ref}>
+      <div className={clsx("table-responsive", { collapsed: collapsed })} onScroll={handleScroll} ref={ref}>
         <table className="table">
           <thead>
             <tr className="first-tr">
-              <th className="lodging-name"></th>
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })}>
+                <Button
+                  className="collapse-button" variant="outlined" fullWidth
+                  onClick={() => setCollapsed(!collapsed)}
+                >
+                  {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </Button>
+              </th>
               {getMonths(range).map((m) => {
                 return <th key={m.date.valueOf()} colSpan={m.size}>
                   <div className="month">
@@ -247,16 +267,16 @@ export const TimelineView: React.FC<Props> = props => {
               })}
             </tr>
             <tr className="second-tr">
-              <th className="lodging-name" />
-              {getDays(range).map((d) => {
-                return <th
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
+              {getDays(range).map((d) =>
+                <th
                   key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
                   style={widthStyle}
-                >{d.label}</th>;
-              })}
+                >{d.label}</th>
+              )}
             </tr>
             <tr className="third-tr">
-              <th className="lodging-name" />
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
               {getDays(range).map((d) => {
                 return (
                   <th
@@ -270,8 +290,8 @@ export const TimelineView: React.FC<Props> = props => {
           <tbody>
             {lodgings.map(l =>
               <tr key={l.id}>
-                <td className="lodging-name" style={heightStyle} title={l.name}>
-                  <div className="valign">{l.name}</div>
+                <td className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle} title={l.name}>
+                  <div className="lodging-name valign">{l.name}</div>
                 </td>
                 {getDaysWithBookings(l).map((d) => {
                   return (
@@ -286,7 +306,7 @@ export const TimelineView: React.FC<Props> = props => {
                       style={widthAndHeightStyle}
                       onClick={() => handleDayClick(l, d)}
                     >
-                      {!d.isBusy && <div className="day-price">{l.daily_rate} €</div>}
+                      {settings.showPrices && !d.isBusy && <div className="day-price">{l.daily_rate} €</div>}
                       {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}
                     </td>
                   );
@@ -295,9 +315,10 @@ export const TimelineView: React.FC<Props> = props => {
             )}
             <tr key={-1}>
               <td
-                className="lodging-name cancelled" style={heightStyle} title={t("Cancellation / Waiting")}
+                className={clsx("lodging-name-col", "cancelled", { collapsed: collapsed })} style={heightStyle}
+                title={t("Cancellation / Waiting")}
               >
-                <div className="valign">{t("Cancellation")}</div>
+                <div className="lodging-name valign">{t("Cancellation")}</div>
               </td>
               {getDaysWithBookings().map((d) => {
                 return (
@@ -312,17 +333,16 @@ export const TimelineView: React.FC<Props> = props => {
             </tr>
           </tbody>
         </table>
-        {/*{getItems()}*/}
-        {/*<div className="item">This is an item</div>*/}
       </div>
-      <pre>
-        <div>Start     : {defaultBeginDate.toDateString()}</div>
-        <div>goToDate  : {goToDate?.toDateString()}</div>
-        <div>range     : {range.startDate.toDateString()} {range.endDate.toDateString()}</div>
-        <div>loadedPos : {loadedPos.date.toDateString()} {loadedPos.pos}</div>
-        <div>ScrollPos : {scrollPos}</div>
-        <div>Width : {visibleWidth}</div>
-      </pre>
+      {/*<pre>*/}
+      {/*  <div>Start     : {defaultBeginDate.toDateString()}</div>*/}
+      {/*  <div>goToDate  : {goToDate?.toDateString()}</div>*/}
+      {/*  <div>range     : {range.startDate.toDateString()} {range.endDate.toDateString()}</div>*/}
+      {/*  <div>loadedPos : {loadedPos.date.toDateString()} {loadedPos.pos}</div>*/}
+      {/*  <div>ScrollPos : {scrollPos}</div>*/}
+      {/*  <div>Width     : {visibleWidth}</div>*/}
+      {/*  <div>collapsed : {collapsed ? "true" : "false"}</div>*/}
+      {/*</pre>*/}
     </div>
   );
 };

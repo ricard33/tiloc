@@ -61,19 +61,20 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
     cancelBooking,
     uncancelBooking,
     deleteBooking
-  } = useBookingActions(location.pathname.startsWith("/planning2") ? "/planning2" :
-    location.pathname.startsWith("/planning") ? "/planning" : undefined);
+  } = useBookingActions(location.pathname.startsWith("/planning") ? "/planning" : undefined);
 
   const getBoundingClientRect = () => {
     return new DOMRect(mousePosition.x, mousePosition.y, 1, 10);
   };
 
   const handleOpenBooking = useCallback((booking: Booking) => {
+    setAnchorEl(null);
     if (onOpenBooking) return onOpenBooking(booking);
     openBooking(booking);
   }, [onOpenBooking, openBooking]);
 
   const handleEditBooking = useCallback((booking: Booking) => {
+    setAnchorEl(null);
     if (onEditBooking) return onEditBooking(booking);
     editBooking(booking);
   }, [editBooking, onEditBooking]);

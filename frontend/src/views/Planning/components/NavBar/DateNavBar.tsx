@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
-import React, { useState } from "react";
-import { Grid, Button, ButtonProps } from "@mui/material";
+import React from "react";
+import { Button, ButtonProps, Grid } from "@mui/material";
 import { add, startOfMonth } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "../../../../common/dateUtils";

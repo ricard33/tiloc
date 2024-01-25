@@ -39,7 +39,6 @@ import CheckoutDone from "./views/Subscription/CheckoutDone";
 import MyAccount from "./views/Subscription/Acccount";
 import SubscriptionCancel from "./views/Subscription/SubscriptionCancel";
 import ForgottenPassword from "./views/SignIn/ForgottenPassword";
-import Planning2 from "./views/Planning2/Planning2";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
@@ -72,7 +71,6 @@ const MyRoutes = () => {
               </React.Suspense>
             }
           />
-          <Route path="/planning2/*" element={<Planning2 />} />
           <Route path="/bookings/*" element={<BookingList />} />
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/payments" element={<PaymentsList />} />

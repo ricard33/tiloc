@@ -3,12 +3,12 @@ $font-weight-medium: 400;
 $border-color: #ccc;
 $primary-blue: #3b4aff;
 $secondary-blue: #3ea7ff;
-$background-login: #ecf3fa;
 $primary-grey: #9a9a9a;
 $secondary-grey: #ececec;
 $grey-3: #A0A0A0;
 $primary-black: #002333;
 $primary-red: #f45b69;
+$collapsed-width: 30px;
 
 .timeline-view {
   position: relative;
@@ -19,6 +19,11 @@ $primary-red: #f45b69;
     margin-left: 100px;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: auto; // Safari
+
+    &.collapsed {
+      margin-left: $collapsed-width;
+
+    }
 
     &::-webkit-scrollbar {
       height: 8px;
@@ -60,7 +65,6 @@ $primary-red: #f45b69;
           line-height: 10px;
           height: 32px;
 
-
           //&:nth-child(2) {
           //  text-overflow: ellipsis;
           //  overflow: hidden;
@@ -98,7 +102,7 @@ $primary-red: #f45b69;
         border-top: none;
         font-weight: $font-weight-light;
 
-        &.lodging-name {
+        &.lodging-name-col {
           border: none;
           border-right: 1px solid $border-color;
           background-color: inherit;
@@ -113,7 +117,7 @@ $primary-red: #f45b69;
 
       td {
 
-        &.lodging-name {
+        &.lodging-name-col {
           background-color: inherit;
         }
       }
@@ -139,10 +143,10 @@ $primary-red: #f45b69;
       }
 
       .day-price {
-        position: absolute;
+        //position: absolute;
         top: 0;
         right: 0;
-        font-size: 0.7rem;
+        font-size: 0.6rem;
         color: $primary-grey;
 
       }
@@ -213,7 +217,7 @@ $primary-red: #f45b69;
     //padding-left: 13px;
     //padding-top: 1rem;
     //padding-bottom: 1rem;
-    background-color: $background-login;
+    background-color: $secondary-grey;
     //border-left: 1px solid $secondary-grey;
   }
 
@@ -236,7 +240,7 @@ $primary-red: #f45b69;
 
     &:not(.third-tr) {
 
-      .lodging-name {
+      .lodging-name-col {
         border-bottom: 1px solid $border-color;
         border-top: 1px solid $border-color;
       }
@@ -247,12 +251,28 @@ $primary-red: #f45b69;
     }
   }
 
-  .lodging-name {
+  .collapse-button {
+    min-width: inherit;
+  }
+
+  .lodging-name-col {
     border-top: 1px solid $border-color;
     border-left: 1px solid $border-color;
     min-width: 100px;
-    overflow-x: clip;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+
+    &.collapsed {
+      min-width: 20px;
+      width: $collapsed-width;
+
+    }
+
+    .lodging-name {
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+    }
 
     a {
       text-decoration: none;
@@ -261,7 +281,7 @@ $primary-red: #f45b69;
     }
   }
 
-  .lodging-name.cancelled {
+  .lodging-name-col.cancelled {
     font-style: italic;
   }
 
@@ -297,11 +317,12 @@ $primary-red: #f45b69;
     font-size: 1rem;
     //box-sizing: border-box;
     //margin: 2px;
-    vertical-align: bottom;
+    vertical-align: center;
+    text-align: right;
 
-    &:hover:not(:has(*:hover)) {
+    &:hover:not(:has(.item:hover)):not(.busy) {
       //border: 2px solid $border-color;
-      box-shadow: inset 0px 0px 0px 2px $border-color;
+      box-shadow: inset 0 0 0 2px $border-color;
       //margin: 2px;
       //border-right: 1px solid $border-color;
     }
@@ -340,6 +361,12 @@ $primary-red: #f45b69;
     line-height: 30px;
     left: 10px;
     //bottom: 4px;
+
+    &:hover {
+      border-left-width: 3px;
+      border-right-width: 3px;
+      border-color: orange;
+    }
 
     .item-title {
       display: inline;
