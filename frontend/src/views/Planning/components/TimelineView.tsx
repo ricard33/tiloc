@@ -9,7 +9,7 @@ import {
   eachMonthOfInterval,
   endOfMonth,
   format,
-  getDaysInMonth,
+  getDaysInMonth, isLastDayOfMonth,
   isSameDay,
   isWeekend,
   isWithinInterval,
@@ -29,12 +29,14 @@ import { Button } from "@mui/material";
 import useWindowDimensions from "../../../common/windowDimensions";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 
 type Day = {
   date: Date,
   label: string,
   weekDay: string,
   isWeekend: boolean,
+  isLastDayOfMonth: boolean;
   isToday: boolean,
   booking?: Booking,
   bookingOffset?: number,
@@ -64,7 +66,7 @@ export const TimelineView: React.FC<Props> = props => {
     ...props
   };
   const { t } = useTranslation();
-  const dayWidth = 30;
+  const dayWidth = 20;
   const dayHeight = 40;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const visibleWidth = dimensions.width;
@@ -184,6 +186,7 @@ export const TimelineView: React.FC<Props> = props => {
         label: format(d, "dd"),
         weekDay: getWeekdayName(d),
         isWeekend: isWeekend(d),
+        isLastDayOfMonth: isLastDayOfMonth(d),
         isToday: isSameDay(today, d)
       };
     });
@@ -209,6 +212,10 @@ export const TimelineView: React.FC<Props> = props => {
     });
   }
 
+  function getDayClasses(d: Day) {
+    return { weekend: d.isWeekend, "end-of-month": d.isLastDayOfMonth, today: d.isToday };
+  }
+
   function renderBookingItem(booking: Booking, offsetInDays: number) {
     const statusProp = booking.status === BookingStatus.External.name
       ? getIconAndBgColor(booking)
@@ -232,8 +239,14 @@ export const TimelineView: React.FC<Props> = props => {
           }}
         >
           {statusProp.icon ? statusProp.icon : ""}
-          <div className="item-title">{booking.lodgings.length > 1 &&
-            <span>{"\uD83D"}{"\uDD17"} </span>}{booking.guest_name}</div>
+          {booking.lodgings.length > 1 &&
+            <AllInclusiveIcon fontSize="small"
+              style={{
+                height: "100%"
+              }}
+            />
+          }
+          <div className="item-title">{booking.guest_name}</div>
           {booking.price && booking.price > 0 ?
             <EuroIcon
               className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
@@ -270,7 +283,7 @@ export const TimelineView: React.FC<Props> = props => {
               <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
               {getDays(range).map((d) =>
                 <th
-                  key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
+                  key={d.date.valueOf()} className={clsx("day", getDayClasses(d))}
                   style={widthStyle}
                 >{d.label}</th>
               )}
@@ -280,7 +293,7 @@ export const TimelineView: React.FC<Props> = props => {
               {getDays(range).map((d) => {
                 return (
                   <th
-                    key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
+                    key={d.date.valueOf()} className={clsx("day", getDayClasses(d))}
                     style={widthStyle}
                   >{d.weekDay}</th>
                 );
@@ -297,12 +310,12 @@ export const TimelineView: React.FC<Props> = props => {
                   return (
                     <td
                       key={d.date.valueOf()}
-                      className={clsx("day", {
-                        weekend: d.isWeekend,
-                        today: d.isToday,
-                        available: !d.isBusy,
-                        busy: d.isBusy
-                      })}
+                      className={clsx("day",
+                        getDayClasses(d),
+                        {
+                          available: !d.isBusy,
+                          busy: d.isBusy
+                        })}
                       style={widthAndHeightStyle}
                       onClick={() => handleDayClick(l, d)}
                     >
@@ -323,7 +336,8 @@ export const TimelineView: React.FC<Props> = props => {
               {getDaysWithBookings().map((d) => {
                 return (
                   <td
-                    key={d.date.valueOf()} className={clsx("day", { weekend: d.isWeekend, today: d.isToday })}
+                    key={d.date.valueOf()}
+                    className={clsx("day", getDayClasses(d))}
                     style={widthAndHeightStyle}
                   >
                     {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}

@@ -5,7 +5,7 @@ $primary-blue: #3b4aff;
 $secondary-blue: #3ea7ff;
 $primary-grey: #9a9a9a;
 $secondary-grey: #ececec;
-$grey-3: #A0A0A0;
+$today-color: #ff00001c;
 $primary-black: #002333;
 $primary-red: #f45b69;
 $collapsed-width: 30px;
@@ -58,7 +58,7 @@ $collapsed-width: 30px;
         border-top: 1px solid $border-color;
 
         th {
-          border-right: 1px solid $border-color;
+          border-right: 2px solid $border-color;
           font-style: normal;
           font-weight: $font-weight-medium;
           font-size: 1rem;
@@ -94,7 +94,7 @@ $collapsed-width: 30px;
         padding-bottom: 0;
         font-style: normal;
         font-weight: $font-weight-light;
-        font-size: 1rem;
+        font-size: 0.9rem;
         line-height: 1.5;
       }
 
@@ -107,6 +107,10 @@ $collapsed-width: 30px;
           border-right: 1px solid $border-color;
           background-color: inherit;
           height: 42px;
+        }
+
+        &.day {
+          font-size: 0.9rem;
         }
 
         &.weekend {
@@ -306,8 +310,13 @@ $collapsed-width: 30px;
       background-color: $secondary-grey;
     }
 
+    &.end-of-month {
+      border-right: 2px solid $border-color;
+    }
+
+
     &.today {
-      background-color: $grey-3;
+      background-color: $today-color;
     }
   }
 
@@ -370,8 +379,12 @@ $collapsed-width: 30px;
 
     .item-title {
       display: inline;
+      //overflow: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
       vertical-align: text-bottom;
       margin-left: 5px;
+      margin-right: 10px;
       position: sticky;
       left: 4px;
     }

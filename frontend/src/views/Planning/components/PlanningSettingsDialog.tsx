@@ -24,7 +24,7 @@ export const loadPlanningSettings = (): PlanningSettings => {
     display: getStorageValue("planning.display", "timeline"),
     monthsToDisplay: getStorageValue("planning.monthsToDisplay", 12),
     showPaymentStatus: getStorageValue("planning.showPaymentStatus", true),
-    showPrices: getStorageValue("planning.showPrices", true),
+    showPrices: getStorageValue("planning.showPrices", false),
   };
 };
 

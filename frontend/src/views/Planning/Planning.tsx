@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IconButton, Stack } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import queryString from "query-string";
 import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import PlanningSettingsDialog, { loadPlanningSettings, PlanningSettings } from "./components/PlanningSettingsDialog";
@@ -23,16 +22,15 @@ const Planning = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log("search", searchParams);
-  console.log("search", searchParams.get("start"));
-  const query = queryString.parse(location.search);
+  // console.log("search", searchParams);
+  // console.log("search", searchParams.get("start"));
   const [goToDate, setGoToDate] = useState<Date | undefined>(undefined);
 
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [settings, setSettings] = useState(loadPlanningSettings());
   const scrollingTimeline = settings.display === "timeline";
 
-  let requestedDate = parse(query.start as string, "yyyy-MM", new Date());
+  let requestedDate = parse(searchParams.get("start") as string, "yyyy-MM", new Date());
   if (isNaN(requestedDate.valueOf()))
     requestedDate = startOfMonth(new Date());
 

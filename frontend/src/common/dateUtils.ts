@@ -37,6 +37,6 @@ export function getMonthName(date: number | Date) {
 }
 
 export function getWeekdayName(date: number | Date) {
-  return format(date, "eeeeee", { locale: locales[getLanguage()] })
+  return format(date, "EEEEE", { locale: locales[getLanguage()] })
 }
 
