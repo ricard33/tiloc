@@ -180,6 +180,8 @@ class BookingFactory(factory.django.DjangoModelFactory):
     end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=b.duration).date())
     daily_rate = 0  # factory.LazyAttribute(lambda b: b.lodgings.first() and b.lodgings.first().daily_rate or 50)
     price = 0  # factory.LazyAttribute(lambda b: b.daily_rate * b.duration)
+    max_daily_tourist_tax = None
+    tourist_tax_rate = None
 
     @factory.post_generation
     def lodgings(self, create, extracted, **kwargs):
@@ -199,12 +201,21 @@ class BookingFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def daily_rates_and_price(self, create, extracted, **kwargs):
         update_fields = []
+        # prices
         if not self.daily_rate:
             self.daily_rate = self.lodgings.first() and self.lodgings.first().daily_rate or 50
             update_fields.append("daily_rate")
         if not self.price:
             self.price = self.daily_rate * self.duration
             update_fields.append("price")
+        # tourism tax
+        if not self.max_daily_tourist_tax and self.lodgings.first():
+            self.max_daily_tourist_tax = self.lodgings.first().max_daily_tourist_tax
+            update_fields.append("max_daily_tourist_tax")
+        if not self.tourist_tax_rate and self.lodgings.first():
+            self.tourist_tax_rate = self.lodgings.first().tourist_tax_rate
+            update_fields.append("tourist_tax_rate")
+
         if update_fields:
             self.save(update_fields=update_fields)
 

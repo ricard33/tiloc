@@ -12,11 +12,12 @@ class BookingChannelTestCase(APITestCase):
     def setUp(self) -> None:
         factories.BookingChannelFactory.create_batch(4)
         self.user = factories.AdminUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_need_authentication(self):
+        self.client.logout()
         response = self.client.get("/api/booking_channel/")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_channels(self):
         response = self.client.get("/api/booking_channel/", **self.header)

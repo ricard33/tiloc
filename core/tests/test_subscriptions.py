@@ -14,7 +14,7 @@ class SubscriptionsTestCase(APITestCase):
     def setUp(self) -> None:
         plan = factories.PlanFactory.create(ref="OWNER", name="Essentiel", max_lodgings=3, max_users=1, price=10)
         self.user = factories.AdminUserFactory.create(account__subscription_set__plan=plan)
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_lodgings_limit(self):
         factories.LodgingFactory.create_batch(2)

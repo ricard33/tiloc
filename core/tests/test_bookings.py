@@ -20,12 +20,13 @@ class BookingTestCase(APITestCase):
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)
         self.user.lodgings.add(self.lodging2)
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_need_authentication(self):
+        self.client.logout()
         booking = factories.BookingFactory.create(lodgings=self.lodging)
         response = self.client.get("/api/booking/%d/" % booking.id)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_booking(self):
         booking = factories.BookingFactory.create(lodgings=self.lodging)
@@ -240,7 +241,7 @@ class BookingQueriesTestCase(APITestCase):
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def testAllGuests(self):
         for name in ["Alain DELON", "Franck HERBERT", "Pablo PICASSO"]:
@@ -294,7 +295,7 @@ class BookingQueriesTestCase(APITestCase):
     def testAllGuestsWithAdminUser(self):
         factories.BookingFactory.create_batch(3)  # on different lodgings
         admin = factories.AdminUserFactory.create()
-        header = force_login(admin)
+        header = force_login(admin, self.client)
 
         response = self.client.get("/api/booking/all_guests/", **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
@@ -366,10 +367,20 @@ class BookingModelTestCase(TestCase):
         booking = factories.BookingFactory.create()
         booking = factories.BookingFactory.create()
         booking = factories.BookingFactory.create(
-            lodgings=lodging, duration=4, adults=2, children=2, price=Decimal(410)
+            lodgings=lodging,
+            duration=4,
+            adults=2,
+            children=2,
+            price=Decimal(410),
+            is_flat_rate_tourist_tax=False,
         )
         booking = factories.BookingFactory.create(
-            lodgings=lodging, duration=4, adults=2, children=2, price=Decimal(410)
+            lodgings=lodging,
+            duration=4,
+            adults=2,
+            children=2,
+            price=Decimal(410),
+            is_flat_rate_tourist_tax=False,
         )
         self.assertEqual(2, booking.adults, booking.guests_distribution)
         self.assertEqual(2, booking.children)
@@ -378,6 +389,12 @@ class BookingModelTestCase(TestCase):
 
         lodging.daily_rate = 50
         lodging.save(update_fields=["daily_rate"])
-        booking = factories.BookingFactory.create(lodgings=lodging, duration=8, adults=2, children=2)
+        booking = factories.BookingFactory.create(
+            lodgings=lodging,
+            duration=8,
+            adults=2,
+            children=2,
+            is_flat_rate_tourist_tax=False,
+        )
         self.assertEqual(400, booking.price)
         self.assertAlmostEqual(Decimal("10.08"), booking.tourist_tax, 1)

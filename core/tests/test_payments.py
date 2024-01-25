@@ -13,12 +13,13 @@ class PaymentTestCase(APITestCase):
         self.lodging = factories.LodgingFactory.create()
         self.user = factories.StandardUserFactory.create()
         self.user.lodgings.add(self.lodging)
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_need_authentication(self):
+        self.client.logout()
         payment = factories.PaymentFactory.create(booking__lodgings=self.lodging)
         response = self.client.get("/api/payment/%d/" % payment.id)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_payment(self):
         payment = factories.PaymentFactory.create(booking__lodgings=self.lodging)

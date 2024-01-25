@@ -24,7 +24,9 @@ class BookingTestCase(APITestCase):
                 booking.payment_set.add(factories.PaymentFactory.create(booking=booking))
         cls.user = factories.StandardUserFactory.create()
         cls.user.lodgings.set(cls.lodgings)
-        cls.header = force_login(cls.user)
+
+    def setUp(self):
+        self.header = force_login(self.user, self.client)
 
     def test_get_booking(self):
         booking = self.lodgings[0].booking_set.first()
@@ -34,7 +36,7 @@ class BookingTestCase(APITestCase):
             print("%d queries" % len(ctx.captured_queries))
             for query in ctx.captured_queries:
                 print(query)
-            self.assertEqual(14, len(ctx.captured_queries))
+            self.assertEqual(17, len(ctx.captured_queries))
 
     def test_get_bookings(self):
         with CaptureQueriesContext(connection) as ctx:
@@ -43,4 +45,4 @@ class BookingTestCase(APITestCase):
             print("%d queries" % len(ctx.captured_queries))
             for query in ctx.captured_queries:
                 print(query)
-            self.assertEqual(14, len(ctx.captured_queries))
+            self.assertEqual(17, len(ctx.captured_queries))

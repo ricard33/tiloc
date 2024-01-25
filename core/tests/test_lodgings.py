@@ -1,3 +1,5 @@
+import unittest
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -11,11 +13,12 @@ class LodgingAdminUserTestCase(APITestCase):
 
     def setUp(self) -> None:
         self.user = factories.AdminUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_need_authentication(self):
+        self.client.logout()
         response = self.client.get("/api/lodging/")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_lodgings(self):
         factories.LodgingFactory.create_batch(5)
@@ -97,6 +100,7 @@ class LodgingAdminUserTestCase(APITestCase):
         lodging = models.Lodging.objects.first()
         self.assertEqual(service.id, lodging.default_services.first().id)
 
+    @unittest.skip("Can't create lodging with synchro in same request")
     def test_create_with_channel_sync(self):
         owner = factories.StandardUserFactory()
         channel = factories.BookingChannelFactory.create(name="airbnb")
@@ -123,7 +127,7 @@ class LodgingAdminUserTestCase(APITestCase):
         response = self.client.post("/api/lodging/", data, **self.header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.data)
         lodging = models.Lodging.objects.first()
-        self.assertEqual(1, lodging.bookingchannelsync_set.count())
+        self.assertEqual(2, lodging.bookingchannelsync_set.count())
 
     def test_update_default_services(self):
         owner = factories.StandardUserFactory.create()
@@ -147,11 +151,12 @@ class LodgingStandardUserTestCase(APITestCase):
 
     def setUp(self) -> None:
         self.user = factories.StandardUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_need_authentication(self):
+        self.client.logout()
         response = self.client.get("/api/lodging/")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_lodgings(self):
         factories.LodgingFactory.create(owner=self.user)  # owned

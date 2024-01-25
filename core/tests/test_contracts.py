@@ -36,7 +36,7 @@ class ContractTestCase(APITestCase):
         )
         booking = factories.BookingFactory.create(lodgings__contract_template=contract_template)
         user.lodgings.add(booking.lodging)
-        header = force_login(user)
+        header = force_login(user, self.client)
         response = self.client.post("/api/booking/%d/generate_contract/" % booking.id, **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(booking.contract)

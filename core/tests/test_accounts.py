@@ -28,23 +28,23 @@ class AccountDeleteTestCase(APITestCase):
 
     def test_adminuser_can_request_for_account_deletion(self):
         admin_user = factories.AdminUserFactory()
-        headers = force_login(admin_user)
+        headers = force_login(admin_user, self.client)
         self.assertEqual(1, models.Account.objects.all().count())
         response = self.client.delete("/api/my-account/", **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(1, models.Account.objects.all().count())
         self.assertFalse(models.Account.objects.first().is_active)
 
-    def test_inactive_accounts_return_401_for_their_users(self):
+    def test_inactive_accounts_return_403_for_their_users(self):
         deleted_account = factories.InactiveAccount()
         user = factories.AdminUserFactory.create(account=deleted_account)
-        headers = force_login(user)
+        headers = force_login(user, self.client)
         response = self.client.get("/api/user/", **headers)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_account_lambda_user_cant_request_for_account_deletion(self):
         lambda_user = factories.StandardUserFactory()
-        headers = force_login(lambda_user)
+        headers = force_login(lambda_user, self.client)
         self.assertEqual(1, models.Account.objects.all().count(), models.Account.objects.all())
         response = self.client.delete("/api/my-account/", **headers)
         self.assertEqual(1, models.Account.objects.all().count())
@@ -67,7 +67,7 @@ class AccountDeleteTestCase(APITestCase):
             bookings.append(factories.BookingFactory.create(lodgings=random.choice(lodgings)))
 
         superuser = factories.SuperUserFactory()
-        headers = force_login(superuser)
+        headers = force_login(superuser, self.client)
         response = self.client.delete("/api/account/%s/" % account.id, **headers)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -78,7 +78,7 @@ class AccountDeleteTestCase(APITestCase):
         factories.AdminUserFactory(account=account)
         superuser = factories.SuperUserFactory(account=factories.AccountFactory(name="Deus"))
 
-        headers = force_login(superuser)
+        headers = force_login(superuser, self.client)
         response = self.client.patch("/api/account/%s/" % account.id, data={"is_active": True}, **headers)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -88,7 +88,7 @@ class AccountDeleteTestCase(APITestCase):
         account = factories.InactiveAccount()
         user = factories.StandardUserFactory(account=account)
 
-        headers = force_login(user)
+        headers = force_login(user, self.client)
         response = self.client.post("/api/auth/logout/", **headers)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -100,7 +100,7 @@ class MyAccountTestCase(APITestCase):
     def test_user_can_get_my_account(self):
         user = factories.StandardUserFactory()
         # self.client.force_authenticate(user=user)
-        headers = force_login(user)
+        headers = force_login(user, self.client)
         response = self.client.get("/api/my-account/", **headers)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
@@ -164,7 +164,7 @@ class MultipleAccountsSeparationTestCase(APITestCase):
             self.assertEqual(status.HTTP_200_OK, response.status_code)
             self.assertEqual(count, response.data["count"])
 
-        headers = force_login(user)
+        headers = force_login(user, self.client)
         assertItemsCount("/api/pricing/", 1)
         assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)
@@ -199,7 +199,7 @@ class MultipleAccountsSeparationTestCase(APITestCase):
             self.assertEqual(status.HTTP_200_OK, response.status_code)
             self.assertEqual(count, len(response.data), response.data)
 
-        headers = force_login(user)
+        headers = force_login(user, self.client)
         assertItemsCount("/api/pricing/", 1)
         assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)

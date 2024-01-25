@@ -13,11 +13,12 @@ class UserTestCase(APITestCase):
 
     def setUp(self) -> None:
         self.user = factories.AdminUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_need_authentication(self):
+        self.client.logout()
         response = self.client.get("/api/user/")
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_get_users(self):
         factories.StandardUserFactory.create_batch(2)
@@ -77,7 +78,7 @@ class CurrentUserTestCase(APITestCase):
 
     def setUp(self) -> None:
         self.user = factories.StandardUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_get_current_user(self):
         response = self.client.get("/api/auth/user/", **self.header)

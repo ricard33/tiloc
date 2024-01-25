@@ -116,7 +116,7 @@ class ExportFullPlanningTestCase(TestCase):
 
     def test_full_export_by_admin(self):
         admin = factories.SuperUserFactory()
-        header = force_login(admin)
+        header = force_login(admin, self.client)
         r = self.client.get("/full_planning/", **header)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
@@ -129,7 +129,7 @@ class FillingRateTestCase(APITestCase):
 
     def setUp(self) -> None:
         self.user = factories.StandardUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def test_default_dates_to_last_12_months(self):
         lodging = factories.LodgingFactory()
@@ -216,7 +216,7 @@ class ChannelsDistributionTestCase(APITestCase):
     def setUp(self) -> None:
         factories.BookingChannelFactory.create_batch(8)
         self.user = factories.StandardUserFactory.create()
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def count_channels(self, results, channel_name):
         return reduce(lambda acc, item: item["channel"] == channel_name and item["count"] + acc or acc, results, 0)

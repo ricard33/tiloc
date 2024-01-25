@@ -22,7 +22,7 @@ class StripeSimulatorTestCase(APITestCase):
     def setUp(self) -> None:
         self.account = factories.AccountFactory.create(stripe_customer_id=customer_id, subscription_set=[])
         self.user = factories.AdminUserFactory.create(account=self.account)
-        self.header = force_login(self.user)
+        self.header = force_login(self.user, self.client)
 
     def make_request(self, event):
         request = HttpRequest()
