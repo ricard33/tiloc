@@ -126,8 +126,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   // console.log("isDirty: ", isDirty, dirtyFields);
   // console.log("defaultValues: ", initialState);
   // console.log("values: ", getValues());
-  // console.log("DIFF", filterObject(deepDiffMapper.map(initialState, getValues()),
-  //   (value) => value && value?.type !== "unchanged"));
+  // console.log("DIFF", deepDiff(initialState, getValues()));
 
   usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
@@ -159,9 +158,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
     // Only include editable fields because to make `isDirty` reseted to false working after a submit
     // ==> dirty state is computed comparing default values and stored values (output of getValues())
-    let { price_with_options, left_to_pay, modified, computed_tourist_tax, guests, ...initialState }: Booking = booking;
+    let { lodgings: _, price_with_options, left_to_pay, modified, computed_tourist_tax, guests, ...initialState }: Booking = booking;
 
     // Provide defaults for new bookings
+    initialState.id = booking.id || "" as any;  // just to have an "undirty" state on new booking
     initialState.status = booking.status || BookingStatus.NotAvailable.name;
     initialState.lodging_ids = booking.lodging_ids || ([] as any);
     initialState.guest_name = booking.guest_name || "";
@@ -332,9 +332,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function handleDistributionChange(lodging: Lodging, fieldName: "adults" | "children" | "babies", value: number) {
-    let newDistribution = structuredClone(guestsDistribution);
-    if (!newDistribution)
-      newDistribution = {};
+    // let newDistribution = structuredClone(guestsDistribution);
+    // if (!newDistribution)
+    //   newDistribution = {};
     if (!guestsDistribution[lodging.id]) {
       guestsDistribution[lodging.id] = defaultDistribution;
     }
@@ -596,8 +596,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           options={allGuests.map((g) => g.name)}
                           autocompleteProps={{
                             freeSolo: true,
-                            onChange: (event: any, newValue: string) => handleChange("existing-guest", newValue),
-                            onInputChange: (event: React.SyntheticEvent, value: string) => {
+                            onChange: (_: any, newValue: string) => handleChange("existing-guest", newValue),
+                            onInputChange: (_: React.SyntheticEvent, value: string) => {
                               setValue("guest_name", value, { shouldDirty: true, shouldTouch: true });
                             }
                           }}
@@ -695,7 +695,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                             sx={{ width: "4em" }}
                             onChange={(value) => handleChange("duration", Number(value))}
                             options={[
-                              ...Array.from({ length: 31 }, (v, k) => k + 1).map(n => ({
+                              ...Array.from({ length: 31 }, (_, k) => k + 1).map(n => ({
                                 id: n,
                                 label: n
                               })),
@@ -870,13 +870,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                                     <TableCell component="th" scope="row">
                                       {l.name}
                                     </TableCell>
-                                    {[["adults", t("Adults")], ["children", t("Children")], ["babies", t("Babies")]].map(([name, label]) =>
+                                    {[["adults", t("Adults")], ["children", t("Children")], ["babies", t("Babies")]].map(([name, _]) =>
                                       <TableCell key={name} align="right">
                                         <FormControl fullWidth>
                                           {/*<InputLabel id={`${l.id}-${label}`}>{label}</InputLabel>*/}
                                           <Select
-                                            // name={name}
-                                            // label={label}
                                             variant="standard"
                                             size="small"
                                             margin={margin}

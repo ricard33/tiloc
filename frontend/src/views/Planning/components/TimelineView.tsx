@@ -99,7 +99,7 @@ export const TimelineView: React.FC<Props> = props => {
 
   useEffect(() => {
     if (ref.current) {
-      console.log("Set scroll to ", scrollPosUpdate);
+      // console.log("Set scroll to ", scrollPosUpdate);
       ref.current.scrollLeft = scrollPosUpdate;
     }
   }, [scrollPosUpdate]);
@@ -116,7 +116,7 @@ export const TimelineView: React.FC<Props> = props => {
   }, [goToDate]);
 
   useLayoutEffect(() => {
-    console.log("useLayoutEffect");
+    // console.log("useLayoutEffect");
     const measure = () => {
       if (ref.current)
         setDimensions({ width: ref.current.offsetWidth, height: ref.current.offsetHeight });
