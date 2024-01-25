@@ -21,10 +21,10 @@ def get_current_user():
     return None
 
 
-def get_listening_users_for_lodging(lodgings, current_user):
+def get_listening_users_for_lodging(lodgings: List[models.Lodging], current_user):
     current_user_id = current_user and current_user.id or 0
-    users = models.User.objects.filter(account=lodgings.first().account, groups__name="administrator").exclude(id=current_user_id)
-    for lodging in lodgings.all():
+    users = models.User.objects.filter(account=lodgings[0].account, groups__name="administrator").exclude(id=current_user_id)
+    for lodging in lodgings:
         users = users.union(lodging.users.exclude(id=current_user_id))
     return users
 
@@ -36,7 +36,7 @@ def on_booking_saved(sender, instance: models.Booking, created: bool, update_fie
         # Booking instance is just created, no lodging added yet.
         return
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodgings, user)
+    users = get_listening_users_for_lodging(list(lodgings.all()), user)
     if created:
         logger.info("booking_created [%s] %s" % (instance.id, instance))
         models.Activity.objects.create(type=models.Activity.ActivityType.add_booking, author=user, booking=instance)
@@ -115,7 +115,7 @@ def booking_lodging_changed(sender, instance, action, reverse, model, pk_set, **
 def on_comment_saved(sender, instance: models.Comment, created: bool, update_fields: List[str], **kwargs):
     lodging = instance.booking.lodging
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodging, user)
+    users = get_listening_users_for_lodging([lodging], user)
     if created:
         logger.info("comment_created [%s] %s" % (instance.id, instance))
         models.Activity.objects.create(
@@ -146,7 +146,7 @@ def on_comment_saved(sender, instance: models.Comment, created: bool, update_fie
 def on_comment_deleted(sender, instance: models.Comment, **kwargs):
     lodging = instance.booking.lodging
     user = get_current_user()
-    users = get_listening_users_for_lodging(lodging, user)
+    users = get_listening_users_for_lodging([lodging], user)
     logger.info("comment_deleted [%s] %s" % (instance.id, instance))
     models.Activity.objects.create(
         type=models.Activity.ActivityType.delete_comment, author=user, booking=instance.booking
