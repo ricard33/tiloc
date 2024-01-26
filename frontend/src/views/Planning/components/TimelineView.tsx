@@ -18,7 +18,7 @@ import {
 } from "date-fns";
 import { DateRange } from "../../../components/DateRangeSelector";
 import "./TimelineView.scss";
-import { getMonthName, getWeekdayName } from "../../../common/dateUtils";
+import { formatISODate, getMonthName, getWeekdayName } from "../../../common/dateUtils";
 import clsx from "clsx";
 import { getBookingStatus, getIconAndBgColor } from "../../../common/statusUtils";
 import { darken } from "@mui/system";
@@ -77,7 +77,7 @@ export const TimelineView: React.FC<Props> = props => {
     startDate: sub(startOfMonth(defaultBeginDate), { months: (buffer - 1) / 2 }),
     endDate: endOfMonth(add(defaultBeginDate, { months: (buffer - 1) / 2 }))
   });
-  // console.log("range=", range.startDate.toDateString(), range.endDate.toDateString());
+  // console.log("range=", formatISODate(range.startDate), formatISODate(range.endDate));
   const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
   const [scrollPosUpdate, setScrollPosUpdate] = useState(scrollPos);
   const [loadedPos, setLoadedPos] = useState({ date: defaultBeginDate, pos: scrollPos });
@@ -111,20 +111,31 @@ export const TimelineView: React.FC<Props> = props => {
 
   useEffect(() => {
     if (ref.current && goToDate) {
-      // console.info("Go to date  ", goToDate.toDateString());
-      // console.info("loaded date ", loadedPos.date.toDateString());
+      console.info("Go to date  ", formatISODate(goToDate));
+      // console.info("loaded date ", formatISODate(loadedPos.date));
       // console.info("Go to pos   ", differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth);
       updateBounds({ startDate: goToDate, endDate: add(goToDate, { days: visibleWidth / dayWidth }) });
-      // ref.current.scrollLeft = differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goToDate]);
 
+  useEffect(() => {
+    if (visibleWidth > 0) {
+      // console.log("visibleWidth change -> updateBounds()");
+      updateBounds({
+        startDate: loadedPos.date,
+        endDate: add(loadedPos.date, { days: visibleWidth / dayWidth })
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleWidth]);
+
   useLayoutEffect(() => {
     // console.log("useLayoutEffect");
     const measure = () => {
-      if (ref.current)
+      if (ref.current) {
         setDimensions({ width: ref.current.offsetWidth, height: ref.current.offsetHeight });
+      }
     };
     measure();
     window.addEventListener("resize", measure);
@@ -139,7 +150,7 @@ export const TimelineView: React.FC<Props> = props => {
   };
 
   function updateBounds(visibleRange: { startDate: Date, endDate: Date }) {
-    console.info("updateBounds", visibleRange.startDate.toDateString(), visibleRange.endDate.toDateString());
+    // console.log("updateBounds", formatISODate(visibleRange.startDate), formatISODate(visibleRange.endDate));
     const widthInDays = visibleWidth / dayWidth;
     const offsetInDays = widthInDays * (buffer - 1) / 2;
     // console.log(`widthInDays=${widthInDays}  offsetInDays=${offsetInDays}`);
@@ -147,23 +158,25 @@ export const TimelineView: React.FC<Props> = props => {
       startDate: startOfMonth(sub(visibleRange.startDate, { days: offsetInDays })),
       endDate: endOfMonth(add(visibleRange.endDate, { days: offsetInDays }))
     };
-    props.onBoundsChange && props.onBoundsChange(
-      newRange.startDate,
-      newRange.endDate
-    );
     setRange(newRange);
     const newScrollPos = differenceInCalendarDays(visibleRange.startDate, newRange.startDate) * dayWidth;
     setLoadedPos({ date: visibleRange.startDate, pos: newScrollPos });
     setScrollPosUpdate(newScrollPos);
+
+    props.onBoundsChange && props.onBoundsChange(
+      newRange.startDate,
+      newRange.endDate
+    );
   }
+
+  const limit = (buffer - 1) * visibleWidth / 2 / 2;
 
   function handleScroll(event: React.UIEvent<HTMLDivElement, UIEvent>) {
     const pos = event.currentTarget.scrollLeft;
     // console.log("handleScroll", pos);
     setScrollPos(pos);
-    const limit = (buffer - 1) * visibleWidth / 2 / 2;
-    // console.log("handleScroll", limit);
     if (props.onScroll) props.onScroll(posToDate(pos), posToDate(pos + visibleWidth));
+    // console.log("handleScroll", limit);
     if (pos < loadedPos.pos - limit || pos > loadedPos.pos + limit) {
       updateBounds({ startDate: posToDate(pos), endDate: posToDate(pos + visibleWidth) });
     }
@@ -388,10 +401,11 @@ export const TimelineView: React.FC<Props> = props => {
         </table>
       </div>
       {/*<pre>*/}
-      {/*  <div>Start     : {defaultBeginDate.toDateString()}</div>*/}
-      {/*  <div>goToDate  : {goToDate?.toDateString()}</div>*/}
-      {/*  <div>range     : {range.startDate.toDateString()} {range.endDate.toDateString()}</div>*/}
-      {/*  <div>loadedPos : {loadedPos.date.toDateString()} {loadedPos.pos}</div>*/}
+      {/*  <div>Start     : {formatISODate(defaultBeginDate)}</div>*/}
+      {/*  <div>goToDate  : {goToDate && formatISODate(goToDate)}</div>*/}
+      {/*  <div>range     : {formatISODate(range.startDate)} {formatISODate(range.endDate)}</div>*/}
+      {/*  <div>loadedPos : {formatISODate(loadedPos.date)} {loadedPos.pos}</div>*/}
+      {/*  <div>limit     : {limit} left: {loadedPos.pos - limit} right: {loadedPos.pos + limit}</div>*/}
       {/*  <div>ScrollPos : {scrollPos}</div>*/}
       {/*  <div>Width     : {visibleWidth}</div>*/}
       {/*  <div>collapsed : {collapsed ? "true" : "false"}</div>*/}

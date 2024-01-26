@@ -21,6 +21,11 @@ export function formatDate(date: number | Date, formatStr = 'PP') {
   })
 }
 
+export function formatISODate(date: number | Date) {
+  if(!isValidDate(date))
+    return "";
+  return format(date, "yyyy/MM/dd")
+}
 
 export function formatDistanceToNow(date: number | Date, options = {}) {
   if(!isValidDate(date))

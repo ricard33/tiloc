@@ -16,6 +16,7 @@ import { Account, Booking, Lodging, User } from "../../types";
 import { getBookingStatuses } from "../../common/statusUtils";
 import { useAppSelector } from "../../app/hooks";
 import { TimelineView } from "./components/TimelineView";
+import { formatISODate } from "../../common/dateUtils";
 
 
 const Planning = () => {
@@ -72,7 +73,7 @@ const Planning = () => {
   }, [setSearchParams]);
 
   const onBoundsChange = useCallback((start: Date, end: Date) => {
-    console.info("onBoundsChange", start.toDateString(), end.toDateString());
+    console.log("onBoundsChange", formatISODate(start), formatISODate(end));
     // const delta = canvasTimeEnd - canvasTimeStart;
     setDates({ start, end });
   }, []);
