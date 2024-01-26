@@ -23,11 +23,22 @@ import useMousePosition from "../common/useMousePosition";
 import { useLocation } from "react-router-dom";
 import { useBookingActions } from "../common/bookingActions";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
+import { styled } from "@mui/material/styles";
+import CalculateIcon from "@mui/icons-material/Calculate";
+import BalanceIcon from "@mui/icons-material/Balance";
+import GuestContact from "./GuestContact";
+import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+
 
 const statusColors = {
   CHECKIN: "#3b4aff",
   CHECKOUT: "#f45b69"
 };
+
+const StyledDiv = styled("div")(({ theme: _ }) => ({
+  display: "flex", alignItems: "center", flexWrap: "wrap"
+}));
+
 
 type Props = {
   booking: Booking;
@@ -122,53 +133,83 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
             </Typography>
           </Grid2>
           <Grid2 xs={6}>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+            <StyledDiv>
               <LoginIcon style={{ color: statusColors["CHECKIN"], marginRight: "10px" }} />
               <span style={{ fontSize: 14, fontWeight: "300" }}>
                 {formatDate(booking.begin_date, "PP")}
               </span>
-            </div>
+            </StyledDiv>
+            <StyledDiv>
+              {booking.arrival_details}
+            </StyledDiv>
           </Grid2>
           <Grid2 xs={6}>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+            <StyledDiv>
               <LogoutIcon style={{ color: statusColors["CHECKOUT"], marginRight: "10px" }} />
               <span style={{ fontSize: 14, fontWeight: "300" }}>
                 {formatDate(booking.end_date, "PP")}
               </span>
-            </div>
+            </StyledDiv>
+            <StyledDiv>
+              {booking.departure_details}
+            </StyledDiv>
           </Grid2>
           <Grid2 xs={6}>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-              <Groups2OutlinedIcon
+            <StyledDiv>
+              <HomeOutlinedIcon
                 fontSize="small" style={{ marginRight: "10px" }}
-              />&nbsp;{booking.adults + booking.children + booking.babies}
-            </div>
+              />&nbsp;{booking.lodgings.map(l => l.name).join("+")}
+            </StyledDiv>
           </Grid2>
           <Grid2 xs={6}>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-              <MonetizationOnOutlinedIcon
-                style={{ marginRight: "10px" }}
-                fontSize="small"
-              />&nbsp;{DecimalPrecision.round(booking.price_with_options)}&nbsp;€
-            </div>
-          </Grid2>
-          <Grid2 xs={6}>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-              <HomeOutlinedIcon fontSize="small" style={{ marginRight: "10px" }} />&nbsp;{booking.lodgings.map(l => l.name).join("+")}
-            </div>
-          </Grid2>
-          <Grid2 xs={6}>
-            <div
+            <StyledDiv
               style={{
-                background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
-                display: "flex", alignItems: "center", flexWrap: "wrap"
+                background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem"
               }}
             >
               {statusDisplay.icon}
               <span style={{ verticalAlign: "text-bottom" }}>
                 {statusDisplay.label}
               </span>
-            </div>
+            </StyledDiv>
+          </Grid2>
+          <Grid2 xs={6}>
+            <StyledDiv>
+              <Groups2OutlinedIcon
+                fontSize="small" style={{ marginRight: "10px" }}
+              />&nbsp;{booking.adults + booking.children + booking.babies}
+            </StyledDiv>
+          </Grid2>
+          <Grid2 xs={6}>
+            <StyledDiv title={t("Price")}>
+              <MonetizationOnOutlinedIcon
+                style={{ marginRight: "10px" }}
+                fontSize="small"
+              />&nbsp;{DecimalPrecision.round(booking.price_with_options_and_taxes)}&nbsp;€
+            </StyledDiv>
+            <StyledDiv title={t("Tourist tax")}>
+              <CalculateIcon
+                style={{ marginRight: "10px" }}
+                fontSize="small"
+              />&nbsp;{DecimalPrecision.round(booking.tourist_tax)}&nbsp;€
+            </StyledDiv>
+            {booking.left_to_pay > 0 &&
+              <StyledDiv title={t("Left to pay")} style={{ color: "darkred" }}>
+                <BalanceIcon
+                  style={{ marginRight: "10px" }}
+                  fontSize="small"
+                />&nbsp;{DecimalPrecision.round(booking.left_to_pay)}&nbsp;€
+              </StyledDiv>
+            }
+          </Grid2>
+          <Grid2 xs={12}>
+            <Stack direction={"row"} title={t("Contact")} spacing={2}>
+
+              <ContactPhoneIcon fontSize="large" />
+              <StyledDiv>
+                <GuestContact value={booking.guest_contact} />
+              </StyledDiv>
+            </Stack>
           </Grid2>
           <Grid2 xs={12}>
             <Divider />
@@ -204,7 +245,10 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
                         startIcon={<EventAvailableIcon />} size="small" color="success"
                         onClick={() => handleCancelBooking(booking)}
                       >{t("Book again")}</Button>
-                      <IconButton title={t("Definitively delete booking")} color="error" onClick={() => handleDeleteBooking(booking)}><DeleteIcon /></IconButton>
+                      <IconButton
+                        title={t("Definitively delete booking")} color="error"
+                        onClick={() => handleDeleteBooking(booking)}
+                      ><DeleteIcon /></IconButton>
                     </>
                     :
                     <Button

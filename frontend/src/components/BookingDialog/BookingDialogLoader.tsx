@@ -4,7 +4,7 @@ import { BookingDialog } from "../index";
 import { Backdrop, CircularProgress } from "@mui/material";
 import { useAllGuestsQuery, useGetBookingQuery, useListLodgingsQuery, useListServicesQuery } from "../../services/api";
 import BookingView from "../BookingView";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import queryString from "query-string";
 import { parseISO } from "date-fns";
 import { useBookingActions } from "../../common/bookingActions";
@@ -38,6 +38,12 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   const { data: allGuests } = useAllGuestsQuery();
   const [isEditMode, setIsEditMode] = useState(bookingId === "new" || location.state?.edit);
   const { cancelBooking, uncancelBooking } = useBookingActions();
+  const navigate = useNavigate();
+
+  if(booking && (!booking.lodgings || !booking.begin_date)) {
+    navigate(-1);
+    return <></>;
+  }
 
   if(bookingError) {
     // navigate(-1);

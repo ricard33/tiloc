@@ -8,15 +8,12 @@ import { useLazyGetPaymentsForBookingQuery } from "../services/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons/faWhatsapp";
-import IconButton from "@mui/material/IconButton";
-import FontAwesomeSvgIcon from "./FontAwesomeSvgIcon";
-import reactStringReplace from "../common/reactStringReplace";
-import { green } from "@mui/material/colors";
 import { Typography } from "@mui/material";
 import Comments from "./Comments";
-import { getBookingStatus } from "../common/statusUtils";
+import { getBookingStatus, otaBranding, OtaIconProps } from "../common/statusUtils";
 import Payments from "./Payments";
+import GuestContact from "./GuestContact";
+
 
 type BookingQuickViewProps = {
   booking: Booking;
@@ -29,39 +26,12 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
   const user = useSelector<RootState>((store) => store.auth.user) as User;
   const showPayments = user.permissions.includes("core.view_payment");
   const [triggerPayments, { data }] = useLazyGetPaymentsForBookingQuery();
-
-  const whatsAppPhoneNumber = (phone: string): string => {
-    return phone.replace(/^00/, "")
-      .replace(/^0696/, "596696")
-      .replace(/^0596/, "596696")
-      .replace(/^00/, "")
-      .replace(/^0/, "33")
-      .replace("+", "")
-      .replaceAll(" ", "");
-  };
-
-  const detectPhoneAndMail = (str: string) => {
-    let result = reactStringReplace(str, /([\w._-]+@[\w.-]+\.[\w-]+)/g, (email, i) => (
-      <a key={i} href={"mailto:" + email}>
-        {email}
-      </a>
-    ));
-    result = reactStringReplace(
-      result,
-      /([+]?[\s./0-9]*[(]?[0-9]{1,4}[)]?[0-9][-\s./0-9]{6,12}[0-9])/g,
-      (phone, i) => (
-        <span key={i}>
-          <a href={"tel:" + phone}>{phone}</a>
-          <a href={"https://wa.me/" + whatsAppPhoneNumber(phone)} target="_blank" rel="noreferrer">
-            <IconButton aria-label="WhatsApp">
-              <FontAwesomeSvgIcon icon={faWhatsapp} sx={{ color: green[500] }} />
-            </IconButton>
-          </a>
-        </span>
-      )
-    );
-    return result;
-  };
+  const status = getBookingStatus(booking.status);
+  const statusDisplay: OtaIconProps & {
+    label: string
+  } = status.name === BookingStatus.External.name && booking.source && booking.source.name in otaBranding
+    ? { label: booking.source.name, ...otaBranding[booking.source.name] }
+    : { label: status.getLabel(t), bgColor: status.color };
 
   useEffect(() => {
     if (showPayments && booking.id) triggerPayments(booking.id);
@@ -92,40 +62,126 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
   return (
     <Grid container spacing={1} className="booking-quick-view">
       <Grid container spacing={1} xs={12} md={showComments ? 8 : 12}>
-        <Grid xs={4}>
-          {displayField(true, t("Check-in"), formatDate(booking.begin_date, "PPPP"))}
-          {displayField(true, t("Check-out"), formatDate(booking.end_date, "PPPP"))}
-          {displayField(true, t("Length of stay"), t("{{count}} nights", { count: booking.duration }))}
-          {
-            booking.lodgings.length > 1 ?
+        {/*<Grid xs={12}>*/}
+        {/*  <Typography variant="h5" component="div">*/}
+        {/*    {booking.guest_name}*/}
+        {/*  </Typography>*/}
+        {/*</Grid>*/}
+        <Grid sm={4} xs={12}>
+          <div>
+            <Grid container>
+              {/*<StyledDiv>*/}
+              {/*  <LoginIcon style={{ color: statusColors["CHECKIN"], marginRight: "10px" }} />*/}
+              {/*  <span style={{ fontSize: 14, fontWeight: "300" }}>*/}
+              {/*    {formatDate(booking.begin_date, "PP")}*/}
+              {/*  </span>*/}
+              {/*</StyledDiv>*/}
+              {/*<StyledDiv>*/}
+              {/*  <LogoutIcon style={{ color: statusColors["CHECKOUT"], marginRight: "10px" }} />*/}
+              {/*  <span style={{ fontSize: 14, fontWeight: "300" }}>*/}
+              {/*    {formatDate(booking.end_date, "PP")}*/}
+              {/*  </span>*/}
+              {/*</StyledDiv>*/}
+              {/*<StyledDiv>*/}
+              {/*  <NightsStayIcon*/}
+              {/*    fontSize="small" style={{ marginRight: "10px" }}*/}
+              {/*  />&nbsp;{t("{{count}} nights", { count: booking.duration })}*/}
+              {/*</StyledDiv>*/}
+              {/*<StyledDiv>*/}
+              {/*  <Groups2OutlinedIcon*/}
+              {/*    fontSize="small" style={{ marginRight: "10px" }}*/}
+              {/*  />&nbsp;{t("{{count}} guests", { count: booking.adults + booking.children + booking.babies })}*/}
+              {/*</StyledDiv>*/}
+              {/*{*/}
+              {/*  booking.lodgings.length > 1 ?*/}
 
-              booking.lodgings.map(l => displayField(true, l.name,
-                getGuestsDistribution(booking.guests_distribution[l.id])
-              ))
-              :
-              displayField(true, t("Total guests"),
-                getGuestsDistribution(booking.guests_distribution[booking.lodgings[0].id])
-              )}
-          {displayField(true, t("Status"), booking.status !== BookingStatus.External.name
-            ? getBookingStatus(booking.status).getLabel(t)
-            : booking.source?.name
-          )}
-          {displayField(showPayments, t("Lodging"), booking.lodgings.map(l => l.name).join("+"), true)}
-          {displayField(showPayments, t("Price"), formatCurrency(booking.price_with_options), true)}
+              {/*    booking.lodgings.map(l => displayField(true, l.name,*/}
+              {/*      getGuestsDistribution(booking.guests_distribution[l.id])*/}
+              {/*    ))*/}
+              {/*    :*/}
+              {/*    <div>*/}
+              {/*      {getGuestsDistribution(booking.guests_distribution[booking.lodgings[0].id])}*/}
+              {/*    </div>*/}
+
+              {/*}*/}
+              {/*<StyledDiv>*/}
+              {/*  <MonetizationOnOutlinedIcon*/}
+              {/*    style={{ marginRight: "10px" }}*/}
+              {/*    fontSize="small"*/}
+              {/*  />&nbsp;{DecimalPrecision.round(booking.price_with_options)}&nbsp;€*/}
+              {/*</StyledDiv>*/}
+              {/*<StyledDiv>*/}
+              {/*  <HomeOutlinedIcon*/}
+              {/*    fontSize="small" style={{ marginRight: "10px" }}*/}
+              {/*  />&nbsp;{booking.lodgings.map(l => l.name).join("+")}*/}
+              {/*</StyledDiv>*/}
+              {/*<StyledDiv>*/}
+              {/*  {statusDisplay.icon}*/}
+              {/*  <span style={{ verticalAlign: "text-bottom" }}>*/}
+              {/*    {statusDisplay.label}*/}
+              {/*  </span>*/}
+              {/*</StyledDiv>*/}
+
+              <Grid sm={12} xs={6}>
+                {displayField(true, t("Check-in"), formatDate(booking.begin_date, "PPPP"))}
+              </Grid>
+              <Grid sm={12} xs={6}>
+                {displayField(true, t("Check-out"), formatDate(booking.end_date, "PPPP"))}
+              </Grid>
+              <Grid sm={12} xs={6}>
+                {displayField(true, t("Length of stay"), t("{{count}} nights", { count: booking.duration }))}
+              </Grid>
+              <Grid sm={12} xs={6}>
+                {displayField(true, t("Status"),
+                  <div
+                    style={{
+                      background: statusDisplay.bgColor, color: statusDisplay.color, height: "1.4rem",
+                      display: "flex", alignItems: "center", flexWrap: "wrap"
+                    }}
+                  >
+                    {statusDisplay.icon}
+                    <span style={{ verticalAlign: "text-bottom" }}>
+                      {statusDisplay.label}
+                    </span>
+                  </div>
+                  // booking.status !== BookingStatus.External.name
+                  //   ? getBookingStatus(booking.status).getLabel(t)
+                  //   : booking.source?.name
+                )}
+              </Grid>
+              <Grid xs={12}>
+                {
+                  booking.lodgings.length > 1 ?
+                    booking.lodgings.map(l => displayField(true, l.name,
+                      getGuestsDistribution(booking.guests_distribution[l.id])
+                    ))
+                    :
+                    displayField(true, t("Total guests"),
+                      getGuestsDistribution(booking.guests_distribution[booking.lodgings[0].id])
+                    )}
+              </Grid>
+              <Grid sm={12} xs={6}>
+                {displayField(showPayments, t("Lodging"), booking.lodgings.map(l => l.name).join("+"), true)}
+              </Grid>
+              <Grid sm={12} xs={6}>
+                {displayField(showPayments, t("Price"), formatCurrency(booking.price_with_options), true)}
+              </Grid>
+            </Grid>
+          </div>
         </Grid>
-        <Grid xs={8}>
+        <Grid sm={8} xs={12}>
           {displayField(true, t("Guest name"), booking.guest_name, true)}
 
           {displayField(booking.guest_address != null, undefined, booking.guest_address)}
           {displayField(booking.guest_contact != null, undefined,
-            booking.guest_contact && booking.guest_contact.match(/[^\r\n]+/g)!.map((s, index) => (
-              // eslint-disable-next-line react/no-danger
-              // <div key={index} dangerouslySetInnerHTML={{ __html: detectPhoneAndMail(s) }} />)}</div>
-              <div key={index}>{detectPhoneAndMail(s)}</div>
-            )))}
-          {displayField(booking.arrival_details != null, t("Check-in info"), booking.arrival_details)}
-          {displayField(booking.departure_details != null, t("Check-out info"), booking.departure_details)}
-          {displayField(booking.notes != null, t("Remarks"),
+            <GuestContact value={booking.guest_contact} />
+            // booking.guest_contact && booking.guest_contact.match(/[^\r\n]+/g)!.map((s, index) => (
+            //   <div key={index}><PhoneOrEmail value={s} /></div>
+            // ))
+          )}
+          {displayField(!!booking.arrival_details, t("Check-in info"), booking.arrival_details)}
+          {displayField(!!booking.departure_details, t("Check-out info"), booking.departure_details)}
+          {displayField(!!booking.notes, t("Remarks"),
             booking.notes && booking.notes.match(/[^\r\n]+/g)!.map((s, index) => (
               <React.Fragment key={index}>
                 {s}
@@ -153,7 +209,6 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
             <Grid xs={1}>
               {displayField(showPayments && booking.commission_fees! > 0, t("Commission fees"), formatCurrency(booking.commission_fees || 0))}
             </Grid>
-            {/* Removed because value is not reliable with the one (maybe modified) in contract */}
             <Grid xs={1}>
               {displayField(showPayments && booking.tourist_tax > 0,
                 t("Tourist tax"),
@@ -164,7 +219,8 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               {displayField(booking.source !== null, t("Channel"), booking.source?.name)}
             </Grid>
           </Grid>
-
+        </Grid>
+        <Grid xs={12}>
           {displayField(showPayments && data != null,
             t("Payment"), <Payments bookingId={booking.id!} />
           )}

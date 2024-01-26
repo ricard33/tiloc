@@ -150,6 +150,7 @@ export function api2Booking(booking: Record<string, any>): Booking {
     total_payments: Number(booking.total_payments),
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
+    price_with_options_and_taxes: Number(booking.price_with_options_and_taxes),
     max_daily_tourist_tax: Number(booking.max_daily_tourist_tax),
     tourist_tax_rate: Number(booking.tourist_tax_rate),
     tourist_tax: Number(booking.tourist_tax),

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { add, format, parse, startOfMonth, sub } from "date-fns";
 import { BookingFixedTimeline } from "./components";
 import { useTranslation } from "react-i18next";
-import { Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { IconButton, Stack } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { DateNavBar } from "./components/NavBar";
@@ -20,7 +20,6 @@ import { TimelineView } from "./components/TimelineView";
 
 const Planning = () => {
   const { t } = useTranslation();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   // console.log("search", searchParams);
   // console.log("search", searchParams.get("start"));

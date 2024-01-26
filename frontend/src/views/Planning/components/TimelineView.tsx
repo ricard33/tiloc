@@ -261,6 +261,7 @@ export const TimelineView: React.FC<Props> = props => {
       <BookingTooltip booking={booking}>
         <div
           className="item"
+          title={booking.guest_name}
           style={{
             width: (dayWidth * booking.duration - 0.1 * dayWidth) + "px",
             // color: "black",
