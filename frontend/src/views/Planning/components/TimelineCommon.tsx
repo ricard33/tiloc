@@ -154,11 +154,11 @@ export function makeGroups(lodgings: Lodging[], t: TFunction<"translation">) {
 }
 
 
-export function makeItems(bookings: Booking[]): TimelineItem[] {
+export function makeItems(bookings: Booking[], anonymize: boolean): TimelineItem[] {
   const bookingToItem = (booking: Booking, groupId: number) => ({
     id: booking.id! + "_" + groupId,
     group: groupId,
-    title: booking.guest_name!,
+    title: anonymize ? booking.guest_name!.split(" ")[0] + " XXXXXX" : booking.guest_name,
     linked: booking.lodgings.length > 1,
     status: booking.status,
     start_time: add(booking.begin_date, { hours: 12 }).valueOf(),

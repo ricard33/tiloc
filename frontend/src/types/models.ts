@@ -138,7 +138,7 @@ export interface Booking {
   id?: number;
   lodging_ids: number[];
   lodgings: Lodging[];
-  guest_name?: string;
+  guest_name: string;
   guest_contact?: string;
   guest_address?: string;
   status: string;

@@ -10,7 +10,8 @@ export type PlanningSettings = {
   display: "timeline" | "annual";
   showPaymentStatus: boolean;
   monthsToDisplay: number;
-  showPrices: boolean
+  showPrices: boolean;
+  anonymized: boolean;
 }
 
 export const loadPlanningSettings = (): PlanningSettings => {
@@ -25,6 +26,7 @@ export const loadPlanningSettings = (): PlanningSettings => {
     monthsToDisplay: getStorageValue("planning.monthsToDisplay", 12),
     showPaymentStatus: getStorageValue("planning.showPaymentStatus", true),
     showPrices: getStorageValue("planning.showPrices", false),
+    anonymized: getStorageValue("planning.anonymized", false)
   };
 };
 
@@ -105,6 +107,11 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
                 name="showPrices"
                 label={t<string>("Show prices")}
               />}
+            <CheckboxElement
+              control={control}
+              name="anonymized"
+              label={t<string>("Anonymize booking for printing (hide last names)")}
+            />
           </Stack>
 
         </FormContainer>

@@ -270,11 +270,13 @@ export const TimelineView: React.FC<Props> = props => {
         selectedBgColor: darken(getBookingStatus(booking.status).color, 0.1)
       };
 
+    const guest_name = settings.anonymized ? booking.guest_name.split(" ")[0] + " XXXXXX" : booking.guest_name;
+
     return (
       <BookingTooltip booking={booking}>
         <div
           className="item"
-          title={booking.guest_name}
+          title={guest_name}
           style={{
             width: (dayWidth * booking.duration - 0.1 * dayWidth) + "px",
             // color: "black",
@@ -293,7 +295,7 @@ export const TimelineView: React.FC<Props> = props => {
               }}
             />
           }
-          <div className="item-title">{booking.guest_name}</div>
+          <div className="item-title">{guest_name}</div>
           {booking.price && booking.price > 0 ?
             <EuroIcon
               className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}

@@ -68,7 +68,7 @@ const BookingFixedTimeline: React.FC<Props> = props => {
   lodgings && lodgings.sort((a, b) => a.rank - b.rank);
 
   let groups = makeGroups(lodgings, t);
-  const items = makeItems(bookings);
+  const items = makeItems(bookings, settings.anonymized);
 
   // bookings && console.debug(bookings[0]);
   // items && console.debug(items[0]);
