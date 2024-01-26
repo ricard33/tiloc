@@ -465,6 +465,9 @@ export const api = createApi({
           url: `booking/${bookingId}/${regenerate ? "generate_contract" : "get_or_create_contract"}/`,
           method: "POST"
         };
+      },
+      transformResponse: (response) => {
+        return api2Contract(response as ApiModel);
       }
     }),
     listContracts: contractApi.list(builder),

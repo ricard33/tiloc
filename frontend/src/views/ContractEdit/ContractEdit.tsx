@@ -147,6 +147,8 @@ const ContractEdit = () => {
     });
   }
 
+  contract && console.log(contract.modified);
+  contract && console.log(formatDistanceToNow(contract.modified));
 
   return (
     <Page>

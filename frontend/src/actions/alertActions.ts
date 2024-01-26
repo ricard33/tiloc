@@ -1,4 +1,5 @@
 import { OptionsObject, SnackbarKey } from "notistack";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 export const ENQUEUE_SNACKBAR = "ENQUEUE_SNACKBAR";
 export const CLOSE_SNACKBAR = "CLOSE_SNACKBAR";
@@ -16,32 +17,37 @@ export interface NotificationAction {
   dismissed?: boolean,
 }
 
-export interface AlertAction {
-  type: string,
+export type AlertAction = PayloadAction<{
   key?: SnackbarKey,
   notification?: NotificationAction,
   dismissAll?: boolean,
-}
+}>;
 
 export const enqueueAlert = (notification: Notification): AlertAction => {
   const key = notification.options && notification.options.key;
 
   return {
     type: ENQUEUE_SNACKBAR,
-    notification: {
-      ...notification,
-      key: key || new Date().getTime() + Math.random(),
-    },
+    payload: {
+      notification: {
+        ...notification,
+        key: key || new Date().getTime() + Math.random()
+      }
+    }
   };
 };
 
 export const closeAlert = (key: SnackbarKey): AlertAction => ({
   type: CLOSE_SNACKBAR,
-  dismissAll: !key, // dismiss all if no key has been defined
-  key
+  payload: {
+    dismissAll: !key, // dismiss all if no key has been defined
+    key
+  }
 });
 
 export const removeAlert = (key: SnackbarKey): AlertAction => ({
   type: REMOVE_SNACKBAR,
-  key
+  payload: {
+    key
+  }
 });

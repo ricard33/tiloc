@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 import { add } from "date-fns";
 import { getBookingStatus, getIconAndBgColor } from "../../../common/statusUtils";
 import { darken } from "@mui/system";

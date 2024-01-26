@@ -18,14 +18,62 @@ import svgrPlugin from "vite-plugin-svgr";
 //   return chunks
 // }
 
-export default defineConfig(({ command, mode, ssrBuild }) => {
+const muteWarningsPlugin = (warningsToIgnore: string[][]): Plugin => {
+  const mutedMessages = new Set()
+  return {
+    name: 'mute-warnings',
+    // @ts-ignore
+    enforce: 'pre',
+    config: (userConfig) => ({
+      build: {
+        rollupOptions: {
+          onwarn(warning, defaultHandler) {
+            if (warning.code) {
+              const muted = warningsToIgnore.find(
+                ([code, message]) =>
+                  code === warning.code && warning.message.includes(message),
+              )
+
+              if (muted) {
+                mutedMessages.add(muted.join())
+                return
+              }
+            }
+
+            if (userConfig.build?.rollupOptions?.onwarn) {
+              userConfig.build.rollupOptions.onwarn(warning, defaultHandler)
+            } else {
+              defaultHandler(warning)
+            }
+          },
+        },
+      },
+    }),
+    closeBundle() {
+      const diff = warningsToIgnore.filter((x) => !mutedMessages.has(x.join()))
+      if (diff.length > 0) {
+        this.warn(
+          'Some of your muted warnings never appeared during the build process:',
+        )
+        diff.forEach((m) => this.warn(`- ${m.join(': ')}`))
+      }
+    },
+  }
+}
+
+const warningsToIgnore = [
+  ['SOURCEMAP_ERROR', "Can't resolve original location of error"],
+  ['INVALID_ANNOTATION', 'contains an annotation that Rollup cannot interpret'],
+]
+
+export default defineConfig(({ command, mode, isSsrBuild }) => {
   return {
     base: mode === "production" ? "/static/" : "/",
     // base: "/static/",
     build: {
       outDir: "build",
       manifest: "vite-manifest.json",
-      sourcemap: true,
+      // sourcemap: true,
       // minify: false,
       rollupOptions: {
         output: {
@@ -49,10 +97,11 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
         },
       }),
       viteTsconfigPaths(),
-      svgrPlugin()
+      svgrPlugin(),
       // handlebars({
       //   partialDirectory: resolve(__dirname, 'src/partials'),
       // }) as Plugin,
+      muteWarningsPlugin(warningsToIgnore),
     ],
     server: {
       host: "0.0.0.0",

@@ -135,7 +135,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                   <CheckboxElement
                     control={control}
                     name={`options.${index}.is_flat_rate`}
-                    label={t<string>("Flat rate")}
+                    label={t("Flat rate")}
                     defaultValue={option.is_flat_rate}
                     color="primary"
                     size="small"

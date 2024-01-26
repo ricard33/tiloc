@@ -91,7 +91,7 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
               <TextFieldElement
                 control={control}
                 name="monthsToDisplay"
-                label={t<string>("Number of months to display")}
+                label={t("Number of months to display")}
                 // defaultValue={settings.monthsToDisplay}
                 type={"number"}
                 required
@@ -105,12 +105,12 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
               <CheckboxElement
                 control={control}
                 name="showPrices"
-                label={t<string>("Show prices")}
+                label={t("Show prices")}
               />}
             <CheckboxElement
               control={control}
               name="anonymized"
-              label={t<string>("Anonymize booking for printing (hide last names)")}
+              label={t("Anonymize booking for printing (hide last names)")}
             />
           </Stack>
 

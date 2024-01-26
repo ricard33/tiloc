@@ -19,13 +19,13 @@ const defaultState: AlertState = {
 export default function alertReducer(state = defaultState, action: AlertAction): AlertState {
   switch (action.type) {
     case ENQUEUE_SNACKBAR:
-      if (!action.notification)
+      if (!action.payload.notification)
         return state;
       return {
         ...state,
         notifications: [
           ...state.notifications,
-          action.notification
+          action.payload.notification
         ]
       };
 
@@ -33,7 +33,7 @@ export default function alertReducer(state = defaultState, action: AlertAction):
       return {
         ...state,
         notifications: state.notifications.map(notification => (
-          (action.dismissAll || notification.key === action.key)
+          (action.payload.dismissAll || notification.key === action.payload.key)
             ? { ...notification, dismissed: true }
             : { ...notification }
         ))
@@ -43,7 +43,7 @@ export default function alertReducer(state = defaultState, action: AlertAction):
       return {
         ...state,
         notifications: state.notifications.filter(
-          notification => notification.key !== action.key
+          notification => notification.key !== action.payload.key
         )
       };
 

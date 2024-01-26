@@ -1,5 +1,5 @@
 import { Feature } from "../views/Subscription/subscription_types";
-import { TFunction } from "react-i18next";
+import { TFunction } from "i18next";
 
 export function getSubscriptionPlans(t: TFunction<"translation">) {
   const commonFeatures: Feature[] = [

@@ -34,7 +34,7 @@ export const store = configureStore({
           isSerializable: (value: any) => isDate(value) || isPlain(value)
         }
       }
-    ).concat([sagaMiddleware, /*rtkQueryErrorLogger, */api.middleware])
+    ).concat([sagaMiddleware, api.middleware])
 
 });
 

@@ -9,7 +9,7 @@ import RoomServiceIcon from "@mui/icons-material/RoomService";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import { ReactComponent as BookingSourcesIcon } from "../../assets/icones/booking-sources.svg";
+import BookingSourcesIcon  from "../../assets/icones/booking-sources.svg?react";
 import { styled } from "@mui/material/styles";
 import ButtonBase from "@mui/material/ButtonBase";
 import Typography from "@mui/material/Typography";

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { ReactI18NextChild, useTranslation } from "react-i18next";
+import React, { ReactNode, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../common/intlUtils";
 import { formatDate } from "../common/dateUtils";
 import { Booking, BookingStatus, Service, User } from "../types";
@@ -37,7 +37,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
     if (showPayments && booking.id) triggerPayments(booking.id);
   }, [booking.id, showPayments, triggerPayments]);
 
-  const displayField = (condition: boolean, label: string | undefined, value: ReactI18NextChild | Iterable<ReactI18NextChild>, isImportant: boolean = false) => {
+  const displayField = (condition: boolean, label: string | undefined, value: ReactNode | Iterable<ReactNode>, isImportant: boolean = false) => {
     if (condition)
       return <React.Fragment>
         {label && <div className="label">{label}</div>}

@@ -26,10 +26,10 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
   const { t } = useTranslation();
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
   const currentUser = useSelector<RootState>(store => store.auth.user) as User;
-  const defaultValues = {
+  const defaultValues = lodging ? {
     ...lodging,
     remote_calendars: undefined  // remove this field
-  } ?? {
+  } : {
     description: "",
     tourist_tax_included_in_payment: true,
     active: true,
@@ -38,7 +38,7 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
     address: currentUser.address,
     deposit_label: "deposit",
     deposit_percent: 30
-  };
+  } as Lodging;
   const formContext = useForm<Lodging>({
     defaultValues: defaultValues
   });
