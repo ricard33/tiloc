@@ -133,6 +133,7 @@ $collapsed-width: 30px;
       border-top: 2px solid $primary-black !important;
 
       td.day {
+        border-top: 2px solid $primary-black !important;
         border-bottom: 1px solid #ccc;
       }
     }
@@ -305,6 +306,7 @@ $collapsed-width: 30px;
     min-width: 40px;
     max-width: 40px;
     padding: 5px 0;
+    background-clip: padding-box;   /* fix for Firefox */
 
     &.weekend {
       background-color: $secondary-grey;
