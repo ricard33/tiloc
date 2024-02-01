@@ -41,7 +41,7 @@ export class BookingStatus {
     this.color = color;
   }
 
-  getLabel = (t: TFunction<"translation", undefined>) => {
+  getLabel = (t: TFunction) => {
     return t(this._label);
   }
 

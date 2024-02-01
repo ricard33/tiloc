@@ -1,7 +1,7 @@
 import { Feature } from "../views/Subscription/subscription_types";
 import { TFunction } from "i18next";
 
-export function getSubscriptionPlans(t: TFunction<"translation">) {
+export function getSubscriptionPlans(t: TFunction) {
   const commonFeatures: Feature[] = [
     { label: t("Global calendar"), available: true },
     { label: t("Manual booking"), available: true },
@@ -59,14 +59,14 @@ export function getSubscriptionPlans(t: TFunction<"translation">) {
   ];
 }
 
-export function getSubscriptionPlan(ref: string, t: TFunction<"translation">) {
+export function getSubscriptionPlan(ref: string, t: TFunction) {
   const plan = getSubscriptionPlans(t).filter(p => p.ref === ref);
   if (plan.length > 0)
     return plan[0]
   return undefined;
 }
 
-export function getIntervalLabel(interval: "monthly"|"yearly", t: TFunction<"translation">) {
+export function getIntervalLabel(interval: "monthly"|"yearly", t: TFunction) {
 
   const intervalLabel = {
     monthly: t("month"),

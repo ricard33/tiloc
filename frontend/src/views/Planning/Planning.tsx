@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { add, format, parse, startOfMonth, sub } from "date-fns";
+import { add, differenceInDays, format, parse, startOfMonth, sub } from "date-fns";
 import { BookingFixedTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
-import { IconButton, Stack } from "@mui/material";
+import { Button, IconButton, Stack } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
@@ -55,6 +55,7 @@ const Planning = () => {
   const { data: lodgings } = useListLodgingsQuery({ shown: true });
   const bookingStatuses = getBookingStatuses();
   const navigate = useNavigate();
+  const [showLegend, setShowLegend] = useState(false);
 
   const user = useAppSelector(store => store.auth.user) as User;
   const account = useAppSelector(store => store.auth.account) as Account;
@@ -73,7 +74,7 @@ const Planning = () => {
   }, [setSearchParams]);
 
   const onBoundsChange = useCallback((start: Date, end: Date) => {
-    console.log("onBoundsChange", formatISODate(start), formatISODate(end));
+    // console.log("onBoundsChange", formatISODate(start), formatISODate(end), differenceInDays(start, end));
     // const delta = canvasTimeEnd - canvasTimeStart;
     setDates({ start, end });
   }, []);
@@ -158,10 +159,11 @@ const Planning = () => {
       <br />
       {/*<Card className="planning-legend">*/}
       <p>
-        <span className="status-legend-title">
-          {t("Legend")} :
-        </span>
-        {bookingStatuses.map(status => {
+        <Button variant="outlined" onClick={() => setShowLegend(!showLegend)}>{showLegend ? t("Hide legend") : t("Show legend")}</Button>
+        {/*<span className="status-legend-title">*/}
+        {/*  {t("Legend")} :*/}
+        {/*</span>*/}
+        {showLegend && bookingStatuses.map(status => {
           return (
             <span key={status.name}>
               <span

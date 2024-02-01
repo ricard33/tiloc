@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import {
@@ -9,10 +9,13 @@ import {
   eachMonthOfInterval,
   endOfMonth,
   format,
-  getDaysInMonth, isLastDayOfMonth,
+  getDaysInMonth,
+  isLastDayOfMonth,
   isSameDay,
   isWeekend,
-  isWithinInterval, max, min,
+  isWithinInterval,
+  max,
+  min,
   startOfMonth,
   sub
 } from "date-fns";
@@ -62,10 +65,10 @@ type Props = {
 export const TimelineView: React.FC<Props> = props => {
   const {
     defaultBeginDate, goToDate, bookings, lodgings, buffer,
-    settings
+    settings, onScroll, onBoundsChange, onCreateBooking
   } = {
     defaultBeginDate: startOfMonth(new Date()),
-    buffer: 9,
+    buffer: 3,
     ...props
   };
   const { t } = useTranslation();
@@ -73,14 +76,21 @@ export const TimelineView: React.FC<Props> = props => {
   const dayHeight = 40;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const visibleWidth = dimensions.width;
-  const [range, setRange] = useState({
-    startDate: sub(startOfMonth(defaultBeginDate), { months: (buffer - 1) / 2 }),
-    endDate: endOfMonth(add(defaultBeginDate, { months: (buffer - 1) / 2 }))
-  });
-  // console.log("range=", formatISODate(range.startDate), formatISODate(range.endDate));
+
+  const getRangeToLoad = useCallback((startDate: Date) => {
+    const widthInDays = visibleWidth / dayWidth;
+    const offsetInDays = widthInDays * (buffer - 1) / 2;
+    // console.log(`widthInDays=${widthInDays}  offsetInDays=${offsetInDays}`);
+    return {
+      startDate: startOfMonth(sub(startDate, { days: offsetInDays })),
+      endDate: endOfMonth(add(startDate, { days: offsetInDays + widthInDays }))
+    };
+
+  }, [buffer, visibleWidth]);
+
+  const [range, setRange] = useState(getRangeToLoad(defaultBeginDate));
+  const previousStart = useRef<Date | undefined>(range.startDate);
   const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
-  const [scrollPosUpdate, setScrollPosUpdate] = useState(scrollPos);
-  const [loadedPos, setLoadedPos] = useState({ date: defaultBeginDate, pos: scrollPos });
   const [selectStart, setSelectStart] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const [selectionEnd, setSelectionEnd] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const { width: screenWidth } = useWindowDimensions();
@@ -102,19 +112,34 @@ export const TimelineView: React.FC<Props> = props => {
     ...heightStyle
   };
 
-  useEffect(() => {
+  if(range.startDate !== previousStart.current) {
     if (ref.current) {
-      // console.log("Set scroll to ", scrollPosUpdate);
-      ref.current.scrollLeft = scrollPosUpdate;
+      const oldPos = ref.current.scrollLeft;
+      // console.log("Old start", previousStart.current && formatISODate(previousStart.current));
+      // console.log("New range", formatISODate(range.startDate), formatISODate(range.endDate));
+      if(typeof previousStart.current !== "undefined") {
+        const offset = differenceInDays(previousStart.current, range.startDate) * dayWidth;
+        // console.log("New pos ", oldPos + offset, "(offset=", offset, ")");
+        ref.current.scrollTo({  left: oldPos + offset });
+        if(ref.current.scrollLeft !== oldPos + offset) {
+          // First time, before days are rendered, scroll is not possible
+          setTimeout(() => ref.current && ref.current.scrollTo({  left: oldPos + offset }), 0);
+        }
+
+      }
+      else if(goToDate) {
+        ref.current.scrollTo({ left: differenceInDays(goToDate, range.startDate) * dayWidth });
+        setTimeout(() => onScroll && onScroll(goToDate, add(goToDate, { days: visibleWidth / dayWidth })), 0);
+      }
+      previousStart.current = range.startDate;
     }
-  }, [scrollPosUpdate]);
+  }
 
   useEffect(() => {
     if (ref.current && goToDate) {
       console.info("Go to date  ", formatISODate(goToDate));
-      // console.info("loaded date ", formatISODate(loadedPos.date));
-      // console.info("Go to pos   ", differenceInCalendarDays(goToDate, loadedPos.date) * dayWidth);
-      updateBounds({ startDate: goToDate, endDate: add(goToDate, { days: visibleWidth / dayWidth }) });
+      updateBounds(goToDate);
+      previousStart.current = undefined;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goToDate]);
@@ -122,10 +147,8 @@ export const TimelineView: React.FC<Props> = props => {
   useEffect(() => {
     if (visibleWidth > 0) {
       // console.log("visibleWidth change -> updateBounds()");
-      updateBounds({
-        startDate: loadedPos.date,
-        endDate: add(loadedPos.date, { days: visibleWidth / dayWidth })
-      });
+      const visibleStartDate = add(range.startDate, {days: scrollPos / dayWidth});
+      updateBounds(visibleStartDate);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleWidth]);
@@ -145,47 +168,43 @@ export const TimelineView: React.FC<Props> = props => {
     };
   }, []);
 
-  const posToDate = (pos: number): Date => {
-    return add(loadedPos.date, { days: (pos - loadedPos.pos) / dayWidth });
-  };
-
-  function updateBounds(visibleRange: { startDate: Date, endDate: Date }) {
-    // console.log("updateBounds", formatISODate(visibleRange.startDate), formatISODate(visibleRange.endDate));
-    const widthInDays = visibleWidth / dayWidth;
-    const offsetInDays = widthInDays * (buffer - 1) / 2;
-    // console.log(`widthInDays=${widthInDays}  offsetInDays=${offsetInDays}`);
-    const newRange = {
-      startDate: startOfMonth(sub(visibleRange.startDate, { days: offsetInDays })),
-      endDate: endOfMonth(add(visibleRange.endDate, { days: offsetInDays }))
-    };
+  const updateBounds = useCallback((startDate: Date) => {
+    // console.log("updateBounds", formatISODate(startDate));
+    const newRange = getRangeToLoad(startDate);
     setRange(newRange);
-    const newScrollPos = differenceInCalendarDays(visibleRange.startDate, newRange.startDate) * dayWidth;
-    setLoadedPos({ date: visibleRange.startDate, pos: newScrollPos });
-    setScrollPosUpdate(newScrollPos);
 
-    props.onBoundsChange && props.onBoundsChange(
+    onBoundsChange && onBoundsChange(
       newRange.startDate,
       newRange.endDate
     );
-  }
 
-  const limit = (buffer - 1) * visibleWidth / 2 / 2;
+  }, [getRangeToLoad, onBoundsChange]);
 
-  function handleScroll(event: React.UIEvent<HTMLDivElement, UIEvent>) {
+  // const limit = (buffer - 1) * visibleWidth / 2 / 2;
+  const limit = visibleWidth / 2;
+  const limitLeft = limit;
+  const limitRight = ((buffer - 1) * visibleWidth) - limit;
+
+  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement, UIEvent>) => {
     const pos = event.currentTarget.scrollLeft;
     // console.log("handleScroll", pos);
+    const posToDate = (pos: number): Date => {
+      return add(range.startDate, { days: pos / dayWidth });
+    };
+
     setScrollPos(pos);
-    if (props.onScroll) props.onScroll(posToDate(pos), posToDate(pos + visibleWidth));
-    // console.log("handleScroll", limit);
-    if (pos < loadedPos.pos - limit || pos > loadedPos.pos + limit) {
-      updateBounds({ startDate: posToDate(pos), endDate: posToDate(pos + visibleWidth) });
+    if (onScroll) onScroll(posToDate(pos), posToDate(pos + visibleWidth));
+
+    if ((pos < limitLeft || pos > limitRight)) {
+      // console.log(`POS => ${limitLeft} < ${pos} < ${limitRight}`)
+      updateBounds(posToDate(pos));
     }
-  }
+  }, [limitLeft, limitRight, onScroll, range.startDate, updateBounds, visibleWidth]);
 
   function handleDayClick(lodging: Lodging, day: Day) {
     if (selectStart && selectStart.lodging.id === lodging.id) {
       if (!isSameDay(day.date, selectStart.date) && (!day.isBusy || day.booking)) {
-        props.onCreateBooking && props.onCreateBooking(lodging, min([day.date, selectStart.date]), max([day.date, selectStart.date]));
+        onCreateBooking && onCreateBooking(lodging, min([day.date, selectStart.date]), max([day.date, selectStart.date]));
       }
       setSelectStart(undefined);
     } else if (!day.isBusy) {
@@ -406,10 +425,10 @@ export const TimelineView: React.FC<Props> = props => {
       {/*  <div>Start     : {formatISODate(defaultBeginDate)}</div>*/}
       {/*  <div>goToDate  : {goToDate && formatISODate(goToDate)}</div>*/}
       {/*  <div>range     : {formatISODate(range.startDate)} {formatISODate(range.endDate)}</div>*/}
-      {/*  <div>loadedPos : {formatISODate(loadedPos.date)} {loadedPos.pos}</div>*/}
-      {/*  <div>limit     : {limit} left: {loadedPos.pos - limit} right: {loadedPos.pos + limit}</div>*/}
-      {/*  <div>ScrollPos : {scrollPos}</div>*/}
-      {/*  <div>Width     : {visibleWidth}</div>*/}
+      {/*  <div>range px  : {0} {differenceInDays(range.endDate, range.startDate) * dayWidth}</div>*/}
+      {/*  <div>ScrollPos : {limitLeft} &lt; {scrollPos} &lt; {limitRight}</div>*/}
+      {/*  <div>Width     : {visibleWidth} ({visibleWidth / dayWidth} days)</div>*/}
+      {/*  <div>Buffer    : {buffer}</div>*/}
       {/*  <div>collapsed : {collapsed ? "true" : "false"}</div>*/}
       {/*</pre>*/}
     </div>

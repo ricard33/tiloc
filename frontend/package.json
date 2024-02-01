@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "extract": "i18next -c config/i18next-parser.config.js",
+    "extract": "i18next -c config/i18next-parser.config.cjs",
     "lint": "eslint src",
     "compile": "tsc"
   },

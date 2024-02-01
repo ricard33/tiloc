@@ -100,7 +100,7 @@ export type ResizeProps = {
   }
 }
 
-export function makeGroups(lodgings: Lodging[], t: TFunction<"translation">) {
+export function makeGroups(lodgings: Lodging[], t: TFunction) {
   let groups: TimelineGroup[] = lodgings.map(lodging => ({
     id: lodging.id,
     title: lodging.name,
