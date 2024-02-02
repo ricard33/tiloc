@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Booking, BookingStatus, Lodging } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import {
@@ -68,7 +68,7 @@ export const TimelineView: React.FC<Props> = props => {
     settings, onScroll, onBoundsChange, onCreateBooking
   } = {
     defaultBeginDate: startOfMonth(new Date()),
-    buffer: 3,
+    buffer: 5,
     ...props
   };
   const { t } = useTranslation();
@@ -90,7 +90,13 @@ export const TimelineView: React.FC<Props> = props => {
 
   const [range, setRange] = useState(getRangeToLoad(defaultBeginDate));
   const previousStart = useRef<Date | undefined>(range.startDate);
-  const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
+  const scrollPos = useRef(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
+  const oldPosRef = useRef(scrollPos.current);
+  // const touchInProgress = useRef(false);
+  const [touchInProgress, setTouchInProgress] = useState(false);
+  // const nextScrollUpdate = useRef(false);
+  const [nextScrollUpdate, setNextScrollUpdate] = useState(0);
+  // const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
   const [selectStart, setSelectStart] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const [selectionEnd, setSelectionEnd] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const { width: screenWidth } = useWindowDimensions();
@@ -112,22 +118,23 @@ export const TimelineView: React.FC<Props> = props => {
     ...heightStyle
   };
 
-  if(range.startDate !== previousStart.current) {
+  if (range.startDate !== previousStart.current) {
     if (ref.current) {
       const oldPos = ref.current.scrollLeft;
       // console.log("Old start", previousStart.current && formatISODate(previousStart.current));
       // console.log("New range", formatISODate(range.startDate), formatISODate(range.endDate));
-      if(typeof previousStart.current !== "undefined") {
+      if (typeof previousStart.current !== "undefined") {
         const offset = differenceInDays(previousStart.current, range.startDate) * dayWidth;
         // console.log("New pos ", oldPos + offset, "(offset=", offset, ")");
-        ref.current.scrollTo({  left: oldPos + offset });
-        if(ref.current.scrollLeft !== oldPos + offset) {
+        ref.current.scrollTo({ left: oldPos + offset });if (ref.current.scrollLeft !== oldPos + offset) {
           // First time, before days are rendered, scroll is not possible
-          setTimeout(() => ref.current && ref.current.scrollTo({  left: oldPos + offset }), 0);
+          // console.log("Delay scrollPos");
+          setTimeout(() => ref.current!.scrollTo({ left: oldPos + offset }), 0);
         }
+        setNextScrollUpdate(oldPos + offset);
+        oldPosRef.current = oldPos;
 
-      }
-      else if(goToDate) {
+      } else if (goToDate) {
         ref.current.scrollTo({ left: differenceInDays(goToDate, range.startDate) * dayWidth });
         setTimeout(() => onScroll && onScroll(goToDate, add(goToDate, { days: visibleWidth / dayWidth })), 0);
       }
@@ -147,7 +154,7 @@ export const TimelineView: React.FC<Props> = props => {
   useEffect(() => {
     if (visibleWidth > 0) {
       // console.log("visibleWidth change -> updateBounds()");
-      const visibleStartDate = add(range.startDate, {days: scrollPos / dayWidth});
+      const visibleStartDate = add(range.startDate, { days: scrollPos.current / dayWidth });
       updateBounds(visibleStartDate);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,20 +193,51 @@ export const TimelineView: React.FC<Props> = props => {
   const limitRight = ((buffer - 1) * visibleWidth) - limit;
 
   const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+    // console.log("handleScroll", event.currentTarget.scrollLeft, "nextScrollUpdate", nextScrollUpdate);
     const pos = event.currentTarget.scrollLeft;
-    // console.log("handleScroll", pos);
+
+    if (nextScrollUpdate && Math.abs(nextScrollUpdate - pos) > Math.abs(pos - oldPosRef.current)) {
+      const shift = pos - oldPosRef.current;
+      ref.current!.scrollTo({ left: nextScrollUpdate + shift });
+      // console.log("skip scroll event, set scroll to ", nextScrollUpdate + shift);
+      return;
+    } else {
+      setNextScrollUpdate(0);
+    }
+
     const posToDate = (pos: number): Date => {
       return add(range.startDate, { days: pos / dayWidth });
     };
 
-    setScrollPos(pos);
-    if (onScroll) onScroll(posToDate(pos), posToDate(pos + visibleWidth));
+    // if (nextScrollUpdate) {
+    //   if (ref.current!.scrollLeft === nextScrollUpdate)
+    //     setNextScrollUpdate(0);
+    //   else {
+    //     ref.current!.scrollTo({ left: nextScrollUpdate });
+    //     return;
+    //   }
+    // }
 
-    if ((pos < limitLeft || pos > limitRight)) {
-      // console.log(`POS => ${limitLeft} < ${pos} < ${limitRight}`)
+    if ((pos < limitLeft || pos > limitRight) && !touchInProgress) {
+      // console.log(`POS => ${limitLeft} < ${pos} < ${limitRight}`);
       updateBounds(posToDate(pos));
     }
-  }, [limitLeft, limitRight, onScroll, range.startDate, updateBounds, visibleWidth]);
+
+    // setScrollPos(pos);
+    scrollPos.current = pos;
+    if (onScroll) onScroll(posToDate(pos), posToDate(pos + visibleWidth));
+
+  }, [limitLeft, limitRight, nextScrollUpdate, onScroll, range.startDate, touchInProgress, updateBounds, visibleWidth]);
+
+  const handleTouchMove = useCallback((event: TouchEvent<HTMLTableElement>) => {
+    // console.log("handleTouchMove");
+    event.preventDefault();
+  }, []);
+
+  const handleTouchEnd = useCallback((event: TouchEvent<HTMLTableElement>) => {
+    // console.log("handleTouchEnd");
+    setTouchInProgress(false);
+  }, []);
 
   function handleDayClick(lodging: Lodging, day: Day) {
     if (selectStart && selectStart.lodging.id === lodging.id) {
@@ -328,7 +366,14 @@ export const TimelineView: React.FC<Props> = props => {
   return (
     <div className="timeline-view">
       <div className={clsx("table-responsive", { collapsed: collapsed })} onScroll={handleScroll} ref={ref}>
-        <table className="table">
+        <table
+          className="table"
+          onTouchStart={() => {
+            setTouchInProgress(true);
+          }}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <thead>
             <tr className="first-tr">
               <th className={clsx("lodging-name-col", { collapsed: collapsed })}>
@@ -372,7 +417,9 @@ export const TimelineView: React.FC<Props> = props => {
             {lodgings.map(l =>
               <tr key={l.id}>
                 <td className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle} title={l.name}>
-                  <div className="lodging-name valign">{l.name}</div>
+                  <div>
+                    <div className="lodging-name valign">{l.name}</div>
+                  </div>
                 </td>
                 {getDaysWithBookings(l).map((d) => {
                   return (
@@ -404,7 +451,9 @@ export const TimelineView: React.FC<Props> = props => {
                 className={clsx("lodging-name-col", "cancelled", { collapsed: collapsed })} style={heightStyle}
                 title={t("Cancellation / Waiting")}
               >
-                <div className="lodging-name valign">{t("Cancellation")}</div>
+                <div>
+                  <div className="lodging-name valign">{t("Cancellation")}</div>
+                </div>
               </td>
               {getDaysWithBookings().map((d) => {
                 return (
@@ -426,10 +475,11 @@ export const TimelineView: React.FC<Props> = props => {
       {/*  <div>goToDate  : {goToDate && formatISODate(goToDate)}</div>*/}
       {/*  <div>range     : {formatISODate(range.startDate)} {formatISODate(range.endDate)}</div>*/}
       {/*  <div>range px  : {0} {differenceInDays(range.endDate, range.startDate) * dayWidth}</div>*/}
-      {/*  <div>ScrollPos : {limitLeft} &lt; {scrollPos} &lt; {limitRight}</div>*/}
+      {/*  <div>ScrollPos : {limitLeft} &lt; {scrollPos.current} &lt; {limitRight}</div>*/}
       {/*  <div>Width     : {visibleWidth} ({visibleWidth / dayWidth} days)</div>*/}
       {/*  <div>Buffer    : {buffer}</div>*/}
-      {/*  <div>collapsed : {collapsed ? "true" : "false"}</div>*/}
+      {/*  <div>touch?    : {touchInProgress ? "true" : "false"}</div>*/}
+      {/*  <div>nextScroll: {nextScrollUpdate ?? "none"}</div>*/}
       {/*</pre>*/}
     </div>
   );

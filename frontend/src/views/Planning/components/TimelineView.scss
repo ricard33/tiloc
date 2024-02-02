@@ -6,44 +6,50 @@ $secondary-blue: #3ea7ff;
 $primary-grey: #9a9a9a;
 $secondary-grey: #ececec;
 $today-color: #ff00001c;
+$cancellation-color: rgb(255, 232, 234);
 $primary-black: #002333;
 $primary-red: #f45b69;
-$collapsed-width: 30px;
+
+//*:not(html) {
+//    -webkit-transform: translate3d(0, 0, 0);
+//}
 
 .timeline-view {
+  --motion-duration-slow: 0.3s;
+  --color-split: rgba(5, 5, 5, 0.23);
+  --line-width: 1px;
+  --header-width: 100px;
+  --header-width-colapsed: 30px;
+
   position: relative;
 
   .table-responsive {
     overflow-y: hidden;
-    overflow-x: scroll;
-    margin-left: 100px;
+    overflow-x: auto;
+    scroll-behavior: auto;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: auto; // Safari
+    -webkit-transform: translate3d(0, 0, 0); // Safari optimization
 
-    &.collapsed {
-      margin-left: $collapsed-width;
-
-    }
-
-    &::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #eee;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      border-radius: 0.25rem;
-      background-color: rgba(167, 167, 167, 1);
-    }
+    //&::-webkit-scrollbar {
+    //  height: 8px;
+    //}
+    //
+    //&::-webkit-scrollbar-track {
+    //  background: #eee;
+    //}
+    //
+    //&::-webkit-scrollbar-thumb {
+    //  border-radius: 0.25rem;
+    //  background-color: rgba(167, 167, 167, 1);
+    //}
   }
 
   table {
     text-indent: initial;
     border-spacing: 0;
-    border-collapse: collapse;
-
+    //border-collapse: collapse;
+    table-layout: fixed;
   }
 
   //.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
@@ -56,8 +62,11 @@ $collapsed-width: 30px;
 
       &:first-child {
         border-top: 1px solid $border-color;
+        padding-top: 1px;
 
         th {
+          background-color: var(--background-color);
+          border-top: 1px solid $border-color;
           border-right: 2px solid $border-color;
           font-style: normal;
           font-weight: $font-weight-medium;
@@ -81,7 +90,7 @@ $collapsed-width: 30px;
 
             .month-label {
               position: sticky;
-              left: 20px;
+              left: calc(var(--header-width) + 20px);
               margin-left: 20px;
               margin-right: 20px;
             }
@@ -102,10 +111,13 @@ $collapsed-width: 30px;
         border-top: none;
         font-weight: $font-weight-light;
 
+        &:first-child {
+          background-color: var(--background-color);
+        }
+
         &.lodging-name-col {
           border: none;
           border-right: 1px solid $border-color;
-          background-color: inherit;
           height: 42px;
         }
 
@@ -122,7 +134,6 @@ $collapsed-width: 30px;
       td {
 
         &.lodging-name-col {
-          background-color: inherit;
         }
       }
     }
@@ -138,9 +149,13 @@ $collapsed-width: 30px;
       }
     }
 
+    tr {
+      td:first-child {
+        background-color: $secondary-grey;
+      }
+    }
+
     td {
-      //height: 50px;
-      //min-height: 50px;
       text-align: center;
 
       &.day {
@@ -205,31 +220,32 @@ $collapsed-width: 30px;
     }
   }
 
-  th:first-child select {
-    top: 0;
-    position: absolute;
-    left: 0;
-    margin-left: 16px;
-    max-width: 115px;
-  }
-
   td:first-child, th:first-child {
-    position: absolute;
-    width: 100px;
+    position: sticky;
+    width: var(--header-width);
     left: 0;
+    z-index: 99;
     line-height: 20px;
     border-right: 1px solid $border-color;
-    //padding-left: 13px;
-    //padding-top: 1rem;
-    //padding-bottom: 1rem;
-    background-color: $secondary-grey;
-    //border-left: 1px solid $secondary-grey;
+
+    &::after {
+      box-shadow: inset 10px 0 8px -8px var(--color-split);
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: calc(var(--line-width) * -1);
+      width: 30px;
+      transform: translateX(100%);
+      //transition: box-shadow var(--motion-duration-slow);
+      content: "";
+      pointer-events: none;
+
+    }
   }
 
   .third-tr {
 
     td:first-child {
-      background-color: transparent;
       border-left: none;
       border-bottom: none;
       padding-top: 0;
@@ -263,20 +279,32 @@ $collapsed-width: 30px;
   .lodging-name-col {
     border-top: 1px solid $border-color;
     border-left: 1px solid $border-color;
-    min-width: 100px;
-    overflow-x: hidden;
+    min-width: var(--header-width);
+    max-width: var(--header-width);
     text-overflow: ellipsis;
     white-space: nowrap;
 
+    &>div {
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
+      height: 100%;
+      padding: 4px;
+    }
+
     &.collapsed {
-      min-width: 20px;
-      width: $collapsed-width;
+      min-width: var(--header-width-colapsed);
+      max-width: var(--header-width-colapsed);
+      width: var(--header-width-colapsed);
 
     }
 
     .lodging-name {
       text-overflow: ellipsis;
       overflow-x: hidden;
+      display: flex;
+      justify-content: flex-start;
+      align-items: baseline;
     }
 
     a {
@@ -288,6 +316,7 @@ $collapsed-width: 30px;
 
   .lodging-name-col.cancelled {
     font-style: italic;
+    background-color: $cancellation-color;
   }
 
   .valign {
@@ -303,7 +332,7 @@ $collapsed-width: 30px;
     border-right: 0.5px solid $border-color;
     border-left: none;
     padding: 5px 0;
-    background-clip: padding-box;   /* fix for Firefox */
+    background-clip: padding-box; /* fix for Firefox */
 
     &.weekend {
       background-color: $secondary-grey;
@@ -338,6 +367,7 @@ $collapsed-width: 30px;
     &.selected.selection-start.selection-end {
       box-shadow: inset 0 0 0 2px $primary-black !important;
     }
+
     &.selected.selection-start {
       box-shadow: inset 2px 0 0 2px $primary-black !important;
       cursor: no-drop !important;
@@ -361,7 +391,7 @@ $collapsed-width: 30px;
       font-style: normal;
       line-height: 17px;
       position: absolute;
-      z-index: 99;
+      z-index: 20;
       top: 17px;
 
       &.shortName {
@@ -379,7 +409,7 @@ $collapsed-width: 30px;
     cursor: pointer;
     background: rgb(250, 172, 234);
     border: 1px solid rgb(26, 111, 179);
-    z-index: 80;
+    z-index: 10;
     border-radius: 4px;
     box-sizing: border-box;
     height: 30px;
@@ -402,7 +432,7 @@ $collapsed-width: 30px;
       margin-left: 5px;
       margin-right: 10px;
       position: sticky;
-      left: 4px;
+      left: calc(var(--header-width) + 4px);
     }
 
     .item-icon {

@@ -1,3 +1,7 @@
+:root {
+  --background-color: #f4f6f8;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,7 +15,7 @@ html {
 }
 
 body {
-  background-color: #f4f6f8;
+  background-color: var(--background-color);
   height: 100%;
 }
 
