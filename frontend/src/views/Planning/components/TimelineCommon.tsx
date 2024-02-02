@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { Tooltip } from "../../../components";
 import BookingTooltip from "../../../components/BookingTooltip";
 import { PlanningSettings } from "./PlanningSettingsDialog";
+import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 
 export const timeSteps = {
   second: 0,
@@ -32,7 +33,7 @@ export type TimelineGroup = {
 };
 
 export type TimelineItem = {
-  id: number|string,
+  id: number | string,
   group: number,
   title: string,
   start_time: number,
@@ -186,7 +187,7 @@ export function makeItems(bookings: Booking[], anonymize: boolean): TimelineItem
     booking
   });
   let items: TimelineItem[] = [];
-  if(bookings) {
+  if (bookings) {
     for (let i = 0; i < bookings.length; i++) {
       const booking = bookings[i];
       if (booking.cancelled) items.push(bookingToItem(booking, -3));
@@ -250,7 +251,15 @@ export function makeRenderItem(
                 style={{ maxHeight: `${itemContext.dimensions.height}` }}
               >
                 {item.icon ? item.icon : ""}
-                <div className="item-title">{item.linked && <span>{'\uD83D'}{'\uDD17'} </span>}{itemContext.title}</div>
+                {item.linked &&
+                  <AllInclusiveIcon
+                    fontSize="small"
+                    style={{
+                      height: "100%"
+                    }}
+                  />
+                }
+                <div className="item-title">{itemContext.title}</div>
                 {settings.showPaymentStatus && item.booking.price && item.booking.price > 0 ?
                   <EuroIcon
                     className={clsx("item-icon", item.booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
