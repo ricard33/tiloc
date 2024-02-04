@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { add, differenceInDays, format, parse, startOfMonth, sub } from "date-fns";
+import { add, format, parse, startOfMonth, sub } from "date-fns";
 import { BookingFixedTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
@@ -16,7 +16,6 @@ import { Account, Booking, Lodging, User } from "../../types";
 import { getBookingStatuses } from "../../common/statusUtils";
 import { useAppSelector } from "../../app/hooks";
 import { TimelineView } from "./components/TimelineView";
-import { formatISODate } from "../../common/dateUtils";
 
 
 const Planning = () => {

@@ -229,12 +229,12 @@ export const TimelineView: React.FC<Props> = props => {
 
   }, [limitLeft, limitRight, nextScrollUpdate, onScroll, range.startDate, touchInProgress, updateBounds, visibleWidth]);
 
-  const handleTouchMove = useCallback((event: TouchEvent<HTMLTableElement>) => {
-    // console.log("handleTouchMove");
-    event.preventDefault();
-  }, []);
+  // const handleTouchMove = useCallback((event: TouchEvent<HTMLTableElement>) => {
+  //   // console.log("handleTouchMove");
+  //   // event.preventDefault();
+  // }, []);
 
-  const handleTouchEnd = useCallback((event: TouchEvent<HTMLTableElement>) => {
+  const handleTouchEnd = useCallback((_: TouchEvent<HTMLTableElement>) => {
     // console.log("handleTouchEnd");
     setTouchInProgress(false);
   }, []);
@@ -371,7 +371,7 @@ export const TimelineView: React.FC<Props> = props => {
           onTouchStart={() => {
             setTouchInProgress(true);
           }}
-          onTouchMove={handleTouchMove}
+          // onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           <thead>
@@ -421,7 +421,13 @@ export const TimelineView: React.FC<Props> = props => {
                     <div className="lodging-name valign">{l.name}</div>
                   </div>
                 </td>
-                {getDaysWithBookings(l).map((d) => {
+                {getDaysWithBookings(l).map((d, index) => {
+                  // if ((index + 1) * dayWidth < scrollPos.current) {
+                  //   if(index > 0)
+                  //     return "";
+                  //   return <td colSpan={Math.trunc((scrollPos.current - 1) / dayWidth)}/>;
+                  // }
+                  // if(index*dayWidth > visibleWidth+scrollPos.current) return "";
                   return (
                     <td
                       key={d.date.valueOf()}

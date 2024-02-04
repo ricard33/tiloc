@@ -439,3 +439,11 @@ def load_db(c, fname):
 def debug(c):
     print(c.run("uname -a"))
     print(c.TARGET_PATH)
+
+@task
+def run_prod_locally(c):
+    if need_to_rebuild(c):
+        build_frontend(c, only_sources=True)
+    with c.cd(WORKSPACE):
+        c.local("python manage.py collectstatic --clear --noinput -v 0 --no-post-process")
+        c.local("python manage.py runserver 0.0.0.0:4000")

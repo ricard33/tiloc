@@ -30,6 +30,8 @@ $primary-red: #f45b69;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: auto; // Safari
     -webkit-transform: translate3d(0, 0, 0); // Safari optimization
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 
     //&::-webkit-scrollbar {
     //  height: 8px;
@@ -454,6 +456,10 @@ $primary-red: #f45b69;
       background: rgb(182, 230, 158);
     }
 
+  }
+
+  .collapsed .item .item-title {
+    left: calc(var(--header-width-colapsed) + 4px);
   }
 
 }
