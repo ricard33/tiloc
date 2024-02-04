@@ -80,7 +80,7 @@ function SignIn() {
         onSuccess={handleSignIn}
         formContext={formContext}
       >
-        <Paper sx={{ padding: "1em", width: "500px" }}>
+        <Paper sx={{ padding: "1em", maxWidth: "500px" }}>
           <Stack direction="column" spacing={2} style={{ width: "100%" }}>
             <Typography
               variant="h2"
