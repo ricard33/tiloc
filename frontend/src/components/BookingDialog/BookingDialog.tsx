@@ -1,26 +1,17 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Contacts as ContactsIcon,
-  Edit as EditIcon,
-  ExpandMore as ExpandMoreIcon,
-  Forward as ForwardIcon
-} from "@mui/icons-material";
+import { Contacts as ContactsIcon, Edit as EditIcon, Forward as ForwardIcon } from "@mui/icons-material";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
 import { getDepositLabel } from "../../common/propertyPrefsUtils";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   AppBar,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   FormControl,
   Grid,
   Hidden,
@@ -29,13 +20,16 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Stack, Tab,
+  Stack,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow, TabProps, Tabs,
+  TableRow,
+  TabProps,
+  Tabs,
   Toolbar,
   Typography
 } from "@mui/material";
@@ -74,17 +68,18 @@ import CommentIcon from "@mui/icons-material/Comment";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 
 const AntTabs = styled(Tabs)({
-  borderBottom: '1px solid #e8e8e8',
-  '& .MuiTabs-indicator': {
-    backgroundColor: '#1890ff',
-  },
+  borderBottom: "1px solid #e8e8e8",
+  "& .MuiTabs-indicator": {
+    backgroundColor: "#1890ff"
+  }
 });
 
 const AntTab = styled((props: TabProps) => <Tab disableRipple {...props} />)(
   ({ theme }) => ({
-    textTransform: 'none',
+    textTransform: "none",
     // minWidth: 0,
     // [theme.breakpoints.up('sm')]: {
     //   minWidth: 0,
@@ -93,32 +88,32 @@ const AntTab = styled((props: TabProps) => <Tab disableRipple {...props} />)(
     marginRight: theme.spacing(1),
     // color: 'rgba(0, 0, 0, 0.85)',
     fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(','),
-    '&:hover': {
-      color: '#40a9ff',
-      opacity: 1,
+      "-apple-system",
+      "BlinkMacSystemFont",
+      "\"Segoe UI\"",
+      "Roboto",
+      "\"Helvetica Neue\"",
+      "Arial",
+      "sans-serif",
+      "\"Apple Color Emoji\"",
+      "\"Segoe UI Emoji\"",
+      "\"Segoe UI Symbol\""
+    ].join(","),
+    "&:hover": {
+      color: "#40a9ff",
+      opacity: 1
     },
-    '&.MuiTab-fullWidth': {
-      minWidth: 0,
+    "&.MuiTab-fullWidth": {
+      minWidth: 0
     },
-    '&.Mui-selected': {
+    "&.Mui-selected": {
       // color: '#1890ff',
       // fontWeight: theme.typography.fontWeightMedium,
     },
-    '&.Mui-focusVisible': {
-      backgroundColor: '#d1eaff',
-    },
-  }),
+    "&.Mui-focusVisible": {
+      backgroundColor: "#d1eaff"
+    }
+  })
 );
 
 interface TabPanelProps {
@@ -136,7 +131,7 @@ function CustomTabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      style={{ width: "100%", minHeight: "350px" }}
+      style={{ width: "100%", minHeight: "360px" }}
       {...other}
     >
       {value === index && (
@@ -163,6 +158,7 @@ type BookingDialogProps = {
   onUncancelBooking?: () => void
 };
 
+// eslint-disable-next-line react/no-multi-comp
 const BookingDialog: React.FC<BookingDialogProps> = props => {
   const { booking, lodgings, allOptions, guests: allGuests, onClose, onOpenContract } = props;
   const user = useSelector<RootState>(store => store.auth.user) as User;
@@ -590,7 +586,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         //   </Grid>
         // </DialogTitle>
       }
-      <DialogContent dividers sx={{ ...(fullScreen && { padding: 1 })}}>
+      <DialogContent dividers sx={{ ...(fullScreen && { padding: 1 }) }}>
         {booking &&
           <FormContainer
             formContext={formContext}
@@ -611,8 +607,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                 value={selectedTab} onChange={(_, value) => setSelectedTab(value)} aria-label="booking dialog"
                 variant={fullScreen ? "fullWidth" : "standard"}
               >
-                <AntTab icon={<InfoOutlinedIcon />} aria-label="info" />
+                <AntTab icon={<EventAvailableIcon />} aria-label="info" />
                 <AntTab icon={<PeopleIcon />} aria-label="contact" />
+                <AntTab icon={<InfoOutlinedIcon />} aria-label="info" />
                 <AntTab icon={<RoomServiceIcon />} aria-label="options" />
                 {booking.id && <AntTab icon={<PaymentOutlinedIcon />} aria-label="payments" />}
                 {booking.id && <AntTab icon={<CommentIcon />} aria-label="comments" />}
@@ -989,6 +986,62 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
             </CustomTabPanel>
             <CustomTabPanel value={selectedTab} index={2}>
               <Grid container spacing={1}>
+                {/* statistics */}
+                <Grid item xs={12}>
+                  {bookingChannels &&
+                    <SelectElement
+                      control={control}
+                      name="source_id"
+                      label={t("Statistics")}
+                      className="full-width"
+                      variant={variant}
+                      margin={margin}
+                      type="number"
+                      sx={{ width: "4em" }}
+                      options={[
+                        { id: undefined, label: "" },
+                        ...bookingChannels.map(channel => ({ id: channel.id, label: channel.name }))
+                      ]}
+                    />}
+                </Grid>
+                {/* arrival_details */}
+                <Grid item sm={6} xs={12}>
+                  <TextFieldElement
+                    control={control}
+                    name={"arrival_details"}
+                    label={t("Check-in info")}
+                    margin={margin}
+                    variant={variant}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <TextFieldElement
+                    control={control}
+                    name={"departure_details"}
+                    label={t("Check-out info")}
+                    margin={margin}
+                    variant={variant}
+                    fullWidth
+                  />
+                </Grid>
+                {/* notes */}
+                <Grid item xs={12}>
+                  <TextFieldElement
+                    control={control}
+                    name={"notes"}
+                    label={t("Further information")}
+                    margin={margin}
+                    variant={variant}
+                    fullWidth
+                    multiline
+                    rows={4}
+                  />
+                </Grid>
+              </Grid>
+            </CustomTabPanel>
+            <CustomTabPanel value={selectedTab} index={3}>
+              <Grid container spacing={1}>
                 <Grid item xs={12}>
                   <Typography variant="h5">{t("Options")}</Typography>
                 </Grid>
@@ -1001,9 +1054,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                 </Grid>
               </Grid>
             </CustomTabPanel>
-            <CustomTabPanel value={selectedTab} index={3}>
+            <CustomTabPanel value={selectedTab} index={4}>
               {booking.id && <>
-                <Typography variant="body1" sx={{fontStyle: "italic"}}>
+                <Typography variant="body1" sx={{ fontStyle: "italic" }}>
                   {leftToPay > 0 &&
                     <span
                       className="left-to-pay"
@@ -1019,529 +1072,26 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                 />
               </>}
             </CustomTabPanel>
-            <CustomTabPanel value={selectedTab} index={4}>
+            <CustomTabPanel value={selectedTab} index={5}>
               {booking.id && <Comments booking={booking} />}
             </CustomTabPanel>
 
-            {/*<Grid container spacing={1}>*/}
-            {/*  { /* BOOKING STATUS *!/*/}
-            {/*  <Grid item sm={4} xs={12}>*/}
-            {/*    <FormControl className="full-width" variant={variant}>*/}
-            {/*      <InputLabel id="status-label">{t("Booking status")}</InputLabel>*/}
-            {/*      <Controller*/}
-            {/*        name="status"*/}
-            {/*        control={control}*/}
-            {/*        render={({ field }) =>*/}
-            {/*          <Select*/}
-            {/*            labelId="status-label"*/}
-            {/*            margin={margin}*/}
-            {/*            label={t("Booking status")}*/}
-            {/*            className="booking-status-select"*/}
-            {/*            {...field}*/}
-            {/*          >*/}
-            {/*            {bookingStatuses.map(status => (*/}
-            {/*              <MenuItem key={status.name} value={status.name}>*/}
-            {/*                <span*/}
-            {/*                  className="booking-status-item"*/}
-            {/*                  style={{ background: status.color }}*/}
-            {/*                >{status.getLabel(t)}</span>*/}
-            {/*              </MenuItem>*/}
-            {/*            ))}*/}
-            {/*          </Select>}*/}
-            {/*      />*/}
-            {/*    </FormControl>*/}
-            {/*  </Grid>*/}
-            {/*  { /* LODGING *!/*/}
-            {/*  <Grid item sm={8} xs={12}>*/}
-            {/*    {lodgings && (*/}
-            {/*      hasGroupedBooking ?*/}
-            {/*        <MultiSelectElement*/}
-            {/*          control={control}*/}
-            {/*          name="lodging_ids"*/}
-            {/*          label={t("Lodging")}*/}
-            {/*          className="full-width"*/}
-            {/*          margin={margin}*/}
-            {/*          fullWidth*/}
-            {/*          required*/}
-            {/*          variant={variant}*/}
-            {/*          options={lodgings.map(lodging => (*/}
-            {/*            { id: lodging.id, label: lodging.name }*/}
-            {/*          ))}*/}
-            {/*          onChange={(event) => handleLodgingsChange(event.target.value)}*/}
-            {/*        />*/}
-            {/*        :*/}
-            {/*        <SelectElement*/}
-            {/*          control={control}*/}
-            {/*          name="lodging_ids"*/}
-            {/*          label={t("Lodging")}*/}
-            {/*          className="full-width"*/}
-            {/*          margin={margin}*/}
-            {/*          fullWidth*/}
-            {/*          variant={variant}*/}
-            {/*          options={lodgings.map(lodging => (*/}
-            {/*            { id: lodging.id, label: lodging.name }*/}
-            {/*          ))}*/}
-            {/*          onChange={(value) => handleLodgingsChange(value)}*/}
-            {/*        />)*/}
-            {/*    }*/}
-            {/*  </Grid>*/}
-            {/*  { /* GUEST *!/*/}
-            {/*  <Grid item lg={6} xs={12}>*/}
-            {/*    <Accordion defaultExpanded>*/}
-            {/*      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="guest-header">*/}
-            {/*        <Typography gutterBottom className="accordion-heading">{t("Guest")}</Typography>*/}
-            {/*      </AccordionSummary>*/}
-            {/*      <AccordionDetails>*/}
-            {/*        <Grid container spacing={1}>*/}
-            {/*          <Grid item xs={12}>*/}
-            {/*            <AutocompleteElement*/}
-            {/*              control={control}*/}
-            {/*              name="guest_name"*/}
-            {/*              label={t("Full guest name")}*/}
-            {/*              rules={{ required: true }}*/}
-            {/*              options={allGuests.map((g) => g.name)}*/}
-            {/*              autocompleteProps={{*/}
-            {/*                freeSolo: true,*/}
-            {/*                onChange: (_: any, newValue: string) => handleChange("existing-guest", newValue),*/}
-            {/*                onInputChange: (_: React.SyntheticEvent, value: string) => {*/}
-            {/*                  setValue("guest_name", value, { shouldDirty: true, shouldTouch: true });*/}
-            {/*                }*/}
-            {/*              }}*/}
-            {/*              textFieldProps={{*/}
-            {/*                fullWidth: true,*/}
-            {/*                margin: margin,*/}
-            {/*                variant: variant,*/}
-            {/*                helperText: errors.guest_name && t("Guest name is required"),*/}
-            {/*                InputProps: {*/}
-            {/*                  // endAdornment: null,*/}
-            {/*                  startAdornment: <ContactsIcon />*/}
-            {/*                }*/}
-            {/*              }}*/}
-            {/*            />*/}
-            {/*          </Grid>*/}
-            {/*          <Grid item sm={6} xs={12}>*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name="guest_contact"*/}
-            {/*              label={t("Phone / email")}*/}
-            {/*              fullWidth*/}
-            {/*              margin={margin}*/}
-            {/*              variant={variant}*/}
-            {/*              multiline*/}
-            {/*              rows={2}*/}
-            {/*            />*/}
-            {/*          </Grid>*/}
-            {/*          <Grid item sm={6} xs={12}>*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name="guest_address"*/}
-            {/*              label={t("Address")}*/}
-            {/*              fullWidth*/}
-            {/*              margin={margin}*/}
-            {/*              variant={variant}*/}
-            {/*              multiline*/}
-            {/*              rows={2}*/}
-            {/*            />*/}
-            {/*          </Grid>*/}
-            {/*        </Grid>*/}
-            {/*      </AccordionDetails>*/}
-            {/*    </Accordion>*/}
-            {/*  </Grid>*/}
-            {/*  { /* BOOKING DETAILS *!/*/}
-            {/*  <Grid item lg={6} xs={12}>*/}
-            {/*    <Accordion defaultExpanded>*/}
-            {/*      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="booking-header">*/}
-            {/*        <Typography gutterBottom className="accordion-heading">{t("Booking details")}</Typography>*/}
-            {/*      </AccordionSummary>*/}
-            {/*      <AccordionDetails>*/}
-            {/*        <Grid container spacing={1}>*/}
-            {/*          /!* Dates *!/*/}
-            {/*          <Grid item xs={12}>*/}
-            {/*            <Grid container spacing={1} justifyContent="space-around" alignItems="center">*/}
-            {/*              <Grid item sm={5} xs={12}>*/}
-            {/*                <DatePickerElement*/}
-            {/*                  control={control}*/}
-            {/*                  name="begin_date"*/}
-            {/*                  label={t("Arrival")}*/}
-            {/*                  onChange={(date) => onDateChange(date, "begin_date")}*/}
-            {/*                  inputProps={{ size: "small" }}*/}
-            {/*                />*/}
-            {/*              </Grid>*/}
-            {/*              <Hidden smDown>*/}
-            {/*                <Grid item sm={2} xs={12} style={{ "textAlign": "center" }}>*/}
-            {/*                  <ForwardIcon />*/}
-            {/*                </Grid>*/}
-            {/*              </Hidden>*/}
-            {/*              <Grid item sm={5} xs={12}>*/}
-            {/*                <DatePickerElement*/}
-            {/*                  control={control}*/}
-            {/*                  name="end_date"*/}
-            {/*                  label={t("Departure")}*/}
-            {/*                  onChange={(date) => onDateChange(date, "end_date")}*/}
-            {/*                  inputProps={{ size: "small" }}*/}
-            {/*                />*/}
-            {/*              </Grid>*/}
-            {/*            </Grid>*/}
-            {/*          </Grid>*/}
-            {/*          /!* Price *!/*/}
-            {/*          <Grid*/}
-            {/*            item container xs={12}*/}
-            {/*            spacing={1} alignItems="center"*/}
-            {/*            justifyContent={!isFlatRate ? "space-around" : "flex-start"}*/}
-            {/*          >*/}
-            {/*            <Grid item sm={isFlatRate ? 5 : 7} xs={isFlatRate ? 5 : 12} className="flex-box-stretched">*/}
-            {/*              <SelectElement*/}
-            {/*                control={control}*/}
-            {/*                name="duration"*/}
-            {/*                label={t("Nights")}*/}
-            {/*                variant={variant}*/}
-            {/*                margin={margin}*/}
-            {/*                size="small"*/}
-            {/*                type="number"*/}
-            {/*                sx={{ width: "6em" }}*/}
-            {/*                onChange={(value) => handleChange("duration", Number(value))}*/}
-            {/*                options={[*/}
-            {/*                  ...Array.from({ length: 31 }, (_, k) => k + 1).map(n => ({*/}
-            {/*                    id: n,*/}
-            {/*                    label: n*/}
-            {/*                  })),*/}
-            {/*                  ...(duration > 31 ? [{ id: duration, label: duration }] : [])*/}
-            {/*                ]}*/}
-            {/*              />*/}
-            {/*              {!isFlatRate &&*/}
-            {/*                <>*/}
-            {/*                  <span>&nbsp;x&nbsp;</span>*/}
-            {/*                  <TextFieldElement*/}
-            {/*                    control={control}*/}
-            {/*                    name={"daily_rate"}*/}
-            {/*                    label={t("Daily rate")}*/}
-            {/*                    className="price-input"*/}
-            {/*                    type={"number"}*/}
-            {/*                    required*/}
-            {/*                    validation={{*/}
-            {/*                      min: { value: 0, message: t("Rate can't be negative") },*/}
-            {/*                      validate: { validateNumber: (v) => (typeof v !== "undefined") }*/}
-            {/*                    }}*/}
-            {/*                    InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}*/}
-            {/*                    margin={margin}*/}
-            {/*                    size="small"*/}
-            {/*                    variant={variant}*/}
-            {/*                    onChange={event => handleChange(event.target.name, event.target.value)}*/}
-            {/*                  />*/}
-            {/*                </>}*/}
-            {/*              <div className="spacer" />*/}
-            {/*              =*/}
-            {/*              <div className="spacer" />*/}
-            {/*            </Grid>*/}
-            {/*            <Grid item sm={isFlatRate ? 7 : 5} xs={isFlatRate ? 7 : 12} className="flex-box-align-left">*/}
-            {/*              <TextFieldElement*/}
-            {/*                control={control}*/}
-            {/*                name={"price"}*/}
-            {/*                label={t("Total")}*/}
-            {/*                className="price-input"*/}
-            {/*                type={"number"}*/}
-            {/*                required*/}
-            {/*                validation={{*/}
-            {/*                  min: { value: 0, message: t("Price can't be negative") },*/}
-            {/*                  validate: { validateNumber: (v) => (typeof v !== "undefined") }*/}
-            {/*                }}*/}
-            {/*                InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}*/}
-            {/*                margin={margin}*/}
-            {/*                size="small"*/}
-            {/*                variant={variant}*/}
-            {/*                onChange={event => handleChange(event.target.name, event.target.value)}*/}
-            {/*              />*/}
-            {/*              <div className="spacer" />*/}
-            {/*              <CheckboxElement*/}
-            {/*                control={control}*/}
-            {/*                name="is_flat_rate"*/}
-            {/*                label={t("Flat rate")}*/}
-            {/*                labelProps={{*/}
-            {/*                  labelPlacement: "start"*/}
-            {/*                }}*/}
-            {/*                onChange={event => handleChange(event.target.name, event.target.checked)}*/}
-            {/*              />*/}
-            {/*            </Grid>*/}
-            {/*          </Grid>*/}
-            {/*          /!* Deposit *!/*/}
-            {/*          <Grid item xs={12} className="flex-box-align-left">*/}
-            {/*            <Typography>*/}
-            {/*              {includedInPriceOptions ? t("Included options: {{amount}}", { amount: formatCurrency(includedInPriceOptions) }) : ""}*/}
-            {/*            </Typography>*/}
-            {/*          </Grid>*/}
-            {/*          <Grid item xs={12} className="flex-box-align-left">*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name={"deposit"}*/}
-            {/*              label={depositLabel}*/}
-            {/*              className="price-input"*/}
-            {/*              type={"number"}*/}
-            {/*              // required*/}
-            {/*              validation={{*/}
-            {/*                min: {*/}
-            {/*                  value: 0,*/}
-            {/*                  message: t("{{depositLabel}} can't be negative", { depositLabel: depositLabel })*/}
-            {/*                },*/}
-            {/*                max: {*/}
-            {/*                  value: price ?? 0,*/}
-            {/*                  message: t("{{depositLabel}} can't be higher than price", { depositLabel: depositLabel })*/}
-            {/*                },*/}
-            {/*                validate: { validateNumber: (v) => (typeof v !== "undefined") }*/}
-            {/*              }}*/}
-            {/*              InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}*/}
-            {/*              margin={margin}*/}
-            {/*              size="small"*/}
-            {/*              variant={variant}*/}
-            {/*            />*/}
-            {/*            <div className="spacer" />*/}
-            {/*            <Typography>*/}
-            {/*              {fullPrice ? t("Balance: {{amount}}", { amount: formatCurrency(fullPrice - (deposit ?? 0)) }) : ""}*/}
-            {/*            </Typography>*/}
-            {/*          </Grid>*/}
-            {/*          { /* commission fees and taxes *!/*/}
-            {/*          <Grid item xs={12} className="flex-box-align-left">*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name={"commission_fees"}*/}
-            {/*              label={t("Commission fees")}*/}
-            {/*              sx={{ width: "10em;" }}*/}
-            {/*              type={"number"}*/}
-            {/*              size="small"*/}
-            {/*              // required*/}
-            {/*              validation={{*/}
-            {/*                min: { value: 0, message: t("Commission fees can't be negative") },*/}
-            {/*                validate: { validateNumber: (v) => (typeof v !== "undefined") }*/}
-            {/*              }}*/}
-            {/*              InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}*/}
-            {/*              margin={margin}*/}
-            {/*              variant={variant}*/}
-            {/*            />*/}
-            {/*            <div className="spacer" />*/}
-            {/*            {customizeTouristTax ?*/}
-            {/*              <>*/}
-            {/*                <TextFieldElement*/}
-            {/*                  control={control}*/}
-            {/*                  name={"custom_tourist_tax"}*/}
-            {/*                  label={t("Tourist tax")}*/}
-            {/*                  sx={{ width: "10em;" }}*/}
-            {/*                  type={"number"}*/}
-            {/*                  validation={{*/}
-            {/*                    min: { value: 0, message: t("Tourist tax can't be negative") },*/}
-            {/*                    validate: { validateNumber: (v) => (typeof v !== "undefined") }*/}
-            {/*                  }}*/}
-            {/*                  InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}*/}
-            {/*                  margin={margin}*/}
-            {/*                  size="small"*/}
-            {/*                  variant={variant}*/}
-            {/*                />*/}
-            {/*                <IconButton*/}
-            {/*                  type="button"*/}
-            {/*                  className="custom_tourist_tax-button"*/}
-            {/*                  color="error"*/}
-            {/*                  onClick={() => onCustomizeTouristTaxHandler()}*/}
-            {/*                  title={t("Reset")}*/}
-            {/*                ><BackspaceIcon /></IconButton>*/}
-            {/*              </>*/}
-            {/*              :*/}
-            {/*              <>*/}
-            {/*                <Typography>*/}
-            {/*                  {t("Tourist tax: {{amount}}", { amount: formatCurrency(touristTax ?? 0) })}*/}
-            {/*                </Typography>*/}
-            {/*                <IconButton*/}
-            {/*                  type="button"*/}
-            {/*                  className="custom_tourist_tax-button"*/}
-            {/*                  color="info"*/}
-            {/*                  onClick={() => onCustomizeTouristTaxHandler()}*/}
-            {/*                  title={t("Customize")}*/}
-            {/*                ><EditIcon /></IconButton>*/}
-            {/*              </>*/}
-            {/*            }*/}
-            {/*          </Grid>*/}
-            {/*          /!* number of persons *!/*/}
-            {/*          <Grid item xs={12}>*/}
-            {/*            <TableContainer component={Paper}>*/}
-            {/*              <Table size="small" aria-label="a dense table">*/}
-            {/*                <TableHead>*/}
-            {/*                  <TableRow>*/}
-            {/*                    <TableCell>{t("Number of occupants")}</TableCell>*/}
-            {/*                    <TableCell align="right">{t("Adults")}</TableCell>*/}
-            {/*                    <TableCell align="right">{t("Children")}</TableCell>*/}
-            {/*                    <TableCell align="right">{t("Babies")}</TableCell>*/}
-            {/*                  </TableRow>*/}
-            {/*                </TableHead>*/}
-            {/*                <TableBody>*/}
-            {/*                  {*/}
-            {/*                    selectedLodgings.map(l =>*/}
-            {/*                      <TableRow key={l.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>*/}
-            {/*                        <TableCell component="th" scope="row">*/}
-            {/*                          {l.name}*/}
-            {/*                        </TableCell>*/}
-            {/*                        {[["adults", t("Adults")], ["children", t("Children")], ["babies", t("Babies")]].map(([name, _]) =>*/}
-            {/*                          <TableCell key={name} align="right">*/}
-            {/*                            <FormControl fullWidth>*/}
-            {/*                              /!*<InputLabel id={`${l.id}-${label}`}>{label}</InputLabel>*!/*/}
-            {/*                              <Select*/}
-            {/*                                variant="standard"*/}
-            {/*                                size="small"*/}
-            {/*                                margin={margin}*/}
-            {/*                                type="number"*/}
-            {/*                                // sx={{ width: "5em" }}*/}
-            {/*                                value={(guestsDistribution && guestsDistribution[l.id] && guestsDistribution[l.id][name as "adults" | "children" | "babies"]) ?? 0}*/}
-            {/*                                onChange={(event) => handleDistributionChange(l, name as any, event.target.value as number)}*/}
-            {/*                              >*/}
-            {/*                                {[...Array(10).keys()].map(n =>*/}
-            {/*                                  <MenuItem*/}
-            {/*                                    key={n} sx={{ textAlign: "right" }} value={n}*/}
-            {/*                                  >{n}</MenuItem>)}*/}
-            {/*                              </Select>*/}
-            {/*                            </FormControl>*/}
-            {/*                          </TableCell>)}*/}
-            {/*                      </TableRow>*/}
-            {/*                    )*/}
-            {/*                  }*/}
-            {/*                </TableBody>*/}
-            {/*              </Table>*/}
-            {/*            </TableContainer>*/}
+            <hr style={{ margin: "20px" }} />
+            <Box className="total-wrapper">
+              <span className="total-price">
+                {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
+              {touristTax > 0 && (
+                <span
+                  className="third-party-price"
+                ><br />+ {formatCurrency(touristTax)} {t("for tourist tax")}</span>)
+              }
+              {(excludedFromPriceOptions) > 0 && (
+                <span
+                  className="third-party-price"
+                ><br />+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")}</span>)
+              }
+            </Box>
 
-            {/*          </Grid>*/}
-            {/*        </Grid>*/}
-            {/*      </AccordionDetails>*/}
-            {/*    </Accordion>*/}
-            {/*  </Grid>*/}
-
-            {/*  { /* OPTIONS *!/*/}
-            {/*  <Grid item lg={6} xs={12}>*/}
-            {/*    <Accordion defaultExpanded>*/}
-            {/*      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="options-content" id="options-header">*/}
-            {/*        <Typography gutterBottom className="accordion-heading">{t("Options")}</Typography>*/}
-            {/*      </AccordionSummary>*/}
-            {/*      <AccordionDetails>*/}
-            {/*        <Grid container spacing={1}>*/}
-            {/*          <Grid item xs={12}>*/}
-            {/*            {allOptions &&*/}
-            {/*              <OptionsList*/}
-            {/*                form={formContext} duration={duration} allOptions={allOptions}*/}
-            {/*                variant={variant}*/}
-            {/*              />}*/}
-            {/*          </Grid>*/}
-            {/*        </Grid>*/}
-            {/*      </AccordionDetails>*/}
-            {/*    </Accordion>*/}
-            {/*  </Grid>*/}
-
-            {/*  { /* COMPLEMENTS *!/*/}
-            {/*  <Grid item lg={6} xs={12}>*/}
-            {/*    <Accordion defaultExpanded>*/}
-            {/*      <AccordionSummary*/}
-            {/*        expandIcon={<ExpandMoreIcon />} aria-controls="complements-content"*/}
-            {/*        id="complements-header"*/}
-            {/*      >*/}
-            {/*        <Typography gutterBottom className="accordion-heading">{t("Complements")}</Typography>*/}
-            {/*      </AccordionSummary>*/}
-            {/*      <AccordionDetails>*/}
-            {/*        <Grid container spacing={1}>*/}
-            {/*          /!* statistics *!/*/}
-            {/*          <Grid item xs={12}>*/}
-            {/*            {bookingChannels &&*/}
-            {/*              <SelectElement*/}
-            {/*                control={control}*/}
-            {/*                name="source_id"*/}
-            {/*                label={t("Statistics")}*/}
-            {/*                className="full-width"*/}
-            {/*                variant={variant}*/}
-            {/*                margin={margin}*/}
-            {/*                type="number"*/}
-            {/*                sx={{ width: "4em" }}*/}
-            {/*                options={[*/}
-            {/*                  { id: undefined, label: "" },*/}
-            {/*                  ...bookingChannels.map(channel => ({ id: channel.id, label: channel.name }))*/}
-            {/*                ]}*/}
-            {/*              />}*/}
-            {/*          </Grid>*/}
-            {/*          /!* arrival_details *!/*/}
-            {/*          <Grid item sm={6} xs={12}>*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name={"arrival_details"}*/}
-            {/*              label={t("Check-in info")}*/}
-            {/*              margin={margin}*/}
-            {/*              variant={variant}*/}
-            {/*              fullWidth*/}
-            {/*            />*/}
-            {/*          </Grid>*/}
-            {/*          <Grid item sm={6} xs={12}>*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name={"departure_details"}*/}
-            {/*              label={t("Check-out info")}*/}
-            {/*              margin={margin}*/}
-            {/*              variant={variant}*/}
-            {/*              fullWidth*/}
-            {/*            />*/}
-            {/*          </Grid>*/}
-            {/*          /!* notes *!/*/}
-            {/*          <Grid item xs={12}>*/}
-            {/*            <TextFieldElement*/}
-            {/*              control={control}*/}
-            {/*              name={"notes"}*/}
-            {/*              label={t("Further information")}*/}
-            {/*              margin={margin}*/}
-            {/*              variant={variant}*/}
-            {/*              fullWidth*/}
-            {/*              multiline*/}
-            {/*              rows={4}*/}
-            {/*            />*/}
-            {/*          </Grid>*/}
-            {/*        </Grid>*/}
-            {/*      </AccordionDetails>*/}
-            {/*    </Accordion>*/}
-            {/*  </Grid>*/}
-
-            {/*  { /* PAYMENTS *!/*/}
-            {/*  {booking.id &&*/}
-            {/*    <Grid item lg={6} xs={12}>*/}
-            {/*      <Accordion defaultExpanded>*/}
-            {/*        <AccordionSummary*/}
-            {/*          expandIcon={<ExpandMoreIcon />} aria-controls="complements-content"*/}
-            {/*          id="complements-header"*/}
-            {/*        >*/}
-            {/*          <Typography gutterBottom className="accordion-heading">{t("Payments")}</Typography>*/}
-            {/*          <Typography gutterBottom className="accordion-secondary-heading">*/}
-            {/*            {leftToPay > 0 &&*/}
-            {/*              <span*/}
-            {/*                className="left-to-pay"*/}
-            {/*              >{t("Left to pay: {{amount}}", { amount: formatCurrency(leftToPay) })}</span>}*/}
-            {/*            {leftToPay < 0 &&*/}
-            {/*              <span*/}
-            {/*                className="too-perceived"*/}
-            {/*              >{t("Too perceived: {{amount}}", { amount: formatCurrency(-leftToPay) })}</span>}*/}
-            {/*            {leftToPay === 0 && t("Fully paid")}*/}
-            {/*          </Typography>*/}
-            {/*        </AccordionSummary>*/}
-            {/*        <AccordionDetails>*/}
-            {/*          <Payments*/}
-            {/*            bookingId={booking.id} onPaymentsUpdate={(total) => setTotalPayment(total)}*/}
-            {/*          />*/}
-            {/*        </AccordionDetails>*/}
-            {/*      </Accordion>*/}
-            {/*    </Grid>}*/}
-
-            {/*  { /* COMMENTS *!/*/}
-            {/*  {booking.id &&*/}
-            {/*    <Grid item lg={6} xs={12}>*/}
-            {/*      <Accordion defaultExpanded>*/}
-            {/*        <AccordionSummary*/}
-            {/*          expandIcon={<ExpandMoreIcon />} aria-controls="comments"*/}
-            {/*          id="comments-header"*/}
-            {/*        >*/}
-            {/*          <Typography gutterBottom className="accordion-heading">{t("Comments")}</Typography>*/}
-            {/*        </AccordionSummary>*/}
-            {/*        <AccordionDetails>*/}
-            {/*          <Comments booking={booking} />*/}
-            {/*        </AccordionDetails>*/}
-            {/*      </Accordion>*/}
-            {/*    </Grid>}*/}
-            {/*</Grid>*/}
           </FormContainer>
         }
       </DialogContent>

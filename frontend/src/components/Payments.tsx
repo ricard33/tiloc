@@ -135,7 +135,8 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
         </Button>
         {edited !== null &&
           <PaymentDialog
-            payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose}
+            payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment}
+            onClose={onClose}
           />}
       </>}</div>
   );
