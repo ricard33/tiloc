@@ -1,5 +1,5 @@
-import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, Route, Routes, Location, useLocation } from "react-router-dom";
 
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
 
@@ -39,11 +39,32 @@ import CheckoutDone from "./views/Subscription/CheckoutDone";
 import MyAccount from "./views/Subscription/Acccount";
 import SubscriptionCancel from "./views/Subscription/SubscriptionCancel";
 import ForgottenPassword from "./views/SignIn/ForgottenPassword";
+import logger from "./common/logger";
+import { useAppSelector } from "./app/hooks";
+import { User } from "./types";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
 
 const MyRoutes = () => {
+  const currentUser = useAppSelector(store => store.auth.user) as User;
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location);
+  }, [location]);
+
+  function trackPageView(location: Location) {
+    console.log(window.location.toString());
+    logger.info({
+      message: `Nav to ${window.location.toString()}`,
+      user: currentUser.email,
+    }, true);
+    // window.mParticle.logPageView(`${window.location.pathname}`, {
+    //   page: window.location.toString()
+    // });
+  }
+
   return (
     <Routes>
       <Route element={<MinimalLayout />}>

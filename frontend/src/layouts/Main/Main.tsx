@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
@@ -85,6 +85,11 @@ const Main = () => {
     ? differenceInCalendarDays(account.current_subscription.current_period_end, new Date())
     : -1
   ;
+
+  useEffect(() => {
+    const page =  pathnames.slice(-1)[0];
+    document.title = `Tiloc - ${breadcrumbNameMap[page] ?? ""}`;
+  }, [breadcrumbNameMap, pathnames]);
 
   return (
     <div

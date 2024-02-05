@@ -42,8 +42,8 @@ const PaymentsTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
-    maxWidth: 375,
-  },
+    maxWidth: 375
+  }
 });
 
 
@@ -131,7 +131,10 @@ export const TimelineView: React.FC<Props> = props => {
     ...heightStyle
   };
 
-  const paymentLabels = paymentMethods(t).reduce<Record<string, string>>((obj, cur) => ({...obj, [cur[0]]: cur[1]}), {});
+  const paymentLabels = paymentMethods(t).reduce<Record<string, string>>((obj, cur) => ({
+    ...obj,
+    [cur[0]]: cur[1]
+  }), {});
 
   if (range.startDate !== previousStart.current) {
     if (ref.current) {
@@ -371,12 +374,13 @@ export const TimelineView: React.FC<Props> = props => {
           <div className="item-title">{guest_name}</div>
           {booking.price && booking.price > 0 ?
             <PaymentsTooltip
-              title={booking.payments.length > 0 ? <Grid2 container width={375}>{booking.payments.map(p => <>
-                <Grid2 xs={3}>{formatDate(p.date, "P")}</Grid2>
-                <Grid2 xs={3}>{p.description}</Grid2>
-                <Grid2 xs={3}>{paymentLabels[p.method]}</Grid2>
-                <Grid2 xs={3}>{DecimalPrecision.round(Number(p.amount))} &euro;</Grid2>
-              </>)}</Grid2> : t("No payment")}
+              title={booking.payments.length > 0 ? <Grid2 container width={375}>{booking.payments.map(p =>
+                <React.Fragment key={p.id}>
+                  <Grid2 xs={3}>{formatDate(p.date, "P")}</Grid2>
+                  <Grid2 xs={3}>{p.description}</Grid2>
+                  <Grid2 xs={3}>{paymentLabels[p.method]}</Grid2>
+                  <Grid2 xs={3}>{DecimalPrecision.round(Number(p.amount))} &euro;</Grid2>
+                </React.Fragment>)}</Grid2> : t("No payment")}
             >
               <EuroIcon
                 className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}

@@ -108,7 +108,8 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
       port: 3000,
       proxy: {
         "/api": "http://127.0.0.1:8000",
-        "/stats": "http://127.0.0.1:8000"
+        "/stats": "http://127.0.0.1:8000",
+        "/loggly": "http://127.0.0.1:8000"
         // '/authorization/': '...',
       }
     },

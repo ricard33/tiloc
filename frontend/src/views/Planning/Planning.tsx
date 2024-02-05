@@ -69,7 +69,7 @@ const Planning = () => {
 
   const onScroll = useCallback((start: Date, _: Date) => {
     setBeginDate(start);
-    setSearchParams({ start: format(start, "yyyy-MM") });
+    setSearchParams({ start: format(start, "yyyy-MM") }, { replace: true });
   }, [setSearchParams]);
 
   const onBoundsChange = useCallback((start: Date, end: Date) => {
