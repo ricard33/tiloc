@@ -135,6 +135,7 @@ function Comments(props: Props) {
                     multiline
                     maxRows={4}
                     fullWidth
+                    sx={{marginTop: 1}}
                     value={edited.content}
                     onChange={(event) => setEdited({ ...edited, content: event.target.value })}
                     onKeyDown={(event) => onKeyDown(event)}
@@ -186,7 +187,7 @@ function Comments(props: Props) {
               }}
             >
               <TextField
-                id="edit-comment"
+                id="add-comment"
                 label={t("Add comment")}
                 multiline
                 maxRows={4}

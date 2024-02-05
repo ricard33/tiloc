@@ -4,13 +4,15 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  List, ListItemText,
+  Paper,
   Select,
   Table,
   TableBody,
   TableCell,
   TableFooter,
   TableRow,
-  Theme
+  Theme, Typography
 } from "@mui/material";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     "& .MuiTableCell-sizeSmall": {
       padding: "6px 2px 6px 2px"
     },
-    fontSize: "small",
+    fontSize: "small"
   },
   cell: {},
   optionPriceInput: {
@@ -87,110 +89,117 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
 
   // console.log(options)
   return (
-    <Table className={classes.table} aria-label="simple table">
-      <TableBody>
-        {
-          fields.map((option: FieldArrayWithId<Service, never, string>, index: number) => (
-            <TableRow key={option.key}>
-              <TableCell>
-                <input
-                  type="hidden" {...register(`options.${index}.id` as const)}
-                  defaultValue={option.id}
-                />
-                <input
-                  type="hidden" {...register(`options.${index}.designation` as const)}
-                  defaultValue={option.designation}
-                />
-                <input
-                  type="hidden" {...register(`options.${index}.vat` as const)}
-                  defaultValue={option.vat}
-                />
-                <input
-                  type="hidden" {...register(`options.${index}.not_included_in_price` as const)}
-                  defaultValue={option.not_included_in_price}
-                />
-                {option.designation}</TableCell>
-              <TableCell>{Number(option.unit_price) >= 0 && !options[index].is_flat_rate &&
-                <span>{duration}&nbsp;x</span>}</TableCell>
-              <TableCell>
-                {Number(option.unit_price) >= 0 &&
-                  <TextFieldElement
-                    control={control}
-                    name={`options.${index}.unit_price`}
-                    className={classes.optionPriceInput}
-                    type={"number"}
-                    required
-                    validation={{
-                      min: { value: 0, message: t("Can't be negative") },
-                      validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
-                    }}
-                    InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                    margin="dense"
-                    size="small"
-                    variant={"standard"}
-                  />}
-              </TableCell>
-              <TableCell>
-                {Number(option.unit_price) >= 0 &&
-                  <CheckboxElement
-                    control={control}
-                    name={`options.${index}.is_flat_rate`}
-                    label={t("Flat rate")}
-                    defaultValue={option.is_flat_rate}
-                    color="primary"
-                    size="small"
-                    labelProps={{ labelPlacement: "start", sx: {fontSize: "small", "& .MuiFormControlLabel-label": {fontSize: "small"}} }}
-                  />}
-              </TableCell>
-              <TableCell>
-                {Number(option.unit_price) >= 0 &&
-                  <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
-              </TableCell>
-              <TableCell>
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  className={classes.deleteButton}
-                  onClick={() => remove(index)}
-                  size="large"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
+    <>
+      <Paper>
+
+        <Table className={classes.table} aria-label="simple table">
+          <TableBody>
+            {
+              fields.map((option: FieldArrayWithId<Service, never, string>, index: number) => (
+                <React.Fragment key={option.key}>
+                  <TableRow>
+                    <TableCell colSpan={5} sx={{ borderBottom: 0 }}>
+                      <input
+                        type="hidden" {...register(`options.${index}.id` as const)}
+                        defaultValue={option.id}
+                      />
+                      <input
+                        type="hidden" {...register(`options.${index}.designation` as const)}
+                        defaultValue={option.designation}
+                      />
+                      <input
+                        type="hidden" {...register(`options.${index}.vat` as const)}
+                        defaultValue={option.vat}
+                      />
+                      <input
+                        type="hidden" {...register(`options.${index}.not_included_in_price` as const)}
+                        defaultValue={option.not_included_in_price}
+                      />
+                      {option.designation}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>{Number(option.unit_price) >= 0 && !options[index].is_flat_rate &&
+                      <span>{duration}&nbsp;x</span>}</TableCell>
+                    <TableCell>
+                      {Number(option.unit_price) >= 0 &&
+                        <TextFieldElement
+                          control={control}
+                          name={`options.${index}.unit_price`}
+                          className={classes.optionPriceInput}
+                          type={"number"}
+                          required
+                          validation={{
+                            min: { value: 0, message: t("Can't be negative") },
+                            validate: { validateNumber: (v) => !isNaN(parseFloat(v)) }
+                          }}
+                          InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                          margin="dense"
+                          size="small"
+                          variant={"standard"}
+                        />}
+                    </TableCell>
+                    <TableCell>
+                      {Number(option.unit_price) >= 0 &&
+                        <CheckboxElement
+                          control={control}
+                          name={`options.${index}.is_flat_rate`}
+                          label={t("Flat rate")}
+                          defaultValue={option.is_flat_rate}
+                          color="primary"
+                          size="small"
+                          labelProps={{
+                            labelPlacement: "start",
+                            sx: { fontSize: "small", "& .MuiFormControlLabel-label": { fontSize: "small" } }
+                          }}
+                        />}
+                    </TableCell>
+                    <TableCell>
+                      {Number(option.unit_price) >= 0 &&
+                        <span>=&nbsp;{formatCurrency((options[index] ? options[index].unit_price : option.unit_price) * ((options[index] ? options[index].is_flat_rate : option.is_flat_rate) ? 1 : duration))}</span>}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        className={classes.deleteButton}
+                        onClick={() => remove(index)}
+                        size="large"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                </React.Fragment>
+
+              ))}
+          </TableBody>
+        </Table>
+      </Paper>
+      <FormControl className={classes.formControl} variant={variant} sx={{ marginTop: 2 }}>
+        <InputLabel htmlFor="booking-options">{t("Options")}</InputLabel>
+        <Select
+          inputProps={{
+            name: "options_select",
+            id: "booking-options"
+          }}
+          label={t("Options")}
+          margin="dense"
+          native
+          value={0}
+          onChange={onAddOption}
+        >
+          <option key={0} value={0}>{t("-- Add an option --")}</option>
+          {allOptions && allOptions.map((option: Service) => (
+            <option
+              key={option.id} value={option.id}
+              // disabled={options.filter((o: Service) => Number(o.id) === option.id).length > 0}
+            >
+              {getDesignation(option)}
+            </option>
           ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={6}>
-            <FormControl className={classes.formControl} variant={variant}>
-              <InputLabel htmlFor="booking-options">{t("Options")}</InputLabel>
-              <Select
-                inputProps={{
-                  name: "options_select",
-                  id: "booking-options"
-                }}
-                label={t("Options")}
-                margin="dense"
-                native
-                value={0}
-                onChange={onAddOption}
-              >
-                <option key={0} value={0}>{t("-- Add an option --")}</option>
-                {allOptions && allOptions.map((option: Service) => (
-                  <option
-                    key={option.id} value={option.id}
-                    // disabled={options.filter((o: Service) => Number(o.id) === option.id).length > 0}
-                  >
-                    {getDesignation(option)}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          </TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
+        </Select>
+      </FormControl>
+    </>
   );
 };
 

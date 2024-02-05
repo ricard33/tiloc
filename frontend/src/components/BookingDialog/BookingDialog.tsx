@@ -35,7 +35,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow, Tabs,
+  TableRow, TabProps, Tabs,
   Toolbar,
   Typography
 } from "@mui/material";
@@ -73,6 +73,53 @@ import PeopleIcon from "@mui/icons-material/PeopleOutlined";
 import CommentIcon from "@mui/icons-material/Comment";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
+
+const AntTabs = styled(Tabs)({
+  borderBottom: '1px solid #e8e8e8',
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#1890ff',
+  },
+});
+
+const AntTab = styled((props: TabProps) => <Tab disableRipple {...props} />)(
+  ({ theme }) => ({
+    textTransform: 'none',
+    // minWidth: 0,
+    // [theme.breakpoints.up('sm')]: {
+    //   minWidth: 0,
+    // },
+    fontWeight: theme.typography.fontWeightRegular,
+    marginRight: theme.spacing(1),
+    // color: 'rgba(0, 0, 0, 0.85)',
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+    '&:hover': {
+      color: '#40a9ff',
+      opacity: 1,
+    },
+    '&.MuiTab-fullWidth': {
+      minWidth: 0,
+    },
+    '&.Mui-selected': {
+      // color: '#1890ff',
+      // fontWeight: theme.typography.fontWeightMedium,
+    },
+    '&.Mui-focusVisible': {
+      backgroundColor: '#d1eaff',
+    },
+  }),
+);
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -89,7 +136,7 @@ function CustomTabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      style={{ width: "100%" }}
+      style={{ width: "100%", minHeight: "350px" }}
       {...other}
     >
       {value === index && (
@@ -543,7 +590,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         //   </Grid>
         // </DialogTitle>
       }
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ ...(fullScreen && { padding: 1 })}}>
         {booking &&
           <FormContainer
             formContext={formContext}
@@ -560,16 +607,16 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
               defaultValue={initialState.guaranty}
             />
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
+              <AntTabs
                 value={selectedTab} onChange={(_, value) => setSelectedTab(value)} aria-label="booking dialog"
                 variant={fullScreen ? "fullWidth" : "standard"}
               >
-                <Tab icon={<InfoOutlinedIcon />} aria-label="info" />
-                <Tab icon={<PeopleIcon />} aria-label="contact" />
-                <Tab icon={<RoomServiceIcon />} aria-label="options" />
-                {booking.id && <Tab icon={<PaymentOutlinedIcon />} aria-label="payments" />}
-                {booking.id && <Tab icon={<CommentIcon />} aria-label="comments" />}
-              </Tabs>
+                <AntTab icon={<InfoOutlinedIcon />} aria-label="info" />
+                <AntTab icon={<PeopleIcon />} aria-label="contact" />
+                <AntTab icon={<RoomServiceIcon />} aria-label="options" />
+                {booking.id && <AntTab icon={<PaymentOutlinedIcon />} aria-label="payments" />}
+                {booking.id && <AntTab icon={<CommentIcon />} aria-label="comments" />}
+              </AntTabs>
             </Box>
 
             <CustomTabPanel value={selectedTab} index={0}>
@@ -644,7 +691,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         name="begin_date"
                         label={t("Arrival")}
                         onChange={(date) => onDateChange(date, "begin_date")}
-                        inputProps={{ size: "small" }}
+                        // inputProps={{ size: "small" }}
                       />
                     </Grid>
                     <Hidden smDown>
@@ -658,7 +705,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         name="end_date"
                         label={t("Departure")}
                         onChange={(date) => onDateChange(date, "end_date")}
-                        inputProps={{ size: "small" }}
+                        // inputProps={{ size: "small" }}
                       />
                     </Grid>
                   </Grid>
@@ -676,7 +723,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       label={t("Nights")}
                       variant={variant}
                       margin={margin}
-                      size="small"
+                      // size="small"
                       type="number"
                       sx={{ width: "6em" }}
                       onChange={(value) => handleChange("duration", Number(value))}
@@ -704,7 +751,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                           }}
                           InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                           margin={margin}
-                          size="small"
+                          // size="small"
                           variant={variant}
                           onChange={event => handleChange(event.target.name, event.target.value)}
                         />
@@ -727,7 +774,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       }}
                       InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                       margin={margin}
-                      size="small"
+                      // size="small"
                       variant={variant}
                       onChange={event => handleChange(event.target.name, event.target.value)}
                     />
@@ -770,7 +817,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     }}
                     InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                     margin={margin}
-                    size="small"
+                    // size="small"
                     variant={variant}
                   />
                   <div className="spacer" />
@@ -786,7 +833,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     label={t("Commission fees")}
                     sx={{ width: "10em;" }}
                     type={"number"}
-                    size="small"
+                    // size="small"
                     // required
                     validation={{
                       min: { value: 0, message: t("Commission fees can't be negative") },
@@ -811,7 +858,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         }}
                         InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                         margin={margin}
-                        size="small"
+                        // size="small"
                         variant={variant}
                       />
                       <IconButton

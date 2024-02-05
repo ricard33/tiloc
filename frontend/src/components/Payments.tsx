@@ -17,7 +17,7 @@ import { fetchErrorDecode } from "../common/apiUtils";
 import { shiftUTCDateToLocalDate } from "../common/tzUtils";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { Button } from "@mui/material";
+import { Button, Paper } from "@mui/material";
 
 type PaymentListProps = {
   bookingId: number;
@@ -53,7 +53,7 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
       description: "",
       method: "",
       amount: 0,
-      checked: false,
+      checked: false
     });
   }
 
@@ -122,7 +122,9 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
   return (
     <div>
       {showPayments && <>
-        <PaymentList payments={data ? data.results : []} onModify={onEditPayment} onDelete={onDeletePayment} />
+        <Paper>
+          <PaymentList payments={data ? data.results : []} onModify={onEditPayment} onDelete={onDeletePayment} />
+        </Paper>
         <Button
           aria-label="delete"
           color="primary"
@@ -132,7 +134,9 @@ const Payments: React.FunctionComponent<PaymentListProps> = ({
           {t("Add payment")}
         </Button>
         {edited !== null &&
-          <PaymentDialog payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose} />}
+          <PaymentDialog
+            payment={edited} bookingId={bookingId} onValidate={onCreateOrModifyPayment} onClose={onClose}
+          />}
       </>}</div>
   );
 };
