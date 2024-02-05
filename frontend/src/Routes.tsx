@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Navigate, Route, Routes, Location, useLocation } from "react-router-dom";
 
 import { Main as MainLayout, Minimal as MinimalLayout } from "./layouts";
@@ -50,20 +50,17 @@ const MyRoutes = () => {
   const currentUser = useAppSelector(store => store.auth.user) as User;
   const location = useLocation();
 
-  useEffect(() => {
-    trackPageView(location);
-  }, [location]);
-
-  function trackPageView(location: Location) {
+  const trackPageView = useCallback((location: Location) => {
     console.log(window.location.toString());
     logger.info({
       message: `Nav to ${window.location.toString()}`,
       user: currentUser && currentUser.email,
     }, true);
-    // window.mParticle.logPageView(`${window.location.pathname}`, {
-    //   page: window.location.toString()
-    // });
-  }
+  }, [currentUser]);
+
+  useEffect(() => {
+    trackPageView(location);
+  }, [location, trackPageView]);
 
   return (
     <Routes>

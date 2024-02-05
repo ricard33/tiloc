@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { makeStyles } from "@mui/styles";
@@ -50,25 +50,27 @@ const Main = () => {
   const query = queryString.parse(location.search) as { subscription_id: string };
   const { subscription_id } = query;
 
-  const breadcrumbNameMap: { [key: string]: string | undefined, } = {
-    "dashboard": t("Dashboard"),
-    "planning": t("Planning"),
-    "bookings": t("Bookings"),
-    "payments": t("Payments"),
-    "guests": t("Guests"),
-    "settings": t("Settings"),
-    "users": t("Users"),
-    "contract-templates": t("Contract templates"),
-    "contract": t("Contract"),
-    "lodgings": t("Lodgings"),
-    "reports": t("Reports"),
-    "services": t("Services"),
-    "booking-channels": t("Booking channels"),
-    "calendar-syncs": t("Calendars synchronization"),
-    "profile": t("My profile"),
-    "account": t("My account"),
-    "subscription": t("Subscription")
-  };
+  const breadcrumbNameMap: { [key: string]: string | undefined, } = useMemo(() => {
+    return {
+      "dashboard": t("Dashboard"),
+      "planning": t("Planning"),
+      "bookings": t("Bookings"),
+      "payments": t("Payments"),
+      "guests": t("Guests"),
+      "settings": t("Settings"),
+      "users": t("Users"),
+      "contract-templates": t("Contract templates"),
+      "contract": t("Contract"),
+      "lodgings": t("Lodgings"),
+      "reports": t("Reports"),
+      "services": t("Services"),
+      "booking-channels": t("Booking channels"),
+      "calendar-syncs": t("Calendars synchronization"),
+      "profile": t("My profile"),
+      "account": t("My account"),
+      "subscription": t("Subscription")
+    }
+  }, [t]);
 
 
   const handleSidebarOpen = () => {
