@@ -58,7 +58,7 @@ const MyRoutes = () => {
     console.log(window.location.toString());
     logger.info({
       message: `Nav to ${window.location.toString()}`,
-      user: currentUser.email,
+      user: currentUser && currentUser.email,
     }, true);
     // window.mParticle.logPageView(`${window.location.pathname}`, {
     //   page: window.location.toString()
