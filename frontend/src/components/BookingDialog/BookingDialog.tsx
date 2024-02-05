@@ -66,6 +66,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import MultiSelectElement from "../Fields/MultiSelectElement";
 import { useAppSelector } from "../../app/hooks";
 import Paper from "@mui/material/Paper";
+import Comments from "../Comments";
 
 
 type BookingDialogProps = {
@@ -158,7 +159,15 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
     // Only include editable fields because to make `isDirty` reseted to false working after a submit
     // ==> dirty state is computed comparing default values and stored values (output of getValues())
-    let { lodgings: _, price_with_options, left_to_pay, modified, computed_tourist_tax, guests, ...initialState }: Booking = booking;
+    let {
+      lodgings: _,
+      price_with_options,
+      left_to_pay,
+      modified,
+      computed_tourist_tax,
+      guests,
+      ...initialState
+    }: Booking = booking;
 
     // Provide defaults for new bookings
     initialState.id = booking.id || "" as any;  // just to have an "undirty" state on new booking
@@ -208,7 +217,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue("tourist_tax", value);
   }
 
-  function computeTouristTax(values: Pick<Booking, "adults" | "children" | "babies" | "price" | "duration" | "max_daily_tourist_tax" | "is_flat_rate_tourist_tax" |"tourist_tax_rate" >) {
+  function computeTouristTax(values: Pick<Booking, "adults" | "children" | "babies" | "price" | "duration" | "max_daily_tourist_tax" | "is_flat_rate_tourist_tax" | "tourist_tax_rate">) {
     // console.log("computeTouristTax", filterObject(values, (v, k) => ["adults", "children", "babies", "price", "duration", "max_daily_tourist_tax"].includes(k)));
     // console.log("computeTouristTax", filterObject(values, (v, k) => ["max_daily_tourist_tax", "is_flat_rate_tourist_tax", "tourist_tax_rate"].includes(k)));
     let daily_rate = values.max_daily_tourist_tax ?? 0;
@@ -301,12 +310,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     if (ids.length === 0) {
       setError("lodging_ids", { type: "required", message: t("At least one lodging should be selected") });
       return ids;
-    }
-    else if(errors.lodging_ids?.type === "required") {
+    } else if (errors.lodging_ids?.type === "required") {
       clearErrors("lodging_ids");
     }
     if (typeof value === "number") { // SelectElement case
-      setValue("lodging_ids", ids, {shouldDirty: true});
+      setValue("lodging_ids", ids, { shouldDirty: true });
     }
     const formValues = getValues();
     lodging = lodgings.filter(x => ids.includes(x.id))[0];
@@ -322,7 +330,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         [id]: (guestsDistribution && guestsDistribution[id]) ?? defaultDistribution
       };
     }, {});
-    setValue("guests_distribution", newDistribution, {shouldDirty: true});
+    setValue("guests_distribution", newDistribution, { shouldDirty: true });
     ["adults", "children", "babies"].forEach((fieldName) =>
       // @ts-ignore
       setValue(fieldName as any, ids.reduce((acc, id) => acc + ((newDistribution[id] && newDistribution[id][fieldName]) ?? 0), 0))
@@ -339,7 +347,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       guestsDistribution[lodging.id] = defaultDistribution;
     }
     guestsDistribution[lodging.id][fieldName] = value;
-    setValue("guests_distribution", guestsDistribution, {shouldDirty: true});
+    setValue("guests_distribution", guestsDistribution, { shouldDirty: true });
     setValue(fieldName, lodging_ids.reduce((acc, id) => acc + ((guestsDistribution[id] && guestsDistribution[id][fieldName]) ?? 0), 0));
     updateTouristTax();
   }
@@ -658,7 +666,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                               name="begin_date"
                               label={t("Arrival")}
                               onChange={(date) => onDateChange(date, "begin_date")}
-                              inputProps={{size: "small"}}
+                              inputProps={{ size: "small" }}
                             />
                           </Grid>
                           <Hidden smDown>
@@ -672,7 +680,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                               name="end_date"
                               label={t("Departure")}
                               onChange={(date) => onDateChange(date, "end_date")}
-                              inputProps={{size: "small"}}
+                              inputProps={{ size: "small" }}
                             />
                           </Grid>
                         </Grid>
@@ -883,7 +891,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                                             value={(guestsDistribution && guestsDistribution[l.id] && guestsDistribution[l.id][name as "adults" | "children" | "babies"]) ?? 0}
                                             onChange={(event) => handleDistributionChange(l, name as any, event.target.value as number)}
                                           >
-                                            {[...Array(10).keys()].map(n => <MenuItem key={n} sx={{textAlign: "right"}} value={n}>{n}</MenuItem>)}
+                                            {[...Array(10).keys()].map(n =>
+                                              <MenuItem
+                                                key={n} sx={{ textAlign: "right" }} value={n}
+                                              >{n}</MenuItem>)}
                                           </Select>
                                         </FormControl>
                                       </TableCell>)}
@@ -1013,6 +1024,22 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       <Payments
                         bookingId={booking.id} onPaymentsUpdate={(total) => setTotalPayment(total)}
                       />
+                    </AccordionDetails>
+                  </Accordion>
+                </Grid>}
+
+              { /* COMMENTS */}
+              {booking.id &&
+                <Grid item lg={6} xs={12}>
+                  <Accordion defaultExpanded>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />} aria-controls="comments"
+                      id="comments-header"
+                    >
+                      <Typography gutterBottom className="accordion-heading">{t("Comments")}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Comments booking={booking} />
                     </AccordionDetails>
                   </Accordion>
                 </Grid>}
