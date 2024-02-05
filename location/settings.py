@@ -14,6 +14,7 @@ import os
 import sys
 from datetime import timedelta
 
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from my_django_tweaks.logging_config import configure_logging
 from smartconfigparser import Config
@@ -388,7 +389,6 @@ NOTIFIER_BACKENDS = (
 )
 
 LOGINAS_REDIRECT_URL = '/'
-from django.urls import reverse_lazy
 LOGOUT_URL = reverse_lazy('loginas-logout')
 LOGINAS_LOGOUT_REDIRECT_URL = reverse_lazy('admin:index')
 LOGINAS_USERNAME_FIELD = 'email'
