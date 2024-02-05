@@ -886,6 +886,17 @@ Django = ">=3.2"
 tablib = {version = "3.5.0", extras = ["html", "ods", "xls", "xlsx", "yaml"]}
 
 [[package]]
+name = "django-loginas"
+version = "0.3.11"
+description = "An app to add a \"Log in as user\" button in the Django user admin page."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-loginas-0.3.11.tar.gz", hash = "sha256:37aec6fcd1cdb72378b69d2468d2ae39b12cd013f838a9bf9b9b5132e8341735"},
+    {file = "django_loginas-0.3.11-py2.py3-none-any.whl", hash = "sha256:5492eb5b4eb86c05e86cd84fb1f89c9796498643dc23d19e9c9bf83f5768ba86"},
+]
+
+[[package]]
 name = "django-picklefield"
 version = "3.1"
 description = "Pickled object field for Django"
@@ -3125,4 +3136,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "da65ab5313c7f04cd6ab5d52164d4d6f4ab83e9aa51f59098310a6d8a82683a1"
+content-hash = "79a9c1232b3293a0c3d2058d60c93b8775cf53124a78b6f48c269188b9b86917"

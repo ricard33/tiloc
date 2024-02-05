@@ -74,6 +74,8 @@ urlpatterns = [
     path(r"stats/filling_rate/<str:begin>/<str:end>/", views.filling_rate),
     path(r"stats/channel_distribution/", views.channel_distribution),
     path(r"stats/channel_distribution/<str:begin>/<str:end>/", views.channel_distribution),
+
+    path('admin/', include('loginas.urls')),  # make sure to add loginas urls before the admin site urls
     path("admin/", admin.site.urls),
     # path('', include('frontend.urls')),
     # re_path(r'^', IndexPage.as_view(template_name="index.html")),

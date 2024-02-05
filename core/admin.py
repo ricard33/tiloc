@@ -190,6 +190,7 @@ class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 @admin.register(models.User, site=site)
 class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
     add_form_template = "admin/auth/user/add_form.html"
+    change_form_template = 'loginas/change_form.html'
     change_user_password_template = None
     fieldsets = (
         (None, {"fields": ("account", "password")}),

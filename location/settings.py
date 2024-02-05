@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     "anymail",
     "django.contrib.admin",  # after to allow templates override
     "user_visit",
+    "loginas",
 ]
 
 MIDDLEWARE = [
@@ -385,3 +386,9 @@ NOTIFIER_BACKENDS = (
     "notifier.backends.EmailBackend",
     "core.notifier_backend.NoopBackend",
 )
+
+LOGINAS_REDIRECT_URL = '/'
+from django.urls import reverse_lazy
+LOGOUT_URL = reverse_lazy('loginas-logout')
+LOGINAS_LOGOUT_REDIRECT_URL = reverse_lazy('admin:index')
+LOGINAS_USERNAME_FIELD = 'email'
