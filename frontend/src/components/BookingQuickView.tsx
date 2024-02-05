@@ -62,66 +62,9 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
   return (
     <Grid container spacing={1} className="booking-quick-view">
       <Grid container spacing={1} xs={12} md={showComments ? 8 : 12}>
-        {/*<Grid xs={12}>*/}
-        {/*  <Typography variant="h5" component="div">*/}
-        {/*    {booking.guest_name}*/}
-        {/*  </Typography>*/}
-        {/*</Grid>*/}
         <Grid sm={4} xs={12}>
           <div>
             <Grid container>
-              {/*<StyledDiv>*/}
-              {/*  <LoginIcon style={{ color: statusColors["CHECKIN"], marginRight: "10px" }} />*/}
-              {/*  <span style={{ fontSize: 14, fontWeight: "300" }}>*/}
-              {/*    {formatDate(booking.begin_date, "PP")}*/}
-              {/*  </span>*/}
-              {/*</StyledDiv>*/}
-              {/*<StyledDiv>*/}
-              {/*  <LogoutIcon style={{ color: statusColors["CHECKOUT"], marginRight: "10px" }} />*/}
-              {/*  <span style={{ fontSize: 14, fontWeight: "300" }}>*/}
-              {/*    {formatDate(booking.end_date, "PP")}*/}
-              {/*  </span>*/}
-              {/*</StyledDiv>*/}
-              {/*<StyledDiv>*/}
-              {/*  <NightsStayIcon*/}
-              {/*    fontSize="small" style={{ marginRight: "10px" }}*/}
-              {/*  />&nbsp;{t("{{count}} nights", { count: booking.duration })}*/}
-              {/*</StyledDiv>*/}
-              {/*<StyledDiv>*/}
-              {/*  <Groups2OutlinedIcon*/}
-              {/*    fontSize="small" style={{ marginRight: "10px" }}*/}
-              {/*  />&nbsp;{t("{{count}} guests", { count: booking.adults + booking.children + booking.babies })}*/}
-              {/*</StyledDiv>*/}
-              {/*{*/}
-              {/*  booking.lodgings.length > 1 ?*/}
-
-              {/*    booking.lodgings.map(l => displayField(true, l.name,*/}
-              {/*      getGuestsDistribution(booking.guests_distribution[l.id])*/}
-              {/*    ))*/}
-              {/*    :*/}
-              {/*    <div>*/}
-              {/*      {getGuestsDistribution(booking.guests_distribution[booking.lodgings[0].id])}*/}
-              {/*    </div>*/}
-
-              {/*}*/}
-              {/*<StyledDiv>*/}
-              {/*  <MonetizationOnOutlinedIcon*/}
-              {/*    style={{ marginRight: "10px" }}*/}
-              {/*    fontSize="small"*/}
-              {/*  />&nbsp;{DecimalPrecision.round(booking.price_with_options)}&nbsp;€*/}
-              {/*</StyledDiv>*/}
-              {/*<StyledDiv>*/}
-              {/*  <HomeOutlinedIcon*/}
-              {/*    fontSize="small" style={{ marginRight: "10px" }}*/}
-              {/*  />&nbsp;{booking.lodgings.map(l => l.name).join("+")}*/}
-              {/*</StyledDiv>*/}
-              {/*<StyledDiv>*/}
-              {/*  {statusDisplay.icon}*/}
-              {/*  <span style={{ verticalAlign: "text-bottom" }}>*/}
-              {/*    {statusDisplay.label}*/}
-              {/*  </span>*/}
-              {/*</StyledDiv>*/}
-
               <Grid sm={12} xs={6}>
                 {displayField(true, t("Check-in"), formatDate(booking.begin_date, "PPPP"))}
               </Grid>

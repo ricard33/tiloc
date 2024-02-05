@@ -6,7 +6,7 @@ import { Booking, BookingStatus } from "../types";
 import { formatDate } from "../common/dateUtils";
 import { useTranslation } from "react-i18next";
 import { getBookingStatus, otaBranding, OtaIconProps } from "../common/statusUtils";
-import { Divider, IconButton, Popover, PopoverProps, Stack } from "@mui/material";
+import { Divider, IconButton, Popover, PopoverProps, Stack, Tooltip } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -181,12 +181,23 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
             </StyledDiv>
           </Grid2>
           <Grid2 xs={6}>
-            <StyledDiv title={t("Price")}>
-              <MonetizationOnOutlinedIcon
-                style={{ marginRight: "10px" }}
-                fontSize="small"
-              />&nbsp;{DecimalPrecision.round(booking.price_with_options_and_taxes)}&nbsp;€
-            </StyledDiv>
+            <Tooltip
+              title={<div>
+                <div>{t("Rental:")}&nbsp;{DecimalPrecision.round(booking.price ?? 0)}&nbsp;€
+                  ({DecimalPrecision.round(booking.daily_rate ?? 0)}&nbsp;€ / {t("night")})
+                </div>
+                <div>{t("Options:")}&nbsp;{DecimalPrecision.round(booking.price_with_options - booking.price!)}&nbsp;€</div>
+                {booking.tourist_tax &&
+                  <div>{t("Tourism tax:")}&nbsp;{DecimalPrecision.round(booking.tourist_tax)}&nbsp;€</div>}
+              </div>}
+            >
+              <StyledDiv>
+                <MonetizationOnOutlinedIcon
+                  style={{ marginRight: "10px" }}
+                  fontSize="small"
+                />&nbsp;{DecimalPrecision.round(booking.price_with_options_and_taxes)}&nbsp;€
+              </StyledDiv>
+            </Tooltip>
             <StyledDiv title={t("Tourist tax")}>
               <CalculateIcon
                 style={{ marginRight: "10px" }}

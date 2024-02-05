@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, TableBody, TableCell, TableRow, IconButton } from "@mui/material";
+import { Table, TableBody, TableCell, TableRow, IconButton, TableProps } from "@mui/material";
 import { formatDate } from "../common/dateUtils";
 import { DecimalPrecision } from "../common/priceUtils";
 import DeleteIcon from "@mui/icons-material/DeleteForever";
@@ -8,13 +8,13 @@ import { useTranslation } from "react-i18next";
 import { Payment, paymentMethods } from "../types";
 
 
-type PaymentListProps = {
+type PaymentListProps = TableProps & {
   payments: Payment[];
   onModify?: (payment: Payment) => void;
   onDelete?: (payment: Payment) => void;
 };
 
-const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onModify, onDelete }: PaymentListProps) => {
+const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onModify, onDelete, ...tableProps }: PaymentListProps) => {
   const { t } = useTranslation();
 
   function ccyFormat(num: number) {
@@ -29,11 +29,11 @@ const PaymentList: React.FunctionComponent<PaymentListProps> = ({ payments, onMo
   const paymentLabels = paymentMethods(t).reduce<Record<string, string>>((obj, cur) => ({...obj, [cur[0]]: cur[1]}), {});
 
   return (
-    <Table aria-label="simple table">
+    <Table aria-label="payments" {...tableProps}>
       <TableBody>
         {payments && payments.map(p => (
           <TableRow key={p.id}>
-            <TableCell>{formatDate(p.date)}</TableCell>
+            <TableCell>{formatDate(p.date, "P")}</TableCell>
             <TableCell>{p.description}</TableCell>
             <TableCell>{paymentLabels[p.method]}</TableCell>
             <TableCell align="right">{DecimalPrecision.round(Number(p.amount))} &euro;</TableCell>

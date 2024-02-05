@@ -29,7 +29,7 @@ export function toDecimal(value?: number, fractionDigits?: number) {
 export function api2Payment(p: Record<string, any>): Payment {
   return {
     ...p as Payment,
-    booking: isNaN(p.booking) ? api2Booking(p.booking) : p.booking,
+    booking: p.booking && isNaN(p.booking) ? api2Booking(p.booking) : p.booking,
     date: parseISO(p.date),
     amount: Number(p.amount)
   };
@@ -148,6 +148,7 @@ export function api2Booking(booking: Record<string, any>): Booking {
     guaranty: Number(booking.guaranty),
     commission_fees: Number(booking.commission_fees),
     total_payments: Number(booking.total_payments),
+    payments: booking.payments ? booking.payments.map(api2Payment) : [],
     left_to_pay: Number(booking.left_to_pay),
     price_with_options: Number(booking.price_with_options),
     price_with_options_and_taxes: Number(booking.price_with_options_and_taxes),

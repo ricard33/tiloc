@@ -1,5 +1,5 @@
 import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Booking, BookingStatus, Lodging } from "../../../types";
+import { Booking, BookingStatus, Lodging, paymentMethods } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import {
   add,
@@ -21,18 +21,31 @@ import {
 } from "date-fns";
 import { DateRange } from "../../../components/DateRangeSelector";
 import "./TimelineView.scss";
-import { formatISODate, getMonthName, getWeekdayName } from "../../../common/dateUtils";
+import { formatDate, formatISODate, getMonthName, getWeekdayName } from "../../../common/dateUtils";
 import clsx from "clsx";
 import { getBookingStatus, getIconAndBgColor } from "../../../common/statusUtils";
 import { darken } from "@mui/system";
 import EuroIcon from "@mui/icons-material/Euro";
 import { useTranslation } from "react-i18next";
 import BookingTooltip from "../../../components/BookingTooltip";
-import { Button } from "@mui/material";
+import { Button, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import useWindowDimensions from "../../../common/windowDimensions";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
+import Grid2 from "@mui/material/Unstable_Grid2";
+import { DecimalPrecision } from "../../../common/priceUtils";
+import { styled } from "@mui/material/styles";
+
+
+const PaymentsTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    maxWidth: 375,
+  },
+});
+
 
 type Day = {
   date: Date,
@@ -118,6 +131,8 @@ export const TimelineView: React.FC<Props> = props => {
     ...heightStyle
   };
 
+  const paymentLabels = paymentMethods(t).reduce<Record<string, string>>((obj, cur) => ({...obj, [cur[0]]: cur[1]}), {});
+
   if (range.startDate !== previousStart.current) {
     if (ref.current) {
       const oldPos = ref.current.scrollLeft;
@@ -126,7 +141,8 @@ export const TimelineView: React.FC<Props> = props => {
       if (typeof previousStart.current !== "undefined") {
         const offset = differenceInDays(previousStart.current, range.startDate) * dayWidth;
         // console.log("New pos ", oldPos + offset, "(offset=", offset, ")");
-        ref.current.scrollTo({ left: oldPos + offset });if (ref.current.scrollLeft !== oldPos + offset) {
+        ref.current.scrollTo({ left: oldPos + offset });
+        if (ref.current.scrollLeft !== oldPos + offset) {
           // First time, before days are rendered, scroll is not possible
           // console.log("Delay scrollPos");
           setTimeout(() => ref.current!.scrollTo({ left: oldPos + offset }), 0);
@@ -354,10 +370,19 @@ export const TimelineView: React.FC<Props> = props => {
           }
           <div className="item-title">{guest_name}</div>
           {booking.price && booking.price > 0 ?
-            <EuroIcon
-              className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
-              style={{ height: `100%` }}
-            /> : ""}
+            <PaymentsTooltip
+              title={booking.payments.length > 0 ? <Grid2 container width={375}>{booking.payments.map(p => <>
+                <Grid2 xs={3}>{formatDate(p.date, "P")}</Grid2>
+                <Grid2 xs={3}>{p.description}</Grid2>
+                <Grid2 xs={3}>{paymentLabels[p.method]}</Grid2>
+                <Grid2 xs={3}>{DecimalPrecision.round(Number(p.amount))} &euro;</Grid2>
+              </>)}</Grid2> : t("No payment")}
+            >
+              <EuroIcon
+                className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
+                style={{ height: `100%` }}
+              />
+            </PaymentsTooltip> : ""}
         </div>
       </BookingTooltip>
     );

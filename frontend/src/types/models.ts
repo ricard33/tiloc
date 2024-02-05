@@ -168,6 +168,7 @@ export interface Booking {
   notes?: string;
   options: Service[];
   total_payments: number;
+  payments: Payment[];
   left_to_pay: number;
   price_with_options: number;
   price_with_options_and_taxes: number;
