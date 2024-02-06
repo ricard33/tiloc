@@ -18,7 +18,8 @@ logger = logging.getLogger("api")
 
 
 def format_decimal(value, locale=settings.LANGUAGE_CODE):
-    return babel_format_decimal(value or 0, format=value == round(value) and "#,##0;-#" or "#,##0.00;-#", locale=locale)
+    value = value or 0
+    return babel_format_decimal(value, format=value == round(value) and "#,##0;-#" or "#,##0.00;-#", locale=locale)
 
 
 def format_date(value, format="medium", locale=settings.LANGUAGE_CODE):

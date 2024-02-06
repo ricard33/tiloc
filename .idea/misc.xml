@@ -2,7 +2,7 @@
 <project version="4">
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
-    <option name="sdkName" value="Poetry (tiloc)" />
+    <option name="sdkName" value="Poetry (tiloc) py3.12" />
   </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
