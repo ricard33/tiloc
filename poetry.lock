@@ -927,6 +927,20 @@ files = [
 requests = "*"
 
 [[package]]
+name = "django-request-logging"
+version = "0.7.5"
+description = "Django middleware that logs http request body."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-request-logging-0.7.5.tar.gz", hash = "sha256:94934d77c2d0fd76fdb9879b874368aa7d55672f0c7e1f59dd39b991c3e123b4"},
+    {file = "django_request_logging-0.7.5-py2.py3-none-any.whl", hash = "sha256:4d9e520842303aaf654c6ffd39831b04513ea343574f8579a59ada46ffb95fb6"},
+]
+
+[package.dependencies]
+Django = "*"
+
+[[package]]
 name = "django-rest-knox"
 version = "4.2.0"
 description = "Authentication for django rest framework"
@@ -3136,4 +3150,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "79a9c1232b3293a0c3d2058d60c93b8775cf53124a78b6f48c269188b9b86917"
+content-hash = "35de8df10bee7cc41f0df543a2c7f93f08c3bdf835f118f18fd902f511dfc062"

@@ -114,6 +114,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "user_visit.middleware.UserVisitMiddleware",
+    'request_logging.middleware.LoggingMiddleware',
 ]
 
 ROOT_URLCONF = "location.urls"
@@ -392,3 +393,5 @@ LOGINAS_REDIRECT_URL = '/'
 LOGOUT_URL = reverse_lazy('loginas-logout')
 LOGINAS_LOGOUT_REDIRECT_URL = reverse_lazy('admin:index')
 LOGINAS_USERNAME_FIELD = 'email'
+
+REQUEST_LOGGING_ENABLE_COLORIZE = False

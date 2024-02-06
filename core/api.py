@@ -398,7 +398,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         )
         qs = qs1.union(qs2).order_by("date")
         count = int(self.request.query_params.get("count", 10))
-        serializer = NextEventSerializer(qs[:count], many=True)
+        serializer = NextEventSerializer(qs[:count], many=True, context={"request": request})
         return Response(serializer.data)
 
     @staticmethod

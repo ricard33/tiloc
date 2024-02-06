@@ -7,6 +7,7 @@ CONFIG_FOLDER = os.path.dirname(__file__)
 LOG_FOLDER = os.path.normpath(os.path.join(CONFIG_FOLDER, "..", "log"))
 config = Config()
 config.read(os.path.join(CONFIG_FOLDER, "config.ini"))
+loggly_handler = config.getboolean("LOGGLY", "ACTIVE", True) and ["loggly"] or []
 
 LOGGING = {
     "version": 1,
@@ -32,6 +33,14 @@ LOGGING = {
             "maxBytes": 10 * 1024 * 1024,
             "backupCount": 10,
         },
+        "file-request": {
+            "level": "NOTSET",
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(LOG_FOLDER, "requests.log"),
+            "maxBytes": 10 * 1024 * 1024,
+            "backupCount": 10,
+        },
         "loggly": {
             "class": "loggly.handlers.HTTPSHandler",
             "level": "INFO",
@@ -48,13 +57,17 @@ LOGGING = {
         },
     },
     "root": {
-        "handlers": ["console", "file", "mail_admins"]
-        + (config.getboolean("LOGGLY", "ACTIVE", True) and ["loggly"] or []),
+        "handlers": ["console", "file", "mail_admins"] + loggly_handler,
         "level": "DEBUG",
     },
     "loggers": {
         "django": {
             "level": "DEBUG",
+        },
+        'django.request': {
+            'handlers': ['file-request'] + loggly_handler,
+            'level': 'DEBUG',
+            'propagate': False,
         },
         "django.db.backends": {
             "level": "INFO",
