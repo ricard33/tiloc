@@ -198,7 +198,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
               fullWidth
             >
               <SelectElement
-                name={"deposit_label"} label={t("Down payment / Deposit")} type={"number"}
+                name={"deposit_label"} label={t("Down payment / Deposit")}
                 required fullWidth
                 options={[
                   { id: "deposit", label: t("Deposit") },
