@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group
 from django.db.models import Max
 from django.db.models.signals import post_save
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from timezone_field.rest_framework import TimeZoneSerializerField
 
 from core import models
@@ -63,6 +64,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(method_name='get_absolute_url')
     id = serializers.CharField(source="name", read_only=True)
     is_initialized = serializers.SerializerMethodField()
     current_plan = serializers.SerializerMethodField()
@@ -72,6 +74,7 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Account
         fields = [
             "id",
+            "url",
             "is_active",
             "is_initialized",
             "current_plan",
@@ -82,6 +85,9 @@ class AccountSerializer(serializers.ModelSerializer):
             "validity",
             "invoice_label",
         ]
+
+    def get_absolute_url(self, obj):
+        return reverse("api:account-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
 
     def get_is_initialized(self, account):
         return account.lodging_set.count() > 0
@@ -125,6 +131,7 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(method_name='get_absolute_url')
     full_name = serializers.SerializerMethodField()
     signature = serializers.ImageField(required=False, allow_empty_file=True, allow_null=True)
     permissions = serializers.SerializerMethodField(read_only=True)
@@ -139,6 +146,9 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "verified")
         exclude = ["user_permissions", "is_superuser", "is_staff", "logo"]
         extra_kwargs = {"password": {"write_only": True}}
+
+    def get_absolute_url(self, obj):
+        return reverse("api:user-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
 
     def create(self, validated_data: dict):
         if "account" not in validated_data:
@@ -326,6 +336,7 @@ class BookingChannelSyncSubSerializerForLodging(BookingChannelSyncSerializer):
 
 
 class LodgingSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(method_name='get_absolute_url')
     owner = UserSubSerializer(read_only=True)
     owner_id = serializers.PrimaryKeyRelatedField(source="owner", queryset=models.User.objects.all())
     rank = serializers.IntegerField(required=False)
@@ -340,6 +351,9 @@ class LodgingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Lodging
         exclude = ["account"]
+
+    def get_absolute_url(self, obj):
+        return reverse("api:lodging-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
 
     def create(self, validated_data: dict):
         if "account" not in validated_data:
@@ -399,6 +413,7 @@ class CommentSubSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(method_name='get_absolute_url')
     lodgings = LodgingSubSerializer(read_only=True, many=True)
     lodging_ids = serializers.PrimaryKeyRelatedField(
         source="lodgings", many=True, queryset=models.Lodging.objects.all()
@@ -424,6 +439,9 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Booking
         exclude = ["account"]
+
+    def get_absolute_url(self, obj):
+        return reverse("api:booking-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
 
     def validate_lodging_ids(self, value):
         if len(value) == 0:
@@ -561,6 +579,8 @@ class SeasonalVariationSerializer(serializers.ModelSerializer):
 
 
 class ContractTemplateSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(method_name='get_absolute_url')
+
     class Meta:
         model = models.ContractTemplate
         exclude = ["account"]
@@ -570,6 +590,9 @@ class ContractTemplateSerializer(serializers.ModelSerializer):
             validated_data["account"] = self.context["request"].user.account
         instance = super().create(validated_data)
         return instance
+
+    def get_absolute_url(self, obj):
+        return reverse("api:contract_template-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
 
 
 class ContractSerializer(serializers.ModelSerializer):

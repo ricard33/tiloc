@@ -703,7 +703,7 @@ class Booking(models.Model):
         return daily_rate * self.duration * self.adults
 
     def get_absolute_url(self):
-        return reverse("booking-detail", kwargs={"pk": self.pk})
+        return reverse("api:booking-detail", kwargs={"pk": self.pk})
 
 
 class Contract(models.Model):

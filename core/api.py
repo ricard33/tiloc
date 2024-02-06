@@ -498,7 +498,7 @@ class ContractTemplateViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], name="Generate PDF preview")
     @transaction.atomic
     def preview_pdf(self, request, pk=None):
         template: models.ContractTemplate = self.get_object()
@@ -522,17 +522,17 @@ class ContractTemplateViewSet(viewsets.ModelViewSet):
             )
         except jinja2.exceptions.TemplateError as ex:
             logger.exception("Template generation error")
-            raise APIException(detail="Template error: " + ex.message)
+            return HttpResponse("Template error: " + ex.message, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             logger.exception("Unknown error during template generation")
-            raise APIException(detail=str(ex))
+            return HttpResponse("Unknown error during template generation: " + str(ex), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         transaction.savepoint_rollback(sid)
 
         if os.path.exists(full_path):
             with open(full_path, "rb") as fh:
                 response = HttpResponse(fh.read(), content_type="application/pdf")
-                response["Content-Disposition"] = "inline; filename=" + os.path.basename(full_path)
+                response["Content-Disposition"] = 'inline;filename="' + os.path.basename(full_path) + '"'
                 return response
         raise Http404
 

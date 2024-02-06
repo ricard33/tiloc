@@ -79,5 +79,8 @@ LOGGING = {
         "PIL.Image": {
             "level": "INFO",
         },
+        "faker": {
+            "level": "INFO",
+        },
     },
 }
