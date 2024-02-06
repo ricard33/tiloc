@@ -1,7 +1,9 @@
+from unittest import TestCase
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from core.contracts import generate_contract, generate_preview_contract
+from core.contracts import format_decimal, generate_contract, generate_preview_contract
 from core.tests import factories
 from core.tests.helpers import force_login
 
@@ -69,3 +71,21 @@ class ContractTemplateTestCase(APITestCase):
         lodging = factories.LodgingFactory.create()
         content = generate_preview_contract(content, lodging)
         self.assertIn(lodging.name, content)
+
+
+class FormatDecimalTestCase(TestCase):
+    def test_integer(self):
+        self.assertEqual("1", format_decimal(1))
+        self.assertEqual("0", format_decimal(0))
+        self.assertEqual("10", format_decimal(10))
+        self.assertEqual("100", format_decimal(100))
+        self.assertEqual("1\u202f000", format_decimal(1000))
+        self.assertEqual("-1\u202f000", format_decimal(-1000))
+
+    def test_decimal(self):
+        self.assertEqual("1,13", format_decimal(1.13, "fr"))
+        self.assertEqual("0,11", format_decimal(0.11, "fr"))
+        self.assertEqual("23,01", format_decimal(23.01, "fr"))
+        self.assertEqual("23,10", format_decimal(23.1, "fr"))
+        self.assertEqual("2\u202f453,10", format_decimal(2453.1, "fr"))
+        self.assertEqual("-2\u202f453,10", format_decimal(-2453.1, "fr"))

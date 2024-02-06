@@ -17,9 +17,8 @@ from core.models import BookedService, Booking, Contract
 logger = logging.getLogger("api")
 
 
-# TODO Get format like "2,60", not "2.6"
 def format_decimal(value, locale=settings.LANGUAGE_CODE):
-    return babel_format_decimal(value or 0, locale=locale)
+    return babel_format_decimal(value or 0, format=value == round(value) and "#,##0;-#" or "#,##0.00;-#", locale=locale)
 
 
 def format_date(value, format="medium", locale=settings.LANGUAGE_CODE):
