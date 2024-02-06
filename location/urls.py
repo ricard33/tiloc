@@ -101,6 +101,6 @@ if settings.ENV == "dev":
                 -1, re_path(relative_path, never_cache(serve_static_file), kwargs={"document_path": fullpath})
             )
 
-urlpatterns.append(re_path(r"^$", never_cache(serve_static_file),
+urlpatterns.append(re_path(r"^", never_cache(serve_static_file),
                            kwargs={"document_path": os.path.join(settings.STATIC_ROOT, "index.html")},
                            name="home"))
