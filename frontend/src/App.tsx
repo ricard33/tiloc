@@ -15,8 +15,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ConfirmProvider } from "./libs/MuiConfirm";
 import { useCurrentUserQuery } from "./services/api";
-// @ts-ignore
-import { DateProvider } from "@ti-gecko/react-calendar-timeline";
 import { useAlert } from "./common/alertUtils";
 import { differenceInCalendarDays, formatDistanceToNow, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -74,7 +72,7 @@ function App(props: Props) {
       });
   }, [appInfo.frontendVersion, appInfo.loaded, dispatch, showError, t]);
 
-  useInterval(loadAppInfo, 60*1000);
+  useInterval(loadAppInfo, 60 * 1000);
 
   useEffect(() => {
     if (!initialised) {
@@ -120,19 +118,17 @@ function App(props: Props) {
     // </StyledEngineProvider>
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
-        <DateProvider locale={frLocale}>
-          {appInfo.loaded ?
-            <ConfirmProvider>
-              <Notifier />
-              {/*<ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showBubble />*/}
-              <BrowserRouter>
-                <Routes />
-              </BrowserRouter>
-            </ConfirmProvider>
-            :
-            <LoadingInProgress />
-          }
-        </DateProvider>
+        {appInfo.loaded ?
+          <ConfirmProvider>
+            <Notifier />
+            {/*<ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showBubble />*/}
+            <BrowserRouter>
+              <Routes />
+            </BrowserRouter>
+          </ConfirmProvider>
+          :
+          <LoadingInProgress />
+        }
       </LocalizationProvider>
     </ThemeProvider>
   );

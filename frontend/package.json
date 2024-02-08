@@ -51,7 +51,6 @@
     "@reduxjs/toolkit": "^2.1.0",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.2",
-    "@ti-gecko/react-calendar-timeline": "^0.31.2",
     "@ti-gecko/tiloc-ckeditor5": "file:./ckeditor5",
     "axios": "^0.25.0",
     "chart.js": "^4.4.1",

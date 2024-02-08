@@ -7,7 +7,6 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 
 export type PlanningSettings = {
-  display: "timeline" | "annual";
   showPaymentStatus: boolean;
   monthsToDisplay: number;
   showPrices: boolean;
@@ -22,7 +21,6 @@ export const loadPlanningSettings = (): PlanningSettings => {
     return typeof initial === "undefined" ? defaultValue : initial;
   };
   return {
-    display: getStorageValue("planning.display", "timeline"),
     monthsToDisplay: getStorageValue("planning.monthsToDisplay", 12),
     showPaymentStatus: getStorageValue("planning.showPaymentStatus", true),
     showPrices: getStorageValue("planning.showPrices", false),
@@ -31,7 +29,6 @@ export const loadPlanningSettings = (): PlanningSettings => {
 };
 
 export const savePlanningSettings = (settings: PlanningSettings) => {
-  localStorage.setItem("planning.display", JSON.stringify(settings.display));
   localStorage.setItem("planning.monthsToDisplay", JSON.stringify(settings.monthsToDisplay));
   localStorage.setItem("planning.showPaymentStatus", JSON.stringify(settings.showPaymentStatus));
   localStorage.setItem("planning.showPrices", JSON.stringify(settings.showPrices));
@@ -50,8 +47,7 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
   const formContext = useForm<PlanningSettings>({
     defaultValues: settings
   });
-  const { handleSubmit, control, watch } = formContext;
-  const display = watch("display", settings.display);
+  const { handleSubmit, control} = formContext;
 
   const onSubmit: SubmitHandler<PlanningSettings> = data => {
     // console.log(data);
@@ -87,26 +83,24 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
             {/*    { id: "annual", label: t("Annual calendar") }*/}
             {/*  ]}*/}
             {/*/>*/}
-            {display === "annual" &&
-              <TextFieldElement
-                control={control}
-                name="monthsToDisplay"
-                label={t("Number of months to display")}
-                // defaultValue={settings.monthsToDisplay}
-                type={"number"}
-                required
-                validation={{
-                  min: { value: 1, message: t("Minimum 1 month") },
-                  max: { value: 12, message: t("Maximum 12 month") }
-                }}
-              />}
+            <TextFieldElement
+              control={control}
+              name="monthsToDisplay"
+              label={t("Number of months to display")}
+              // defaultValue={settings.monthsToDisplay}
+              type={"number"}
+              required
+              validation={{
+                min: { value: 1, message: t("Minimum 1 month") },
+                max: { value: 12, message: t("Maximum 12 month") }
+              }}
+            />
 
-            {display === "timeline" &&
-              <CheckboxElement
-                control={control}
-                name="showPrices"
-                label={t("Show prices")}
-              />}
+            <CheckboxElement
+              control={control}
+              name="showPrices"
+              label={t("Show prices")}
+            />
             <CheckboxElement
               control={control}
               name="anonymized"

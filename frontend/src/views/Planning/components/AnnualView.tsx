@@ -1,5 +1,4 @@
 import React, { useLayoutEffect, useState } from "react";
-import "@ti-gecko/react-calendar-timeline/lib/Timeline.css";
 import { add, startOfMonth, sub } from "date-fns";
 import clsx from "clsx";
 import useWindowDimensions from "../../../common/windowDimensions";

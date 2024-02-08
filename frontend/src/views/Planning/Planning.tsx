@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { add, format, parse, startOfMonth, sub } from "date-fns";
-import { BookingFixedTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
@@ -185,16 +184,16 @@ const Planning = () => {
           disabled={isLoadingBookings}
         />
       }
-      {view === "monthly" &&
-        <BookingFixedTimeline
-          bookings={bookings ?? []}
-          lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
-          beginDate={startOfMonth(beginDate)}
-          onCreateBooking={canAdd ? onCreateBooking : undefined}
-          settings={settings}
-          disabled={isLoadingBookings}
-        />
-      }
+      {/*{view === "monthly" &&*/}
+      {/*  <BookingFixedTimeline*/}
+      {/*    bookings={bookings ?? []}*/}
+      {/*    lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}*/}
+      {/*    beginDate={startOfMonth(beginDate)}*/}
+      {/*    onCreateBooking={canAdd ? onCreateBooking : undefined}*/}
+      {/*    settings={settings}*/}
+      {/*    disabled={isLoadingBookings}*/}
+      {/*  />*/}
+      {/*}*/}
 
       <br />
       {/*<Card className="planning-legend">*/}
