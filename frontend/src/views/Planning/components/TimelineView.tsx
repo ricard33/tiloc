@@ -455,21 +455,21 @@ export const TimelineView: React.FC<Props> = props => {
               })}
             </tr>
             <tr className="second-tr">
-              <th className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle} />
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
               {getDays(range).map((d) =>
                 <th
                   key={d.date.valueOf()} className={clsx("day", getDayClasses(d))}
-                  style={widthAndHeightStyle}
+                  style={widthStyle}
                 >{d.label}</th>
               )}
             </tr>
             <tr className="third-tr">
-              <th className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle} />
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })}  />
               {getDays(range).map((d) => {
                 return (
                   <th
                     key={d.date.valueOf()} className={clsx("day", getDayClasses(d))}
-                    style={widthAndHeightStyle}
+                    style={widthStyle}
                   >{d.weekDay}</th>
                 );
               })}

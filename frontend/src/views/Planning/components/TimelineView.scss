@@ -20,10 +20,11 @@ $primary-red: #f45b69;
   --line-width: 1px;
   --header-width: 100px;
   --header-width-colapsed: 30px;
+  --header-height: 20px;
 
   position: relative;
 
-  .table-full-width{
+  .table-full-width {
     overflow: hidden;
 
     table {
@@ -103,6 +104,7 @@ $primary-red: #f45b69;
               left: calc(var(--header-width) + 20px);
               margin-left: 20px;
               margin-right: 20px;
+              //noinspection CssInvalidPropertyValue
               text-wrap: nowrap;
             }
           }
@@ -110,17 +112,18 @@ $primary-red: #f45b69;
       }
 
       &:nth-child(2) th {
-        height: 31px;
         padding-bottom: 0;
         font-style: normal;
         font-weight: $font-weight-light;
         font-size: 0.9rem;
-        line-height: 1.5;
       }
 
       th {
         border-top: none;
         font-weight: $font-weight-light;
+        line-height: calc(var(--header-height) / 2);
+        height: var(--header-height);
+        min-height: var(--header-height);
 
         &:first-child {
           background-color: var(--background-color);
@@ -129,11 +132,11 @@ $primary-red: #f45b69;
         &.lodging-name-col {
           border: none;
           border-right: 1px solid $border-color;
-          height: 42px;
         }
 
         &.day {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
+
           &.narrow {
             font-size: 0.7rem;
           }
@@ -189,48 +192,6 @@ $primary-red: #f45b69;
         color: $secondary-grey;
       }
 
-      .departureSpan, .newBookingDepartureSpan, .arrivalSpan, .newBookingArrivalSpan {
-
-        top: 0;
-        right: 0;
-        position: absolute;
-        filter: brightness(93%);
-        -webkit-filter: brightness(93%);
-        width: 60px;
-        height: 35px;
-      }
-
-      .departureSpan, .newBookingDepartureSpan {
-        margin-right: 1px;
-      }
-
-      .dayContent {
-        position: relative;
-      }
-
-      &.extendedDeparture {
-
-        .dayContent {
-          filter: brightness(93%);
-          -webkit-filter: brightness(93%);
-
-          .dayText {
-            color: transparent;
-            opacity: 0.5;
-
-            &.isDeparture {
-              color: inherit;
-            }
-          }
-        }
-
-        &[data-booking-end] {
-
-          .departureSpan {
-            display: none !important;
-          }
-        }
-      }
     }
   }
 
@@ -298,7 +259,7 @@ $primary-red: #f45b69;
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    &>div {
+    & > div {
       display: flex;
       justify-content: flex-start;
       align-items: baseline;
