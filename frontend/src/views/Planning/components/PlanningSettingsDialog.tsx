@@ -2,7 +2,7 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from "@mui/material";
-import { CheckboxElement, FormContainer, SelectElement, TextFieldElement } from "react-hook-form-mui";
+import { CheckboxElement, FormContainer, TextFieldElement } from "react-hook-form-mui";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 
@@ -79,14 +79,14 @@ const PlanningSettingsDialog: React.FunctionComponent<Props> = ({ open, settings
             {/*  label={t<string>("Show payment status on bookings")}*/}
             {/*  // defaultChecked={settings.showPaymentStatus}*/}
             {/*/>*/}
-            <SelectElement
-              name={"display"}
-              label={t("Display type")}
-              options={[
-                { id: "timeline", label: t("Scrolling timeline") },
-                { id: "annual", label: t("Annual calendar") }
-              ]}
-            />
+            {/*<SelectElement*/}
+            {/*  name={"display"}*/}
+            {/*  label={t("Display type")}*/}
+            {/*  options={[*/}
+            {/*    { id: "timeline", label: t("Scrolling timeline") },*/}
+            {/*    { id: "annual", label: t("Annual calendar") }*/}
+            {/*  ]}*/}
+            {/*/>*/}
             {display === "annual" &&
               <TextFieldElement
                 control={control}

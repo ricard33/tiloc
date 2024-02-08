@@ -23,6 +23,14 @@ $primary-red: #f45b69;
 
   position: relative;
 
+  .table-full-width{
+    overflow: hidden;
+
+    table {
+      overflow: hidden;
+    }
+  }
+
   .table-responsive {
     overflow-y: hidden;
     overflow-x: auto;
@@ -95,6 +103,7 @@ $primary-red: #f45b69;
               left: calc(var(--header-width) + 20px);
               margin-left: 20px;
               margin-right: 20px;
+              text-wrap: nowrap;
             }
           }
         }
@@ -125,6 +134,9 @@ $primary-red: #f45b69;
 
         &.day {
           font-size: 0.9rem;
+          &.narrow {
+            font-size: 0.7rem;
+          }
         }
 
         &.weekend {
@@ -333,7 +345,7 @@ $primary-red: #f45b69;
     border-top: 0.5px solid $border-color;
     border-right: 0.5px solid $border-color;
     border-left: none;
-    padding: 5px 0;
+    //padding: 5px 0;
     background-clip: padding-box; /* fix for Firefox */
 
     &.weekend {
@@ -351,7 +363,7 @@ $primary-red: #f45b69;
   }
 
   td.day {
-    padding: 5px 0;
+    //padding: 5px 0;
     white-space: nowrap;
     font-size: 1rem;
     //box-sizing: border-box;

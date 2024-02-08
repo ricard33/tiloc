@@ -3,7 +3,7 @@ import { add, format, parse, startOfMonth, sub } from "date-fns";
 import { BookingFixedTimeline } from "./components";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
-import { Button, IconButton, Stack } from "@mui/material";
+import { Button, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
@@ -16,6 +16,7 @@ import { Account, Booking, Lodging, User } from "../../types";
 import { getBookingStatuses } from "../../common/statusUtils";
 import { useAppSelector } from "../../app/hooks";
 import { TimelineView } from "./components/TimelineView";
+import AnnualView from "./components/AnnualView";
 
 
 const Planning = () => {
@@ -27,7 +28,9 @@ const Planning = () => {
 
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [settings, setSettings] = useState(loadPlanningSettings());
-  const scrollingTimeline = settings.display === "timeline";
+  const [view, setView] = useState<string>(searchParams.get("view") ?? "timeline");
+  // const scrollingTimeline = settings.display === "timeline";
+  const scrollingTimeline = view === "timeline";
 
   let requestedDate = parse(searchParams.get("start") as string, "yyyy-MM", new Date());
   if (isNaN(requestedDate.valueOf()))
@@ -69,8 +72,12 @@ const Planning = () => {
 
   const onScroll = useCallback((start: Date, _: Date) => {
     setBeginDate(start);
-    setSearchParams({ start: format(start, "yyyy-MM") }, { replace: true });
-  }, [setSearchParams]);
+    const startString = format(start, "yyyy-MM");
+    if(startString !== searchParams.get("start")) {
+      searchParams.set("start", startString);
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const onBoundsChange = useCallback((start: Date, end: Date) => {
     // console.log("onBoundsChange", formatISODate(start), formatISODate(end), differenceInDays(start, end));
@@ -100,6 +107,14 @@ const Planning = () => {
     }
   }, []);
 
+  const handleSetView = useCallback((viewName: string) => {
+    if (["timeline", "annual", "monthly"].includes(viewName)) {
+      setView(viewName);
+      searchParams.set("view", viewName);
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   return (
     <Page className="planning">
       <Routes>
@@ -112,6 +127,17 @@ const Planning = () => {
             />}
         />
       </Routes>
+      <Stack direction={"row"} sx={{marginBottom: 1}}>
+        <ToggleButtonGroup
+          value={view} exclusive color="primary"
+          size="small"
+          onChange={(_, value) => handleSetView(value)}
+        >
+          <ToggleButton value={"timeline"}>{t("Timeline")}</ToggleButton>
+          <ToggleButton value={"annual"}>{t("Annual")}</ToggleButton>
+          {/*<ToggleButton value={"monthly"}>{t("Monthly")}</ToggleButton>*/}
+        </ToggleButtonGroup>
+      </Stack>
       <Stack direction={"row"}>
         <IconButton
           type="button"
@@ -124,15 +150,20 @@ const Planning = () => {
           // onChange={(newDate) => setDates({ start: newDate, end: add(newDate, { years: 1 }) })}
           onChange={scrollingTimeline
             ? (newDate) => setGoToDate(newDate)
-            : (newDate) => setDates({
-              start: startOfMonth(newDate),
-              end: add(startOfMonth(newDate), { years: 1 })
-            })
+            : (newDate) => {
+              setBeginDate(startOfMonth(newDate));
+              setDates({
+                start: startOfMonth(newDate),
+                end: add(startOfMonth(newDate), { years: 1 })
+              });
+              searchParams.set("start", format(newDate, "yyyy-MM"));
+              setSearchParams(searchParams, { replace: true });
+            }
           }
           hideMonthNav={scrollingTimeline}
         />
       </Stack>
-      {scrollingTimeline ?
+      {view === "timeline" &&
         <TimelineView
           bookings={bookings ?? []}
           lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
@@ -143,12 +174,22 @@ const Planning = () => {
           onBoundsChange={onBoundsChange}
           settings={settings}
           disabled={isLoadingBookings}
+        />}
+      {view === "annual" &&
+        <AnnualView
+          bookings={bookings ?? []}
+          lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
+          beginDate={startOfMonth(beginDate)}
+          onCreateBooking={canAdd ? onCreateBooking : undefined}
+          settings={settings}
+          disabled={isLoadingBookings}
         />
-        :
+      }
+      {view === "monthly" &&
         <BookingFixedTimeline
           bookings={bookings ?? []}
           lodgings={[...((lodgings && lodgings.slice(0, account.current_plan.max_lodgings)) ?? [])]}
-          beginDate={dates.start}
+          beginDate={startOfMonth(beginDate)}
           onCreateBooking={canAdd ? onCreateBooking : undefined}
           settings={settings}
           disabled={isLoadingBookings}
@@ -158,7 +199,9 @@ const Planning = () => {
       <br />
       {/*<Card className="planning-legend">*/}
       <p>
-        <Button variant="outlined" onClick={() => setShowLegend(!showLegend)}>{showLegend ? t("Hide legend") : t("Show legend")}</Button>
+        <Button
+          variant="outlined" onClick={() => setShowLegend(!showLegend)}
+        >{showLegend ? t("Hide legend") : t("Show legend")}</Button>
         {/*<span className="status-legend-title">*/}
         {/*  {t("Legend")} :*/}
         {/*</span>*/}

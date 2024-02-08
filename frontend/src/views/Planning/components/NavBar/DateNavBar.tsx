@@ -1,9 +1,8 @@
 /* eslint-disable react/no-multi-comp */
 import React from "react";
 import { Button, ButtonProps, Grid } from "@mui/material";
-import { add, startOfMonth } from "date-fns";
+import { add } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { formatDate } from "../../../../common/dateUtils";
 import useWindowDimensions from "../../../../common/windowDimensions";
 
 interface NavButtonProps extends ButtonProps {
@@ -11,7 +10,7 @@ interface NavButtonProps extends ButtonProps {
 }
 
 const NavButton: React.FC<NavButtonProps> = (props) => {
-  const {children, ...attr} = props;
+  const { children, ...attr } = props;
   return (
     <Button
       size="small"
@@ -33,17 +32,15 @@ type NavBarProps = {
 
 
 const DateNavBar: React.FC<NavBarProps> = props => {
-  const {date, onChange, hideMonthNav} = props;
+  const { date, onChange, hideMonthNav } = props;
   // const [currentDate, setCurrentDate] = useState(startOfMonth(date));
-  const currentDate = startOfMonth(date);
   const { t } = useTranslation();
   const { width: windowWidth } = useWindowDimensions();
   const isPhone = windowWidth < 600;
-  const monthFormat = isPhone ? "MMM" : "MMMM Y";
 
   const onPrevNextClick = (months: number) => {
     console.log(performance.now().toFixed(2), "onPrevNextClick");
-    const newDate = add(date, {months: months});
+    const newDate = add(date, { months: months });
     // setCurrentDate(newDate)
     onChange(newDate);
   };
@@ -51,20 +48,25 @@ const DateNavBar: React.FC<NavBarProps> = props => {
   return (
     <Grid container justifyContent="space-between">
       <Grid item className="backward-buttons">
-        {!isPhone && <NavButton onClick={() => onPrevNextClick(-12)}>&larr;{isPhone ? t("12 m") : t("12 months")}</NavButton>}
+        {!isPhone &&
+          <NavButton onClick={() => onPrevNextClick(-12)}>&larr;{isPhone ? t("12 m") : t("12 months")}</NavButton>}
         <NavButton onClick={() => onPrevNextClick(-6)}>&larr;{isPhone ? t("6 m") : t("6 months")}</NavButton>
-        {!hideMonthNav && <NavButton onClick={() => onPrevNextClick(-1)}>&larr;{formatDate(add(currentDate, {months: -1}), monthFormat)}
-        </NavButton>}
+        {!hideMonthNav &&
+          <NavButton onClick={() => onPrevNextClick(-1)}>&larr;{isPhone ? t("1 m") : t("1 month")}</NavButton>}
       </Grid>
-      <Grid item className="" sx={{alignSelf: "center"}}>
-        <NavButton onClick={() => onChange(new Date())}>{t("Today")}</NavButton>
+      <Grid item className="" sx={{ alignSelf: "normal" }}>
+        <NavButton
+          onClick={() => onChange(new Date())}
+          sx={isPhone ? { maxWidth: "64px", textOverflow: "ellipsis", overflowX: "hidden", display: "inline" } : {}}
+        >{t("Today")}</NavButton>
       </Grid>
-      <Grid item className="forward-buttons" sx={{alignSelf: "right"}}>
+      <Grid item className="forward-buttons" sx={{ alignSelf: "right" }}>
         {!hideMonthNav && <NavButton onClick={() => onPrevNextClick(1)}>
-          {formatDate(add(currentDate, {months: 1}), monthFormat)}&rarr;
+          {isPhone ? t("1 m") : t("1 month")}&rarr;
         </NavButton>}
         <NavButton onClick={() => onPrevNextClick(6)}>{isPhone ? t("6 m") : t("6 months")}&rarr;</NavButton>
-        {!isPhone && <NavButton onClick={() => onPrevNextClick(12)}>{isPhone ? t("12 m") : t("12 months")}&rarr;</NavButton>}
+        {!isPhone &&
+          <NavButton onClick={() => onPrevNextClick(12)}>{isPhone ? t("12 m") : t("12 months")}&rarr;</NavButton>}
       </Grid>
     </Grid>
   );

@@ -4,7 +4,6 @@ import { PlanningSettings } from "./PlanningSettingsDialog";
 import {
   add,
   differenceInCalendarDays,
-  differenceInDays,
   eachDayOfInterval,
   eachMonthOfInterval,
   endOfMonth,
@@ -21,7 +20,7 @@ import {
 } from "date-fns";
 import { DateRange } from "../../../components/DateRangeSelector";
 import "./TimelineView.scss";
-import { formatDate, formatISODate, getMonthName, getWeekdayName } from "../../../common/dateUtils";
+import { formatDate, getMonthName, getWeekdayName } from "../../../common/dateUtils";
 import clsx from "clsx";
 import { getBookingStatus, getIconAndBgColor } from "../../../common/statusUtils";
 import { darken } from "@mui/system";
@@ -36,10 +35,11 @@ import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import { DecimalPrecision } from "../../../common/priceUtils";
 import { styled } from "@mui/material/styles";
+import { useDebounceEffect } from "../../../common/useDebounceEffets";
 
 
-const PaymentsTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} />
+const PaymentsTooltip = styled(({ className, children, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }}  children={children}/>
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 375
@@ -64,31 +64,45 @@ type Day = {
 
 type Props = {
   defaultBeginDate?: Date,
+  visibleBeginDate?: Date,
+  visibleEndDate?: Date,
   goToDate?: Date,    // special property: make an action on value change
   bookings: Booking[],
-  disabled: boolean,
+  disabled?: boolean,
   lodgings: Lodging[],
   buffer?: number,
   onCreateBooking?: (lodging: Lodging, startDate: Date, endDate: Date) => void,
   onScroll?: (visibleStart: Date, visibleEnd: Date) => void,
-  onBoundsChange: (canvasStart: Date, canvasEnd: Date) => void,
+  onBoundsChange?: (canvasStart: Date, canvasEnd: Date) => void,
   settings: PlanningSettings,
+  dayWidth?: number,
+  dayHeight?: number,
+  collapsed?: boolean,
+  onCollapse?: (colapsed: boolean) => void,
 };
 
 export const TimelineView: React.FC<Props> = props => {
   const {
-    defaultBeginDate, goToDate, bookings, lodgings, buffer,
-    settings, onScroll, onBoundsChange, onCreateBooking
+    defaultBeginDate, visibleBeginDate, visibleEndDate, goToDate, bookings, lodgings, buffer,
+    settings, onScroll, onBoundsChange, onCreateBooking,
+    dayWidth: initialDayWidth, dayHeight, collapsed: collapsedProps, onCollapse
   } = {
     defaultBeginDate: startOfMonth(new Date()),
     buffer: 5,
+    dayWidth: 20,
+    dayHeight: 40,
     ...props
   };
+  const fixed = Boolean(visibleBeginDate && visibleEndDate);
   const { t } = useTranslation();
-  const dayWidth = 20;
-  const dayHeight = 40;
+  const { width: screenWidth } = useWindowDimensions();
+  const isDesktop = screenWidth >= 900;
+  const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
+  const collapsed = collapsedProps ?? (typeof collapsedState === "undefined" ? !isDesktop : collapsedState);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const visibleWidth = dimensions.width;
+  // const visibleWidth = dimensions.width - (fixed ? collapsed ? 30 : 100 : 0);
+  const [visibleWidth, setVisibleWidth] = useState(dimensions.width - (fixed ? collapsed ? 30 : 100 : 0));
+  const [dayWidth, setDayWidth] = useState(initialDayWidth);
 
   const getRangeToLoad = useCallback((startDate: Date) => {
     const widthInDays = visibleWidth / dayWidth;
@@ -99,27 +113,26 @@ export const TimelineView: React.FC<Props> = props => {
       endDate: endOfMonth(add(startDate, { days: offsetInDays + widthInDays }))
     };
 
-  }, [buffer, visibleWidth]);
+  }, [buffer, dayWidth, visibleWidth]);
 
-  const [range, setRange] = useState(getRangeToLoad(defaultBeginDate));
+  const [range, setRange] = useState(fixed ?
+    { startDate: visibleBeginDate!, endDate: visibleEndDate! }
+    : getRangeToLoad(defaultBeginDate));
+  // console.log("Range", formatISODate(range.startDate), formatISODate(range.endDate));
   const previousStart = useRef<Date | undefined>(range.startDate);
-  const scrollPos = useRef(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
+  const scrollPos = useRef(differenceInCalendarDays(defaultBeginDate, range.startDate) * dayWidth);
   const oldPosRef = useRef(scrollPos.current);
   // const touchInProgress = useRef(false);
   const [touchInProgress, setTouchInProgress] = useState(false);
   // const nextScrollUpdate = useRef(false);
   const [nextScrollUpdate, setNextScrollUpdate] = useState(0);
-  // const [scrollPos, setScrollPos] = useState(differenceInDays(defaultBeginDate, range.startDate) * dayWidth);
   const [selectStart, setSelectStart] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const [selectionEnd, setSelectionEnd] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
-  const { width: screenWidth } = useWindowDimensions();
-  const isDesktop = screenWidth >= 900;
-  const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
-  const collapsed = typeof collapsedState === "undefined" ? !isDesktop : collapsedState;
   const ref = useRef<HTMLDivElement>(null);
   const heightStyle = {
     height: `${dayHeight}px`,
-    minHeight: `${dayHeight}px`
+    minHeight: `${dayHeight}px`,
+    lineHeight: `${dayHeight * 0.5}px`
   };
   const widthStyle = {
     width: `${dayWidth}px`,
@@ -136,13 +149,13 @@ export const TimelineView: React.FC<Props> = props => {
     [cur[0]]: cur[1]
   }), {});
 
-  if (range.startDate !== previousStart.current) {
+  if (!fixed && (typeof previousStart.current === "undefined" || !isSameDay(range.startDate, previousStart.current))) {
     if (ref.current) {
       const oldPos = ref.current.scrollLeft;
       // console.log("Old start", previousStart.current && formatISODate(previousStart.current));
       // console.log("New range", formatISODate(range.startDate), formatISODate(range.endDate));
       if (typeof previousStart.current !== "undefined") {
-        const offset = differenceInDays(previousStart.current, range.startDate) * dayWidth;
+        const offset = differenceInCalendarDays(previousStart.current, range.startDate) * dayWidth;
         // console.log("New pos ", oldPos + offset, "(offset=", offset, ")");
         ref.current.scrollTo({ left: oldPos + offset });
         if (ref.current.scrollLeft !== oldPos + offset) {
@@ -154,7 +167,7 @@ export const TimelineView: React.FC<Props> = props => {
         oldPosRef.current = oldPos;
 
       } else if (goToDate) {
-        ref.current.scrollTo({ left: differenceInDays(goToDate, range.startDate) * dayWidth });
+        ref.current.scrollTo({ left: differenceInCalendarDays(goToDate, range.startDate) * dayWidth });
         setTimeout(() => onScroll && onScroll(goToDate, add(goToDate, { days: visibleWidth / dayWidth })), 0);
       }
       previousStart.current = range.startDate;
@@ -162,19 +175,37 @@ export const TimelineView: React.FC<Props> = props => {
   }
 
   useEffect(() => {
+    if(fixed) {
+      setRange({ startDate: visibleBeginDate!, endDate: visibleEndDate! });
+      const rangeInDays = differenceInCalendarDays(visibleEndDate!, visibleBeginDate!) + 1;
+      setDayWidth(visibleWidth / rangeInDays);
+    }
+  }, [fixed, visibleBeginDate, visibleEndDate, visibleWidth]);
+
+  useEffect(() => {
     if (ref.current && goToDate) {
-      console.info("Go to date  ", formatISODate(goToDate));
+      // console.info("Go to date  ", formatISODate(goToDate));
       updateBounds(goToDate);
       previousStart.current = undefined;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goToDate]);
 
+  useDebounceEffect(() => {
+    setVisibleWidth(dimensions.width - (fixed ? collapsed ? 30 : 100 : 0));
+  }, 300, [dimensions.width, collapsed, fixed])
+
   useEffect(() => {
     if (visibleWidth > 0) {
-      // console.log("visibleWidth change -> updateBounds()");
-      const visibleStartDate = add(range.startDate, { days: scrollPos.current / dayWidth });
-      updateBounds(visibleStartDate);
+      if (fixed) {
+        const rangeInDays = differenceInCalendarDays(range.endDate, range.startDate) + 1;
+        // console.log(`visibleWidth change to ${visibleWidth}`);
+        setDayWidth(visibleWidth / rangeInDays);
+      } else {
+        // console.log(`visibleWidth change to ${visibleWidth} -> updateBounds()`);
+        const visibleStartDate = add(range.startDate, { days: scrollPos.current / dayWidth });
+        updateBounds(visibleStartDate);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleWidth]);
@@ -195,6 +226,7 @@ export const TimelineView: React.FC<Props> = props => {
   }, []);
 
   const updateBounds = useCallback((startDate: Date) => {
+    if (fixed) return;
     // console.log("updateBounds", formatISODate(startDate));
     const newRange = getRangeToLoad(startDate);
     setRange(newRange);
@@ -204,7 +236,7 @@ export const TimelineView: React.FC<Props> = props => {
       newRange.endDate
     );
 
-  }, [getRangeToLoad, onBoundsChange]);
+  }, [fixed, getRangeToLoad, onBoundsChange]);
 
   // const limit = (buffer - 1) * visibleWidth / 2 / 2;
   const limit = visibleWidth / 2;
@@ -228,15 +260,6 @@ export const TimelineView: React.FC<Props> = props => {
       return add(range.startDate, { days: pos / dayWidth });
     };
 
-    // if (nextScrollUpdate) {
-    //   if (ref.current!.scrollLeft === nextScrollUpdate)
-    //     setNextScrollUpdate(0);
-    //   else {
-    //     ref.current!.scrollTo({ left: nextScrollUpdate });
-    //     return;
-    //   }
-    // }
-
     if ((pos < limitLeft || pos > limitRight) && !touchInProgress) {
       // console.log(`POS => ${limitLeft} < ${pos} < ${limitRight}`);
       updateBounds(posToDate(pos));
@@ -246,7 +269,7 @@ export const TimelineView: React.FC<Props> = props => {
     scrollPos.current = pos;
     if (onScroll) onScroll(posToDate(pos), posToDate(pos + visibleWidth));
 
-  }, [limitLeft, limitRight, nextScrollUpdate, onScroll, range.startDate, touchInProgress, updateBounds, visibleWidth]);
+  }, [dayWidth, limitLeft, limitRight, nextScrollUpdate, onScroll, range.startDate, touchInProgress, updateBounds, visibleWidth]);
 
   // const handleTouchMove = useCallback((event: TouchEvent<HTMLTableElement>) => {
   //   // console.log("handleTouchMove");
@@ -282,7 +305,7 @@ export const TimelineView: React.FC<Props> = props => {
 
   function getDays(range: DateRange, lodging?: Lodging): Day[] {
     const today = new Date();
-    return eachDayOfInterval({ start: range.startDate, end: range.endDate }).map(d => {
+    return eachDayOfInterval({ start: range.startDate, end: range.endDate }).map((d) => {
       const start = selectStart && selectionEnd && min([selectStart.date, selectionEnd.date]);
       const end = selectStart && selectionEnd && max([selectStart.date, selectionEnd.date]);
       const isSelected = selectStart && lodging && lodging.id === selectStart.lodging.id
@@ -333,7 +356,8 @@ export const TimelineView: React.FC<Props> = props => {
       today: d.isToday,
       selected: d.isSelected,
       "selection-start": d.isSelectionStart,
-      "selection-end": d.isSelectionEnd
+      "selection-end": d.isSelectionEnd,
+      narrow: dayWidth < 20
     };
   }
 
@@ -355,6 +379,9 @@ export const TimelineView: React.FC<Props> = props => {
           title={guest_name}
           style={{
             width: (dayWidth * booking.duration - 0.1 * dayWidth) + "px",
+            height: `${dayHeight * 0.75}px`,
+            lineHeight: `${dayHeight * 0.75}px`,
+
             // color: "black",
             color: statusProp.color,
             backgroundColor: statusProp.bgColor,
@@ -394,7 +421,10 @@ export const TimelineView: React.FC<Props> = props => {
 
   return (
     <div className="timeline-view">
-      <div className={clsx("table-responsive", { collapsed: collapsed })} onScroll={handleScroll} ref={ref}>
+      <div
+        className={clsx({ "table-responsive": !fixed, "table-full-width": fixed, collapsed: collapsed })}
+        onScroll={!fixed ? handleScroll : undefined} ref={ref}
+      >
         <table
           className="table"
           onTouchStart={() => {
@@ -405,16 +435,19 @@ export const TimelineView: React.FC<Props> = props => {
         >
           <thead>
             <tr className="first-tr">
-              <th className={clsx("lodging-name-col", { collapsed: collapsed })}>
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle}>
                 <Button
                   className="collapse-button" variant="outlined" fullWidth
-                  onClick={() => setCollapsed(!collapsed)}
+                  onClick={() => {
+                    setCollapsed(!collapsed);
+                    onCollapse && onCollapse(!collapsed);
+                  }}
                 >
                   {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                 </Button>
               </th>
               {getMonths(range).map((m) => {
-                return <th key={m.date.valueOf()} colSpan={m.size}>
+                return <th key={m.date.valueOf()} colSpan={m.size} style={heightStyle}>
                   <div className="month">
                     <div className="month-label">{m.label}</div>
                   </div>
@@ -422,21 +455,21 @@ export const TimelineView: React.FC<Props> = props => {
               })}
             </tr>
             <tr className="second-tr">
-              <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle} />
               {getDays(range).map((d) =>
                 <th
                   key={d.date.valueOf()} className={clsx("day", getDayClasses(d))}
-                  style={widthStyle}
+                  style={widthAndHeightStyle}
                 >{d.label}</th>
               )}
             </tr>
             <tr className="third-tr">
-              <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} style={heightStyle} />
               {getDays(range).map((d) => {
                 return (
                   <th
                     key={d.date.valueOf()} className={clsx("day", getDayClasses(d))}
-                    style={widthStyle}
+                    style={widthAndHeightStyle}
                   >{d.weekDay}</th>
                 );
               })}
@@ -450,13 +483,7 @@ export const TimelineView: React.FC<Props> = props => {
                     <div className="lodging-name valign">{l.name}</div>
                   </div>
                 </td>
-                {getDaysWithBookings(l).map((d, index) => {
-                  // if ((index + 1) * dayWidth < scrollPos.current) {
-                  //   if(index > 0)
-                  //     return "";
-                  //   return <td colSpan={Math.trunc((scrollPos.current - 1) / dayWidth)}/>;
-                  // }
-                  // if(index*dayWidth > visibleWidth+scrollPos.current) return "";
+                {getDaysWithBookings(l).map((d) => {
                   return (
                     <td
                       key={d.date.valueOf()}
@@ -509,7 +536,7 @@ export const TimelineView: React.FC<Props> = props => {
       {/*  <div>Start     : {formatISODate(defaultBeginDate)}</div>*/}
       {/*  <div>goToDate  : {goToDate && formatISODate(goToDate)}</div>*/}
       {/*  <div>range     : {formatISODate(range.startDate)} {formatISODate(range.endDate)}</div>*/}
-      {/*  <div>range px  : {0} {differenceInDays(range.endDate, range.startDate) * dayWidth}</div>*/}
+      {/*  <div>range px  : {0} {differenceInCalendarDays(range.endDate, range.startDate) * dayWidth}</div>*/}
       {/*  <div>ScrollPos : {limitLeft} &lt; {scrollPos.current} &lt; {limitRight}</div>*/}
       {/*  <div>Width     : {visibleWidth} ({visibleWidth / dayWidth} days)</div>*/}
       {/*  <div>Buffer    : {buffer}</div>*/}
