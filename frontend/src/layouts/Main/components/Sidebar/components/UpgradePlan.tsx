@@ -1,48 +1,33 @@
 import React from "react";
-import { makeStyles } from "@mui/styles";
-import { Button, colors, Theme, Typography } from "@mui/material";
+import { Button, colors, Typography } from "@mui/material";
 import ResumeFolderSvg from "../../../../../assets/images/undraw_resume_folder_2_arse.svg";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import Box from "@mui/material/Box";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    backgroundColor: colors.grey[50]
-  },
-  media: {
-    paddingTop: theme.spacing(2),
-    height: 80,
-    textAlign: "center",
-    "& > img": {
-      height: "100%",
-      width: "auto"
-    }
-  },
-  content: {
-    padding: theme.spacing(1, 2)
-  },
-  actions: {
-    padding: theme.spacing(1, 2),
-    display: "flex",
-    justifyContent: "center"
-  }
-}));
 
 const UpgradePlan = () => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   return (
-    <div
-      className={classes.root}
-    >
-      <div className={classes.media}>
+    <Box sx={{ backgroundColor: colors.grey[50] }}>
+      <Box
+        sx={{
+          paddingTop: 2,
+          height: "80px",
+          textAlign: "center",
+          "& > img": {
+            height: "100%",
+            width: "auto"
+          }
+        }}
+      >
         <img
           alt={t("Upgrade to PRO")}
           src={ResumeFolderSvg}
         />
-      </div>
-      <div className={classes.content}>
+      </Box>
+      <Box sx={{ padding: (theme) => theme.spacing(1, 2) }}>
         <Typography
           align="center"
           gutterBottom
@@ -56,8 +41,8 @@ const UpgradePlan = () => {
         >
           {t("Upgrade your Tiloc subscription and get Premium features")}
         </Typography>
-      </div>
-      <div className={classes.actions}>
+      </Box>
+      <Box sx={{ padding: (theme) => theme.spacing(1, 2), display: "flex", justifyContent: "center" }}>
         <Button
           color="primary"
           component={Link}
@@ -66,8 +51,8 @@ const UpgradePlan = () => {
         >
           {t("Upgrade")}
         </Button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

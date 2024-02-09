@@ -1,31 +1,13 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { Button, Grid, Typography } from "@mui/material";
+import React from "react";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    padding: theme.spacing(4)
-  },
-  content: {
-    paddingTop: 150,
-    textAlign: 'center'
-  },
-  image: {
-    marginTop: 50,
-    display: 'inline-block',
-    maxWidth: '100%',
-    width: 560
-  }
-}));
-
 const LoggedOut = () => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   return (
-    <div className={classes.root}>
+    <Box sx={{ padding: 4 }}>
       <Grid
         container
         justifyContent="center"
@@ -36,26 +18,25 @@ const LoggedOut = () => {
           lg={6}
           xs={12}
         >
-          <div className={classes.content}>
+          <div style={{ paddingTop: "150px", textAlign: "center" }}>
             <Typography variant="h1">
-              {t('You are now logged out.')}
+              {t("You are now logged out.")}
             </Typography>
             <Typography variant="subtitle2">
-              {t('Click on "Log in" button to sign in again.')}
+              {t("Click on \"Log in\" button to sign in again.")}
             </Typography>
             <Button
               variant="contained"
               color="primary"
-              className={classes.button}
               component={NavLink}
               to="/login"
             >
-              {t('Log in')}
+              {t("Log in")}
             </Button>
           </div>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 

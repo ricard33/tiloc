@@ -1,4 +1,4 @@
-import { stringify } from 'query-string';
+import queryString from 'query-string';
 import md5 from 'md5';
 
 export interface GravatarOptions {
@@ -16,5 +16,5 @@ export const getGravatarUrl = (email: string, options: GravatarOptions = {}): st
     delete query.defaultUrl;
   }
   const emailHash = md5(email);
-  return `https://www.gravatar.com/avatar/${emailHash}?${stringify(query)}`;
+  return `https://www.gravatar.com/avatar/${emailHash}?${queryString.stringify(query)}`;
 };

@@ -1,10 +1,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { useEffect, useMemo, useState } from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
-import { makeStyles } from "@mui/styles";
 import { useTheme } from "@mui/material/styles";
-import { Alert, Breadcrumbs, Button, Link, Theme, Typography, useMediaQuery } from "@mui/material";
+import { Alert, Breadcrumbs, Button, CssBaseline, Link, Toolbar, Typography, useMediaQuery } from "@mui/material";
 import { Footer, Sidebar, Topbar } from "./components";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
@@ -13,31 +10,10 @@ import CheckoutResult from "../../components/CheckoutResult";
 import { Account, AppInfo } from "../../types";
 import { differenceInCalendarDays } from "date-fns";
 import { useAppSelector } from "../../app/hooks";
+import Box from "@mui/material/Box";
 
-
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    paddingTop: 56,
-    height: "100%",
-    [theme.breakpoints.up("sm")]: {
-      paddingTop: 64
-    }
-  },
-  shiftContent: {
-    paddingLeft: 170
-  },
-  content: {
-    height: "100%",
-    display: "flex",
-    flexFlow: "column"
-  },
-  breadcrumb: {
-    padding: `0 ${theme.spacing(1)}`
-  }
-}));
 
 const Main = () => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
   const location = useLocation();
@@ -49,6 +25,7 @@ const Main = () => {
   const appInfo = useAppSelector(store => store.appInfo) as AppInfo;
   const query = queryString.parse(location.search) as { subscription_id: string };
   const { subscription_id } = query;
+  const drawerWidth = 170;
 
   const breadcrumbNameMap: { [key: string]: string | undefined, } = useMemo(() => {
     return {
@@ -69,7 +46,7 @@ const Main = () => {
       "profile": t("My profile"),
       "account": t("My account"),
       "subscription": t("Subscription")
-    }
+    };
   }, [t]);
 
 
@@ -89,24 +66,31 @@ const Main = () => {
   ;
 
   useEffect(() => {
-    const page =  pathnames.slice(-1)[0];
+    const page = pathnames.slice(-1)[0];
     document.title = `Tiloc - ${breadcrumbNameMap[page] ?? ""}`;
   }, [breadcrumbNameMap, pathnames]);
 
   return (
-    <div
-      className={clsx({
-        [classes.root]: true,
-        [classes.shiftContent]: isDesktop
-      })}
-    >
+    <Box sx={{ display: "flex", height: "100%" }}>
+      <CssBaseline />
       <Topbar onSidebarOpen={handleSidebarOpen} />
       <Sidebar
         onClose={handleSidebarClose}
         open={shouldOpenSidebar}
         variant={isDesktop ? "permanent" : "temporary"}
+        width={drawerWidth}
       />
-      <main className={classes.content}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1, paddingTop: 1,
+          height: "100%",
+          maxWidth: `calc(100% - ${isDesktop ? drawerWidth : 0}px)`,
+          display: "flex",
+          flexFlow: "column"
+        }}
+      >
+        <Toolbar />
         {appInfo.version !== appInfo.frontendVersion &&
           <Alert severity="warning">
             <Trans
@@ -121,7 +105,7 @@ const Main = () => {
             />
           </Alert>
         }
-        <Breadcrumbs className={classes.breadcrumb} aria-label="breadcrumb">
+        <Breadcrumbs sx={{ padding: `0 ${theme.spacing(1)}` }} aria-label="breadcrumb">
           <Link color="inherit" component={RouterLink} to="/">
             {t("Home")}
           </Link>
@@ -150,13 +134,9 @@ const Main = () => {
           </Alert>}
         <Outlet />
         <Footer />
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
-};
-
-Main.propTypes = {
-  children: PropTypes.node
 };
 
 export default Main;

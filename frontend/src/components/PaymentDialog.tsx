@@ -1,54 +1,28 @@
-import React, {  } from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import React from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle, InputAdornment, MenuItem,
-  TextField,
+  DialogTitle,
+  InputAdornment,
+  MenuItem,
+  TextField
 } from "@mui/material";
-import { DatePicker } from '@mui/x-date-pickers';
-import makeStyles from "@mui/styles/makeStyles";
+import { DatePicker } from "@mui/x-date-pickers";
 import { Payment, paymentMethods } from "../types";
 
 
-const useStyles = makeStyles((/*theme: Theme*/) => ({
-  input: {
-    marginLeft: "4px",
-    marginRight: "4px"
-  },
-  date: {
-    marginLeft: "4px",
-    marginRight: "4px",
-    width: "8em"
-  },
-  description: {
-    marginLeft: "4px",
-    marginRight: "4px"
-  },
-  method: {
-    marginLeft: "4px",
-    marginRight: "4px",
-    width: "10em"
-  },
-  amount: {
-    marginLeft: "4px",
-    marginRight: "4px",
-    width: "5em"
-  }
-}));
-
 type Props = {
-  payment?: Omit<Payment, 'booking'>;
+  payment?: Omit<Payment, "booking">;
   bookingId: number;
   onValidate: (payment: Payment) => void;
   onClose: () => void;
 };
 
 const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onValidate, onClose }: Props) => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const { register, handleSubmit, control, formState: { errors } } = useForm<Payment>();
   const onSubmit: SubmitHandler<Payment> = data => {
@@ -87,7 +61,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
                 views={["year", "month", "day"]}
                 format="dd/MM/yyyy"
                 slotProps={{ textField: { variant: variant } }}
-                className={classes.date}
+                sx={{ marginLeft: "4px", marginRight: "4px", width: "8em" }}
                 {...field}
                 onChange={date => field.onChange(date!)}
               />}
@@ -101,7 +75,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
               <TextField
                 label={t("description")}
                 variant={variant}
-                className={classes.description}
+                sx={{ marginLeft: "4px", marginRight: "4px" }}
                 onKeyPress={handleKeyPress}
                 error={!!errors.description}
                 helperText={errors.description?.type === "required" && t("The description is required")}
@@ -117,7 +91,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
               <TextField
                 label={t("payment method")}
                 variant={variant}
-                className={classes.method}
+                sx={{ marginLeft: "4px", marginRight: "4px", width: "10em" }}
                 select
                 error={!!errors.method}
                 helperText={errors.method?.type === "required" && t("The payment method is required")}
@@ -135,7 +109,7 @@ const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onV
               <TextField
                 label={t("amount")}
                 variant={variant}
-                className={classes.amount}
+                sx={{ marginLeft: "4px", marginRight: "4px", width: "5em" }}
                 error={!!errors.amount}
                 helperText={errors.amount?.type === "required" && t("The amount is required")}
                 onKeyPress={handleKeyPress}

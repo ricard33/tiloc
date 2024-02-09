@@ -81,7 +81,7 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
             vendor: ['react', 'react-router-dom', 'react-dom'],
             'chart.js': ['chart.js'],
             'date-fns': ['date-fns'],
-            'mui': ['@mui/icons-material', '@mui/material', "@mui/styles", "@mui/system", "@mui/x-data-grid", "@mui/x-date-pickers"]
+            'mui': ['@mui/icons-material', '@mui/material', "@mui/system", "@mui/x-data-grid", "@mui/x-date-pickers"]
             // ...renderChunks(dependencies),
           },
         },

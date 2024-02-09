@@ -1,29 +1,19 @@
-import React from 'react';
-import { makeStyles } from '@mui/styles';
+import React from "react";
 
-import { Topbar } from './components';
+import { Topbar } from "./components";
 import { Outlet } from "react-router-dom";
+import Box from "@mui/material/Box";
 
-const useStyles = makeStyles(() => ({
-  root: {
-    paddingTop: 64,
-    height: '100%'
-  },
-  content: {
-    height: '100%'
-  }
-}));
 
 const Minimal = () => {
-  const classes = useStyles();
 
   return (
-    <div className={classes.root}>
+    <Box sx={{ height: "100%" }}>
       <Topbar />
-      <main className={classes.content}>
+      <main style={{ height: "100%" }}>
         <Outlet />
       </main>
-    </div>
+    </Box>
   );
 };
 

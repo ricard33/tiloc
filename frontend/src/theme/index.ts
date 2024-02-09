@@ -1,4 +1,5 @@
-import { colors, createTheme } from "@mui/material";
+import { colors} from "@mui/material";
+import { createTheme } from "@mui/material/styles";
 import { frFR } from "@mui/x-data-grid";
 
 import palette from "./palette";

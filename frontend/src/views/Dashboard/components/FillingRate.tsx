@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import clsx from "clsx";
 import axios from "axios";
 import "chart.js/auto";
 import { Chart } from "react-chartjs-2";
-// @ts-ignore
-import { makeStyles } from "@mui/styles";
 import {
   Button,
   Card,
@@ -12,10 +9,10 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  FormControl,
   FormControlLabel,
   Radio,
-  RadioGroup,
-  FormControl,
+  RadioGroup
 } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useDispatch } from "react-redux";
@@ -30,20 +27,6 @@ import { formatISO } from "../../../common/tzUtils";
 import { Lodging } from "../../../types";
 import { colorGen } from "../../../common/colorTools";
 
-const useStyles = makeStyles(() => ({
-  root: {},
-  chartContainer: {
-    // height: 400,
-    position: "relative",
-    "& canvas": {
-      // height: "400px !important",
-    }
-
-  },
-  actions: {
-    justifyContent: "flex-end"
-  }
-}));
 
 type FillingRateData = {
   date: string,
@@ -65,7 +48,6 @@ type FillingRateProps = {
 const FillingRate: React.FC<FillingRateProps> = props => {
   const { className, ...rest } = props;
 
-  const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { data: lodgings } = useListLodgingsQuery({ shown: true, active: true });
@@ -77,7 +59,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
     startDate: addMonths(startOfMonth(subYears(today, 1)), 1),
     endDate: endOfMonth(today)
   });
-  const colorGenerator = colorGen()
+  const colorGenerator = colorGen();
 
   // console.debug(data);
 
@@ -129,7 +111,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
   return (
     <Card
       {...rest}
-      className={clsx(classes.root, className)}
+      className={className}
     >
       <CardHeader
         action={
@@ -155,7 +137,11 @@ const FillingRate: React.FC<FillingRateProps> = props => {
       />
       <Divider />
       <CardContent>
-        <div className={classes.chartContainer}>
+        <div
+          style={{
+            position: "relative",
+          }}
+        >
           {loaded &&
             <Chart
               type="bar"
@@ -282,7 +268,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
         </div>
       </CardContent>
       <Divider />
-      <CardActions className={classes.actions}>
+      <CardActions sx={{justifyContent: "flex-end"}}>
         <Button
           color="primary"
           size="small"

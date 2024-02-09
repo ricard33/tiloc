@@ -1,32 +1,11 @@
 import React from "react";
-import clsx from "clsx";
-import { makeStyles } from "@mui/styles";
-import { Button, Card, CardActions, CardContent, CardHeader, Divider, Theme, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Divider, Typography } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { useNextEventsQuery } from "../../../services/api";
 import InOutEvent from "./InOutEvent";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {},
-  content: {
-    padding: 0
-  },
-  inner: {
-    minWidth: 800
-  },
-  statusContainer: {
-    display: "flex",
-    alignItems: "center"
-  },
-  status: {
-    marginRight: theme.spacing(1)
-  },
-  actions: {
-    justifyContent: "flex-end"
-  }
-}));
 
 type Props = {
   className?: string
@@ -34,7 +13,6 @@ type Props = {
 
 const NextEvents: React.FC<Props> = props => {
   const { className, ...rest } = props;
-  const classes = useStyles();
   const { t } = useTranslation();
   const { data: events } = useNextEventsQuery(5);
 
@@ -43,7 +21,7 @@ const NextEvents: React.FC<Props> = props => {
   return (
     <Card
       {...rest}
-      className={clsx(classes.root, className)}
+      className={className}
     >
       <CardHeader
         // action={
@@ -58,7 +36,7 @@ const NextEvents: React.FC<Props> = props => {
         title={t("Next arrivals / departures")}
       />
       <Divider />
-      <CardContent className={classes.content}>
+      <CardContent sx={{padding: 0}}>
         {(events && events.length > 0) ?
           events.map(event => <InOutEvent key={event.event_type + event.id} event={event} />)
           :
@@ -66,7 +44,7 @@ const NextEvents: React.FC<Props> = props => {
         }
       </CardContent>
       <Divider />
-      <CardActions className={classes.actions}>
+      <CardActions sx={{justifyContent: "flex-end"}}>
         <Button
           component={NavLink}
           color="primary"

@@ -107,20 +107,20 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
 
   const onBack = () => {
     backOrForward(false);
-  }
+  };
 
   const onForward = () => {
     backOrForward(true);
-  }
+  };
 
   const backOrForward = (isForward: boolean) => {
     if (range.startDate && range.endDate) {
-      const duration = intervalToDuration({start: range.startDate, end: startOfDay(addDays(range.endDate, 1))});
+      const duration = intervalToDuration({ start: range.startDate, end: startOfDay(addDays(range.endDate, 1)) });
       console.log(duration);
       // const days = (differenceInCalendarDays(range.endDate, range.startDate) + 1) * (isForward ? 1 : -1);
       const op = isForward ? add : sub;
       const startDate = op(range.startDate, duration);
-      console.log(range.startDate, "-->", startDate)
+      console.log(range.startDate, "-->", startDate);
       const newRange = { startDate: startDate, endDate: endOfDay(subDays(add(startDate, duration), 1)) };
       console.log("New range:", newRange);
       setRange(newRange);
@@ -147,14 +147,16 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
   };
 
   return (
-    <ButtonGroup>
-      <Button onClick={onBack}><ArrowBackIosIcon /></Button>
-      <Button
-        aria-describedby={id}
-        startIcon={<DateRangeIcon />}
-        onClick={(event) => toggle(event.currentTarget)}
-      >{getRangeLabel(range)}</Button>
-      <Button onClick={onForward}><ArrowForwardIosIcon /></Button>
+    <>
+      <ButtonGroup>
+        <Button onClick={onBack}><ArrowBackIosIcon /></Button>
+        <Button
+          aria-describedby={id}
+          startIcon={<DateRangeIcon />}
+          onClick={(event) => toggle(event.currentTarget)}
+        >{getRangeLabel(range)}</Button>
+        <Button onClick={onForward}><ArrowForwardIosIcon /></Button>
+      </ButtonGroup>
       <Popover
         id={id}
         open={open}
@@ -171,7 +173,7 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
           locale={frLocale}
         />
       </Popover>
-    </ButtonGroup>
+    </>
   );
 };
 

@@ -1,36 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "chart.js/auto";
 import { Doughnut } from "react-chartjs-2";
-import clsx from "clsx";
-import { makeStyles } from "@mui/styles";
 import { useTheme } from "@mui/material/styles";
-import { Card, CardContent, CardHeader, Divider, IconButton, Theme } from "@mui/material";
+import { Card, CardContent, CardHeader, Divider, IconButton } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { TooltipItem } from "chart.js";
-
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    height: "100%"
-  },
-  chartContainer: {
-    position: "relative",
-    height: "300px"
-  },
-  stats: {
-    marginTop: theme.spacing(2),
-    display: "flex",
-    justifyContent: "center"
-  },
-  device: {
-    textAlign: "center",
-    padding: theme.spacing(1)
-  }
-  // deviceIcon: {
-  //   color: theme.palette.icon
-  // }
-}));
 
 type ChannelsDistributionData = {
   channel: string,
@@ -44,7 +20,6 @@ type Props = {
 const ChannelsDistribution: React.FC<Props> = props => {
   const { className, ...rest } = props;
 
-  const classes = useStyles();
   const theme = useTheme();
   const { t } = useTranslation();
   const [data, setData] = useState<ChannelsDistributionData[]>([]);
@@ -66,7 +41,8 @@ const ChannelsDistribution: React.FC<Props> = props => {
   return (
     <Card
       {...rest}
-      className={clsx(classes.root, className)}
+      className={className}
+      sx={{ height: "100%" }}
     >
       <CardHeader
         action={
@@ -78,7 +54,7 @@ const ChannelsDistribution: React.FC<Props> = props => {
       />
       <Divider />
       <CardContent>
-        <div className={classes.chartContainer}>
+        <div style={{ position: "relative", height: "300px" }}>
           <Doughnut
             data={{
               labels: data.map(e => e.channel ?? t("Not set")),
@@ -125,23 +101,6 @@ const ChannelsDistribution: React.FC<Props> = props => {
             }}
           />
         </div>
-        {/*<div className={classes.stats}>*/}
-        {/*  {devices.map(device => (*/}
-        {/*    <div*/}
-        {/*      className={classes.device}*/}
-        {/*      key={device.title}*/}
-        {/*    >*/}
-        {/*      <span className={classes.deviceIcon}>{device.icon}</span>*/}
-        {/*      <Typography variant="body1">{device.title}</Typography>*/}
-        {/*      <Typography*/}
-        {/*        style={{ color: device.color }}*/}
-        {/*        variant="h2"*/}
-        {/*      >*/}
-        {/*        {device.value}%*/}
-        {/*      </Typography>*/}
-        {/*    </div>*/}
-        {/*  ))}*/}
-        {/*</div>*/}
       </CardContent>
     </Card>
   );

@@ -8,7 +8,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Stack, Typography
+  Stack, Toolbar, Typography
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
@@ -94,7 +94,8 @@ const NotificationButton = () => {
         open={open}
         onClose={toggleDrawer(false)}
       >
-        <Stack direction={"column"} maxWidth={360} style={{ paddingTop: "48px" }}>
+        <Toolbar/>
+        <Stack direction={"column"} maxWidth={360}>
           <Stack direction={"row"} style={{margin: "10px"}} justifyContent={"space-between"}>
             <Typography variant="h5">{t("Notifications")}</Typography>
             <IconButton

@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -8,7 +7,7 @@ import {
   Refresh as RefreshIcon,
   Save as SaveIcon
 } from "@mui/icons-material";
-import { Alert, Backdrop, Button, CircularProgress, Grid, Theme, Typography } from "@mui/material";
+import { Alert, Backdrop, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import {
   useDeleteContractMutation,
   useGetOrGenerateContractMutation,
@@ -24,55 +23,14 @@ import { Contract } from "../../types";
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 
-const useStyles = makeStyles((theme: Theme) => ({
-  content: {
-    marginTop: theme.spacing(2)
-  },
-  formControl: {
-    width: "100%"
-  },
-  flexBoxAlignLeft: {
-    display: "flex",
-    alignItems: "baseline"
-    // justifyContent: "stretch"
-  },
-  flexBoxStretched: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between"
-  },
-  spacer: {
-    flexBasis: "2em"
-  },
-  button: {
-    margin: theme.spacing(1)
-  },
-  statusItem: {
-    width: "-webkit-fill-available"
-    // width: "stretch",
-    // padding: theme.spacing(1)
-    // height: "1em",
-    // marginRight: "5px"
-  },
-  deleteButton: {
-    color: "red",
-    margin: theme.spacing(1)
-  },
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: "#fff"
-  }
-}));
-
 const ContractEdit = () => {
   let { bookingId } = useParams();
-  const classes = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
   // const [loading, setLoading] = useState(true);
-  const [getOrGenerateContract, {data: contract, isLoading}] = useGetOrGenerateContractMutation();
-  const [ updateContract ] = useUpdateContractMutation();
-  const [ deleteContract ] = useDeleteContractMutation();
+  const [getOrGenerateContract, { data: contract, isLoading }] = useGetOrGenerateContractMutation();
+  const [updateContract] = useUpdateContractMutation();
+  const [deleteContract] = useDeleteContractMutation();
   const [content, setContent] = useState(contract ? contract.content : undefined);
   const { showError, showSuccess } = useAlert();
 
@@ -83,7 +41,7 @@ const ContractEdit = () => {
   // }
 
   useEffect(() => {
-    if (bookingId) getOrGenerateContract({bookingId: Number(bookingId)});
+    if (bookingId) getOrGenerateContract({ bookingId: Number(bookingId) });
   }, [bookingId, getOrGenerateContract]);
 
   useEffect(() => {
@@ -110,7 +68,7 @@ const ContractEdit = () => {
   function onDelete() {
     if (contract && contract.id)
       deleteContract(contract).then((result) => {
-        const {error} = result as any;
+        const { error } = result as any;
         if (error) {
           console.error("Error deleting contract", error);
           showError(t("Impossible to delete contract: ") + fetchErrorDecode(error));
@@ -135,14 +93,14 @@ const ContractEdit = () => {
       content: content
     };
     updateContract(submittedContract).then((result) => {
-      const {error} = result as any;
+      const { error } = result as any;
       if (error) {
         console.error("Error during contract saving", error);
         showError(t("Impossible to save contract: ") + fetchErrorDecode(error));
       } else {
         showSuccess(t("Contract saved"));
         const data = (result as any).data as Contract;
-        if(callback) callback(data);
+        if (callback) callback(data);
       }
     });
   }
@@ -152,7 +110,7 @@ const ContractEdit = () => {
 
   return (
     <Page>
-      <Backdrop className={classes.backdrop} open={isLoading}>
+      <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, color: "#fff" }} open={isLoading}>
         <CircularProgress color="inherit" />
       </Backdrop>
 
@@ -169,49 +127,49 @@ const ContractEdit = () => {
       >
         <Grid item xs={12}>
           {contract &&
-          <Typography variant="caption" display="block" gutterBottom>
-            {t("Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
-              { modified_date: formatDistanceToNow(contract.modified) })}
-          </Typography>
+            <Typography variant="caption" display="block" gutterBottom>
+              {t("Contract saved {{modified_date}}. Click on 'Regenerate' to update it.",
+                { modified_date: formatDistanceToNow(contract.modified) })}
+            </Typography>
           }
         </Grid>
         <Grid item xs={12}>
           <Suspense fallback={<div>{t("Loading...")}</div>}>
             {typeof content !== "undefined" &&
-            <RichTextEditor
-              content={content}
-              onChange={onChange}
-            />}
+              <RichTextEditor
+                content={content}
+                onChange={onChange}
+              />}
           </Suspense>
         </Grid>
         <Grid item container xs={12} justifyContent="space-between" alignItems="flex-start">
           <Grid item>
             {contract && contract.id &&
-            <Button
-              type="button"
-              className={classes.deleteButton}
-              color="secondary"
-              startIcon={<DeleteIcon />}
-              onClick={onDelete}
-            >{t("Delete")}</Button>}
+              <Button
+                type="button"
+                sx={{ color: "red", margin: 1 }}
+                color="secondary"
+                startIcon={<DeleteIcon />}
+                onClick={onDelete}
+              >{t("Delete")}</Button>}
           </Grid>
           <Grid item>
             <Button
               type="button"
-              className={classes.button}
+              sx={{ margin: 1 }}
               startIcon={<RefreshIcon />}
               onClick={regenerateContract}
             >{t("Regenerate")}</Button>
             <Button
               type="button"
-              className={classes.button}
+              sx={{ margin: 1 }}
               startIcon={<PdfIcon />}
               onClick={() => makePDF("/api/contract/" + contract!.id + "/pdf/", "contract.pdf")}
               title={t("PDF")}
             >{t("PDF")}</Button>
             <Button
               type="button"
-              className={classes.button}
+              sx={{ margin: 1 }}
               startIcon={<PdfIcon />}
               onClick={onSaveAndMakePDF}
               title={t("PDF")}
@@ -222,7 +180,7 @@ const ContractEdit = () => {
             <Button
               type="submit"
               color="primary"
-              className={classes.button}
+              sx={{ margin: 1 }}
               startIcon={<SaveIcon />}
               onClick={onSave}
             >{t("Save")}</Button>

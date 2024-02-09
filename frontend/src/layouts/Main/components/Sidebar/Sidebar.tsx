@@ -1,6 +1,5 @@
 import React from "react";
-import { makeStyles } from "@mui/styles";
-import { Drawer, Theme } from "@mui/material";
+import { Drawer, Toolbar } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import GroupIcon from "@mui/icons-material/Group";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -17,49 +16,19 @@ import { Account, AppInfo } from "../../../../types";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 import { useAppSelector } from "../../../../app/hooks";
+import Box from "@mui/material/Box";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  drawer: {
-    width: 170,
-    marginTop: 48,
-    height: "calc(100% - 48px)",
-    [theme.breakpoints.up("md")]: {
-      marginTop: 64,
-      height: "calc(100% - 64px)"
-    }
-  },
-  root: {
-    backgroundColor: theme.palette.common.white,
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-    padding: theme.spacing(1)
-  },
-  divider: {
-    margin: theme.spacing(2, 0)
-  },
-  nav: {
-    marginBottom: theme.spacing(2),
-    overflow: "scroll"
-  },
-  version: {
-    fontSize: "x-small",
-    position: "fixed",
-    bottom: "4px"
-  }
-}));
 
 type Props = {
   open: boolean;
   variant: "permanent" | "persistent" | "temporary" | undefined;
   onClose: () => void;
+  width: number;
 }
 
 
 const Sidebar: React.FC<Props> = props => {
-  const { open, variant, onClose } = props;
-
-  const classes = useStyles();
+  const { open, variant, onClose, width: drawerWidth } = props;
   const { t } = useTranslation();
   const location = useLocation();
   const locationPathname = location.pathname;
@@ -94,7 +63,7 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
         { title: t("My account"), href: "/account", icon: <AccountBoxIcon />, disabled: false },
-        { title: t("Subscription"), href: "/account/subscription", icon: <WorkspacePremiumIcon /> },
+        { title: t("Subscription"), href: "/account/subscription", icon: <WorkspacePremiumIcon /> }
         // { title: t("Prices"), href: "/account/prices", icon: <MoneyIcon /> },
       ]
     },
@@ -105,13 +74,6 @@ const Sidebar: React.FC<Props> = props => {
         { title: t("Planning"), href: "/planning", icon: <CalendarIcon /> },
         // ...(appInfo.isDebug ? [{ title: "Planning bêta", href: "/planning2", icon: <CalendarIcon /> }] : []),
         { title: t("Bookings"), href: "/bookings", icon: <ListIcon /> },
-        // {
-        //   title: t("Cleanings"),
-        //   href: "https://docs.google.com/spreadsheets/d/1ucUML5Voeydfnss2udi4XZ-Yrb6p8qRXv7VPgAgGwjw/edit?usp=sharing",
-        //   icon: <LocalLaundryServiceIcon />,
-        //   disabled: false,
-        //   external: true
-        // },
         { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon />, premium: account.trial_is_over },
         // { title: t("Reports"), href: "/reports", icon: <MovingIcon />, disabled: true, premium: true },
         // { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
@@ -131,23 +93,42 @@ const Sidebar: React.FC<Props> = props => {
   return (
     <Drawer
       anchor="left"
-      classes={{ paper: classes.drawer }}
       onClose={onClose}
       open={open}
       variant={variant}
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box" }
+      }}
     >
-      <div className={classes.root}>
+      <Toolbar />
+      <Box
+        sx={{
+          backgroundColor: "common.white",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          padding: 1
+        }}
+      >
         <SidebarNav
-          className={classes.nav}
+          sx={{ marginBottom: 2, overflow: "scroll" }}
           pages={currentMenu.pages}
           onClick={onClose}
         />
         {account.trial_is_over && <UpgradePlan />}
-        <div className={classes.version}>
+        <div
+          style={{
+            fontSize: "x-small",
+            position: "fixed",
+            bottom: "4px"
+          }}
+        >
           <div>{t("version")} {appInfo.version}</div>
           <div>{t("build on")} {appInfo.buildDate}</div>
         </div>
-      </div>
+      </Box>
     </Drawer>
   );
 };

@@ -1,7 +1,5 @@
 import React from "react";
 import { Link, Link as RouterLink } from "react-router-dom";
-import clsx from "clsx";
-import { makeStyles } from "@mui/styles";
 import {
   AppBar,
   AppBarProps,
@@ -14,7 +12,6 @@ import {
   Menu,
   MenuItem,
   Stack,
-  Theme,
   Toolbar
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -32,44 +29,18 @@ import ChatwootWidget from "../../../components/ChatwootWidget";
 import { useAppSelector } from "../../../app/hooks";
 import useWindowDimensions from "../../../common/windowDimensions";
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    boxShadow: "none"
-  },
-  flexGrow: {
-    flexGrow: 1
-  },
-  signOutButton: {
-    marginLeft: theme.spacing(1)
-  },
-  appMenu: {
-    color: "white",
-    marginRight: "20px"
-  },
-  appLogo: {
-    verticalAlign: "text-bottom"
-  },
-  appName: {
-    color: "white",
-    fontSize: "2em"
-  }
-}));
-
 export interface TopbarProps extends AppBarProps {
-  className?: string;
   onSidebarOpen: (event: React.MouseEvent) => void;
 }
 
 const Topbar: React.FC<TopbarProps> = (props) => {
-  const { className, onSidebarOpen, ...rest } = props;
-
-  const classes = useStyles();
+  const { onSidebarOpen, ...rest } = props;
 
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null);
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const account = useAppSelector(store => store.auth.account) as Account;
-  const {logout} = useAuth();
+  const { logout } = useAuth();
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
 
@@ -93,12 +64,12 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   return (
     <AppBar
       {...rest}
-      className={clsx(classes.root, className)}
+      sx={{ boxShadow: "none" }}
     >
       <Toolbar>
         <Hidden mdUp>
           <IconButton
-            className={classes.appMenu}
+            sx={{ color: "white", marginRight: "20px" }}
             onClick={onSidebarOpen}
             size="large"
           >
@@ -107,15 +78,15 @@ const Topbar: React.FC<TopbarProps> = (props) => {
         </Hidden>
         <RouterLink to="/">
           <img
-            className={classes.appLogo}
+            style={{ verticalAlign: "text-bottom" }}
             alt="Logo"
             src={LogoTiloc}
             width="110"
           />
-          {/*<span className={classes.appName}>Tiloc</span>*/}
+          {/*<span style={{color: "white", fontSize: "2em"}}>Tiloc</span>*/}
         </RouterLink>
-        <div className={classes.flexGrow} />
-        <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showHelpIcon showBubble={!isMobile}/>
+        <div style={{flexGrow: 1}} />
+        <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showHelpIcon showBubble={!isMobile} />
         <NotificationButton />
         <Avatar
           alt="Person"

@@ -9,38 +9,15 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableRow,
-  Theme
+  TableRow
 } from "@mui/material";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
-import { makeStyles } from "@mui/styles";
 import { useTranslation } from "react-i18next";
 import { FieldArrayWithId, useFieldArray } from "react-hook-form";
 import { formatCurrency } from "../../common/intlUtils";
 import { Service } from "../../types";
 import { CheckboxElement, TextFieldElement } from "react-hook-form-mui";
 
-
-const useStyles = makeStyles((theme: Theme) => ({
-  table: {
-    "& .MuiTableCell-sizeSmall": {
-      padding: "6px 2px 6px 2px"
-    },
-    fontSize: "small"
-  },
-  cell: {},
-  optionPriceInput: {
-    fontSize: "small",
-    width: "5em"
-  },
-  formControl: {
-    width: "100%"
-  },
-  deleteButton: {
-    color: "red",
-    margin: theme.spacing(1)
-  }
-}));
 
 type OptionsListProps = {
   form: any;
@@ -55,7 +32,6 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
   duration,
   variant
 }: OptionsListProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const { register, control, watch } = form;
   const optionsFieldArray = useFieldArray({
@@ -90,7 +66,10 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
     <>
       <Paper>
 
-        <Table className={classes.table} aria-label="simple table">
+        <Table
+          sx={{ "& .MuiTableCell-sizeSmall": { padding: "6px 2px 6px 2px" }, fontSize: "small" }}
+          aria-label="simple table"
+        >
           <TableBody>
             {
               fields.map((option: FieldArrayWithId<Service, never, string>, index: number) => (
@@ -123,7 +102,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                         <TextFieldElement
                           control={control}
                           name={`options.${index}.unit_price`}
-                          className={classes.optionPriceInput}
+                          sx={{ fontSize: "small", width: "5em" }}
                           type={"number"}
                           required
                           validation={{
@@ -159,7 +138,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        className={classes.deleteButton}
+                        sx={{ color: "red", margin: 1 }}
                         onClick={() => remove(index)}
                         size="large"
                       >
@@ -173,7 +152,7 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
           </TableBody>
         </Table>
       </Paper>
-      <FormControl className={classes.formControl} variant={variant} sx={{ marginTop: 2 }}>
+      <FormControl variant={variant} sx={{ marginTop: 2, width: "100%" }}>
         <InputLabel htmlFor="booking-options">{t("Options")}</InputLabel>
         <Select
           inputProps={{

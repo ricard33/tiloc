@@ -1,35 +1,16 @@
 import React, { useState } from "react";
-import { makeStyles } from "@mui/styles";
-import { IconButton, InputAdornment, TextField, Theme } from "@mui/material";
+import { IconButton, InputAdornment, TextField, TextFieldProps } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import clsx from "clsx";
 
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    // borderRadius: "4px",
-    // alignItems: "center",
-    // padding: theme.spacing(1),
-    // display: "flex",
-    // flexBasis: 420,
-    // flexGrow: 1,
-    minWidth: "250px"
-  },
-}));
-
-type Props = {
-  className?: string,
+type Props = Omit<TextFieldProps, "onChange"> & {
   onChange: (text: string) => void,
-  placeholder?: string,
-  style?: object
-
 };
 
 const SearchInput: React.FC<Props> = props => {
-  const { className, onChange, style, placeholder } = props;
+  const { onChange, style, placeholder, ...rest} = props;
   const [value, setValue] = useState("");
-  const classes = useStyles();
 
   const handleOnChange = (newValue: string) => {
     setValue(newValue);
@@ -48,9 +29,8 @@ const SearchInput: React.FC<Props> = props => {
   return (
     <TextField
       id="input-with-icon-textfield"
-      className={clsx(classes.root, className)}
-      style={style}
-      placeholder={placeholder}
+      {...rest}
+      style={{ minWidth: "250px", ...style }}
       value={value}
       onChange={event => handleOnChange(event.target.value)}
       InputProps={{
