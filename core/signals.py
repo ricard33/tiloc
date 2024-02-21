@@ -137,7 +137,7 @@ def on_comment_saved(sender, instance: models.Comment, created: bool, update_fie
             "comment-modified",
             users,
             _("Comment has been modified on booking %(booking)s") % {"booking": instance.booking},
-            "/bookings/%d" % instance.id,
+            "/bookings/%d" % instance.booking.id,
             context={"comment": instance},
         )
 
