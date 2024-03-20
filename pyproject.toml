@@ -83,7 +83,7 @@ patchwork = {git = "https://github.com/ricard33/patchwork.git", rev = "fabric3"}
 pep8 = "^1.7.1"
 pytest = "^7.4.3"
 pytest-django = "^4.7.0"
-black = "^23.11.0"
+black = "^24.3.0"
 pytest-cov = "^4.0.0"
 setuptools = "^69.0.2"
 poetry-plugin-export = "^1.6.0"
