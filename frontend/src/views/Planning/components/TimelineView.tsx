@@ -27,7 +27,7 @@ import { darken } from "@mui/system";
 import EuroIcon from "@mui/icons-material/Euro";
 import { useTranslation } from "react-i18next";
 import BookingTooltip from "../../../components/BookingTooltip";
-import { Button, Popover, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
+import { Button, Divider, Popover, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import useWindowDimensions from "../../../common/windowDimensions";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -39,6 +39,7 @@ import { useDebounceEffect } from "../../../common/useDebounceEffets";
 import CommentIcon from "@mui/icons-material/Comment";
 import Comments from "../../../components/Comments";
 import comments from "../../../components/Comments";
+import { formatCurrency } from "../../../common/intlUtils";
 
 
 const PaymentsTooltip = styled(({ className, children, ...props }: TooltipProps) => (
@@ -421,13 +422,24 @@ export const TimelineView: React.FC<Props> = props => {
             </Tooltip> : ""}
           {booking.price && booking.price > 0 ?
             <PaymentsTooltip
-              title={booking.payments.length > 0 ? <Grid2 container width={375}>{booking.payments.map(p =>
-                <React.Fragment key={p.id}>
-                  <Grid2 xs={3}>{formatDate(p.date, "P")}</Grid2>
-                  <Grid2 xs={3}>{p.description}</Grid2>
-                  <Grid2 xs={3}>{paymentLabels[p.method]}</Grid2>
-                  <Grid2 xs={3}>{DecimalPrecision.round(Number(p.amount))} &euro;</Grid2>
-                </React.Fragment>)}</Grid2> : t("No payment")}
+              title={<Grid2 container width={375}>
+                <Grid2
+                  xs={6}
+                >{t("Total: {{amount}}", { amount: formatCurrency(booking.price_with_options_and_taxes) })}</Grid2>
+                <Grid2 xs={6}>{t("Left to pay: {{amount}}", { amount: formatCurrency(booking.left_to_pay) })}</Grid2>
+                <Grid2 xs={12}><Divider variant="middle" sx={{ borderColor: "white", marginLeft: 0 }} /></Grid2>
+                {booking.payments.length > 0 ?
+                  booking.payments.map(p =>
+                    <React.Fragment key={p.id}>
+                      <Grid2 xs={3}>{formatDate(p.date, "P")}</Grid2>
+                      <Grid2 xs={3}>{p.description}</Grid2>
+                      <Grid2 xs={3}>{paymentLabels[p.method]}</Grid2>
+                      <Grid2 xs={3}>{DecimalPrecision.round(Number(p.amount))} &euro;</Grid2>
+                    </React.Fragment>)
+                  :
+                  <Grid2 xs={12}>{t("No payment")}</Grid2>
+                }
+              </Grid2>}
             >
               <EuroIcon
                 className={clsx("item-icon", booking.left_to_pay > 0 ? "partially-paid" : "fully-paid")}
@@ -566,7 +578,7 @@ export const TimelineView: React.FC<Props> = props => {
       {/*  <div>nextScroll: {nextScrollUpdate ?? "none"}</div>*/}
       {/*</pre>*/}
       <Popover
-        id={commentOpen ? 'comment-popover' : undefined}
+        id={commentOpen ? "comment-popover" : undefined}
         open={commentOpen}
         anchorEl={commentAnchorEl?.element}
         onClose={() => setCommentAnchorEl(null)}
