@@ -391,6 +391,7 @@ $primary-red: #f45b69;
     line-height: 30px;
     left: 10px;
     //bottom: 4px;
+    text-align: left;
 
     &:hover {
       border-left-width: 3px;
@@ -398,26 +399,33 @@ $primary-red: #f45b69;
       border-color: orange;
     }
 
-    .item-title {
-      display: inline;
-      //overflow: auto;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: text-bottom;
-      margin-left: 5px;
-      margin-right: 10px;
-      position: sticky;
-      left: calc(var(--header-width) + 4px);
+    .item-content {
+      display: flex;
+      flex: 1;
+        overflow: clip;
+
+      .item-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: text-bottom;
+        margin-left: 5px;
+        margin-right: 10px;
+        position: sticky;
+        left: calc(var(--header-width) + 4px);
+      }
     }
 
     .item-icon {
       color: black;
       font-size: 1em;
-      position: absolute;
-      right: 0;
-      top: 0;
       border-left: 1px solid black;
       height: 100%;
+    }
+
+    .comment-icon {
+      color: black;
+      font-size: 1.5em;
+      //height: 100%;
     }
 
 

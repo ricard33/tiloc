@@ -27,7 +27,7 @@ import { darken } from "@mui/system";
 import EuroIcon from "@mui/icons-material/Euro";
 import { useTranslation } from "react-i18next";
 import BookingTooltip from "../../../components/BookingTooltip";
-import { Button, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
+import { Button, Popover, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import useWindowDimensions from "../../../common/windowDimensions";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -36,10 +36,13 @@ import Grid2 from "@mui/material/Unstable_Grid2";
 import { DecimalPrecision } from "../../../common/priceUtils";
 import { styled } from "@mui/material/styles";
 import { useDebounceEffect } from "../../../common/useDebounceEffets";
+import CommentIcon from "@mui/icons-material/Comment";
+import Comments from "../../../components/Comments";
+import comments from "../../../components/Comments";
 
 
 const PaymentsTooltip = styled(({ className, children, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }}  children={children}/>
+  <Tooltip {...props} classes={{ popper: className }} children={children} />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 375
@@ -129,6 +132,7 @@ export const TimelineView: React.FC<Props> = props => {
   const [selectStart, setSelectStart] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const [selectionEnd, setSelectionEnd] = useState<{ lodging: Lodging, date: Date } | undefined>(undefined);
   const ref = useRef<HTMLDivElement>(null);
+  const [commentAnchorEl, setCommentAnchorEl] = useState<{ booking: Booking, element: HTMLDivElement } | null>(null);
   const heightStyle = {
     height: `${dayHeight}px`,
     minHeight: `${dayHeight}px`,
@@ -175,7 +179,7 @@ export const TimelineView: React.FC<Props> = props => {
   }
 
   useEffect(() => {
-    if(fixed) {
+    if (fixed) {
       setRange({ startDate: visibleBeginDate!, endDate: visibleEndDate! });
       const rangeInDays = differenceInCalendarDays(visibleEndDate!, visibleBeginDate!) + 1;
       setDayWidth(visibleWidth / rangeInDays);
@@ -193,7 +197,7 @@ export const TimelineView: React.FC<Props> = props => {
 
   useDebounceEffect(() => {
     setVisibleWidth(dimensions.width - (fixed ? collapsed ? 30 : 100 : 0));
-  }, 300, [dimensions.width, collapsed, fixed])
+  }, 300, [dimensions.width, collapsed, fixed]);
 
   useEffect(() => {
     if (visibleWidth > 0) {
@@ -398,7 +402,23 @@ export const TimelineView: React.FC<Props> = props => {
               }}
             />
           }
-          <div className="item-title">{guest_name}</div>
+          <div className="item-content">
+            {/*<div style={{width: 0}}></div>*/}
+            <div className="item-title">{guest_name}</div>
+          </div>
+          {booking.comments && booking.comments.length > 0 ?
+            <Tooltip
+              title={<Comments booking={booking} readonly />}
+              onClick={(e) => {
+                setCommentAnchorEl({ booking, element: e.currentTarget });
+                e.stopPropagation();
+              }}
+            >
+              <CommentIcon
+                className={clsx("item-icdon", "comment-icon")}
+                style={{ height: `100%` }}
+              />
+            </Tooltip> : ""}
           {booking.price && booking.price > 0 ?
             <PaymentsTooltip
               title={booking.payments.length > 0 ? <Grid2 container width={375}>{booking.payments.map(p =>
@@ -418,6 +438,8 @@ export const TimelineView: React.FC<Props> = props => {
       </BookingTooltip>
     );
   }
+
+  const commentOpen = Boolean(commentAnchorEl);
 
   return (
     <div className="timeline-view">
@@ -464,7 +486,7 @@ export const TimelineView: React.FC<Props> = props => {
               )}
             </tr>
             <tr className="third-tr">
-              <th className={clsx("lodging-name-col", { collapsed: collapsed })}  />
+              <th className={clsx("lodging-name-col", { collapsed: collapsed })} />
               {getDays(range).map((d) => {
                 return (
                   <th
@@ -543,6 +565,18 @@ export const TimelineView: React.FC<Props> = props => {
       {/*  <div>touch?    : {touchInProgress ? "true" : "false"}</div>*/}
       {/*  <div>nextScroll: {nextScrollUpdate ?? "none"}</div>*/}
       {/*</pre>*/}
+      <Popover
+        id={commentOpen ? 'comment-popover' : undefined}
+        open={commentOpen}
+        anchorEl={commentAnchorEl?.element}
+        onClose={() => setCommentAnchorEl(null)}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left"
+        }}
+      >
+        {commentAnchorEl && <Comments booking={commentAnchorEl?.booking} />}
+      </Popover>
     </div>
   );
 };

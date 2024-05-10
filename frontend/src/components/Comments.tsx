@@ -106,7 +106,7 @@ function Comments(props: Props) {
   }
 
   return (
-    <div>
+    <div onClick={(e) => e.stopPropagation()}>
       {
         canViewComment && comments && comments.map((comment) => (
           <Paper key={comment.id} sx={{ display: "flex", marginBottom: "4px", padding: "4px" }}>
