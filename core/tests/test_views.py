@@ -197,7 +197,8 @@ class FillingRateTestCase(APITestCase):
         obj = response.data
         self.assertEqual(0, len(obj), obj)
 
-    def test_multiple_lodgings_are_filtered(self):
+    def test_not_owned_lodgings_are_filtered(self):
+        """Use can see only lodgings he is associated with."""
         lodging = factories.LodgingFactory()
         factories.BookingFactory(
             lodgings=lodging,
@@ -208,6 +209,27 @@ class FillingRateTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj = response.data
         self.assertEqual(0, len(obj), obj)
+
+    def test_block_bookings(self):
+        lodging1 = factories.LodgingFactory()
+        lodging2 = factories.LodgingFactory()
+        self.user.lodgings.add(lodging1)
+        self.user.lodgings.add(lodging2)
+        factories.BookingFactory(
+            lodgings=[lodging1, lodging2],
+            begin_date=arrow.get("2020-08-02").date(),
+            end_date=arrow.get("2020-08-18").date(),
+            duration=16,
+            price=2000,
+        )
+        response = self.client.get("/stats/filling_rate/2020-01-01/2020-09-30/", **self.header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = response.data
+        self.assertEqual(9, len(obj), obj)
+        self.assertEqual(2000, obj[7]['turnover'], obj[7])
+        self.assertEqual(32, obj[7]['days'], obj[7])
+        self.assertEqual(1000, obj[7][str(lodging1.id)]['turnover'], obj[7])
+        self.assertEqual(1000, obj[7][str(lodging2.id)]['turnover'], obj[7])
 
 
 class ChannelsDistributionTestCase(APITestCase):
