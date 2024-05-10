@@ -195,7 +195,7 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
                 <MonetizationOnOutlinedIcon
                   style={{ marginRight: "10px" }}
                   fontSize="small"
-                />&nbsp;{DecimalPrecision.round(booking.price_with_options_and_taxes)}&nbsp;€
+                />&nbsp;{DecimalPrecision.round(booking.price_with_options)}&nbsp;€
               </StyledDiv>
             </Tooltip>
             <StyledDiv title={t("Tourist tax")}>
