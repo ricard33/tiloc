@@ -259,7 +259,7 @@ class Migration(migrations.Migration):
                 ('method', models.CharField(choices=[('cash', 'Cash'), ('bank_card', 'Bank card'), ('check', 'Check'), ('transfer', 'Transfer'), ('paypal', 'PayPal'), ('vouchers', 'Holiday vouchers'), ('other', 'Other')], max_length=30, verbose_name='Payment method')),
                 ('date', models.DateField(verbose_name='Payment date')),
                 ('checked', models.BooleanField(default=False, help_text='Used for account reconciliation', verbose_name='Checked')),
-                ('booking', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.booking')),
+                ('booking', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payment_set', to='core.booking')),
             ],
             options={
                 'ordering': ['date'],

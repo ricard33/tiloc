@@ -452,9 +452,9 @@ class BookingStatus(models.TextChoices):
 
 
 # ignored from statistics
-status_no_stats = map(lambda x: x.value, [BookingStatus.NotAvailable])
+status_no_stats = list(map(lambda x: x.value, [BookingStatus.NotAvailable]))
 # booking is finalized and considered as real
-status_finalized = map(lambda x: x.value, [BookingStatus.Paid, BookingStatus.External])
+status_finalized = list(map(lambda x: x.value, [BookingStatus.Paid, BookingStatus.External]))
 
 
 class BookingChannel(models.Model):
@@ -856,7 +856,7 @@ class Payment(models.Model):
         HOLIDAY_VOUCHERS = "vouchers", _("Holiday vouchers")
         OTHER = "other", _("Other")
 
-    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="payment_set")
     description = models.CharField(_("description"), max_length=255)
     amount = models.DecimalField(_("amount"), max_digits=20, decimal_places=2)
     method = models.CharField(_("Payment method"), max_length=30, choices=PaymentMethod.choices)

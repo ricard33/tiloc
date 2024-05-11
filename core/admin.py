@@ -414,6 +414,8 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "cancelled",
         "deleted",
         "account",
+        "created",
+        "modified",
     )
     list_filter = (
         "lodgings",
@@ -422,6 +424,9 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "source",
         "cancelled",
         "deleted",
+        "payment_set__method",
+        "created",
+        "modified",
     )
     search_fields = ("guest_name",)
     history_list_display = (
