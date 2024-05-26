@@ -125,7 +125,27 @@ const Sidebar: React.FC<Props> = props => {
             bottom: "4px"
           }}
         >
-          <div>{t("version")} {appInfo.version}</div>
+
+          <div>{t("version")} {appInfo.frontendVersion !== appInfo.version ?
+            <>
+              <Box
+                sx={{
+                  display: "inline",
+                  textDecoration: "line-through",
+                  color: "magenta"
+                }}
+              >{appInfo.frontendVersion}</Box>
+              &nbsp;
+              <Box
+                sx={{
+                  display: "inline",
+                  color: "green"
+                }}
+              >{appInfo.version}</Box>
+            </>
+            :
+            <Box sx={{ display: "inline" }}>{appInfo.frontendVersion}</Box>
+          }</div>
           <div>{t("build on")} {appInfo.buildDate}</div>
         </div>
       </Box>
