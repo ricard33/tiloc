@@ -38,7 +38,6 @@ import { styled } from "@mui/material/styles";
 import { useDebounceEffect } from "../../../common/useDebounceEffets";
 import CommentIcon from "@mui/icons-material/Comment";
 import Comments from "../../../components/Comments";
-import comments from "../../../components/Comments";
 import { formatCurrency } from "../../../common/intlUtils";
 
 

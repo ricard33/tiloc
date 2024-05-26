@@ -402,7 +402,9 @@ $primary-red: #f45b69;
     .item-content {
       display: flex;
       flex: 1;
-        overflow: clip;
+      overflow: hidden;
+      overflow: clip;
+      width: 10px; /* fix for Firefox */
 
       .item-title {
         overflow: hidden;
