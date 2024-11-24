@@ -112,6 +112,7 @@ class OrderedModelMixin:
 @api_view()
 @permission_classes([AllowAny])
 def info_view(request, *args, **kwargs):
+    request.session.modified = True
     return Response(
         {
             "version": __version__,
