@@ -31,7 +31,9 @@ function SignIn() {
   let location = useLocation();
   let { from } = location.state || { from: { pathname: "/" } };
 
-  const formContext = useForm<LoginData>();
+  const formContext = useForm<LoginData>({
+    defaultValues: {keep_connected: true}
+  });
   const { control, setValue } = formContext;
   const { isDirty, errors } = useFormState({ control });
 
