@@ -27,7 +27,7 @@ const Planning = () => {
 
   const [settingsOpened, setSettingsOpened] = useState<boolean>(false);
   const [settings, setSettings] = useState(loadPlanningSettings());
-  const [view, setView] = useState<string>(searchParams.get("view") ?? "timeline");
+  const [view, setView] = useState<string|null>(searchParams.get("view") ?? localStorage.getItem("planning.view"));
   // const scrollingTimeline = settings.display === "timeline";
   const scrollingTimeline = view === "timeline";
 
@@ -53,7 +53,7 @@ const Planning = () => {
     // refetchOnMountOrArgChange: 20,
     refetchOnReconnect: true
   });
-  const { data: lodgings } = useListLodgingsQuery({ shown: true });
+  const { data: lodgings, isLoading: isLoadingLodgings } = useListLodgingsQuery({ shown: true });
   const bookingStatuses = getBookingStatuses();
   const navigate = useNavigate();
   const [showLegend, setShowLegend] = useState(false);
@@ -64,6 +64,11 @@ const Planning = () => {
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
+
+  useEffect(() => {
+    if(view === null && !isLoadingLodgings && lodgings)
+      setView(lodgings.length > 3 ? "timeline" : "annual");
+  }, [isLoadingLodgings, lodgings, view]);
 
   useEffect(() => {
     // console.log(performance.now().toFixed(2), "fetching", IsFetchingBooking);
@@ -111,6 +116,7 @@ const Planning = () => {
       setView(viewName);
       searchParams.set("view", viewName);
       setSearchParams(searchParams, { replace: true });
+      localStorage.setItem("planning.view", viewName);
     }
   }, [searchParams, setSearchParams]);
 
