@@ -69,6 +69,7 @@ urlpatterns = [
 
     path(r"calendar/<uuid:uid>/", views.export_calendar, name="calendar_sync"),
     path(r"calendar/<uuid:uid>.ics", views.export_calendar, name="calendar_sync"),
+    path(r"calendar/", views.export_calendar_for_lodgings_list, name="calendar_sync"),
     # path(r'full_planning/', views.export_full_planning),
     path(r"stats/filling_rate/", views.filling_rate),
     path(r"stats/filling_rate/<str:begin>/<str:end>/", views.filling_rate),

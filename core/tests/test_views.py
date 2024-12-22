@@ -42,12 +42,30 @@ class ExportCalendarTestCase(TestCase):
         self.assertTrue(self.lodging.account.is_free_plan)
         r = self.client.get("/calendar/%s/" % self.lodging.uid)
         self.assertEqual(r.status_code, 403)
+        r = self.client.get("/calendar/?l=%s" % self.lodging.uid)
+        self.assertEqual(r.status_code, 403)
 
     def test_secondary_export_url(self):
         factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")
         r = self.client.get("/calendar/%s.ics" % self.lodging.uid)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["content-type"], "text/calendar")
+
+    def test_parametrized_export_url(self):
+        factories.BookingFactory(lodgings=self.lodging)
+        r = self.client.get("/calendar/?l=%s" % self.lodging.uid)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r["content-type"], "text/calendar")
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 1)
+
+        lodging2 = factories.LodgingFactory.create()
+        factories.BookingFactory(lodgings=lodging2)
+        r = self.client.get("/calendar/?l=%s&l=%s" % (self.lodging.uid, lodging2.uid))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r["content-type"], "text/calendar")
+        c = Calendar(r.content.decode())
+        self.assertEqual(len(c.events), 2)
 
     def test_event_uid_are_reliable(self):
         factories.BookingFactory(lodgings=self.lodging, guest_name="Cédric")

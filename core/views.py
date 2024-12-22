@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Q
-from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.utils import timezone
@@ -85,7 +85,7 @@ def loggly_proxy(request, path):
 def export_calendar(request, uid):
     lodging = get_object_or_404(models.Lodging, uid=uid)
     if lodging.account.is_free_plan:
-        logger.warning("Calender request for a FREE account [%s]. Request rejected.")
+        logger.warning("Calender request for a FREE account [%s]. Request rejected.", lodging.account)
         return HttpResponseForbidden("No calendar export for FREE account")
     source = request.GET.get("s")
     qs = lodging.booking_set.filter(end_date__gte=timezone.now(), cancelled=False, deleted=False)
@@ -112,6 +112,34 @@ def export_calendar(request, uid):
     response["Content-Disposition"] = 'attachment; filename="{}"'.format("%s.ics" % uid)
     return response
 
+@never_cache
+def export_calendar_for_lodgings_list(request):
+    uids = request.GET.getlist("l")
+    if not uids:
+        return HttpResponseBadRequest("Lodging list is empty")
+    for uid in uids:
+        lodging = get_object_or_404(models.Lodging, uid=uid)
+        if lodging.account.is_free_plan:
+            logger.warning("Calender request for a FREE account [%s]. Request rejected.", lodging.account)
+            return HttpResponseForbidden("No calendar export for FREE account")
+
+    qs = models.Booking.objects.filter(lodgings__uid__in=uids, end_date__gte=timezone.now(), cancelled=False,
+                                       deleted=False)
+    lodging_names = models.Lodging.objects.filter(uid__in=uids).values_list("name", flat=True)
+    logger.info("Full calendar requested for lodging [%s]", ', '.join(lodging_names))
+
+    c = Calendar(creator="-//Ti'Gecko//Location")
+    for booking in qs.order_by("begin_date", "lodgings__rank"):
+        e = Event()
+        e.uid = str(booking.uid)
+        e.summary = booking.guest_name.split()[0]  # only first word (= first name)
+        e.begin = booking.begin_date
+        e.end = arrow.get(booking.end_date).date()
+        e.make_all_day()
+        c.events.append(e)
+    response = HttpResponse(c.serialize() + "\n", content_type="text/calendar")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format("planning.ics")
+    return response
 
 @never_cache
 @transaction.atomic
@@ -128,8 +156,8 @@ def export_full_planning(request):
     #         r = HttpResponse(status=401)
     #         r['WWW-Authenticate'] = 'Basic realm="Need authentication"'
     #         return r
-    if request.user.account.is_free_plan:
-        logger.warning("Calender request for a FREE account [%s]. Request rejected.")
+    if request.user.is_anonymous or request.user.account.is_free_plan:
+        logger.warning("Calender request for a FREE account [%s]. Request rejected.", request.user.account)
         return HttpResponseForbidden("No calendar export for FREE account")
     qs = models.Booking.objects.for_user(request.user).filter(cancelled=False, deleted=False)
     logger.info("Full planning requested")
