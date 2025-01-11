@@ -31,6 +31,7 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
         c = Calendar(ical_content)
     else:
         # Some OTA (like Booking) return empty string for empty calendar
+        logger.info("Receiving empty ical content.")
         c = Calendar()
     event_uids = []
     for event in c.events:
