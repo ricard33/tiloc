@@ -11,7 +11,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
+  ListSubheader, Skeleton,
   Stack,
   Typography,
   Unstable_Grid2 as Grid2
@@ -426,23 +426,23 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
         {/*    />*/}
         {/*  </HelpTooltip>*/}
         {/*</Grid2>*/}
-        {/*<Grid2 xs={12}>*/}
-        {/*  {*/}
-        {/*    templates ?*/}
-        {/*      <SelectElement*/}
-        {/*        label={t("Contract template")}*/}
-        {/*        name="contract_template"*/}
-        {/*        options={templates.map(l => {*/}
-        {/*          return { id: l.id, label: l.name };*/}
-        {/*        })}*/}
-        {/*        fullWidth*/}
-        {/*        style={{ minWidth: "300px" }}*/}
-        {/*        defaultValue={templates[0].id}*/}
-        {/*      />*/}
-        {/*      :*/}
-        {/*      <Skeleton variant="rectangular" width={210} height={24} />*/}
-        {/*  }*/}
-        {/*</Grid2>*/}
+        <Grid2 xs={12}>
+          {
+            templates ?
+              <SelectElement
+                label={t("Contract template")}
+                name="contract_template"
+                options={templates.map(l => {
+                  return { id: l.id, label: l.name };
+                })}
+                fullWidth
+                style={{ minWidth: "300px" }}
+                defaultValue={templates[0].id}
+              />
+              :
+              <Skeleton variant="rectangular" width={210} height={24} />
+          }
+        </Grid2>
 
         {/*<Grid2 xs={12}>*/}
         {/*  <Typography variant="h6">{t("Lodging description (annexed to contracts)")}</Typography>*/}

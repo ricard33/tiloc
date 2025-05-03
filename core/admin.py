@@ -37,7 +37,7 @@ from simple_history.admin import SimpleHistoryAdmin
 import notifier.admin
 import notifier.models
 from core import models
-from core.imp_exp_resources import BookingResource
+from core.imp_exp_resources import BookingResource, CommentResource, UserResource
 from core.sync import retrieve_and_synchronize_bookings
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -188,7 +188,7 @@ class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 
 
 @admin.register(models.User, site=site)
-class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+class UserAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     add_form_template = "admin/auth/user/add_form.html"
     change_form_template = 'loginas/change_form.html'
     change_user_password_template = None
@@ -235,6 +235,7 @@ class UserAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
         "lodgings",
         "user_permissions",
     )
+    resource_class = UserResource
 
     def get_fieldsets(self, request, obj=None):
         if not obj:
@@ -590,6 +591,12 @@ class PaymentAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     ordering = ("-date",)
 
 
+class CommentAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
+    list_display = ("id", "booking", "content", "created_by", "created_on", "modified")
+    ordering = ("created_on",)
+    resource_class = CommentResource
+
+
 class ServiceAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = (
         "reference",
@@ -680,6 +687,7 @@ site.register(models.SeasonalVariation, SeasonalVariationAdmin)
 site.register(models.Contract, ContractAdmin)
 site.register(models.ContractTemplate, ContractTemplateAdmin)
 site.register(models.Payment, PaymentAdmin)
+site.register(models.Comment, CommentAdmin)
 
 site.register([Config], ConstanceAdmin)
 site.register(Group, GroupAdmin)

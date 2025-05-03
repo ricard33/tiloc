@@ -9,10 +9,11 @@ import urllib3
 from django.conf import settings
 from django.db import transaction
 from django_cron import CronJobBase, Schedule
+from import_export.resources import modelresource_factory
 from requests import HTTPError
 
 from core import models
-from core.imp_exp_resources import BookingResource
+from core.imp_exp_resources import BookingResource, CommentResource, UserResource
 from core.sync import retrieve_and_synchronize_bookings
 
 logger = logging.getLogger("cron")
@@ -69,18 +70,37 @@ class ExportBookingsJob(CronJobBase):
     PURGE_OLDER_THAN_DAYS = 30
 
     @staticmethod
-    def make_filename(date):
-        return "bookings-" + date.strftime("%Y-%m-%d_%H-%M-%S") + ".xlsx"
+    def make_filename(model_name, date):
+        return model_name + "-" + date.strftime("%Y-%m-%d_%H-%M-%S") + ".xlsx"
 
     def do(self):
-        dataset = BookingResource().export()
-        filename = os.path.join(settings.BACKUP_DIR, self.make_filename(arrow.utcnow()))
+        for Resource in [
+            BookingResource,
+            modelresource_factory(models.BookingChannel),
+            CommentResource,
+            modelresource_factory(models.ContractTemplate),
+            modelresource_factory(models.Lodging),
+            modelresource_factory(models.Payment),
+            modelresource_factory(models.Service),
+            UserResource,
+        ]:
+            self.export_ressource(Resource)
+
+    def export_ressource(self, Resource):
+        model_name = Resource._meta.model.__name__
+        dataset = Resource().export()
+        filename = os.path.join(settings.BACKUP_DIR, self.make_filename(model_name, arrow.utcnow()))
         with open(filename, "wb") as f:
-            f.write(dataset.xlsx)
+            try:
+                f.write(dataset.xlsx)
+            except Exception:
+                logger.exception("Exception during export")
+
 
         purge_date = arrow.utcnow().shift(days=-self.PURGE_OLDER_THAN_DAYS)
-        max_filename = self.make_filename(purge_date)
+        max_filename = self.make_filename(model_name, purge_date)
         for filename in os.listdir(settings.BACKUP_DIR):
-            fullpath = os.path.join(settings.BACKUP_DIR, filename)
-            if os.path.isfile(fullpath) and filename < max_filename:
-                os.remove(fullpath)
+            if filename.startswith(model_name + "-"):
+                fullpath = os.path.join(settings.BACKUP_DIR, filename)
+                if os.path.isfile(fullpath) and filename < max_filename:
+                    os.remove(fullpath)
