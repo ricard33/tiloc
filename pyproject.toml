@@ -28,6 +28,7 @@ profile = "black"
 line_length = 120
 
 [tool.poetry]
+package-mode = false
 name = "tiloc"
 version = "0.1.0"
 description = ""
