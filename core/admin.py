@@ -37,7 +37,7 @@ from simple_history.admin import SimpleHistoryAdmin
 import notifier.admin
 import notifier.models
 from core import models
-from core.imp_exp_resources import BookingResource, CommentResource, UserResource
+from core.imp_exp_resources import BookingForInvoiceResource, BookingResource, CommentResource, UserResource
 from core.sync import retrieve_and_synchronize_bookings
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -226,7 +226,7 @@ class UserAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
-    list_display = ("email", "first_name", "last_name", "is_staff", "verified", "account")
+    list_display = ("email", "first_name", "last_name", "is_active", "is_staff", "verified", "account")
     list_filter = ("is_staff", "is_superuser", "is_active", "verified", "groups")
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
@@ -392,6 +392,10 @@ class CommentInlineAdmin(RestrictedInlineModelAdminMixIn, TabularInline):
     ordering = ("created_on",)
 
 
+class OptionsInlineAdmin(RestrictedInlineModelAdminMixIn, TabularInline):
+    model = models.Booking.options.through
+
+
 class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
     list_display = (
         "id",
@@ -436,8 +440,8 @@ class BookingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
         "deleted",
     )
     ordering = ("-begin_date",)
-    resource_class = BookingResource
-    inlines = [PaymentInlineAdmin, CommentInlineAdmin]
+    resource_classes = [BookingResource, BookingForInvoiceResource]
+    inlines = [PaymentInlineAdmin, CommentInlineAdmin, OptionsInlineAdmin]
 
     def source_uid_(self, obj: models.Booking):
         return obj.source_uid and "%s..." % obj.source_uid[0:5]
