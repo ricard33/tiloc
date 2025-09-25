@@ -112,6 +112,7 @@ def export_calendar(request, uid):
     response["Content-Disposition"] = 'attachment; filename="{}"'.format("%s.ics" % uid)
     return response
 
+
 @never_cache
 def export_calendar_for_lodgings_list(request):
     uids = request.GET.getlist("l")
@@ -140,6 +141,7 @@ def export_calendar_for_lodgings_list(request):
     response = HttpResponse(c.serialize() + "\n", content_type="text/calendar")
     response["Content-Disposition"] = 'attachment; filename="{}"'.format("planning.ics")
     return response
+
 
 @never_cache
 @transaction.atomic

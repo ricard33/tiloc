@@ -1,15 +1,15 @@
 __all__ = ["UserResource", "BookingResource", "BookingForInvoiceResource", "CommentResource"]
 
-from django.utils.formats import date_format
-from import_export import fields, resources
-from import_export.widgets import DateTimeWidget, ForeignKeyWidget, ManyToManyWidget
 from django.contrib.auth.models import Group
+from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
+from import_export import fields, resources
+from import_export.widgets import ForeignKeyWidget, ManyToManyWidget
 
 from core import models
 
-
 EXPORT_DATE_FORMAT = "d/m/Y"
+
 
 class UserResource(resources.ModelResource):
     account = fields.Field(column_name="account", attribute="account", widget=ForeignKeyWidget(models.Account, "name"))

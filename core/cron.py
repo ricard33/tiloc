@@ -96,7 +96,6 @@ class ExportBookingsJob(CronJobBase):
             except Exception:
                 logger.exception("Exception during export")
 
-
         purge_date = arrow.utcnow().shift(days=-self.PURGE_OLDER_THAN_DAYS)
         max_filename = self.make_filename(model_name, purge_date)
         for filename in os.listdir(settings.BACKUP_DIR):
