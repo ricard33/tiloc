@@ -194,7 +194,11 @@ class BookingForInvoiceResource(resources.ModelResource):
         return booking.price_with_options
 
     def dehydrate_paiements(self, booking):
-        return '\n'.join(map(lambda b: _("%.2f € by %s on %s") % (b.amount, dict(models.Payment.PaymentMethod.choices)[b.method], date_format(b.date, format=EXPORT_DATE_FORMAT)), booking.payment_set.all()))
+        def get_amount(p: models.Payment):
+            if booking.payment_set.all().count() == 1 and booking.commission_fees:
+                return p.amount + booking.commission_fees
+            return p.amount
+        return '\n'.join(map(lambda b: _("%.2f € by %s on %s") % (get_amount(b), dict(models.Payment.PaymentMethod.choices)[b.method], date_format(b.date, format=EXPORT_DATE_FORMAT)), booking.payment_set.all()))
 
     def dehydrate_invoice_title(self, booking):
         return _("Stay from %s to %s") % (date_format(booking.begin_date, format=EXPORT_DATE_FORMAT), date_format(booking.end_date, format=EXPORT_DATE_FORMAT))
