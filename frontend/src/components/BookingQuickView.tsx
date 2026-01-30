@@ -159,7 +159,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
               )}
             </Grid>
             <Grid xs={1}>
-              {displayField(booking.source !== null, t("Channel"), booking.source?.name)}
+              {displayField(true, t("Channel"), booking.source?.name)}
             </Grid>
           </Grid>
         </Grid>

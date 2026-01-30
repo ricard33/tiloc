@@ -28,6 +28,7 @@ import CalculateIcon from "@mui/icons-material/Calculate";
 import BalanceIcon from "@mui/icons-material/Balance";
 import GuestContact from "./GuestContact";
 import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+import BookingSourcesIcon  from "../assets/icones/booking-sources.svg?react";
 
 
 const statusColors = {
@@ -174,11 +175,18 @@ export default function BookingTooltip(props: PropsWithChildren<Props>) {
             </StyledDiv>
           </Grid2>
           <Grid2 xs={6}>
-            <StyledDiv>
-              <Groups2OutlinedIcon
-                fontSize="small" style={{ marginRight: "10px" }}
-              />&nbsp;{booking.adults + booking.children + booking.babies}
-            </StyledDiv>
+            <Stack>
+              <StyledDiv>
+                <Groups2OutlinedIcon
+                  fontSize="small" style={{ marginRight: "10px" }}
+                />&nbsp;{booking.adults + booking.children + booking.babies}
+              </StyledDiv>
+              <StyledDiv>
+                <BookingSourcesIcon
+                  width="20px" style={{ marginRight: "10px" }}
+                />&nbsp;{booking.source?.name}
+              </StyledDiv>
+            </Stack>
           </Grid2>
           <Grid2 xs={6}>
             <Tooltip
