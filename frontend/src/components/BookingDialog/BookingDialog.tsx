@@ -69,6 +69,7 @@ import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import HelpTooltip from "../HelpTooltip";
 
 const AntTabs = styled(Tabs)({
   borderBottom: "1px solid #e8e8e8",
@@ -222,7 +223,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
   // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
-  const leftToPay = fullPrice + (lodging.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
+  const leftToPay = fullPrice + (booking.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
   // console.log("options", options, fullPrice);
   const guestsDistribution = watch("guests_distribution", {});
 
@@ -880,6 +881,20 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       ><EditIcon /></IconButton>
                     </>
                   }
+                  <div className="spacer" />
+                  <HelpTooltip
+                    helpContent={t("Check if the tax is paid upon booking, uncheck if it is paid separately upon arrival.")}
+                  >
+                    <CheckboxElement
+                      control={control}
+                      name="tourist_tax_included_in_payment"
+                      label={t("Included")}
+                      labelProps={{
+                        labelPlacement: "start"
+                      }}
+                      onChange={event => handleChange(event.target.name, event.target.checked)}
+                    />
+                  </HelpTooltip>
                 </Grid>
               </Grid>
             </CustomTabPanel>
