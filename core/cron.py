@@ -15,6 +15,7 @@ from requests import HTTPError
 from core import models
 from core.imp_exp_resources import BookingResource, CommentResource, UserResource
 from core.sync import retrieve_and_synchronize_bookings
+from notifier.models import SentNotification
 
 logger = logging.getLogger("cron")
 
@@ -103,3 +104,19 @@ class ExportBookingsJob(CronJobBase):
                 fullpath = os.path.join(settings.BACKUP_DIR, filename)
                 if os.path.isfile(fullpath) and filename < max_filename:
                     os.remove(fullpath)
+
+
+class PurgeNotificationsJob(CronJobBase):
+    schedule = Schedule(run_at_times=['00:30', ])
+    code = "core.purge_notifications"
+    READ_NOTIFICATIONS_MAX_DAYS = 7
+    UNREAD_NOTIFICATIONS_MAX_DAYS = 180
+
+    def do(self):
+        logger.info("Purge old notifications")
+        SentNotification.objects.filter(read=True,
+                                        created__lte=arrow.utcnow().shift(days=-self.READ_NOTIFICATIONS_MAX_DAYS).datetime
+                                        ).delete()
+        SentNotification.objects.filter(read=False,
+                                        created__lte=arrow.utcnow().shift(days=-self.UNREAD_NOTIFICATIONS_MAX_DAYS).datetime
+                                        ).delete()

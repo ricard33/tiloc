@@ -37,7 +37,7 @@ admin.site.register(models.UserPrefs, UserPrefsAdmin)
 
 
 class SentNotifcationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'notification', 'backend', 'success', 'description')
-    list_filter = ('user', 'backend', 'notification', 'success')
-    readonly_fields = ('user', 'notification', 'backend', 'success')
+    list_display = ('user', 'notification', 'backend', 'success', 'description', 'created')
+    list_filter = ('user', 'backend', 'notification', 'success', 'created')
+    readonly_fields = ('user', 'notification', 'backend', 'success', 'created')
 admin.site.register(models.SentNotification, SentNotifcationAdmin)
