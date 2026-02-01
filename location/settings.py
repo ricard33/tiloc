@@ -317,6 +317,7 @@ IMPORT_EXPORT_SKIP_ADMIN_LOG = True
 CRON_CLASSES = [
     "core.cron.SyncBookingsJob",
     "core.cron.ExportBookingsJob",
+    "core.cron.PurgeNotificationsJob",
     # ...
 ]
 DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 30
