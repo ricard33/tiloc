@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { QueryError, useSignupMutation } from "../../services/api";
@@ -27,6 +27,9 @@ import queryString from "query-string";
 import { getSubscriptionPlan } from "../../common/subscriptionPlans";
 import FeaturesList from "../Subscription/FeaturesList";
 import LogoTiloc from "../../assets/images/logos/logo-tiloc-with-name-black.png";
+import ReCAPTCHA from "react-google-recaptcha";
+
+const siteKey = '6Lc8eVwsAAAAAPMGY4C5yw5rZsiZxqNhfTPJiGgP';
 
 
 export function SignUp() {
@@ -44,10 +47,23 @@ export function SignUp() {
   const plan = query.plan && getSubscriptionPlan(query.plan.split("-")[0], t);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const captchaRef = useRef<ReCAPTCHA>(null)
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
 
-
+  const handleCaptchaChange = (token: string | null) => {
+    setIsCaptchaVerified(!!token);
+  };
+  const resetCaptcha = () => {
+    captchaRef.current?.reset();
+    setIsCaptchaVerified(false);
+  };
 
   const onSubmit = (formData: SignUpData) => {
+    if (!isCaptchaVerified) {
+      alert(t('Please verify the CAPTCHA before submitting.'));
+      return;
+    }
+    const token = captchaRef.current && captchaRef.current;
     setIsSubmitting(true);
     doSignup(formData).then((result: {
       data: LoginInfo
@@ -64,6 +80,7 @@ export function SignUp() {
         console.log(result);
         setIsSubmitting(false);
       } else {
+        resetCaptcha();
         dispatch(auth.loginSuccessful(data));
         navigate("/setup");
       }
@@ -150,6 +167,13 @@ export function SignUp() {
               { plan && <Grid2 xs={12}>
                 <Typography variant="body2">{t("No credit card is required for the trial period")}</Typography>
               </Grid2>}
+              <Grid2 xs={12}>
+                <ReCAPTCHA
+                  sitekey={siteKey}
+                  ref={captchaRef}
+                  onChange={handleCaptchaChange}
+                />
+              </Grid2>
               <Grid2 xs={12}>
                 <Button
                   type={"submit"} color={"primary"} variant="contained"
