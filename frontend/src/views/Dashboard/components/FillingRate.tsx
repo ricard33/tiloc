@@ -8,6 +8,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Checkbox,
   Divider,
   FormControl,
   FormControlLabel,
@@ -18,7 +19,7 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useDispatch } from "react-redux";
 import palette from "../../../theme/palette";
 import { useTranslation } from "react-i18next";
-import { TooltipItem } from "chart.js";
+import { ChartDataset, TooltipItem } from "chart.js";
 import { formatCurrency } from "../../../common/intlUtils";
 import { useListLodgingsQuery } from "../../../services/api";
 import DateRangeSelector from "../../../components/DateRangeSelector";
@@ -52,7 +53,9 @@ const FillingRate: React.FC<FillingRateProps> = props => {
   const { t } = useTranslation();
   const { data: lodgings } = useListLodgingsQuery({ shown: true, active: true });
   const [mode, setMode] = useState<"global" | "per-lodging">("global");
+  const [previousYear, setPreviousYear] = useState<boolean>(true);
   const [data, setData] = useState<FillingRateData[]>([]);
+  const [previousYearData, setPreviousYearData] = useState<FillingRateData[]>([]);
   const [loaded, setLoaded] = useState(false);
   const today = new Date();
   const [dateRange, setDateRange] = useState({
@@ -69,6 +72,15 @@ const FillingRate: React.FC<FillingRateProps> = props => {
         // console.debug(response);
         setData(response.data);
         setLoaded(true);
+        axios.get(`stats/filling_rate/${formatISO(subYears(dateRange.startDate, 1))}/${formatISO(subYears(dateRange.endDate, 1))}/`)
+          .then(response => {
+            // console.debug(response);
+            setPreviousYearData(response.data);
+            setLoaded(true);
+          })
+          .catch(() => {
+            setLoaded(true);
+          });
       })
       .catch(() => {
         setLoaded(true);
@@ -93,13 +105,25 @@ const FillingRate: React.FC<FillingRateProps> = props => {
     }
   ];
 
-  const globalTurnover = data ?
-    data.reduce((previousValue, currentValue) => previousValue + (currentValue.turnover ?? 0), 0)
-    : 0;
-  const globalRate = data ?
-    data.reduce((previousValue, currentValue) => previousValue + (currentValue.rate ?? 0), 0) / data.length
-    : 0;
-  const computeTurnover = (lodging: Lodging) => {
+  function getGlobalTurnover(data: FillingRateData[]) {
+    return data ?
+      data.reduce((previousValue, currentValue) => previousValue + (currentValue.turnover ?? 0), 0)
+      : 0;
+  }
+
+  const globalTurnover = getGlobalTurnover(data);
+  const globalTurnoverPreviousYear = getGlobalTurnover(previousYearData);
+
+  function getGlobalRate(data: FillingRateData[]) {
+    return data ?
+      data.reduce((previousValue, currentValue) => previousValue + (currentValue.rate ?? 0), 0) / data.length
+      : 0;
+  }
+
+  const globalRate = getGlobalRate(data);
+  const globalRatePreviousYear = getGlobalRate(previousYearData);
+
+  const computeTurnover = (data: FillingRateData[], lodging: Lodging) => {
     if (data) {
       return data.reduce((previousValue, currentValue) =>
         lodging.id in currentValue ? previousValue + (currentValue[lodging.id].turnover ?? 0) : previousValue, 0);
@@ -125,12 +149,23 @@ const FillingRate: React.FC<FillingRateProps> = props => {
               aria-labelledby="filling-rate-mode"
               name="filling-rate-mode"
               value={mode}
-              onChange={(event, value) => setMode(value as never)}
+              onChange={(_, value) => setMode(value as never)}
 
             >
               <FormControlLabel value="global" control={<Radio />} label={t("global")} />
               <FormControlLabel value="per-lodging" control={<Radio />} disabled={!lodgings} label={t("per lodging")} />
             </RadioGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={previousYear}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setPreviousYear(event.target.checked);
+                  }}
+                  inputProps={{ "aria-label": "controlled" }}
+                />}
+              label={t("Show previous year")}
+            />
           </FormControl>
         }
         title={mode === "global" ? t("Filling rate") : t("Turnover per lodging")}
@@ -159,25 +194,54 @@ const FillingRate: React.FC<FillingRateProps> = props => {
                     barPercentage: 0.5,
                     categoryPercentage: 0.5,
                     data: data.map(e => e.rate),
-                    order: 2
+                    order: 3
                   },
                   {
                     type: "line",
                     label: t("Turnover") + ` (${formatCurrency(globalTurnover)})`,
                     yAxisID: "yAxisTurnover",
-                    backgroundColor: palette.warning.main,
-                    borderColor: palette.warning.main,
+                    backgroundColor: palette.warning.dark,
+                    borderColor: palette.warning.dark,
                     borderJoinStyle: "round",
                     tension: 0.2,
                     fill: false,
                     data: data.map(e => e.turnover),
                     order: 1
-                  }
-                ] : lodgings!.map((lodging, index) => {
+                  },
+                  ...(previousYear ? [
+                    {
+                      type: "bar",
+                      label: t("Filling rate (previous year)") + ` (${globalRatePreviousYear.toFixed()}%)`,
+                      yAxisID: "yAxisFillingRate",
+                      backgroundColor: palette.primary.light,
+                      barThickness: 12,
+                      borderRadius: 20,
+                      maxBarThickness: 10,
+                      barPercentage: 0.5,
+                      categoryPercentage: 0.5,
+                      data: previousYearData.map(e => e.rate),
+                      order: 4
+                    },
+                    {
+                      type: "line",
+                      label: t("Turnover (previous year)") + ` (${formatCurrency(globalTurnoverPreviousYear)})`,
+                      yAxisID: "yAxisTurnover",
+                      backgroundColor: palette.warning.light,
+                      borderColor: palette.warning.light,
+                      borderJoinStyle: "round",
+                      tension: 0.2,
+                      fill: false,
+                      data: previousYearData.map(e => e.turnover),
+                      order: 2
+                    }
+                  ] : []) as ChartDataset<"line" | "bar", number[]>[],
+                ]
+                  :
+                lodgings!.map((lodging, index) => {
                   const color = colorGenerator.next().value as { background: string, border: string };
                   return {
                     type: "bar",
-                    label: `${lodging.name}: ${formatCurrency(computeTurnover(lodging), 0)}`,
+                    label: `${lodging.name}: ${formatCurrency(computeTurnover(data, lodging), 0)}`,
                     yAxisID: "yAxisTurnoverPerLodging",
                     backgroundColor: color.background,
                     borderColor: color.border,
@@ -198,14 +262,11 @@ const FillingRate: React.FC<FillingRateProps> = props => {
                     mode: "index",
                     callbacks: {
                       label: function(context: TooltipItem<"line">) {
-                        let label = context.dataset!.label || "";
-                        if (label) {
-                          label += ": ";
-                        }
-                        if (context.datasetIndex === 0 && mode === "global")
-                          label += context.parsed.y + " %";
+                        let label;
+                        if ((context.datasetIndex === 0 || context.datasetIndex === 2) && mode === "global")
+                          label = t("Filling rate") + ": " + context.parsed.y + " %";
                         else
-                          label += formatCurrency(context.parsed.y);
+                          label = t("Turnover") + ": " +  formatCurrency(context.parsed.y);
                         return label;
                       }
                     }

@@ -17,7 +17,9 @@ def aggregate_month_for_range(
     end = arrow.get(end).ceil("month")
     data = {}
     dates_range = [begin.date(), end.date()]
-    bookings = models.Booking.objects.filter(
+    bookings = models.Booking.objects.prefetch_related(
+        'lodgings'
+    ).filter(
         Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
         lodgings__id__in=lodging_ids,
         cancelled=False,
