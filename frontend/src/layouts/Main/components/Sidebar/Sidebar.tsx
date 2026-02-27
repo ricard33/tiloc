@@ -99,6 +99,7 @@ const Sidebar: React.FC<Props> = props => {
       sx={{
         width: drawerWidth,
         flexShrink: 0,
+        displayPrint: 'none',
         [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box" }
       }}
     >

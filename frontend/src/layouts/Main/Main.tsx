@@ -20,6 +20,7 @@ const Main = () => {
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"), {
     defaultMatches: true
   });
+  const isPrint = useMediaQuery('print');
   const [openSidebar, setOpenSidebar] = useState(false);
   const account = useAppSelector(store => store.auth.account) as Account;
   const appInfo = useAppSelector(store => store.appInfo) as AppInfo;
@@ -85,7 +86,7 @@ const Main = () => {
         sx={{
           flexGrow: 1, paddingTop: 1,
           height: "100%",
-          maxWidth: `calc(100% - ${isDesktop ? drawerWidth : 0}px)`,
+          maxWidth: `calc(100% - ${isDesktop && !isPrint ? drawerWidth : 0}px)`,
           display: "flex",
           flexFlow: "column"
         }}
