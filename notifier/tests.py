@@ -196,6 +196,11 @@ class EmailTests(TestCase):
         shortcuts.send_notification('test-notification', self.user1)
 
         # Test that one message has been sent.
+        # emails are sent asynchronously, so we need to wait for the queue to
+        import time
+        t0 = time.time()
+        while not mail.outbox and time.time() - t0 < 1:
+            pass
         self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the subject of the first message is correct.

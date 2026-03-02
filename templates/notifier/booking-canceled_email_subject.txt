@@ -1,0 +1,1 @@
+Tiloc : 🚫 réservation annulée {{ booking.lodging.name }} du {{ booking.begin_date }} au {{ booking.end_date }}

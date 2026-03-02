@@ -65,7 +65,6 @@ class EmailBackend(BaseBackend):
     def send(self, user, context=None):
         super(EmailBackend, self).send(user, context)
 
-        # TODO Sent in background : https://aurigait.com/blog/email-notification-in-django/
         thread = Thread(target=self.send_async,
                         args=(user,), kwargs={"context": context})
         thread.start()
