@@ -1,0 +1,8 @@
+Une nouvelle réservation a été ajoutée :
+{{ booking }}
+
+    Logement(s) : {{ booking.get_lodgings }}
+    Début       : {{ booking.begin_date }}
+    Fin         : {{ booking.end_date }}
+    Statut      : {{ booking.status }}
+    Source      : {{ booking.source.name }}

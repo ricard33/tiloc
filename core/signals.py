@@ -23,9 +23,9 @@ def get_current_user():
 
 def get_listening_users_for_lodging(lodgings: List[models.Lodging], current_user):
     current_user_id = current_user and current_user.id or 0
-    users = models.User.objects.filter(account=lodgings[0].account, groups__name="administrator").exclude(id=current_user_id)
+    users = models.User.objects.filter(account=lodgings[0].account, groups__name="administrator", is_active=True).exclude(id=current_user_id)
     for lodging in lodgings:
-        users = users.union(lodging.users.exclude(id=current_user_id))
+        users = users.union(lodging.users.filter(is_active=True).exclude(id=current_user_id))
     return users
 
 

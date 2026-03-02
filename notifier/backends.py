@@ -4,6 +4,7 @@
 # Python
 import logging
 from smtplib import SMTPException
+from threading import Thread
 
 # Django
 from django.conf import settings
@@ -65,6 +66,12 @@ class EmailBackend(BaseBackend):
         super(EmailBackend, self).send(user, context)
 
         # TODO Sent in background : https://aurigait.com/blog/email-notification-in-django/
+        thread = Thread(target=self.send_async,
+                        args=(user,), kwargs={"context": context})
+        thread.start()
+        return True
+
+    def send_async(self, user, context=None):
         try:
             subject = render_to_string(self.template_subject, self.context)
             subject = "".join(subject.splitlines())

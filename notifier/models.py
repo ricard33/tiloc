@@ -105,7 +105,7 @@ class Notification(BaseModel):
 
     # These are the backend methods that are allowed for this type of
     # notification
-    backends = models.ManyToManyField(Backend, blank=True)
+    backends = models.ManyToManyField(Backend, blank=True, help_text=_("Default notification methods (unless overridden by prefs)"))
 
     objects = managers.NotificationManager()
 
@@ -138,11 +138,12 @@ class Notification(BaseModel):
 
         group_settings = self.groupprefs_set.filter(group_filter)
 
-        backends = self.backends.filter(enabled=True)
+        backends = Backend.objects.filter(enabled=True)
+        activated_backends = self.backends.filter(enabled=True)
 
         remove_backends = []
         for backend in backends:
-            notify = self.default_notify
+            notify = self.default_notify and backend in activated_backends
             try:
                 userprefs = user_settings.get(backend=backend)
                 notify = userprefs.notify
