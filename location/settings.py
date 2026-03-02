@@ -245,7 +245,7 @@ ADMINS = (("Support", config.get("APP", "EMAIL_ADMIN", "app@tiloc.fr")),)
 
 EMAIL_BACKEND = config.get("EMAIL", "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 
-DEFAULT_FROM_EMAIL = config.get("EMAIL", "DEFAULT_FROM_EMAIL", "app@tiloc.fr")
+DEFAULT_FROM_EMAIL = config.get("EMAIL", "DEFAULT_FROM_EMAIL", "Tiloc <app@tiloc.fr>")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_HOST = config.get("EMAIL", "SMTP_HOST", "smtp-crd.alwaysdata.net")
 EMAIL_PORT = 587
