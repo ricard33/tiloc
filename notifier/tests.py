@@ -199,7 +199,7 @@ class EmailTests(TestCase):
         # emails are sent asynchronously, so we need to wait for the queue to
         import time
         t0 = time.time()
-        while not mail.outbox and time.time() - t0 < 1:
+        while not mail.outbox and time.time() - t0 < 2:
             pass
         self.assertEqual(len(mail.outbox), 1)
 

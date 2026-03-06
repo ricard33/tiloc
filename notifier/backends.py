@@ -4,7 +4,7 @@
 # Python
 import logging
 from smtplib import SMTPException
-from threading import Thread
+from threading import Timer
 
 # Django
 from django.conf import settings
@@ -65,7 +65,7 @@ class EmailBackend(BaseBackend):
     def send(self, user, context=None):
         super(EmailBackend, self).send(user, context)
 
-        thread = Thread(target=self.send_async,
+        thread = Timer(1, self.send_async,
                         args=(user,), kwargs={"context": context})
         thread.start()
         return True
