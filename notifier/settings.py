@@ -17,5 +17,10 @@ BACKENDS = getattr(
     'NOTIFIER_BACKENDS',
     ('notifier.backends.EmailBackend',)
 )
+THREADED_EMAIL = getattr(
+    settings,
+    'NOTIFIER_THREADED_EMAIL',
+    True
+)
 
 BACKEND_CLASSES = [getattr(import_module(mod), cls) for (mod, cls) in (backend.rsplit(".", 1) for backend in BACKENDS)]

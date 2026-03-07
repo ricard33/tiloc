@@ -5,6 +5,7 @@
 import logging
 from smtplib import SMTPException
 from threading import Timer
+from notifier import settings as notifier_settings
 
 # Django
 from django.conf import settings
@@ -65,12 +66,15 @@ class EmailBackend(BaseBackend):
     def send(self, user, context=None):
         super(EmailBackend, self).send(user, context)
 
-        thread = Timer(1, self.send_async,
-                        args=(user,), kwargs={"context": context})
-        thread.start()
+        if notifier_settings.THREADED_EMAIL:
+            thread = Timer(1, self.send_email,
+                            args=(user,), kwargs={"context": context})
+            thread.start()
+        else:
+            self.send_email(user, context)
         return True
 
-    def send_async(self, user, context=None):
+    def send_email(self, user, context=None):
         try:
             subject = render_to_string(self.template_subject, self.context)
             subject = "".join(subject.splitlines())

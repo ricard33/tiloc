@@ -389,6 +389,7 @@ NOTIFIER_BACKENDS = (
     "notifier.backends.EmailBackend",
     "core.notifier_backend.NoopBackend",
 )
+NOTIFIER_THREADED_EMAIL = not UNITTEST
 
 LOGINAS_REDIRECT_URL = '/'
 LOGOUT_URL = reverse_lazy('loginas-logout')
