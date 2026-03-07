@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
-from notifier.shortcuts import create_notification
 from notifier.models import Backend
+from notifier.shortcuts import create_notification
 
 defaults_backends = Backend.objects.filter(name="noop")
 

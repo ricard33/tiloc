@@ -5,13 +5,14 @@
 import logging
 from smtplib import SMTPException
 from threading import Timer
-from notifier import settings as notifier_settings
 
 # Django
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
+
+from notifier import settings as notifier_settings
 
 logger = logging.getLogger("notifier.backend")
 
