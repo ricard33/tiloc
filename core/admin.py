@@ -71,9 +71,9 @@ class RestrictedModelAdminMixIn(object):
 
                 return qs.filter(
                     reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field))
-                ).distinct()
+                )
 
-            return qs.filter(**{account_field + "__id": account["id"]}).distinct()
+            return qs.filter(**{account_field + "__id": account["id"]})
         return qs
 
     def get_field_queryset(self, db, db_field, request):

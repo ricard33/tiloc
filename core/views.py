@@ -209,7 +209,7 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     data = []
     dates_range = [begin.date(), end.date()]
     filter = Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range)
-    filter &= Q(booking__lodgings__account=request.user.account)
+    filter &= Q(booking__account=request.user.account)
     if not request.user.has_perm("core.administrator"):
         filter &= Q(booking__lodgings__in=request.user.lodgings.all())
 

@@ -82,9 +82,9 @@ class Command(BaseCommand):
             admin.save()
 
         # purge bookings
-        Payment.objects.filter(booking__lodgings__account=demo_account).delete()
-        Contract.objects.filter(booking__lodgings__account=demo_account).delete()
-        BookedService.objects.filter(booking__lodgings__account=demo_account).delete()
+        Payment.objects.filter(booking__account=demo_account).delete()
+        Contract.objects.filter(booking__account=demo_account).delete()
+        BookedService.objects.filter(booking__account=demo_account).delete()
         Booking.objects.filter(lodgings__account=demo_account).delete()
 
         default_template = ContractTemplate.objects.filter(account=demo_account).first()

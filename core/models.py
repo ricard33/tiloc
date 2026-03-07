@@ -200,9 +200,9 @@ class Account(models.Model):
         super().delete(using, keep_parents)
 
     def cleanup_account(self, using=None, keep_parents=False):
-        Payment.objects.filter(booking__lodgings__account=self).delete()
-        Contract.objects.filter(booking__lodgings__account=self).delete()
-        BookedService.objects.filter(booking__lodgings__account=self).delete()
+        Payment.objects.filter(booking__account=self).delete()
+        Contract.objects.filter(booking__account=self).delete()
+        BookedService.objects.filter(booking__account=self).delete()
         Booking.objects.filter(lodgings__account=self).delete()
         BookingChannelSync.objects.filter(lodging__account=self).delete()
         Lodging.objects.filter(account=self).delete()
@@ -718,7 +718,7 @@ class Contract(models.Model):
     class Meta:
         verbose_name = _("Contract")
 
-    _account_qs_path = "booking__lodgings__account"
+    _account_qs_path = "booking__account"
     _lodging_qs_path = "booking__lodgings"
     objects = ForUserQuerySet.as_manager()
 
@@ -869,7 +869,7 @@ class Payment(models.Model):
             ("reconciliation", "Can do account reconciliation"),
         ]
 
-    _account_qs_path = "booking__lodgings__account"
+    _account_qs_path = "booking__account"
     _lodging_qs_path = "booking__lodgings"
     objects = ForUserQuerySet.as_manager()
 
@@ -884,7 +884,7 @@ class Comment(models.Model):
     class Meta:
         ordering = ["created_on"]
 
-    _account_qs_path = "booking__lodgings__account"
+    _account_qs_path = "booking__account"
     _lodging_qs_path = "booking__lodgings"
     objects = ForUserQuerySet.as_manager()
 
@@ -1013,7 +1013,7 @@ class Activity(models.Model):
         ordering = ("-date",)
 
     objects = ForUserQuerySet.as_manager()
-    _account_qs_path = "booking__lodgings__account"
+    _account_qs_path = "booking__account"
     _lodging_qs_path = "booking__lodgings"
 
 
