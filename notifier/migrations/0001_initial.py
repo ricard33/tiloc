@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 ('display_name', models.CharField(max_length=200)),
                 ('public', models.BooleanField(default=True)),
                 ('default_notify', models.BooleanField(default=True, help_text='Default notification state')),
-                ('backends', models.ManyToManyField(blank=True, to='notifier.backend')),
+                ('backends', models.ManyToManyField(blank=True, help_text='Default notification methods (unless overridden by prefs)', to='notifier.backend')),
                 ('permissions', models.ManyToManyField(blank=True, to='auth.permission')),
             ],
             options={
