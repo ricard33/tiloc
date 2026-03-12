@@ -286,7 +286,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   function updateTouristTax() {
     if (typeof lodging !== "undefined") {
       setValue("is_flat_rate_tourist_tax", lodging.is_flat_rate_tourist_tax);
-      setValue("tourist_tax_included_in_payment", lodging.tourist_tax_included_in_payment);
       setValue("max_daily_tourist_tax", lodging.max_daily_tourist_tax);
       setValue("tourist_tax_rate", lodging.tourist_tax_rate);
     }
