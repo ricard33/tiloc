@@ -1,0 +1,5 @@
+TARGET_PATH: ~/www/tiloc/
+SITE_ID: 123456
+API_KEY: xxxxxxxxx
+ACCOUNT: account_name
+PYTHON_VERSION: "3.12"

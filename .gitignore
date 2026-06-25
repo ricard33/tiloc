@@ -149,3 +149,4 @@ frontend0/
 /files-unittest/
 .pgpass
 .yarn/
+/deployment/*.yml
