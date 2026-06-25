@@ -136,6 +136,7 @@ frontend0/
 /assets/bundles/
 /.idea/shelf/
 /config/config.ini
+/config/newrelic.ini
 .DS_Store
 /backup/
 /backups/
