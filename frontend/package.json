@@ -50,7 +50,7 @@
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.2",
     "@ti-gecko/tiloc-ckeditor5": "file:./ckeditor5",
-    "axios": "^0.25.0",
+    "axios": "^0.32.0",
     "chart.js": "^4.4.1",
     "classnames": "^2.3.2",
     "clsx": "^2.1.0",
@@ -58,7 +58,7 @@
     "history": "^5.3.0",
     "i18next": "^23.7.20",
     "i18next-browser-languagedetector": "^7.2.0",
-    "i18next-http-backend": "^2.4.2",
+    "i18next-http-backend": "^3.0.5",
     "interactjs": "^1.10.26",
     "js-file-download": "^0.4.12",
     "loggly-jslogger": "^2.2.4",
@@ -111,11 +111,11 @@
     "jsdom": "^24.0.0",
     "sass": "^1.69.5",
     "typescript": "^4.9.5",
-    "vite": "^5.1.0",
+    "vite": "^6.4.3",
     "vite-plugin-checker": "^0.6.4",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.2",
-    "vitest": "^1.2.2"
+    "vitest": "^3.2.6"
   },
   "resolutions": {
     "@types/react": "^18.0.26"
