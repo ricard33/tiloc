@@ -65,6 +65,23 @@ def synchronize_bookings(sync: models.BookingChannelSync, ical_content: str):
             booking.save(update_fields=["source_uid"])
             continue
 
+        # Temporary patch for buggy booking.com events
+        same_bookings = models.Booking.objects.filter(
+            lodgings=lodging,
+            begin_date__lt=event.begin.date(),
+            end_date=event.end.date(),
+            cancelled=False,
+            deleted=False,
+        )
+        if same_bookings.exists():
+            booking = same_bookings.first()
+            logger.warning("Found buggy booking.com event with modified start date for event [%s -> %s: %s]", event.begin, event.end, event.summary)
+            booking.source_uid = event.uid
+            booking._change_reason = "Updating source_uid due to buggy booking.com event"
+            booking.save(update_fields=["source_uid"])
+            continue
+        # End of temporary patch
+
         logger.debug("Creating booking for event [%s -> %s: %s]", event.begin, event.end, event.summary)
         booking = models.Booking.objects.create(
             account=lodging.account,

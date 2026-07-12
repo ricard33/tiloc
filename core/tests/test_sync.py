@@ -98,6 +98,21 @@ END:VEVENT
 END:VCALENDAR
 """
 
+booking_bug_ical = r"""BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//admin.booking.com\\\, b.v.//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+DTSTAMP:20260712T074848Z
+DTSTART;VALUE=DATE:20260712
+DTEND;VALUE=DATE:20260724
+UID:dc79d15284e78b114c0edfe83e4ee87b@booking.com
+SUMMARY:CLOSED - Not available
+ORGANIZER:mailto:noreply@booking.com
+END:VEVENT
+END:VCALENDAR
+"""
 
 class SyncBookingsTestCase(TestCase):
     fixtures = ["default-groups"]
@@ -162,3 +177,12 @@ class SyncBookingsTestCase(TestCase):
         """Change on 26/06/2023: Booking returns empty string if calendar is empty"""
         synchronize_bookings(self.sync, booking_empty_ical)
         self.assertEqual(models.Booking.objects.all().count(), 0)
+
+    def test_booking_bug_ical(self):
+        """Bug on 12/07/2026: Booking return already started booking with today as start date."""
+        factories.BookingFactory(
+            lodgings=self.lodging, begin_date=arrow.get("2026-07-10").date(), end_date=arrow.get("2026-07-24").date()
+        )
+        synchronize_bookings(self.sync, booking_bug_ical)
+        self.assertEqual(models.Booking.objects.all().count(), 1)
+        self.assertEqual(models.Booking.objects.first().begin_date, arrow.get("2026-07-10").date())
