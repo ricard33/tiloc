@@ -114,6 +114,7 @@ END:VEVENT
 END:VCALENDAR
 """
 
+
 class SyncBookingsTestCase(TestCase):
     fixtures = ["default-groups"]
 
