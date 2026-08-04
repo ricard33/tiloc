@@ -187,7 +187,7 @@ const ContractTemplateEdit = (/*props*/) => {
           </Suspense>
         </Box>
         {
-          lodgings &&
+          lodgings && template &&
           <Stack direction={"row"} justifyContent={"center"}>
             <Stack direction={"row"} spacing={2}>
               <form
