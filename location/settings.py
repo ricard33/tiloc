@@ -308,7 +308,6 @@ CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_CONFIG = {
     "DEBUG": (False, "Turn on DEBUG information on Django"),
     "CAN_SIGNUP": (False, "Turn on/off new accounts signup"),
-    "USE_INAPP_CHAT": (not IS_DEMO, "Turn on/off in-app chat and support (using Chatwoot)"),
 }
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True

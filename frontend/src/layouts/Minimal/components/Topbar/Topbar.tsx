@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
 import { User } from "../../../../types";
 import { useAuth } from "../../../../common/authUtils";
-import ChatwootWidget from "../../../../components/ChatwootWidget";
 
 export interface TopbarProps extends AppBarProps {
   className?: string;
@@ -44,7 +43,6 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           />
         </RouterLink>
         <div style={{ flexGrow: 1 }} />
-        <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showHelpIcon />
         {user && <Tooltip title={t("Logout from application")}>
           <IconButton color="inherit" size="large" onClick={handleSignOut}>
             <ExitToAppIcon />

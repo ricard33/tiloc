@@ -121,7 +121,6 @@ function App(props: Props) {
         {appInfo.loaded ?
           <ConfirmProvider>
             <Notifier />
-            {/*<ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showBubble />*/}
             <BrowserRouter>
               <Routes />
             </BrowserRouter>

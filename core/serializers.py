@@ -138,7 +138,6 @@ class UserSerializer(serializers.ModelSerializer):
     groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(), slug_field="name")
     lodgings = FilteredSlugRelatedField(many=True, queryset=Lodging.objects.all(), slug_field="name", required=False)
     tz = TimeZoneSerializerField(required=False)
-    chatwoot_identifier_hash = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -188,19 +187,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_permissions(self, user):
         return user.get_all_permissions()
-
-    def get_chatwoot_identifier_hash(self, user):
-        import hashlib
-        import hmac
-
-        # Define your key and identifier
-        secret = bytes("3kJewR8EYgoExYUMCEaFnhnc", "utf-8")
-        identifier = bytes(str(user.id), "utf-8")
-
-        # Generate the HMAC
-        hash = hmac.new(secret, identifier, hashlib.sha256)
-        identifier_hash = hash.hexdigest()
-        return identifier_hash
 
 
 class CurrentUserSerializer(UserSerializer):

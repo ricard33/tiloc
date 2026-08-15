@@ -77,7 +77,6 @@ export interface User {
   verified: boolean;
   groups: string[];
   permissions: string[];
-  chatwoot_identifier_hash: string;
 }
 
 export interface Lodging {

@@ -25,9 +25,7 @@ import { RootState } from "../../../store";
 import { Account, User } from "../../../types";
 import NotificationButton from "../../../components/NotificationButton";
 import { useAuth } from "../../../common/authUtils";
-import ChatwootWidget from "../../../components/ChatwootWidget";
 import { useAppSelector } from "../../../app/hooks";
-import useWindowDimensions from "../../../common/windowDimensions";
 
 export interface TopbarProps extends AppBarProps {
   onSidebarOpen: (event: React.MouseEvent) => void;
@@ -41,8 +39,6 @@ const Topbar: React.FC<TopbarProps> = (props) => {
   const user = useSelector<RootState>(store => store.auth.user) as User;
   const account = useAppSelector(store => store.auth.account) as Account;
   const { logout } = useAuth();
-  const { width } = useWindowDimensions();
-  const isMobile = width < 600;
 
   const avatar = getGravatarUrl(user.email, {
     default: "mp"
@@ -86,7 +82,6 @@ const Topbar: React.FC<TopbarProps> = (props) => {
           {/*<span style={{color: "white", fontSize: "2em"}}>Tiloc</span>*/}
         </RouterLink>
         <div style={{flexGrow: 1}} />
-        <ChatwootWidget token={"F9GGzGyKirYZ5uipLprdTxU2"} showHelpIcon showBubble={!isMobile} />
         <NotificationButton />
         <Avatar
           alt="Person"
