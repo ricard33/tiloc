@@ -134,7 +134,7 @@ staticfiles/
 /log/
 frontend0/
 /assets/bundles/
-/.idea/shelf/
+/.idea/
 /config/config.ini
 /config/newrelic.ini
 .DS_Store
@@ -142,7 +142,6 @@ frontend0/
 /backups/
 /location/version.properties
 /frontend/src/components/Editor/ckeditor5/node_modules/
-/.idea/codestream.xml
 /TODO.md
 /test-reports/
 /requirements-prod.txt
