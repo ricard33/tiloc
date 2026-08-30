@@ -13,7 +13,6 @@ export interface AppInfo {
   frontendVersion: string;
   buildDate: string;
   canRegister: boolean;
-  useInAppChat: boolean;
   isDebug: boolean;
   isDemo: boolean;
 }

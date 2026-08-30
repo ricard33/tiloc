@@ -120,7 +120,6 @@ def info_view(request, *args, **kwargs):
             "is_debug": settings.DEBUG,
             "is_demo": settings.IS_DEMO,
             "can_register": config.CAN_SIGNUP and not settings.IS_DEMO,
-            "use_inapp_chat": config.USE_INAPP_CHAT,
         }
     )
 
