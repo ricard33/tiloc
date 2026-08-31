@@ -15,7 +15,7 @@ import {
   Payment,
   Service,
   User,
-  Notification, SignUpData, Activity, Account
+  Notification, SignUpData, Activity, Account, BookingHistoryEntry
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
@@ -26,6 +26,7 @@ import {
   api2Comment,
   api2Contract,
   api2ContractTemplate,
+  api2BookingHistoryEntry,
   api2Lodging, api2NextEvent, api2Notification,
   api2Payment,
   api2Service,
@@ -141,6 +142,8 @@ type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unkn
 function invalidatesDependentTags<T extends BaseModel>(modelName: string, obj: T) {
   if (modelName === "Comment")
     return [{ type: "Booking", id: (obj as any as Comment).booking_id }, { type: "Booking", id: "LIST" }];
+  if (modelName === "Booking" && obj.id)
+    return [{ type: "BookingHistory", id: obj.id }];
   return [];
 }
 
@@ -300,7 +303,8 @@ export const api = createApi({
     "ContractTemplate",
     "Service",
     "User",
-    "Notification"
+    "Notification",
+    "BookingHistory"
   ],
   // keepUnusedDataFor: 5,
   endpoints: (builder) => ({
@@ -446,6 +450,11 @@ export const api = createApi({
           results: (response as Pagination<ApiModel>).results.map((p) => api2Payment(p))
         };
       }
+    }),
+    getBookingHistory: builder.query<BookingHistoryEntry[], number>({
+      query: (bookingId) => `booking/${bookingId}/history/`,
+      providesTags: (result, error, bookingId) => [{ type: "BookingHistory", id: bookingId }],
+      transformResponse: (response) => (response as ApiModel[]).map((e) => api2BookingHistoryEntry(e))
     }),
     listPayments: paymentApi.list(builder),
     listPaymentsPaginated: paymentApi.pages(builder),
@@ -617,5 +626,7 @@ export const {
   useReadAllNotificationsMutation,
 
   useListActivitiesQuery,
-  useGetActivityQuery
+  useGetActivityQuery,
+
+  useGetBookingHistoryQuery
 } = api;

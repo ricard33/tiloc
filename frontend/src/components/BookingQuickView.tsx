@@ -10,6 +10,7 @@ import { RootState } from "../store";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { Typography } from "@mui/material";
 import Comments from "./Comments";
+import BookingHistorySummary from "./BookingHistorySummary";
 import { getBookingStatus, otaBranding, OtaIconProps } from "../common/statusUtils";
 import Payments from "./Payments";
 import GuestContact from "./GuestContact";
@@ -61,7 +62,7 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
 
   return (
     <Grid container spacing={1} className="booking-quick-view">
-      <Grid container spacing={1} xs={12} md={showComments ? 8 : 12}>
+      <Grid container spacing={1} xs={12} md={8}>
         <Grid sm={4} xs={12}>
           <div>
             <Grid container>
@@ -169,11 +170,14 @@ const BookingQuickView = (props: BookingQuickViewProps) => {
           )}
         </Grid>
       </Grid>
-      {showComments &&
-        <Grid xs={12} md={4}>
-          <Typography variant="h5" sx={{ marginBottom: "10px" }}>{t("Comments")}</Typography>
-          <Comments booking={booking} readonly={readonly} />
-        </Grid>}
+      <Grid xs={12} md={4}>
+        {showComments &&
+          <>
+            <Typography variant="h5" sx={{ marginBottom: "10px" }}>{t("Comments")}</Typography>
+            <Comments booking={booking} readonly={readonly} />
+          </>}
+        <BookingHistorySummary booking={booking} />
+      </Grid>
     </Grid>
   );
 };
