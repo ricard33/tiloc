@@ -52,6 +52,10 @@ vi.mock("./OptionsList", () => ({
   default: () => <div data-testid="options-stub">OptionsList</div>
 }));
 
+vi.mock("../BookingHistory", () => ({
+  default: () => <div data-testid="history-stub">BookingHistory</div>
+}));
+
 // --- Fixtures ---
 
 const makeLodging = (overrides: Partial<Lodging> = {}): Lodging => ({
@@ -275,8 +279,8 @@ describe("BookingDialog", () => {
     renderDialog();
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
-    // 6 tabs are shown once the booking has an id (info, contact, details, options, payments, comments)
-    expect(screen.getAllByRole("tab")).toHaveLength(6);
+    // 7 tabs are shown once the booking has an id (info, contact, details, options, payments, comments, history)
+    expect(screen.getAllByRole("tab")).toHaveLength(7);
     expect(screen.getByLabelText("Booking status")).toBeInTheDocument();
     expect(screen.getByLabelText("Lodging")).toBeInTheDocument();
     // Total price summary is rendered
@@ -289,6 +293,17 @@ describe("BookingDialog", () => {
 
     await screen.findByRole("dialog");
     expect(screen.getAllByRole("tab")).toHaveLength(4);
+  });
+
+  test("opens the history panel from the history tab", async () => {
+    const uiUser = userEvent.setup();
+    renderDialog();
+
+    await screen.findByRole("dialog");
+    const tabs = screen.getAllByRole("tab");
+    await uiUser.click(tabs[6]);
+
+    expect(await screen.findByTestId("history-stub")).toBeInTheDocument();
   });
 
   test("switches to the contact tab and shows guest fields", async () => {

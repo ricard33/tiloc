@@ -268,3 +268,18 @@ export interface Activity {
   author: User;
   booking: Booking;
 }
+
+export interface BookingHistoryChange {
+  field: string;
+  old: unknown;
+  new: unknown;
+}
+
+export interface BookingHistoryEntry {
+  history_id: number;
+  date: Date;
+  type: "+" | "~" | "-";
+  type_label: string;
+  user: Pick<User, "id" | "full_name" | "email"> | null;
+  changes: BookingHistoryChange[];
+}

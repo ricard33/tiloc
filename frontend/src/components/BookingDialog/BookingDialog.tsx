@@ -69,7 +69,9 @@ import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import HistoryIcon from "@mui/icons-material/History";
 import HelpTooltip from "../HelpTooltip";
+import BookingHistory from "../BookingHistory";
 
 const AntTabs = styled(Tabs)({
   borderBottom: "1px solid #e8e8e8",
@@ -613,6 +615,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                 <AntTab icon={<RoomServiceIcon />} aria-label="options" />
                 {booking.id && <AntTab icon={<PaymentOutlinedIcon />} aria-label="payments" />}
                 {booking.id && <AntTab icon={<CommentIcon />} aria-label="comments" />}
+                {booking.id && <AntTab icon={<HistoryIcon />} aria-label="history" />}
               </AntTabs>
             </Box>
 
@@ -1088,6 +1091,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
             </CustomTabPanel>
             <CustomTabPanel value={selectedTab} index={5}>
               {booking.id && <Comments booking={booking} />}
+            </CustomTabPanel>
+            <CustomTabPanel value={selectedTab} index={6}>
+              {booking.id && <BookingHistory booking={booking} />}
             </CustomTabPanel>
 
             <hr style={{ margin: "20px" }} />

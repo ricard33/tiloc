@@ -39,6 +39,7 @@ from notifier.shortcuts import send_notification
 from . import models
 from .contracts import generate_contract, generate_preview_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
+from .history import build_booking_history
 from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
 from .pdf_tools import generate_pdf
@@ -434,6 +435,16 @@ class BookingViewSet(viewsets.ModelViewSet):
         contract = self._generate_contract(booking, request)
         serializer = ContractSerializer(instance=contract)
         return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def history(self, request, pk=None):
+        """Return the modification history (time, changed fields, author) of a booking."""
+        booking = self.get_object()
+        entries = build_booking_history(
+            list(booking.history.all()),
+            include_prices=request.user.has_perm("core.view_prices"),
+        )
+        return Response(entries)
 
 
 class BookingChannelViewSet(viewsets.ModelViewSet):

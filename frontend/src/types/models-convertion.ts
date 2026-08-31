@@ -9,7 +9,7 @@ import {
   Payment,
   Service,
   User,
-  Notification, NextEvent, Activity
+  Notification, NextEvent, Activity, BookingHistoryEntry
 } from "./models";
 import { parseISO } from "date-fns";
 import { formatISO } from "../common/tzUtils";
@@ -247,6 +247,15 @@ export function api2Activity(activity: Record<string, any>): Activity {
     ...activity as Activity,
     date: parseISO(activity.date),
     booking: api2Booking(activity.booking),
+  };
+}
+
+// ----- BOOKING HISTORY -----
+
+export function api2BookingHistoryEntry(entry: Record<string, any>): BookingHistoryEntry {
+  return {
+    ...entry as BookingHistoryEntry,
+    date: parseISO(entry.date),
   };
 }
 
