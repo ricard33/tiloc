@@ -36,9 +36,7 @@ import { useAlert } from "../../common/alertUtils";
 import { useAppSelector } from "../../app/hooks";
 
 
-type Props = {};
-
-const Checkout = (props: Props) => {
+const Checkout = () => {
   const location = useLocation();
   const plan = location.state?.plan as Plan;
   const interval = location.state?.interval as "monthly" | "yearly";
@@ -98,7 +96,7 @@ const Checkout = (props: Props) => {
       axios.post(`/api/subscription/${account.current_subscription.id}/change/`, {
         plan: `${plan.ref}-${interval.toUpperCase()}`
       })
-        .then(({ data, status }) => {
+        .then(({ data }) => {
           showSuccess(t("Subscription changed"));
           dispatch(subscriptionUpdated(data));
           navigate("../subscription");

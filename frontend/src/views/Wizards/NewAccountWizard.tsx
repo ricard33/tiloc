@@ -30,7 +30,7 @@ export default function NewAccountWizard() {
     t("Finished")
   ];
 
-  const isStepOptional = (step: number) => {
+  const isStepOptional = (_step: number) => {
     // return step === 1;
     return false;
   };

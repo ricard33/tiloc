@@ -37,7 +37,7 @@ export const DecimalPrecision = {
 };
 
 export const computeBookingPrice = (beginDate: Date, endDate: Date, dailyRate: number,
-  weekendRate: number, weekRate: number, seasonalRates = [], depositPercent: number)
+  weekendRate: number, weekRate: number, _seasonalRates = [], depositPercent: number)
   : {
   price: Pick<Booking, "price" | "deposit" | "daily_rate">,
   price_details: { begin_date: Date, end_date: Date, day_count: number, rate_name: string | null, is_week_rate: boolean }[]

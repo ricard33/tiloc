@@ -22,7 +22,7 @@ type Props = {
   onClose: () => void;
 };
 
-const PaymentDialog: React.FunctionComponent<Props> = ({ payment, bookingId, onValidate, onClose }: Props) => {
+const PaymentDialog: React.FunctionComponent<Props> = ({ payment, onValidate, onClose }: Props) => {
   const { t } = useTranslation();
   const { register, handleSubmit, control, formState: { errors } } = useForm<Payment>();
   const onSubmit: SubmitHandler<Payment> = data => {

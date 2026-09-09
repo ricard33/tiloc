@@ -49,7 +49,12 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-expressions": "off", // `cond && fn()` used as a statement
       // `React` stays in the ignore list: the new JSX transform makes most
       // `import React from "react"` lines technically unused but harmless.
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^(_|React$)" }],
+      // ignoreRestSiblings: the "destructure a few keys out so `...rest` omits them" pattern.
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^(_|React$)",
+        ignoreRestSiblings: true,
+      }],
       "no-unused-vars": "off",
       "no-prototype-builtins": "off",
       "react/display-name": "warn",

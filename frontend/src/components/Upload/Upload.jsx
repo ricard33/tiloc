@@ -38,7 +38,7 @@ class UploadClass extends Component {
       await Promise.all(promises);
 
       this.setState({ successfulUploaded: true, uploading: false });
-    } catch (e) {
+    } catch {
       // Not Production ready! Do some error handling here instead...
       this.setState({ successfulUploaded: true, uploading: false });
     }
@@ -59,14 +59,14 @@ class UploadClass extends Component {
         }
       });
 
-      req.upload.addEventListener("load", event => {
+      req.upload.addEventListener("load", () => {
         const copy = { ...this.state.uploadProgress };
         copy[file.name] = { state: "done", percentage: 100 };
         this.setState({ uploadProgress: copy });
         resolve(req.response);
       });
 
-      req.upload.addEventListener("error", event => {
+      req.upload.addEventListener("error", () => {
         const copy = { ...this.state.uploadProgress };
         copy[file.name] = { state: "error", percentage: 0 };
         this.setState({ uploadProgress: copy });

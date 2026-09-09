@@ -20,7 +20,7 @@ export function TimezonePickerElement<TFieldValues extends FieldValues>(props: T
       options={timezones}
       autocompleteProps={{
         disableClearable: true,
-        onChange: (event, value, reason, details) => {
+        onChange: (_event, value) => {
           console.log(value);
         },
         isOptionEqualToValue: (option, value) => {

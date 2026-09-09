@@ -1,6 +1,6 @@
 import timezones from 'timezones-list';
 
-export function getTimeZoneOptions(showTimezoneOffset: boolean) {
+export function getTimeZoneOptions(_showTimezoneOffset: boolean) {
   const offsetTmz = [];
   for (const i in timezones) {
     const tz = timezones[i];

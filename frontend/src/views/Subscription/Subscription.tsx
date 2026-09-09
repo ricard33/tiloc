@@ -26,7 +26,7 @@ function Subscription() {
     axios.post(`/api/subscription/${account.current_subscription.id}/create_customer_portal_session/`, {
       return_url: window.location.href
     })
-      .then(({ data, status }) => {
+      .then(({ data }) => {
         // console.log(data)
         window.location.href = data.url;
         // navigate("../subscription");
@@ -45,7 +45,7 @@ function Subscription() {
     }).then(() => {
       console.info(`Reactivate subscription`);
       axios.post(`/api/subscription/${account.current_subscription.id}/reactivate/`)
-        .then(({ data, status }) => {
+        .then(({ data }) => {
           showSuccess(t("Subscription reactivated"));
           dispatch(subscriptionUpdated(data));
           // navigate("../subscription");

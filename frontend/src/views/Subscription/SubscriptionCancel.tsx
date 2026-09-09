@@ -32,7 +32,7 @@ function SubscriptionCancel() {
     }).then(() => {
       console.warn(`Cancelling subscription`);
       axios.post(`/api/subscription/${account.current_subscription.id}/cancel/`)
-        .then(({ data, status }) => {
+        .then(({ data }) => {
           showSuccess(t("Subscription cancelled"));
           dispatch(subscriptionUpdated(data));
           navigate("../subscription");

@@ -50,7 +50,7 @@ const MyRoutes = () => {
   const currentUser = useAppSelector(store => store.auth.user) as User;
   const location = useLocation();
 
-  const trackPageView = useCallback((location: Location) => {
+  const trackPageView = useCallback((_location: Location) => {
     console.log(window.location.toString());
     logger.info({
       message: `Nav to ${window.location.toString()}`,

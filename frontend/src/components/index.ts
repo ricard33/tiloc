@@ -9,17 +9,17 @@ export { default as RouteWithLayout } from './RouteWithLayout';
 export { HtmlTooltip } from './Tooltip';
 export { default as BookingQuickView } from './BookingQuickView';
 
-export const Label = styled(Grid2)(({ theme }) => ({
+export const Label = styled(Grid2)(() => ({
   color: "#7a7a7a"
 }));
 
-export const Value = styled(Grid2)(({ theme }) => ({
+export const Value = styled(Grid2)(() => ({
   color: "#646464",
   textAlign: "right",
   fontWeight: "bold"
 }));
 
-export const HighlightBadge = styled(Chip)(({ theme }) => ({
+export const HighlightBadge = styled(Chip)(() => ({
   borderRadius: "7px",
   position: "relative",
   overflow: "hidden",

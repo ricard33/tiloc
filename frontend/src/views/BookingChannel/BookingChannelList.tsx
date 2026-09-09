@@ -12,7 +12,7 @@ import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { BookingSource } from "../../common/statusUtils";
 
-const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+const StyledDataGrid = styled(DataGrid)(() => ({
   "& .booking-channel-list-readonly": {
     cursor: "not-allowed"
   }

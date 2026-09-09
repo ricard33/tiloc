@@ -13,9 +13,7 @@ import { getIntervalLabel, getSubscriptionPlans } from "../../common/subscriptio
 import { useAppSelector } from "../../app/hooks";
 
 
-type Props = {};
-
-const PricingTable = (props: Props) => {
+const PricingTable = () => {
   const { t } = useTranslation();
   const account = useAppSelector(store => store.auth.account) as Account;
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
@@ -23,7 +21,7 @@ const PricingTable = (props: Props) => {
 
   useEffect(() => {
     axios.get("/api/prices/")
-      .then((response) => {
+      .then(() => {
         // setClientSecret(response.data.clientSecret);
       });
   }, []);

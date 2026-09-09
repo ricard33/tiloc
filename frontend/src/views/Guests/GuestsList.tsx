@@ -21,7 +21,7 @@ const GuestsList: React.FunctionComponent<Props> = () => {
     { field: "address", headerName: t("Address"), width: 200 }
   ];
 
-  const onClick = (guest: Guest) => {
+  const onClick = (_guest: Guest) => {
     // navigate(guest.id.toString());
   };
 

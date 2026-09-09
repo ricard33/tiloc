@@ -5,9 +5,7 @@ import { useTranslation } from "react-i18next";
 import CheckoutResult from "../../components/CheckoutResult";
 import { Button } from "@mui/material";
 
-type Props = {};
-
-const CheckoutDone = (props: Props) => {
+const CheckoutDone = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const query = queryString.parse(location.search) as { subscription_id: string };

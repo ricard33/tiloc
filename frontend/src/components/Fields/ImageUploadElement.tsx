@@ -29,7 +29,6 @@ type ImageUploadElementProps<T extends FieldValues = FieldValues> = Omit<
 const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues extends FieldValues = FieldValues>({
   name,
   label,
-  readOnly = false,
   placeholder,
   onChange,
   width = 200,
@@ -40,7 +39,7 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
   variant,
   className,
   helperText,
-  ...props
+  ..._props
 }: ImageUploadElementProps<TFieldValues>): JSX.Element => {
   const { t } = useTranslation();
   const { setValue, getValues, register } = useFormContext();
@@ -114,7 +113,7 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
             startIcon={<DeleteIcon />}
             sx={{ marginRight: "1rem" }}
             disabled={!imgSrc}
-            onClick={e => handleClearLogoClick()}
+            onClick={() => handleClearLogoClick()}
           >
             {t("Remove")}
           </Button>

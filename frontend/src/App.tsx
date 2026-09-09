@@ -30,9 +30,7 @@ validate.validators = {
   ...validators
 };
 
-type Props = {};
-
-function App(props: Props) {
+function App() {
   const dispatch = useDispatch();
   const token = useAppSelector((store) => store.auth.token);
   const appInfo = useAppSelector(store => store.appInfo) as AppInfo;
