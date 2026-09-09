@@ -139,10 +139,10 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
         reporter: ['text-summary', 'json-summary', 'html', 'lcov'],
         // Floor only — raise these as coverage improves, never lower them.
         thresholds: {
-          lines: 33,
-          functions: 50,
-          branches: 71,
-          statements: 33,
+          lines: 36,
+          functions: 53,
+          branches: 72,
+          statements: 36,
         },
       },
     }

@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@testing-library/react";
 import useWindowDimensions from "./windowDimensions";
 
 const resizeTo = (width: number, height: number) => {
@@ -8,14 +8,20 @@ const resizeTo = (width: number, height: number) => {
 };
 
 describe("useWindowDimensions()", () => {
-  beforeEach(() => vi.useFakeTimers());
+  beforeEach(() => {
+    (window as any).innerWidth = 1024;
+    (window as any).innerHeight = 768;
+    vi.useFakeTimers();
+  });
   afterEach(() => {
+    // unmount (removes the resize listener) then flush any pending debounce timer
+    // while fake timers + jsdom are still alive, so nothing fires post-teardown.
+    cleanup();
+    act(() => vi.runOnlyPendingTimers());
     vi.useRealTimers();
-    resizeTo(1024, 768);
   });
 
   it("returns the current window size", () => {
-    resizeTo(1024, 768);
     const { result } = renderHook(() => useWindowDimensions());
     expect(result.current).toEqual({ width: 1024, height: 768 });
   });
