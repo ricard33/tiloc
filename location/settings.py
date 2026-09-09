@@ -16,8 +16,9 @@ from datetime import timedelta
 
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from my_django_tweaks.logging_config import configure_logging
 from smartconfigparser import Config
+
+from location.logging_config import configure_logging
 
 from . import __version__
 
