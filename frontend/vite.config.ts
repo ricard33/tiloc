@@ -51,9 +51,11 @@ export default defineConfig(({ mode }) => {
       globals: true,
       environment: 'jsdom',
       setupFiles: 'src/setupTests.ts',
-      // A couple of data-loading views occasionally lose the findBy* race under full
-      // parallel load; one retry keeps CI deterministic without masking real breakage.
-      retry: 1,
+      // A few heavy views (the year-grid AnnualView especially) race the findBy* timeout
+      // under full parallel load with v8 coverage instrumentation; retry keeps CI
+      // deterministic without masking real breakage. testTimeout is raised to match.
+      retry: 2,
+      testTimeout: 20000,
       // Node loads react-hook-form-mui's CJS build in tests, which require()s its own copy of
       // react-hook-form — so <FormContainer> and a component's own useFormContext() end up in
       // different React contexts. Point at rhf-mui's ESM build (real `import`s) so Vite

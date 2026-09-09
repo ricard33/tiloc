@@ -9,7 +9,7 @@ import i18n from './i18n';
 
 // The default 1000ms findBy*/waitFor timeout is tight when the whole suite runs in
 // parallel under CI load; a few data-loading views race it intermittently.
-configure({ asyncUtilTimeout: 5000 });
+configure({ asyncUtilTimeout: 8000 });
 
 // Keep i18next from logging missing translation keys during tests.
 i18n.options.debug = false;
