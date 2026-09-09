@@ -28,6 +28,8 @@ interface Options extends Omit<RenderOptions, "wrapper"> {
   preloadedState?: Record<string, unknown>;
   /** stand-in for useConfirm(): resolve to accept, reject to dismiss. Defaults to auto-accept. */
   confirm?: (options?: unknown) => Promise<unknown>;
+  /** set false when the component under test renders its own <Router> (e.g. <App/>) */
+  router?: boolean;
 }
 
 export function makeTestStore(
@@ -58,13 +60,30 @@ export function makeTestStore(
 
 /** Render `ui` wrapped in every provider the app relies on (redux, router, i18n, MUI theme, date pickers, snackbar). */
 export function renderWithProviders(ui: ReactElement, options: Options = {}) {
-  const { route = "/", user, account, preloadedState, confirm = () => Promise.resolve(), ...renderOptions } = options;
+  const {
+    route = "/",
+    user,
+    account,
+    preloadedState,
+    confirm = () => Promise.resolve(),
+    router = true,
+    ...renderOptions
+  } = options;
   const entries = Array.isArray(route) ? route : [route];
   const store = makeTestStore(user, preloadedState, account);
 
+  const withRouter = (children: React.ReactNode) =>
+    router ? (
+      <MemoryRouter initialEntries={entries as never} initialIndex={entries.length - 1}>
+        {children}
+      </MemoryRouter>
+    ) : (
+      children
+    );
+
   const Wrapper = ({ children }: PropsWithChildren) => (
     <Provider store={store}>
-      <MemoryRouter initialEntries={entries as never} initialIndex={entries.length - 1}>
+      {withRouter(
         <I18nextProvider i18n={i18n}>
           <ThemeProvider theme={theme}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -74,7 +93,7 @@ export function renderWithProviders(ui: ReactElement, options: Options = {}) {
             </LocalizationProvider>
           </ThemeProvider>
         </I18nextProvider>
-      </MemoryRouter>
+      )}
     </Provider>
   );
 
