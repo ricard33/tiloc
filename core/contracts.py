@@ -132,7 +132,9 @@ def generate_contract(booking, url_server="http://127.0.0.1:8000", save=True, te
     if not isinstance(lodgings, (list, tuple)):
         lodgings = lodgings.all()
     lodging = lodgings[0]
-    if not Contract.objects.filter(booking=booking).exists():
+    # An unsaved booking (contract preview) has no persisted Contract; guard on pk so we
+    # never pass a pk-less instance to the related filter (a hard error in Django 5.0).
+    if not (booking.pk and Contract.objects.filter(booking=booking).exists()):
         booking.contract = Contract(booking=booking)
     if lodging.contract_template or template_content:
         from core.jinja2_tools import render_template
