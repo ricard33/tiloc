@@ -138,8 +138,8 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
         // Floor only — raise these as coverage improves, never lower them.
         thresholds: {
           lines: 20,
-          functions: 32,
-          branches: 53,
+          functions: 34,
+          branches: 56,
           statements: 20,
         },
       },

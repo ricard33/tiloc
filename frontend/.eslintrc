@@ -4,7 +4,9 @@
     "react-app/jest"
   ],
   "globals": {
-    "JSX": "readonly"
+    "JSX": "readonly",
+    "vi": "readonly",
+    "vitest": "readonly"
   },
   "rules": {
     "comma-dangle": 0,
