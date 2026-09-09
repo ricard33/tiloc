@@ -117,6 +117,32 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
       globals: true,
       environment: 'jsdom',
       setupFiles: 'src/setupTests.ts',
+      coverage: {
+        // Scope the report to our own code. Without an explicit `include`, the v8
+        // provider also tries to convert coverage for executed dependencies, and
+        // chokes on a non-JSON inline source map shipped by one of them.
+        provider: 'v8',
+        all: true,
+        include: ['src/**/*.{ts,tsx,js,jsx}'],
+        exclude: [
+          'src/**/*.test.{ts,tsx,js,jsx}',
+          'src/**/*.d.ts',
+          'src/setupTests.ts',
+          'src/react-app-env.d.ts',
+          'src/vite-env.d.ts',
+          'src/global.d.ts',
+          'src/icons/**',
+          'src/**/*.stories.*',
+        ],
+        reporter: ['text-summary', 'json-summary', 'html', 'lcov'],
+        // Floor only — raise these as coverage improves, never lower them.
+        thresholds: {
+          lines: 20,
+          functions: 32,
+          branches: 53,
+          statements: 20,
+        },
+      },
     }
   };
 });
