@@ -1,4 +1,5 @@
 // https://vitejs.dev/config/
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import checker from "vite-plugin-checker";
@@ -117,6 +118,16 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
       globals: true,
       environment: 'jsdom',
       setupFiles: 'src/setupTests.ts',
+      // Node loads react-hook-form-mui's CJS build in tests, which require()s its own copy of
+      // react-hook-form — so <FormContainer> and a component's own useFormContext() end up in
+      // different React contexts. Point at rhf-mui's ESM build (real `import`s) so Vite
+      // resolves react-hook-form once.
+      alias: [
+        {
+          find: /^react-hook-form-mui$/,
+          replacement: fileURLToPath(new URL('./node_modules/react-hook-form-mui/dist/esm/index.js', import.meta.url)),
+        },
+      ],
       coverage: {
         // Scope the report to our own code. Without an explicit `include`, the v8
         // provider also tries to convert coverage for executed dependencies, and
@@ -139,10 +150,10 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
         reporter: ['text-summary', 'json-summary', 'html', 'lcov'],
         // Floor only — raise these as coverage improves, never lower them.
         thresholds: {
-          lines: 40,
-          functions: 55,
-          branches: 74,
-          statements: 40,
+          lines: 45,
+          functions: 57,
+          branches: 76,
+          statements: 45,
         },
       },
     }
