@@ -17,8 +17,9 @@ import { alert as alertReducer, appInfo as appInfoReducer, auth as authReducer }
 import type { User } from "../types";
 
 interface Options extends Omit<RenderOptions, "wrapper"> {
-  /** initial URL(s) for the in-memory router; pass an array to give the history a "back" entry */
-  route?: string | string[];
+  /** initial URL(s) for the in-memory router; pass an array to give the history a "back" entry.
+   *  Entries may be `{ pathname, state }` objects to seed `location.state`. */
+  route?: string | Array<string | { pathname: string; state?: unknown }>;
   /** the authenticated user (sets auth.isAuthenticated + user.permissions) */
   user?: Partial<User> | null;
   /** the user's account (auth.account) */
@@ -63,7 +64,7 @@ export function renderWithProviders(ui: ReactElement, options: Options = {}) {
 
   const Wrapper = ({ children }: PropsWithChildren) => (
     <Provider store={store}>
-      <MemoryRouter initialEntries={entries} initialIndex={entries.length - 1}>
+      <MemoryRouter initialEntries={entries as never} initialIndex={entries.length - 1}>
         <I18nextProvider i18n={i18n}>
           <ThemeProvider theme={theme}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
