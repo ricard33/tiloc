@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, ReactElement } from "react";
-import { render, RenderOptions } from "@testing-library/react";
+import { render, RenderOptions, RenderResult } from "@testing-library/react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
@@ -59,7 +59,10 @@ export function makeTestStore(
 }
 
 /** Render `ui` wrapped in every provider the app relies on (redux, router, i18n, MUI theme, date pickers, snackbar). */
-export function renderWithProviders(ui: ReactElement, options: Options = {}) {
+export function renderWithProviders(
+  ui: ReactElement,
+  options: Options = {}
+): RenderResult & { store: ReturnType<typeof makeTestStore> } {
   const {
     route = "/",
     user,
