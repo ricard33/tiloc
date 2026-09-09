@@ -55,7 +55,7 @@ class SyncBookingsJob(CronJobBase):
                 logging.exception(
                     "[%s] exception during bookings synchronization from [%s]", sync.lodging.name, sync.channel.name
                 )
-            if (arrow.utcnow().datetime - sync.last_import) > timedelta(hours=6):
+            if sync.last_import and (arrow.utcnow().datetime - sync.last_import) > timedelta(hours=6):
                 logging.error(
                     "[%s] bookings synchronization from [%s] in error since %d hours",
                     sync.lodging.name,
