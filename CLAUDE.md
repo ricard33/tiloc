@@ -112,7 +112,8 @@ into a `Contract`, then to PDF via `core/pdf_tools.py` (`pdfkit` → `wkhtmltopd
   for an optional secondary `legacy` DB (currently disabled).
 - **Tests**: pytest + `pytest-django`, `factory_boy` factories in `core/tests/factories.py`, helpers
   (e.g. `force_login`) in `core/tests/helpers.py`. Uploads use in-memory storage under test.
-- **Logging**: JSON formatter + Loggly, configured via `my_django_tweaks.logging_config`. `/loggly/`
+- **Logging**: JSON formatter + Loggly, configured via `location.logging_config.configure_logging`
+  (vendored from the former `my-django-tweaks` dependency). `/loggly/`
   is a proxy so the browser frontend can ship logs through the backend.
 - **Demo mode**: `settings.IS_DEMO` / `DEMO_ACCOUNT_NAME = "__demo__"` disables sync and other
   side-effecting behavior.
