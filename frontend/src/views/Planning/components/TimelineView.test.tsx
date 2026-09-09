@@ -25,9 +25,16 @@ const bookings = [
     status: "paid",
     price: 700,
     price_with_options: 700,
+    price_with_options_and_taxes: 700,
+    left_to_pay: 0,
+    total_payments: 700,
+    payments: [],
+    options: [],
+    comments: [],
     adults: 2,
     children: 0,
     babies: 0,
+    duration: 7,
   },
 ] as unknown as Booking[];
 
