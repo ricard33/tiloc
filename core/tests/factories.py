@@ -48,6 +48,7 @@ class AccountFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Account
         django_get_or_create = ("name",)
+        skip_postgeneration_save = True
 
     name = "default"
     stripe_customer_id = factory.Sequence(lambda n: "pk_customer_%d" % n)
@@ -87,6 +88,7 @@ class _UserFactory(factory.django.DjangoModelFactory):
             "account",
             "email",
         )
+        skip_postgeneration_save = True
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
@@ -169,6 +171,7 @@ class BookingChannelSyncFactory(factory.django.DjangoModelFactory):
 class BookingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Booking
+        skip_postgeneration_save = True
 
     account = factory.SubFactory(AccountFactory)
     guest_name = factory.Faker("name")
@@ -245,6 +248,11 @@ class BookingFactory(factory.django.DjangoModelFactory):
             self.guests_distribution.setdefault(self.lodgings.first().id, {})["babies"] = extracted
         else:
             self.guests_distribution.setdefault(self.lodgings.first().id, {})["babies"] = 0
+        # `babies` is the last post-generation hook; adults/children have populated the same
+        # JSONField in memory. With skip_postgeneration_save the implicit re-save is gone, so
+        # persist guests_distribution here (only for created — never for .build()).
+        if create:
+            self.save(update_fields=["guests_distribution"])
 
 
 class ContractTemplateFactory(factory.django.DjangoModelFactory):
