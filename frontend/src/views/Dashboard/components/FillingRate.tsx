@@ -266,7 +266,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
                         if ((context.datasetIndex === 0 || context.datasetIndex === 2) && mode === "global")
                           label = t("Filling rate") + ": " + context.parsed.y + " %";
                         else
-                          label = t("Turnover") + ": " +  formatCurrency(context.parsed.y);
+                          label = t("Turnover") + ": " +  formatCurrency(context.parsed.y ?? 0);
                         return label;
                       }
                     }

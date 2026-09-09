@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { DeleteForever as DeleteIcon } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
-import { FieldArrayWithId, useFieldArray } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import { formatCurrency } from "../../common/intlUtils";
 import { Service } from "../../types";
 import { CheckboxElement, TextFieldElement } from "react-hook-form-mui";
@@ -72,7 +72,9 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
         >
           <TableBody>
             {
-              fields.map((option: FieldArrayWithId<Service, never, string>, index: number) => (
+              // `form` is untyped (`form: any`), so `useFieldArray` can't infer the row
+              // shape; treat each row as the Service it holds (+ the `key` from keyName).
+              (fields as unknown as Array<Service & { key: string }>).map((option, index: number) => (
                 <React.Fragment key={option.key}>
                   <TableRow>
                     <TableCell colSpan={5} sx={{ borderBottom: 0 }}>
@@ -121,7 +123,9 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
                           control={control}
                           name={`options.${index}.is_flat_rate`}
                           label={t("Flat rate")}
-                          defaultValue={option.is_flat_rate}
+                          // rhf-mui types CheckboxElement's defaultValue as string-ish; the
+                          // field is a boolean and was passed as-is before rhf 7 tightened this.
+                          defaultValue={option.is_flat_rate as unknown as string}
                           color="primary"
                           size="small"
                           labelProps={{

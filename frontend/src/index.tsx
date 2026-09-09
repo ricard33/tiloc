@@ -111,7 +111,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   );
 }
 
-const logError = (error: Error, info: { componentStack: string }) => {
+const logError = (error: Error, info: React.ErrorInfo) => {
   // Do something with the error, e.g. log to an external API
   logger.error(error, info);
 };

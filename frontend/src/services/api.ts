@@ -36,7 +36,7 @@ import {
   payment2Api,
   user2api
 } from "../types/models-convertion";
-import { EndpointBuilder } from "@reduxjs/toolkit/dist/query/endpointDefinitions";
+import type { EndpointBuilder } from "@reduxjs/toolkit/query";
 
 export const serviceURL = "/api/";
 

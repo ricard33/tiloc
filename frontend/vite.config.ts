@@ -139,7 +139,6 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
           'src/**/*.test.{ts,tsx,js,jsx}',
           'src/**/*.d.ts',
           'src/setupTests.ts',
-          'src/react-app-env.d.ts',
           'src/vite-env.d.ts',
           'src/global.d.ts',
           'src/icons/**',
