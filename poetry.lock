@@ -1175,18 +1175,18 @@ typing-extensions = "*"
 
 [[package]]
 name = "django-timezone-field"
-version = "6.1.0"
+version = "7.2.2"
 description = "A Django app providing DB, form, and REST framework fields for zoneinfo and pytz timezone objects."
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 groups = ["main"]
 files = [
-    {file = "django_timezone_field-6.1.0-py3-none-any.whl", hash = "sha256:0095f43da716552fcc606783cfb42cb025892514f1ec660ebfa96186eb83b74c"},
-    {file = "django_timezone_field-6.1.0.tar.gz", hash = "sha256:d40f7059d7bae4075725d04a9dae601af9fe3c7f0119a69b0e2c6194a782f797"},
+    {file = "django_timezone_field-7.2.2-py3-none-any.whl", hash = "sha256:30354d0f37462a0b9b5c289e271580a6be9b58dea30e7bf88435372882c8fa7a"},
+    {file = "django_timezone_field-7.2.2.tar.gz", hash = "sha256:a004d0b19fe10bf5964cb21a65b36324b16a61879e4711c0dafdf8d6253e8ebc"},
 ]
 
 [package.dependencies]
-Django = ">=3.2,<6.0"
+Django = ">=4.2,<6.2"
 
 [[package]]
 name = "django-user-visit"
@@ -2766,4 +2766,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "f90907e7f1f242e822266c051cca113a1b44ce6aa6aaaa6a49c48c96306e908e"
+content-hash = "7a2fef03292d8c8f82d731cc1abbfe4321f674ad9d9bce1d37e8fa309aa9a73f"

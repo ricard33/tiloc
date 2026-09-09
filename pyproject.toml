@@ -71,7 +71,7 @@ django-email-verification = "^0.3.3"
 # Pinned to v7: code uses stripe.Invoice.upcoming and stripe.error.SignatureVerificationError,
 # both removed/relocated in stripe v8+.
 stripe = "^7.5.0"
-django-timezone-field = "^6.1.0"
+django-timezone-field = "^7.0"
 django-anymail = {extras = ["mailjet", "sendinblue"], version = "^10.2"}
 django-user-visit = "^2.0"
 django-loginas = "^0.3.11"
