@@ -55,6 +55,15 @@ describe("LodgingForm", () => {
     expect(onDelete).toHaveBeenCalledWith(lodging);
   });
 
+  it("still renders when the account has no contract templates", async () => {
+    (axios as any).mockImplementation(async () => ({ data: { count: 0, results: [] }, status: 200 }));
+    renderWithProviders(
+      <LodgingForm lodging={lodging} users={users} onSubmit={vi.fn()} onCancel={vi.fn()} />,
+      opts
+    );
+    expect(await screen.findByText("Lodging properties")).toBeInTheDocument();
+  });
+
   it("confirms unsaved changes before cancelling", async () => {
     const confirm = vi.fn().mockResolvedValue(undefined);
     const onCancel = vi.fn();

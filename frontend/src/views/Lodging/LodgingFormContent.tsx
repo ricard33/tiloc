@@ -73,7 +73,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
   const [remoteCalendars, setRemoteCalendars] = useState(lodging?.remote_calendars ?? []);
 
   useEffect(() => {
-    if (!template && templates)
+    if (!template && templates && templates.length > 0)
       setValue("contract_template", templates[0].id, { shouldDirty: true });
   }, [setValue, template, templates]);
 
@@ -437,7 +437,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
                 })}
                 fullWidth
                 style={{ minWidth: "300px" }}
-                defaultValue={templates[0].id}
+                defaultValue={templates[0]?.id}
               />
               :
               <Skeleton variant="rectangular" width={210} height={24} />
