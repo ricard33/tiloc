@@ -133,14 +133,16 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
           'src/global.d.ts',
           'src/icons/**',
           'src/**/*.stories.*',
+          'src/common/testUtils2.ts',
+          'src/common/testRender.tsx',
         ],
         reporter: ['text-summary', 'json-summary', 'html', 'lcov'],
         // Floor only — raise these as coverage improves, never lower them.
         thresholds: {
-          lines: 21,
-          functions: 37,
-          branches: 60,
-          statements: 21,
+          lines: 23,
+          functions: 41,
+          branches: 64,
+          statements: 23,
         },
       },
     }

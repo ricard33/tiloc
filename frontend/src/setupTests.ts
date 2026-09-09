@@ -10,6 +10,12 @@ import i18n from './i18n';
 i18n.options.debug = false;
 i18n.language = "en";
 
+// i18n keys are the literal English source strings (keySeparator: false), so forcing the
+// language to "en" makes t("Some label") echo the key back — assertions can match on English.
+beforeAll(async () => {
+  await i18n.changeLanguage("en");
+});
+
 // jsdom doesn't implement matchMedia / ResizeObserver, both of which MUI relies on
 // (useMediaQuery, <Hidden>, responsive components, x-data-grid, ...).
 if (!window.matchMedia) {
