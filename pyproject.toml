@@ -39,33 +39,35 @@ readme = "README.md"
 python = "^3.12"
 arrow = "^1.2.3"
 babel = "^2.10.3"
-django = "^4.1.2"
+django = "^4.2"
 django-constance = "^3.1.0"
-django-cors-headers = "^4.2.0"
 django-cron = "^0.6.0"
 django-dbbackup = "^4.0.2"
 django-filter = "^23.2"
 django-import-export = "^4.3.7"
-django-picklefield = "^3.1"
 django-proxy = "^1.2.1"
 django-rest-knox = "^4.2.0"
 django-simple-history = "^3.1.1"
 djangorestframework = "^3.14.0"
-gunicorn = ">=21.2,<23.0"
+gunicorn = ">=22.0,<27.0"
+# Git fork for lenient parsing of the malformed iCal feeds some booking channels emit
+# (core/sync.py). Do not swap for the PyPI release. Branch: more-permissive-parsing.
 ics = { git = "https://github.com/ricard33/ics-py", branch="more-permissive-parsing" }
 invoke = "^2.1.3"
 jinja2 = "^3.1.2"
 JSON-log-formatter = "^0.5.1"
 loggly-python-handler = "^1.0.1"
-newrelic = "==10.11.0"
+newrelic = ">=10.11,<14"
 pdfkit = "^1.0.0"
-Pillow = ">=10.1,<13.0"
+Pillow = ">=10.4,<14.0"
 requests = "^2.28.1"
 smartconfigparser = "^1.0.0"
 whitenoise = { version = "^6.2.0", extras = ["brotli"] }
 psycopg2-binary = "^2.9.7"
 faker = "^20.1.0"
 django-email-verification = "^0.3.3"
+# Pinned to v7: code uses stripe.Invoice.upcoming and stripe.error.SignatureVerificationError,
+# both removed/relocated in stripe v8+.
 stripe = "^7.5.0"
 django-timezone-field = "^6.1.0"
 django-anymail = {extras = ["mailjet", "sendinblue"], version = "^10.2"}
@@ -81,15 +83,14 @@ django-stubs = "^5.2"
 djangorestframework-stubs = "^3.16.7"
 fabric = "^3.0"
 factory_boy = "^3.3.1"
-flake8 = "^6.1.0"
+flake8 = "^7.1"
 isort = "^5.6.4"
 patchwork = {git = "https://github.com/ricard33/patchwork.git", rev = "fabric3"}
 pytest = ">=7.4.3,<10.0.0"
 pytest-django = "^4.7.0"
 black = ">=23.11,<27.0"
-pytest-cov = "^4.0.0"
-setuptools = ">=69.0.2,<79.0.0"
-poetry-plugin-export = "^1.6.0"
+pytest-cov = "^6.0"
+setuptools = ">=70.0,<82.0"
 pyyaml = "^6.0.2"
 
 [tool.coverage.run]
@@ -100,6 +101,7 @@ omit = [
     "*/tests.py",
     "location/wsgi.py",
     "location/asgi.py",
+    "location/logging_config.py",  # infra, vendored verbatim from my-django-tweaks
 ]
 
 [tool.coverage.report]

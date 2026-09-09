@@ -298,6 +298,8 @@ def empty_folder(c):
 @task
 def deploy_location(c):
     c.run("mkdir -p %s" % c.TARGET_PATH)
+    # Uses the local Poetry install; it must have poetry-plugin-export
+    # (`poetry self add poetry-plugin-export`). No longer a project dev dependency.
     subprocess.check_call(
         ["poetry", "export", "-o", os.path.join(WORKSPACE, "requirements-prod.txt"), "--without-hashes"]
     )
