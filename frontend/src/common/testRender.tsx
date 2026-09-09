@@ -8,6 +8,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { SnackbarProvider } from "notistack";
+import ConfirmContext from "../libs/MuiConfirm/ConfirmContext";
 
 import i18n from "../i18n";
 import theme from "../theme";
@@ -22,6 +23,8 @@ interface Options extends Omit<RenderOptions, "wrapper"> {
   user?: Partial<User> | null;
   /** anything to merge into the preloaded redux state */
   preloadedState?: Record<string, unknown>;
+  /** stand-in for useConfirm(): resolve to accept, reject to dismiss. Defaults to auto-accept. */
+  confirm?: (options?: unknown) => Promise<unknown>;
 }
 
 export function makeTestStore(user?: Partial<User> | null, preloadedState: Record<string, unknown> = {}) {
@@ -47,7 +50,7 @@ export function makeTestStore(user?: Partial<User> | null, preloadedState: Recor
 
 /** Render `ui` wrapped in every provider the app relies on (redux, router, i18n, MUI theme, date pickers, snackbar). */
 export function renderWithProviders(ui: ReactElement, options: Options = {}) {
-  const { route = "/", user, preloadedState, ...renderOptions } = options;
+  const { route = "/", user, preloadedState, confirm = () => Promise.resolve(), ...renderOptions } = options;
   const store = makeTestStore(user, preloadedState);
 
   const Wrapper = ({ children }: PropsWithChildren) => (
@@ -56,7 +59,9 @@ export function renderWithProviders(ui: ReactElement, options: Options = {}) {
         <I18nextProvider i18n={i18n}>
           <ThemeProvider theme={theme}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <SnackbarProvider>{children}</SnackbarProvider>
+              <SnackbarProvider>
+                <ConfirmContext.Provider value={confirm}>{children}</ConfirmContext.Provider>
+              </SnackbarProvider>
             </LocalizationProvider>
           </ThemeProvider>
         </I18nextProvider>
