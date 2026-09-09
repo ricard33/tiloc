@@ -144,6 +144,9 @@ New Relic config is `config/newrelic.ini`.
 - Tests: pytest-django + factory_boy, never `setUp()` style unittest
 - Import order: stdlib, third-party, local
  
+## Commit conventions
+Never add "Co-Authored-By" lines or any AI attribution to git commit messages or metadata.
+
 ## Non-negotiable rules
 - Never commit without `poetry run python runtests.py` passing
 - All migration must be reversible (test `migrate <app> <previous>`)

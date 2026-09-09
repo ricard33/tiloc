@@ -10,8 +10,8 @@ import sys
 import pytest
 
 PYTEST_ARGS = {
-    "default": ["core", "--tb=short", "-v", "-s", "-rw"],
-    "fast": ["core", "--tb=short", "-q", "-s", "-rw"],
+    "default": ["--tb=short"],      #, "-v", "-s", "-rw"],
+    "fast": ["--tb=short", "-q"],   #, "-s", "-rw"],
 }
 
 FLAKE8_ARGS = [

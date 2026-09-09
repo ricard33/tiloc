@@ -40,6 +40,7 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ENV = os.environ.get("APP_ENV", DEBUG and "dev" or "prod")
 UNITTEST = "test" in sys.argv or "pytest" in sys.modules
+TEST_RUNNER = "location.runner.PytestTestRunner"
 IS_DEMO = config.getboolean("APP", "IS_DEMO", False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
