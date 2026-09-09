@@ -34,7 +34,12 @@ jobs:
 
     - name: Run Tests
       run: |
-        poetry run coverage run --source=. -m pytest -v --junitxml=test-reports/report.xml
+        poetry run coverage run -m pytest -v --junitxml=test-reports/report.xml
+
+    - name: Check coverage
+      run: |
+        poetry run coverage report
+        poetry run coverage xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
