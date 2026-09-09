@@ -228,7 +228,9 @@ class ResetPasswordAPI(generics.GenericAPIView):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        email = request.data["email"]
+        email = request.data.get("email")
+        if not email:
+            return Response({"email": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = models.User.objects.get(email=email)
             send_reset_password(user, context={"request": request})
@@ -857,7 +859,7 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError:
         # Invalid signature
-        return HttpResponse(400)
+        return HttpResponse(status=400)
 
     # if settings.DEBUG and settings.ENV == "dev" and not settings.UNITTEST:
     #     with open(os.path.join(settings.LOG_DIR, "stripe-event-%f-%s.txt" % (time.time(), event.type)), "tw") as f:

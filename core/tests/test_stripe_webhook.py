@@ -90,11 +90,6 @@ class TestWebhookVerification:
 
         assert response.status_code == 400
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="the SignatureVerificationError branch returns HttpResponse(400) — that sets the "
-        "body to '400' and leaves the status at 200, so Stripe is told the delivery succeeded.",
-    )
     def test_invalid_signature_returns_400(self, monkeypatch, db):
         def boom(*a, **kw):
             raise stripe.error.SignatureVerificationError("bad sig", "sig-header")

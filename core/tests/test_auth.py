@@ -159,15 +159,11 @@ class TestResetPasswordAPI:
         assert response.status_code == status.HTTP_200_OK
         assert sent_emails["reset"] == []
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="ResetPasswordAPI reads request.data['email'] directly; a missing key raises "
-        "KeyError and returns 500 instead of a 400.",
-    )
-    def test_missing_email_returns_400(self, api_client, db):
+    def test_missing_email_returns_400(self, api_client, db, sent_emails):
         response = api_client.post("/api/auth/reset_password/", {})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert sent_emails["reset"] == []
 
 
 # --------------------------------------------------------------------------- #
