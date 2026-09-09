@@ -53,7 +53,7 @@ const AnnualView: React.FC<Props> = props => {
     window.setTimeout(() => window.dispatchEvent(new Event("resize")));
   }, []);
 
-  // eslint-disable-next-line react/no-multi-comp
+   
   function renderTimeline(start: Date, end: Date) {
     return (
       <TimelineView
@@ -73,10 +73,10 @@ const AnnualView: React.FC<Props> = props => {
     );
   }
 
-  let timelines = [];
+  const timelines = [];
 
   for (let i = 0; i < (settings.monthsToDisplay ?? 12); i += horizontalMonths) {
-    let start = add(beginDate, { months: Math.trunc(i), days: 30 * (i % 1) });
+    const start = add(beginDate, { months: Math.trunc(i), days: 30 * (i % 1) });
     timelines.push(
       <div key={i} className="timeline">
         {renderTimeline(

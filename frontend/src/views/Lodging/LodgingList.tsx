@@ -92,10 +92,12 @@ const LodgingsList: React.FunctionComponent<Props> = () => {
         type: "actions",
         getActions: (params: GridRowParams) => [
           <GridActionsCellItem
+            key="up"
             disabled={!canChange} icon={<ArrowUpwardIcon />}
             onClick={() => onRankUpDown(params.row, "up")} label="up"
           />,
           <GridActionsCellItem
+            key="down"
             disabled={!canChange}
             icon={<ArrowDownwardIcon />} onClick={() => onRankUpDown(params.row, "down")} label="down"
             // showInMenu

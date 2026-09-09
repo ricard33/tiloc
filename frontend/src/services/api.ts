@@ -70,16 +70,15 @@ const axiosBaseQuery =
   ): BaseQueryFn<string | AxiosArgs, unknown, QueryError, {}, AxiosQueryMeta> =>
     async (arg) => {
       const { url, method = "get", params = undefined, data = undefined } = typeof arg == "string" ? { url: arg } : arg;
-      let meta: AxiosQueryMeta;
       const requestArgs: AxiosRequestConfig = { url: baseUrl + url, method, params, data };
       if (method.toLowerCase() === "put" || method.toLowerCase() === "patch" || method.toLowerCase() === "post") {
-        let form_data = new FormData();
+        const form_data = new FormData();
         let fileUpload = false;
         for (const propertyName in data) {
           // propertyName is what you want
           // you can get the value like this: myObject[propertyName]
           if (data.hasOwnProperty(propertyName)) {
-            let value = data[propertyName];
+            const value = data[propertyName];
 
             if (FileList && value instanceof FileList) {
               // Safari, Firefox, IE land here
@@ -100,12 +99,12 @@ const axiosBaseQuery =
           // a FormData; setting the header by hand here would drop the boundary.
         }
       }
-      meta = { request: requestArgs };
+      const meta: AxiosQueryMeta = { request: requestArgs };
       try {
         const result = await axios(requestArgs);
         return { data: result.data };
       } catch (axiosError) {
-        let err = axiosError as AxiosError;
+        const err = axiosError as AxiosError;
         if (err.response) {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx

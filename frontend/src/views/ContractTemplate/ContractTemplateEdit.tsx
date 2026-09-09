@@ -36,7 +36,7 @@ import { getCookie } from "../../common/cookies";
 const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 const ContractTemplateEdit = (/*props*/) => {
-  let { templateId } = useParams();
+  const { templateId } = useParams();
   const { t } = useTranslation();
   const {
     data: template, isLoading

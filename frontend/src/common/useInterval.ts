@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+ 
 export default function useInterval(callback: () => void, delay: number) {
   const savedCallback = useRef<() => void>(() => undefined);
 
@@ -15,7 +15,7 @@ export default function useInterval(callback: () => void, delay: number) {
       savedCallback.current();
     }
     if (delay !== null) {
-      let id = setInterval(tick, delay);
+      const id = setInterval(tick, delay);
       return () => clearInterval(id);
     }
   }, [delay]);

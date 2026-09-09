@@ -2,8 +2,8 @@ import { format } from "date-fns";
 
 export const shiftPickerDateToUTCDate = (pickerDate: { getTimezoneOffset: () => any; getTime: () => number; }) => {
   // console.debug("PickerDate", pickerDate);
-  let pickerOffset = pickerDate.getTimezoneOffset();
-  let utcDate = new Date();
+  const pickerOffset = pickerDate.getTimezoneOffset();
+  const utcDate = new Date();
   utcDate.setTime(pickerDate.getTime() - pickerOffset * 60000);
   return utcDate;
 };

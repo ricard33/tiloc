@@ -18,7 +18,7 @@ export const useAlert = () => {
       const msg = message.length > 1000 ? (message.substring(0, 1000) + "...") : message;
       return enqueueSnackbar(msg, {
         variant: variant,
-        // eslint-disable-next-line react/display-name
+         
         action: (key) => (
           <Button onClick={() => closeSnackbar(key)}>{t("dismiss")}</Button>
         )

@@ -10,7 +10,7 @@ if (Number.EPSILON === undefined) {
 
 export const DecimalPrecision = {
   round: function(n: number, p = 2) {
-    let r = 0.5 * Number.EPSILON * n;
+    const r = 0.5 * Number.EPSILON * n;
     let o = 1;
     if(p<0) while (p++ < 0) o /= 10
     else while (p-- > 0) o *= 10;
@@ -19,7 +19,7 @@ export const DecimalPrecision = {
     return Math.round((n + r) * o) / o;
   },
   ceil: function(n: number, p = 2) {
-    let r = 0.5 * Number.EPSILON * n;
+    const r = 0.5 * Number.EPSILON * n;
     let o = 1;
     while (p-- > 0) o *= 10;
     if (n < 0)
@@ -27,7 +27,7 @@ export const DecimalPrecision = {
     return Math.ceil((n + r) * o) / o;
   },
   floor: function(n: number, p = 2) {
-    let r = 0.5 * Number.EPSILON * n;
+    const r = 0.5 * Number.EPSILON * n;
     let o = 1;
     while (p-- > 0) o *= 10;
     if (n < 0)

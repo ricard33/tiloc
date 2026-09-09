@@ -15,20 +15,20 @@ export const deepDiffMapper = function() {
         };
       }
 
-      let diff: Record<string, any> = {};
-      for (let key in obj1) {
+      const diff: Record<string, any> = {};
+      for (const key in obj1) {
         if (this.isFunction(obj1[key])) {
           continue;
         }
 
-        var value2 = undefined;
+        let value2 = undefined;
         if (obj2[key] !== undefined) {
           value2 = obj2[key];
         }
 
         diff[key] = this.map(obj1[key], value2);
       }
-      for (var key in obj2) {
+      for (const key in obj2) {
         if (this.isFunction(obj2[key]) || diff[key] !== undefined) {
           continue;
         }

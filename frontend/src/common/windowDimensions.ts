@@ -8,12 +8,11 @@ function getWindowDimensions() {
   };
 }
 
-function debounce(fn: Function, ms: number) {
+function debounce(fn: () => void, ms: number) {
   let timeoutId: number;
   return () => {
     clearTimeout(timeoutId);
-    // @ts-ignore
-    timeoutId = window.setTimeout(() => fn.apply(this, arguments), ms);
+    timeoutId = window.setTimeout(() => fn(), ms);
   };
 }
 

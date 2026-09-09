@@ -8,7 +8,7 @@ import { SignUp } from "./SignUp";
 vi.mock("axios");
 
 vi.mock("react-google-recaptcha", () => {
-  // eslint-disable-next-line react/display-name
+   
   const Captcha = React.forwardRef((props: any, _ref) => (
     <button type="button" onClick={() => props.onChange("captcha-token")}>
       solve captcha

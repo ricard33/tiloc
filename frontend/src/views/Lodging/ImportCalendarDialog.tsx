@@ -48,7 +48,7 @@ function ImportCalendarDialog(props: Props) {
   const [submitted, setSubmitted] = useState(false);
 
   function updateErrorState(value: Partial<CalendarSync>) {
-    let newError ={
+    const newError ={
       channel_id: submitted && !value?.channel_id ?
         t("You should select a booking platform")
         : undefined,

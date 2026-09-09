@@ -15,7 +15,7 @@ export const useDeviceDetector = () => {
     } else {
       // Only as a last resort, fall back to user agent sniffing
       // @ts-ignore
-      var UA = navigator.userAgent;
+      const UA = navigator.userAgent;
       hasTouchScreen =
         /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(UA) ||
         /\b(Android|Windows Phone|iPad|iPod)\b/i.test(UA);

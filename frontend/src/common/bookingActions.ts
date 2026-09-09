@@ -51,7 +51,7 @@ export const useBookingActions = (baseUrl = "/bookings") => {
 
   const uncancelBooking = async (booking: Booking) => {
     if (!canEdit) throw Error("prohibited");
-    let result = await updateBooking({ ...booking, cancelled: false });
+    const result = await updateBooking({ ...booking, cancelled: false });
     if ((result as any).error) {
       const error = (result as any).error;
       console.error("Error uncancelling booking", error);

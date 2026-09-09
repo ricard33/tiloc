@@ -28,8 +28,8 @@ function SignIn() {
   const { isDemo } = useAppSelector((store) => store.appInfo);
   const isAuthenticated = useSelector<RootState>(store => store.auth.isAuthenticated);
   const [doLogin] = useLoginMutation();
-  let location = useLocation();
-  let { from } = location.state || { from: { pathname: "/" } };
+  const location = useLocation();
+  const { from } = location.state || { from: { pathname: "/" } };
 
   const formContext = useForm<LoginData>({
     defaultValues: {keep_connected: true}

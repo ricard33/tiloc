@@ -1,4 +1,4 @@
-/* eslint-disable vars-on-top, no-var, prefer-template */
+ 
 import React from "react";
 
 const isRegExp = function (re: RegExp | string) {
@@ -69,7 +69,7 @@ function replaceString(
 
   const re = isRegExp(match) ? (match as RegExp) : new RegExp("(" + escapeRegExp(match as string) + ")", "gi");
 
-  let result: (React.ReactNode|string)[] = str.split(re);
+  const result: (React.ReactNode|string)[] = str.split(re);
 
   // Apply fn to all odd elements
   for (let i = 1, length = result.length; i < length; i += 2) {

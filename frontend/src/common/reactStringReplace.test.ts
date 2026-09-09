@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import replaceString from "./reactStringReplace";
 
 describe("reactStringReplace", () => {
@@ -15,7 +14,7 @@ describe("reactStringReplace", () => {
 
   test("Returns correct character offsets", () => {
     const correctOffsets = [6, 17];
-    let charOffsets: number[] = [];
+    const charOffsets: number[] = [];
 
     replaceString("Hey there, stranger", "er", (m, i, o) => charOffsets.push(o));
     expect(charOffsets).toEqual(correctOffsets);

@@ -19,7 +19,7 @@ import { useConfirm } from "../../libs/MuiConfirm";
 
 export function UserPage() {
   const { t } = useTranslation();
-  let { userId } = useParams();
+  const { userId } = useParams();
   const {
     data: user,
     isLoading

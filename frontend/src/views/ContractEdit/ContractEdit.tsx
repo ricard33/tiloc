@@ -24,7 +24,7 @@ const RichTextEditor = React.lazy(() => import("../../components/Editor"));
 
 
 const ContractEdit = () => {
-  let { bookingId } = useParams();
+  const { bookingId } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
   // const [loading, setLoading] = useState(true);

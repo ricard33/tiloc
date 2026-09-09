@@ -19,7 +19,7 @@ import { BookingChannel, User } from "../../types";
 
 export function BookingChannelPage() {
   const { t } = useTranslation();
-  let { bookingChannelId } = useParams();
+  const { bookingChannelId } = useParams();
   const {
     data: bookingChannel,
     isLoading

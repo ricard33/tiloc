@@ -27,7 +27,7 @@ const InOutEvent: React.FC<Props> = props => {
   const { t } = useTranslation();
 
   // console.log(events);
-  /* eslint-disable react/no-multi-comp */
+   
   function Sep() {
     return <span style={{ margin: "0 4px" }}>-</span>;
   }

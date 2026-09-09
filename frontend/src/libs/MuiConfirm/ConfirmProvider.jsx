@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+ 
 import React, { useState, useCallback, Fragment } from "react";
 import ConfirmContext from "./ConfirmContext";
 import ConfirmationDialog from "./ConfirmationDialog";

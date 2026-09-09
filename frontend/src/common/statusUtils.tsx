@@ -1,4 +1,4 @@
-/* eslint-disable react/no-multi-comp */
+ 
 import { Booking, BookingChannel, BookingStatus } from "../types";
 import React, { ReactElement } from "react";
 import FontAwesomeSvgIcon from "../components/FontAwesomeSvgIcon";
@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 
 export const getBookingStatus = (name: string) => {
-  for (let key in BookingStatus) {
+  for (const key in BookingStatus) {
     const status = (BookingStatus as any)[key] as BookingStatus;
     if (status.name === name)
       return status;

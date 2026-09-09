@@ -19,7 +19,7 @@ import { useConfirm } from "../../libs/MuiConfirm";
 
 export function LodgingPage() {
   const { t } = useTranslation();
-  let { lodgingId } = useParams();
+  const { lodgingId } = useParams();
   const {
     data: lodging,
     isLoading

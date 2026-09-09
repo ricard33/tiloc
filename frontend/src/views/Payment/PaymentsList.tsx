@@ -178,6 +178,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
         field: "checked", headerName: t("Reconciliation"), width: 40, type: "actions",
         getActions: (params: GridRowParams) => [
           <GridActionsCellItem
+            key="validated"
             icon={params.row.checked ? <CheckCircleOutlineIcon color="success" /> :
               <CancelOutlinedIcon color="warning" />}
             onClick={() => onValidatePayment(params.row)} label="validated"
@@ -216,6 +217,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
           if (isInEditMode) {
             return [
               <GridActionsCellItem
+                key="save"
                 icon={<SaveIcon />}
                 label="Save"
                 sx={{
@@ -224,6 +226,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
                 onClick={handleSaveClick(params.row)}
               />,
               <GridActionsCellItem
+                key="cancel"
                 icon={<CancelIcon />}
                 label="Cancel"
                 className="textPrimary"
@@ -234,6 +237,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
           }
           return [
             <GridActionsCellItem
+              key="edit"
               icon={<EditIcon />}
               label="Edit"
               className="textPrimary"
@@ -241,6 +245,7 @@ const PaymentsList: React.FunctionComponent<Props> = () => {
               color="inherit"
             />,
             <GridActionsCellItem
+              key="delete"
               icon={<DeleteIcon />}
               label="Delete"
               onClick={handleDeleteClick(params.row)}

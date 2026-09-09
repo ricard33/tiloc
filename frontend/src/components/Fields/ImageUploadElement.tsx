@@ -51,7 +51,7 @@ const ImageUploadElement: React.FC<ImageUploadElementProps> = <TFieldValues exte
 
   function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
-      var file = e.target.files[0];
+      const file = e.target.files[0];
       setFileInfo({ name: file.name, type: file.type, lastModified: file.lastModified });
       const reader = new FileReader();
       reader.addEventListener("load", () => {

@@ -161,7 +161,7 @@ type BookingDialogProps = {
   onUncancelBooking?: () => void
 };
 
-// eslint-disable-next-line react/no-multi-comp
+ 
 const BookingDialog: React.FC<BookingDialogProps> = props => {
   const { booking, lodgings, allOptions, guests: allGuests, onClose, onOpenContract } = props;
   const user = useSelector<RootState>(store => store.auth.user) as User;
@@ -238,7 +238,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
     // Only include editable fields because to make `isDirty` reseted to false working after a submit
     // ==> dirty state is computed comparing default values and stored values (output of getValues())
-    let {
+    const {
       lodgings: _,
       price_with_options,
       left_to_pay,
@@ -326,7 +326,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       case "status_id": {
         return value;
       }
-      case "existing-guest":
+      case "existing-guest": {
         const guest = allGuests.filter(guest => guest.name === value);
         // console.log(guest, typeof guest);
         if (guest && guest.length > 0) {
@@ -335,6 +335,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           setValue("guest_address", guest[0].address);
         }
         break;
+      }
       case "duration": {
         const duration = Number(value);
         onDurationChange(duration);
@@ -490,7 +491,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       source_id: data.source_id ? data.source_id : undefined
     };
     const action = booking.id ? updateBooking : createBooking;
-    let result = await action(submittedBooking);
+    const result = await action(submittedBooking);
     if ((result as any).error) {
       const error = (result as any).error;
       console.error("Error saving booking", error);
@@ -527,7 +528,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     }
   }
 
-  // eslint-disable-next-line react/no-multi-comp
+   
   const dialogTitle = booking && booking.id ? t("Modify") : t("Add");
   return (
     <Dialog

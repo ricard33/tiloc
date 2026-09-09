@@ -42,7 +42,7 @@ import { formatCurrency } from "../../../common/intlUtils";
 
 
 const PaymentsTooltip = styled(({ className, children, ...props }: TooltipProps) => (
-  <Tooltip {...props} classes={{ popper: className }} children={children} />
+  <Tooltip {...props} classes={{ popper: className }}>{children}</Tooltip>
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
     maxWidth: 375

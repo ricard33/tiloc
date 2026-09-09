@@ -18,7 +18,7 @@ import { CalendarSync, User } from "../../types";
 
 export default function CalendarSyncPage() {
   const { t } = useTranslation();
-  let { calendarSyncId } = useParams();
+  const { calendarSyncId } = useParams();
   console.log("calendarSyncId", calendarSyncId, typeof calendarSyncId);
   const {
     data: calendarSync,

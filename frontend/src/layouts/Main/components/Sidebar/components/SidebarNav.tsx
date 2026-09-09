@@ -1,5 +1,5 @@
-/* eslint-disable react/no-multi-comp */
-/* eslint-disable react/prop-types */
+ 
+ 
 import React from "react";
 import { NavLink, NavLinkProps } from "react-router-dom";
 import clsx from "clsx";

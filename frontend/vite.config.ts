@@ -26,10 +26,15 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
-      checker({
+      // Type/lint overlay for dev and build only — it spawns tsc/eslint watchers that
+      // just add noise (and cost) under Vitest, which type-checks via `yarn compile`.
+      !process.env.VITEST && checker({
         overlay: { initialIsOpen: false },
         typescript: true,
-        // ESLint is wired back in once the flat config lands (see eslint.config.js).
+        eslint: {
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+          useFlatConfig: true,
+        },
       }),
       svgrPlugin(),
     ],

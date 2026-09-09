@@ -1,4 +1,4 @@
-/* eslint-disable react/no-multi-comp */
+ 
 import React from "react";
 import { Card, CardContent, CardHeader, Divider, Stack } from "@mui/material";
 import Timeline from "@mui/lab/Timeline";
@@ -138,7 +138,7 @@ const ActivityFeed: React.FC<Props> = props => {
         >
           {(activities && activities.length > 0) ?
             activities.map((activity) => (
-              // eslint-disable-next-line react/prop-types
+               
               <ActivityItem key={activity.id} activity={activity} />
             ))
             :

@@ -29,7 +29,7 @@ const Profile = () => {
       >
         {user.full_name}
       </Typography>
-      <Typography variant="body2">"Small bio</Typography>
+      <Typography variant="body2">{'"Small bio'}</Typography>
     </div>
   );
 };

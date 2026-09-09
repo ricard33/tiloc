@@ -18,7 +18,7 @@ import { Service, User } from "../../types";
 
 export function ServicePage() {
   const { t } = useTranslation();
-  let { serviceId } = useParams();
+  const { serviceId } = useParams();
   const {
     data: service,
     isLoading
