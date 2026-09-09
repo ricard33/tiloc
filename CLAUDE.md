@@ -130,8 +130,8 @@ a catch-all route returns `index.html`. `DJANGO_VITE_*` settings point at the bu
 Fabric 3 (`deployment/fabfile.py`), hosted on alwaysdata:
 
 ```shell
-poetry run fab -H alwaysdata -f deployment/staging.yml deploy   # staging
-poetry run fab -H alwaysdata -f deployment/prod.yml deploy      # production
+poetry run fab -r deployment -H alwaysdata -f deployment/staging.yml deploy   # staging
+poetry run fab -r deployment -H alwaysdata -f deployment/prod.yml deploy      # production
 ```
 
 `deploy` prompts for a version bump, creates a git tag, writes `location/version.properties`, rsyncs
