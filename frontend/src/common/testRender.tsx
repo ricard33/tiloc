@@ -21,13 +21,19 @@ interface Options extends Omit<RenderOptions, "wrapper"> {
   route?: string;
   /** the authenticated user (sets auth.isAuthenticated + user.permissions) */
   user?: Partial<User> | null;
+  /** the user's account (auth.account) */
+  account?: Record<string, unknown>;
   /** anything to merge into the preloaded redux state */
   preloadedState?: Record<string, unknown>;
   /** stand-in for useConfirm(): resolve to accept, reject to dismiss. Defaults to auto-accept. */
   confirm?: (options?: unknown) => Promise<unknown>;
 }
 
-export function makeTestStore(user?: Partial<User> | null, preloadedState: Record<string, unknown> = {}) {
+export function makeTestStore(
+  user?: Partial<User> | null,
+  preloadedState: Record<string, unknown> = {},
+  account?: Record<string, unknown>
+) {
   return configureStore({
     reducer: combineReducers({
       alert: alertReducer,
@@ -42,6 +48,7 @@ export function makeTestStore(user?: Partial<User> | null, preloadedState: Recor
         isLoading: false,
         needToReload: false,
         user: user ? ({ id: 1, email: "test@example.com", permissions: [], ...user } as User) : undefined,
+        account,
       },
       ...preloadedState,
     } as never,
@@ -50,8 +57,8 @@ export function makeTestStore(user?: Partial<User> | null, preloadedState: Recor
 
 /** Render `ui` wrapped in every provider the app relies on (redux, router, i18n, MUI theme, date pickers, snackbar). */
 export function renderWithProviders(ui: ReactElement, options: Options = {}) {
-  const { route = "/", user, preloadedState, confirm = () => Promise.resolve(), ...renderOptions } = options;
-  const store = makeTestStore(user, preloadedState);
+  const { route = "/", user, account, preloadedState, confirm = () => Promise.resolve(), ...renderOptions } = options;
+  const store = makeTestStore(user, preloadedState, account);
 
   const Wrapper = ({ children }: PropsWithChildren) => (
     <Provider store={store}>

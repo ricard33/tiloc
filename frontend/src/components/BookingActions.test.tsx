@@ -8,7 +8,17 @@ import type { Booking } from "../types";
 
 vi.mock("axios");
 
-const booking = { id: 5, cancelled: false, guest_name: "Doe", lodgings: [{ name: "Villa" }] } as unknown as Booking;
+const booking = {
+  id: 5,
+  cancelled: false,
+  guest_name: "Doe",
+  lodgings: [{ name: "Villa" }],
+  daily_rate: 100,
+  price: 700,
+  deposit: 200,
+  guaranty: 300,
+  commission_fees: 0,
+} as unknown as Booking;
 
 const noop = { onCancelBooking: vi.fn(), onUncancelBooking: vi.fn() };
 
