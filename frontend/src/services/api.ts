@@ -96,7 +96,8 @@ const axiosBaseQuery =
         }
         if (fileUpload) {
           requestArgs.data = form_data;
-          requestArgs.headers = { "Content-Type": "multipart/form-data" };
+          // axios 1.x sets multipart/form-data *with the boundary* itself when the body is
+          // a FormData; setting the header by hand here would drop the boundary.
         }
       }
       meta = { request: requestArgs };
@@ -108,13 +109,14 @@ const axiosBaseQuery =
         if (err.response) {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
+          const responseData = err.response.data;  // `unknown` since axios 1.x
           return {
             error: {
-              message: typeof err.response?.data === "string" ? err.response?.data
-                : typeof err.response?.data === "object" ? JSON.stringify(err.response?.data)
-                  : err.response?.statusText,
-              status: err.response?.status,
-              data: err.response?.data,
+              message: typeof responseData === "string" ? responseData
+                : typeof responseData === "object" ? JSON.stringify(responseData)
+                  : err.response.statusText,
+              status: err.response.status,
+              data: responseData as ApiError | ValidationError,
               meta
             }
           };

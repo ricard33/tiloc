@@ -27,7 +27,7 @@ axios.interceptors.request.use(
   function(config) {
     // Do something before request is sent
     // console.log("axios.interceptors.request", config)
-    if (typeof config.headers === "undefined") config.headers = {};
+    // axios 1.x always provides an AxiosHeaders instance on config.headers.
 
     const token = localStorage.getItem("token");
     if (token) {

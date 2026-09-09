@@ -50,7 +50,7 @@
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.2",
     "@ti-gecko/tiloc-ckeditor5": "file:./ckeditor5",
-    "axios": "^0.25.0",
+    "axios": "^1.7.9",
     "chart.js": "^4.4.1",
     "classnames": "^2.3.2",
     "clsx": "^2.1.0",
