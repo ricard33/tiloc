@@ -61,7 +61,7 @@
     "mui-daterange-picker": "^1.0.6",
     "notistack": "^3.0.1",
     "prop-types": "^15.8.1",
-    "query-string": "^8.2.0",
+    "query-string": "^9.5.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
