@@ -140,7 +140,6 @@ export default defineConfig(({ command, mode, isSsrBuild }) => {
           'src/**/*.d.ts',
           'src/setupTests.ts',
           'src/vite-env.d.ts',
-          'src/global.d.ts',
           'src/icons/**',
           'src/**/*.stories.*',
           'src/common/testUtils2.ts',

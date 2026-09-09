@@ -182,7 +182,7 @@ function makePaginatedListApi<T extends BaseModel>(builder: AxiosEndpointBuilder
       { type: modelName, id: "LIST" }
     ] : [{ type: modelName, id: "LIST" }],
     ...(convertFromApi && {
-      transformResponse: (response) => {
+      transformResponse: (response: unknown) => {
         return {
           ...response as Pagination<T>,
           results: (response as Pagination<ApiModel>).results.map(p => convertFromApi(p))
@@ -198,7 +198,7 @@ function makeGetApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: str
     providesTags: (data) => data ? [
       { type: modelName, id: data.id }
     ] : [],
-    ...(convertFromApi && { transformResponse: (response) => convertFromApi(response as ApiModel) })
+    ...(convertFromApi && { transformResponse: (response: unknown) => convertFromApi(response as ApiModel) })
   });
 }
 
@@ -217,7 +217,7 @@ function makeCreateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
       ...invalidatesDependentTags(modelName, obj)
     ],
     ...(convertFromApi && {
-      transformResponse: (response) => {
+      transformResponse: (response: unknown) => {
         return convertFromApi(response as ApiModel);
       }
     })
@@ -240,7 +240,7 @@ function makeUpdateApi<T extends BaseModel>(builder: AxiosEndpointBuilder, url: 
       ...invalidatesDependentTags(modelName, obj)
     ],
     ...(convertFromApi && {
-      transformResponse: (response) => {
+      transformResponse: (response: unknown) => {
         return convertFromApi(response as ApiModel);
       }
     })
