@@ -31,10 +31,27 @@ if (!window.matchMedia) {
   }) as unknown as MediaQueryList;
 }
 
-if (!(window as any).ResizeObserver) {
-  (window as any).ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
+// A ResizeObserver that reports a fixed non-zero size on observe(), so components that
+// size themselves from their container (MUI x-data-grid especially) render content.
+(window as any).ResizeObserver = class {
+  private cb: (entries: unknown[], observer: unknown) => void;
+  constructor(cb: (entries: unknown[], observer: unknown) => void) {
+    this.cb = cb;
+  }
+  observe(target: Element) {
+    this.cb([{ target, contentRect: { width: 800, height: 600 } }], this);
+  }
+  unobserve() {}
+  disconnect() {}
+};
+
+// jsdom returns 0 for every layout box; give elements a usable size for the same reason.
+for (const [prop, value] of [
+  ["offsetHeight", 600],
+  ["offsetWidth", 800],
+  ["clientHeight", 600],
+  ["clientWidth", 800],
+] as const) {
+  if (Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop)?.get) continue;
+  Object.defineProperty(HTMLElement.prototype, prop, { configurable: true, get: () => value });
 }
