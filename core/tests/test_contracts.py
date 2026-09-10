@@ -1,9 +1,11 @@
+from datetime import date
+from decimal import Decimal
 from unittest import TestCase
 
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from core.contracts import format_decimal, generate_contract, generate_preview_contract
+from core.contracts import format_decimal, format_price_breakdown, generate_contract, generate_preview_contract
 from core.tests import factories
 from core.tests.helpers import force_login
 
@@ -71,6 +73,45 @@ class ContractTemplateTestCase(APITestCase):
         lodging = factories.LodgingFactory.create()
         content = generate_preview_contract(content, lodging)
         self.assertIn(lodging.name, content)
+
+    def test_contract_renders_price_breakdown(self):
+        template = factories.ContractTemplateFactory.create(content="Détail: {{ Réservation_DETAIL_TARIF }}")
+        lodging = factories.LodgingFactory.create(contract_template=template, daily_rate=Decimal("100.00"))
+        booking = factories.BookingFactory.create(lodgings=lodging, begin_date=date(2027, 4, 5), duration=3)
+        booking.price_details = None
+        booking.save()
+        content = generate_contract(booking, lodgings=[lodging]).content
+        self.assertIn("3 nuits du", content)
+        self.assertIn("Total", content)
+
+
+class FormatPriceBreakdownTestCase(TestCase):
+    def test_empty_when_no_details(self):
+        self.assertEqual("", format_price_breakdown(None))
+        self.assertEqual("", format_price_breakdown({"lodgings": []}))
+
+    def test_groups_nights_and_lists_adjustments(self):
+        details = {
+            "total_price": "270.00",
+            "lodgings": [
+                {
+                    "lodging_name": "Gîte",
+                    "nights": [
+                        {"date": "2027-04-05", "season": "Haute", "applied_rate": "100.00", "is_weekend": False},
+                        {"date": "2027-04-06", "season": "Haute", "applied_rate": "100.00", "is_weekend": False},
+                        {"date": "2027-04-07", "season": "Haute", "applied_rate": "100.00", "is_weekend": False},
+                    ],
+                    "adjustments": [
+                        {"type": "los_discount", "label": "Weekly discount", "amount": "-30.00"},
+                    ],
+                }
+            ],
+        }
+        html = format_price_breakdown(details, "fr")
+        self.assertIn("3 nuits du", html)
+        self.assertIn("Haute", html)
+        self.assertIn("Remise à la semaine : -30", html)
+        self.assertIn("Total : 270", html)
 
 
 class FormatDecimalTestCase(TestCase):

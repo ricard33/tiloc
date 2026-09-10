@@ -192,6 +192,7 @@ const Editor: React.FunctionComponent<Props> = (props) => {
                 "Réservation_NB_NUITS",
                 "Réservation_MONTANT",
                 "Réservation_MONTANT_AVEC_OPTIONS",
+                "Réservation_DETAIL_TARIF",
                 "Réservation_ARRHES",
                 "Réservation_SOLDE_APRES_ARRHES",
                 "Réservation_NB_VOYAGEURS",

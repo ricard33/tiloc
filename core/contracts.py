@@ -13,8 +13,15 @@ from django.utils.translation import gettext as _
 from faker import Faker
 
 from core.models import BookedService, Booking, Contract
+from core.pricing import compute_quote
 
 logger = logging.getLogger("api")
+
+# Engine-emitted labels for the length-of-stay discount, rendered in French on contracts.
+_LOS_LABELS_FR = {
+    "Weekly discount": "Remise à la semaine",
+    "Monthly discount": "Remise au mois",
+}
 
 
 def format_decimal(value, locale=settings.LANGUAGE_CODE):
@@ -37,6 +44,86 @@ def format_services(services: List[BookedService], booking):
             services,
         )
     )
+
+
+def _group_nights(nights):
+    """Collapse consecutive nights sharing a season / rate / weekend flag into blocks."""
+    groups = []
+    for night in nights:
+        key = (night["season"], night["applied_rate"], night["is_weekend"])
+        if groups and groups[-1]["key"] == key:
+            groups[-1]["count"] += 1
+            groups[-1]["end"] = night["date"]
+        else:
+            groups.append(
+                {
+                    "key": key,
+                    "count": 1,
+                    "begin": night["date"],
+                    "end": night["date"],
+                    "rate": Decimal(night["applied_rate"]),
+                    "season": night["season"],
+                    "is_weekend": night["is_weekend"],
+                }
+            )
+    return groups
+
+
+def format_price_breakdown(price_details, locale=settings.LANGUAGE_CODE):
+    """Render a ``Booking.price_details`` quote snapshot as an HTML price breakdown.
+
+    Falls back to an empty string when there is nothing to show.
+    """
+    if not price_details or not price_details.get("lodgings"):
+        return ""
+
+    multi = len(price_details["lodgings"]) > 1
+    lines = []
+    for quote_lodging in price_details["lodgings"]:
+        if multi:
+            lines.append("<strong>%s</strong>" % quote_lodging["lodging_name"])
+        for group in _group_nights(quote_lodging.get("nights", [])):
+            label = "%d nuit%s du %s au %s" % (
+                group["count"],
+                "s" if group["count"] > 1 else "",
+                format_date(date.fromisoformat(group["begin"]), "short", locale),
+                format_date(date.fromisoformat(group["end"]), "short", locale),
+            )
+            if group["season"]:
+                label += " — %s" % group["season"]
+            if group["is_weekend"]:
+                label += " (week-end)"
+            amount = group["rate"] * group["count"]
+            lines.append("%s : %s €" % (label, format_decimal(amount, locale)))
+        for adjustment in quote_lodging.get("adjustments", []):
+            if adjustment["type"] == "flat_rate":
+                lines.append("Forfait : %s €" % format_decimal(Decimal(adjustment["amount"]), locale))
+                continue
+            name = _LOS_LABELS_FR.get(adjustment["label"], adjustment["label"])
+            lines.append("%s : %s €" % (name, format_decimal(Decimal(adjustment["amount"]), locale)))
+
+    lines.append("<strong>Total : %s €</strong>" % format_decimal(Decimal(price_details["total_price"]), locale))
+    return "<br>".join(lines)
+
+
+def _price_details_for(booking, lodgings):
+    """Return the stored breakdown, or compute one on the fly for an unsaved/legacy booking."""
+    if booking.price_details:
+        return booking.price_details
+    if not lodgings or not booking.begin_date or not booking.end_date:
+        return None
+    booking_date = booking.created.date() if getattr(booking, "created", None) else date.today()
+    try:
+        return compute_quote(
+            lodgings=list(lodgings),
+            begin_date=booking.begin_date,
+            end_date=booking.end_date,
+            booking_date=booking_date,
+            is_flat_rate=booking.is_flat_rate,
+            flat_price=booking.price if booking.is_flat_rate else None,
+        ).as_dict()
+    except (ValueError, ZeroDivisionError):
+        return None
 
 
 def make_context(booking, lodgings, url_server):
@@ -99,6 +186,7 @@ def make_context(booking, lodgings, url_server):
         "Réservation_DATE_DEPART": format_date(booking.end_date, "full"),
         "Réservation_NB_NUITS": booking.duration,
         "Réservation_MONTANT": format_decimal(booking.price),
+        "Réservation_DETAIL_TARIF": format_price_breakdown(_price_details_for(booking, lodgings)),
         "Réservation_MONTANT_AVEC_OPTIONS": format_decimal(booking.price_with_options),
         "Réservation_ARRHES": format_decimal(booking.deposit),
         "Réservation_SOLDE_APRES_ARRHES": format_decimal(booking.price_with_options_and_taxes - (booking.deposit or 0)),
@@ -165,6 +253,7 @@ def generate_preview_contract(template_content, lodging, url_server="http://127.
     begin_date = fake.date_between(start_date="+1m", end_date="+1y")
     duration = random.randint(7, 21)
     end_date = arrow.get(begin_date).shift(days=duration).date()
+    quote = compute_quote(lodgings=[lodging], begin_date=begin_date, end_date=end_date)
     booking = Booking(
         begin_date=begin_date,
         end_date=end_date,
@@ -179,8 +268,9 @@ def generate_preview_contract(template_content, lodging, url_server="http://127.
                 "babies": random.choices([0, 1], weights=(10, 1))[0],
             }
         },
-        price=lodging.daily_rate * duration,
-        deposit=Decimal(round(float(lodging.daily_rate) * duration * 0.3, -1)),
+        price=Decimal(quote.total_price),
+        deposit=Decimal(quote.total_deposit),
+        price_details=quote.as_dict(),
         guaranty=lodging.guaranty,
     )
     booking.lodging = lodging
