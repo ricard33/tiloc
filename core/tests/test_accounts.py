@@ -118,8 +118,10 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         for i in range(5):
             users.append(factories.StandardUserFactory.create(account=account))
         factories.ContractTemplateFactory.create(account=account)
-        pricing = factories.PricingFactory.create(account=account)
-        factories.SeasonalVariationFactory.create(pricing=pricing)
+        calendar = factories.SeasonCalendarFactory.create(account=account)
+        season = factories.SeasonFactory.create(calendar=calendar)
+        factories.SeasonDateRangeFactory.create(season=season)
+        factories.PricingAdjustmentFactory.create(account=account)
         for i in range(6):
             factories.ServiceFactory.create(account=account)
 
@@ -152,8 +154,8 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         booking = factories.BookingFactory.create(account=account, lodgings=lodging)
         factories.BookingChannelSyncFactory(lodging=lodging, channel=channel)
         factories.ContractTemplateFactory.create(account=account)
-        pricing = factories.PricingFactory.create(account=account)
-        factories.SeasonalVariationFactory.create(pricing=pricing)
+        factories.SeasonCalendarFactory.create(account=account)
+        factories.PricingAdjustmentFactory.create(account=account)
         factories.PaymentFactory.create(booking=booking)
         factories.ContractFactory.create(booking=booking)
 
@@ -163,8 +165,8 @@ class MultipleAccountsSeparationTestCase(APITestCase):
             self.assertEqual(count, response.data["count"])
 
         headers = force_login(user, self.client)
-        assertItemsCount("/api/pricing/", 1)
-        assertItemsCount("/api/seasonal_variation/", 1)
+        assertItemsCount("/api/season_calendar/", 1)
+        assertItemsCount("/api/pricing_adjustment/", 1)
         assertItemsCount("/api/contract_template/", 1)
         assertItemsCount("/api/user/", 1)
         assertItemsCount("/api/booking_channel/", 1)
@@ -197,8 +199,9 @@ class MultipleAccountsSeparationTestCase(APITestCase):
             self.assertEqual(count, len(response.data), response.data)
 
         headers = force_login(user, self.client)
-        assertItemsCount("/api/pricing/", 1)
-        assertItemsCount("/api/seasonal_variation/", 1)
+        assertItemsCount("/api/season_calendar/", 1)
+        # account-wide (lodging=None) adjustments are not listed for a lodging-restricted user
+        assertItemsCount("/api/pricing_adjustment/", 0)
         assertItemsCount("/api/contract_template/", 1)
         assertItemsCount("/api/booking_channel/", 8)
         assertItemsCount("/api/booking_channel_sync/", 1)
