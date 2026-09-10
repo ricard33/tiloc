@@ -406,5 +406,50 @@ describe("BookingDialog", () => {
     expect(await screen.findByText(/below the minimum 10 nights/, {}, { timeout: 4000 })).toBeInTheDocument();
     expect(screen.getByText("Weekly discount")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole("spinbutton", { name: "Total" })).toHaveValue(630));
+    // the average nightly rate is read-only (derived from the pricing rules)
+    expect(screen.getByRole("spinbutton", { name: "Average nightly rate" })).toHaveAttribute("readonly");
+  });
+
+  test("keeps a manually edited deposit when the price is recomputed", async () => {
+    const uiUser = userEvent.setup();
+    let quoteDeposit = "190.00";
+    (axios as any).mockImplementation(async (config: any) => {
+      const url: string = config?.url ?? "";
+      if (url.includes("booking/quote/")) {
+        return {
+          status: 200,
+          data: {
+            begin_date: "2026-01-10", end_date: "2026-01-17", nights: 7, booking_date: "2026-01-01",
+            currency: "EUR", total_price: "700.00", total_deposit: quoteDeposit, effective_daily_rate: "100.00",
+            is_flat_rate: false, warnings: [],
+            lodgings: [{
+              lodging_id: 1, lodging_name: "Villa Test", season_calendar_id: null,
+              nightly_subtotal: "700.00", price: "700.00", deposit: quoteDeposit, nights: [], warnings: [], adjustments: []
+            }]
+          }
+        };
+      }
+      if ((config?.method ?? "get").toLowerCase() === "get") return { data: { count: 0, results: [] }, status: 200 };
+      return { data: bookingRestResponse, status: 201 };
+    });
+
+    const newBooking = makeBooking({ id: undefined });
+    renderDialog({ booking: newBooking });
+    await screen.findByRole("dialog");
+
+    const depositInput = await screen.findByRole("spinbutton", { name: /Deposit/ });
+    await waitFor(() => expect(depositInput).toHaveValue(190));
+
+    await uiUser.clear(depositInput);
+    await uiUser.type(depositInput, "250");
+
+    // a later quote with a different computed deposit must not overwrite the manual value
+    quoteDeposit = "210.00";
+    const duration = screen.getByLabelText("Nights");
+    await uiUser.click(duration);
+    await uiUser.click(await screen.findByRole("option", { name: "8" }));
+
+    await waitFor(() => expect(screen.getByRole("spinbutton", { name: "Total" })).toHaveValue(700));
+    expect(depositInput).toHaveValue(250);
   });
 });
