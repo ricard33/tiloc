@@ -92,7 +92,7 @@ pytest = ">=7.4.3,<10.0.0"
 pytest-django = "^4.7.0"
 black = ">=23.11,<27.0"
 pytest-cov = "^6.0"
-setuptools = ">=70.0,<82.0"
+setuptools = ">=70.0,<84.0"
 pyyaml = "^6.0.2"
 
 [tool.coverage.run]
