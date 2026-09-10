@@ -7,7 +7,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { DateNavBar } from "./components/NavBar";
 import { formatISO } from "../../common/tzUtils";
 import PlanningSettingsDialog, { loadPlanningSettings, PlanningSettings } from "./components/PlanningSettingsDialog";
-import { useListBookingsQuery, useListLodgingsQuery } from "../../services/api";
+import { useGetLodgingRateCalendarQuery, useListBookingsQuery, useListLodgingsQuery } from "../../services/api";
 import BookingDialogLoader from "../../components/BookingDialog/BookingDialogLoader";
 import "./Planning.scss";
 import Page from "../../layouts/Main/Page";
@@ -61,6 +61,10 @@ const Planning = () => {
   const user = useAppSelector(store => store.auth.user) as User;
   const account = useAppSelector(store => store.auth.account) as Account;
   const canAdd = user.permissions.includes("core.add_booking");
+  const { data: rateCalendars } = useGetLodgingRateCalendarQuery(
+    { begin: format(dates.start, "yyyy-MM-dd"), end: format(add(dates.end, { days: 1 }), "yyyy-MM-dd") },
+    { skip: !settings.showPrices || !user.permissions.includes("core.view_prices") || view !== "timeline" }
+  );
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -178,6 +182,7 @@ const Planning = () => {
           onScroll={onScroll}
           onBoundsChange={onBoundsChange}
           settings={settings}
+          rateCalendars={rateCalendars}
           disabled={isLoadingBookings}
         />}
       {view === "annual" &&

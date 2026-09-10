@@ -515,10 +515,11 @@ def test_rate_calendar_endpoint_returns_per_day_rates(priced_client) -> None:
     factories.LodgingSeasonRateFactory.create(
         lodging=lodging, season=season, nightly_rate=Decimal("175.00"), weekend_rate=None, min_nights=None
     )
-    response = client.get(f"/api/lodging/{lodging.id}/rate_calendar/?begin=2027-07-10&end=2027-07-13")
+    response = client.get("/api/lodging/rate_calendar/?begin=2027-07-10&end=2027-07-13")
     assert response.status_code == status.HTTP_200_OK, response.data
-    assert [row["rate"] for row in response.data] == ["175.00", "175.00", "175.00"]
-    assert response.data[0]["season"] == season.name
+    rows = response.data[str(lodging.id)] if str(lodging.id) in response.data else response.data[lodging.id]
+    assert [row["rate"] for row in rows] == ["175.00", "175.00", "175.00"]
+    assert rows[0]["season"] == season.name
 
 
 def test_lodging_season_rate_rejects_season_from_another_calendar(admin_client) -> None:

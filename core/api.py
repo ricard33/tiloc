@@ -507,12 +507,14 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
             raise OverLimitError(detail="The maximum number of lodgings has been reached.")
         return super().create(request, *args, **kwargs)
 
-    @action(detail=True, methods=["get"])
+    @action(detail=False, methods=["get"])
     def rate_calendar(self, request, pk=None):
-        """Per-night base rate for a lodging over ``?begin=YYYY-MM-DD&end=YYYY-MM-DD`` (end exclusive)."""
+        """Per-night base rate for the shown lodgings over ``?begin=YYYY-MM-DD&end=YYYY-MM-DD``.
+
+        ``end`` is exclusive. Returns ``{lodging_id: [{date, rate, season, is_weekend}, ...]}``.
+        """
         if not request.user.has_perm("core.view_prices"):
             raise PermissionDenied
-        lodging = self.get_object()
         try:
             begin = arrow.get(request.query_params["begin"]).date()
             end = arrow.get(request.query_params["end"]).date()
@@ -521,10 +523,16 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
         if end <= begin:
             raise ValidationError({"end": _("end must be after begin.")})
 
-        quote = compute_quote(lodgings=[lodging], begin_date=begin, end_date=end, apply_adjustments=False)
-        nights = quote.lodgings[0].nights if quote.lodgings else []
-        return Response(
-            [
+        lodgings = self.get_queryset().filter(shown=True)
+        ids = request.query_params.get("lodging_ids")
+        if ids:
+            lodgings = lodgings.filter(id__in=[int(part) for part in ids.split(",") if part.strip().isdigit()])
+
+        result = {}
+        for lodging in lodgings:
+            quote = compute_quote(lodgings=[lodging], begin_date=begin, end_date=end, apply_adjustments=False)
+            nights = quote.lodgings[0].nights if quote.lodgings else []
+            result[lodging.id] = [
                 {
                     "date": night.date.isoformat(),
                     "rate": f"{night.applied_rate:.2f}",
@@ -533,7 +541,7 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
                 }
                 for night in nights
             ]
-        )
+        return Response(result)
 
 
 class SeasonCalendarViewSet(viewsets.ModelViewSet):

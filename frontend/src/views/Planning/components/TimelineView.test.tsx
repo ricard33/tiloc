@@ -10,8 +10,8 @@ beforeEach(() => (axios as any).mockResolvedValue({ data: { count: 0, results: [
 afterEach(() => vi.clearAllMocks());
 
 const lodgings = [
-  { id: 1, name: "Villa Rose", rank: 1 },
-  { id: 2, name: "Studio Blue", rank: 2 },
+  { id: 1, name: "Villa Rose", rank: 1, daily_rate: 100 },
+  { id: 2, name: "Studio Blue", rank: 2, daily_rate: 60 },
 ] as unknown as Lodging[];
 
 const bookings = [
@@ -69,5 +69,26 @@ describe("TimelineView", () => {
       { user: { permissions: [] } }
     );
     expect(screen.getByText("Villa Rose")).toBeInTheDocument();
+  });
+
+  it("shows the season rate from the rate calendar, falling back to the lodging default", () => {
+    renderWithProviders(
+      <TimelineView
+        lodgings={lodgings}
+        bookings={[]}
+        settings={{ ...settings, showPrices: true }}
+        defaultBeginDate={new Date("2026-06-15")}
+        rateCalendars={{
+          1: [{ date: "2026-06-15", rate: "180.00", season: "High", is_weekend: false }]
+        }}
+      />,
+      { user: { permissions: ["core.view_booking", "core.view_prices"] } }
+    );
+    // dated day gets the season rate
+    expect(screen.getAllByText("180.00 €").length).toBeGreaterThan(0);
+    // a day without an entry falls back to the lodging's daily_rate
+    expect(screen.getAllByText("100 €").length).toBeGreaterThan(0);
+    // the other lodging (no calendar) uses its default everywhere
+    expect(screen.getAllByText("60 €").length).toBeGreaterThan(0);
   });
 });

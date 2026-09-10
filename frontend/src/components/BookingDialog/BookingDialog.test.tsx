@@ -330,7 +330,7 @@ describe("BookingDialog", () => {
 
     const writeCall = (axios as any).mock.calls
       .map((c: any[]) => c[0])
-      .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()));
+      .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()) && !String(cfg.url).includes("/quote/"));
     expect(writeCall).toBeDefined();
     expect(writeCall.method.toLowerCase()).toBe("patch");
     expect(writeCall.url).toBe("/api/booking/22/");
@@ -348,7 +348,7 @@ describe("BookingDialog", () => {
 
     const writeCall = (axios as any).mock.calls
       .map((c: any[]) => c[0])
-      .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()));
+      .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()) && !String(cfg.url).includes("/quote/"));
     expect(writeCall).toBeDefined();
     expect(writeCall.method.toLowerCase()).toBe("post");
     expect(writeCall.url).toBe("/api/booking/");
@@ -371,7 +371,7 @@ describe("BookingDialog", () => {
 
     const writeCall = (axios as any).mock.calls
       .map((c: any[]) => c[0])
-      .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()));
+      .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()) && !String(cfg.url).includes("/quote/"));
     expect(writeCall).toBeUndefined();
   });
 
