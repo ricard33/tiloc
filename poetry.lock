@@ -935,18 +935,15 @@ resend = ["svix"]
 
 [[package]]
 name = "django-constance"
-version = "3.1.0"
+version = "4.3.5"
 description = "Django live settings with pluggable backends, including Redis."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "django-constance-3.1.0.tar.gz", hash = "sha256:2b96e51de63751ef63f8f92f74e0f6aea30fb6453f3a736c21e1f8b3f6cf0b4f"},
-    {file = "django_constance-3.1.0-py3-none-any.whl", hash = "sha256:6242486a346e396d765a9333d17f3101c8613cabc92e0b98dcb70c2a391bc53b"},
+    {file = "django_constance-4.3.5-py3-none-any.whl", hash = "sha256:c28f360c2822112772a3e4caf02db758c82cca8de7d0b9f648fef371bf4b8bc6"},
+    {file = "django_constance-4.3.5.tar.gz", hash = "sha256:081177483d272b664cf768deae76fc2fbb0a777076f45620b6fde4d9075ee2b3"},
 ]
-
-[package.dependencies]
-django-picklefield = "*"
 
 [package.extras]
 redis = ["redis"]
@@ -1038,24 +1035,6 @@ files = [
     {file = "django_loginas-0.3.14-py2.py3-none-any.whl", hash = "sha256:f682ad64420e5c32a5ae7051d203a82c10cf32353d5d29ff36947b2639840668"},
     {file = "django_loginas-0.3.14.tar.gz", hash = "sha256:080bb6b714cee854739cc7242f2faf9e23f098691bd42ef3fd62e9bc9c5492ad"},
 ]
-
-[[package]]
-name = "django-picklefield"
-version = "3.4.0"
-description = "Pickled object field for Django"
-optional = false
-python-versions = ">=3.10"
-groups = ["main"]
-files = [
-    {file = "django_picklefield-3.4.0-py3-none-any.whl", hash = "sha256:929bcfbae5b48bd22a52bc04521fdfdd152eee36abb9f20228f9480f9df65f45"},
-    {file = "django_picklefield-3.4.0.tar.gz", hash = "sha256:3a1f740536c0e60d0dba43aa89ccdbe86760d4c3f8ec47799eae122baa741d0a"},
-]
-
-[package.dependencies]
-Django = ">=4.2"
-
-[package.extras]
-tests = ["tox"]
 
 [[package]]
 name = "django-proxy"
@@ -2749,4 +2728,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "8ff60f56afb7e80486cadb77d285c8802537bf1165c1fbcbb64ef4a8c798d0fd"
+content-hash = "4336df99f148f7c6031390ca64ee10f06cce2aeb8848a3ffb5ffc9f8262ceaef"
