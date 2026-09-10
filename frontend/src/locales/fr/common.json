@@ -649,5 +649,7 @@
   "Leave a season blank to fall back to the lodging's default daily rate.": "Laissez une saison vide pour utiliser le tarif journalier par défaut du logement.",
   "Rate saved": "Tarif enregistré",
   "Clear": "Effacer",
-  "Manage season calendars": "Gérer les calendriers des saisons"
+  "Manage season calendars": "Gérer les calendriers des saisons",
+  "Average nightly rate": "Tarif moyen par nuit",
+  "Computed from the pricing rules": "Calculé à partir des règles de tarification"
 }

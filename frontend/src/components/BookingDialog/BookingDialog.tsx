@@ -195,6 +195,12 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue(key as any, (object as any)[key]);
   });
 
+  // Apply a synchronous price estimate, but never overwrite a deposit the user edited by hand.
+  const applyPriceEstimate = (priceObj: Partial<Booking>) => {
+    const { deposit, ...withoutDeposit } = priceObj;
+    setMultipleValues(dirtyFields.deposit ? withoutDeposit : priceObj);
+  };
+
   let lodging: Lodging = booking.lodgings[0];  // first lodging for defaults values like taxes
 
   const defaultDistribution = { adults: 2, children: 0, babies: 0 };
@@ -263,7 +269,10 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     if (booking.id && !isDirty) return;
     setValue("price", quote.total_price, { shouldDirty: false });
     setValue("daily_rate", quote.effective_daily_rate, { shouldDirty: false });
-    setValue("deposit", quote.total_deposit, { shouldDirty: false });
+    // The deposit follows the price automatically, unless the user has edited it by hand.
+    if (!dirtyFields.deposit) {
+      setValue("deposit", quote.total_deposit, { shouldDirty: false });
+    }
     updateTouristTax();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quote]);
@@ -386,7 +395,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         value = parseFloat(value as string);
         if (!isNaN(value)) {
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], lodging.deposit_percent);
-          setMultipleValues(priceObj);
+          applyPriceEstimate(priceObj);
           updateTouristTax();
         }
         break;
@@ -406,7 +415,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           const formValues = getValues();
           const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date,
             formValues.daily_rate ?? lodging.daily_rate, 0, 0, [], lodging.deposit_percent);
-          setMultipleValues(priceObj);
+          applyPriceEstimate(priceObj);
           updateTouristTax();
           return false;
         }
@@ -440,7 +449,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     const daily_rate = lodgings.filter(x => ids.includes(x.id)).reduce((pValue, lodging) => pValue + lodging.daily_rate, 0);
     if (!isFlatRate && formValues.daily_rate !== daily_rate) {
       const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, daily_rate, 0, 0, [], lodging.deposit_percent);
-      setMultipleValues(priceObj);
+      applyPriceEstimate(priceObj);
     }
 
     const newDistribution = ids.reduce((d, id) => {
@@ -477,7 +486,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     const endDate = addDays(formValues.begin_date, duration);
     const priceObj = formValues.is_flat_rate ? { daily_rate: (formValues.price ?? 0) / duration }
       : computeBookingPrice(formValues.begin_date, endDate, formValues.daily_rate ?? lodging.daily_rate, 0, 0, [], lodging.deposit_percent).price;
-    setMultipleValues(priceObj);
+    applyPriceEstimate(priceObj);
     setValue("end_date", endDate);
     return duration;
   }
@@ -498,7 +507,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     const duration = differenceInCalendarDays(newBooking.end_date, newBooking.begin_date);
     const priceObj = newBooking.is_flat_rate ? { daily_rate: (newBooking.price ?? 0) / duration }
       : computeBookingPrice(newBooking.begin_date, newBooking.end_date, formValues.daily_rate ?? lodging.daily_rate, 0, 0, [], lodging.deposit_percent).price;
-    setMultipleValues(priceObj);
+    applyPriceEstimate(priceObj);
     setValue("duration", duration);
     updateTouristTax();
     return newBooking[fieldName];
@@ -782,19 +791,18 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         <TextFieldElement
                           control={control}
                           name={"daily_rate"}
-                          label={t("Daily rate")}
+                          label={t("Average nightly rate")}
                           className="price-input"
                           type={"number"}
-                          required
-                          validation={{
-                            min: { value: 0, message: t("Rate can't be negative") },
-                            validate: { validateNumber: (v) => (typeof v !== "undefined") }
+                          helperText={t("Computed from the pricing rules")}
+                          InputProps={{
+                            readOnly: true,
+                            endAdornment: <InputAdornment position="end">&euro;</InputAdornment>
                           }}
-                          InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                          sx={{ "& .MuiInputBase-input": { color: "text.secondary" } }}
                           margin={margin}
                           // size="small"
                           variant={variant}
-                          onChange={event => handleChange(event.target.name, event.target.value)}
                         />
                       </>}
                     <div className="spacer" />

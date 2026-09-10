@@ -640,5 +640,7 @@
   "Leave a season blank to fall back to the lodging's default daily rate.": "",
   "Rate saved": "",
   "Clear": "",
-  "Manage season calendars": ""
+  "Manage season calendars": "",
+  "Average nightly rate": "",
+  "Computed from the pricing rules": ""
 }
