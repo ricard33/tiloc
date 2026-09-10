@@ -30,7 +30,6 @@
   "default rate": "default rate",
   "week": "week",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
-  "Cancelled": "Cancelled",
   "Modify description": "Modify description",
   "Page break": "Page break",
   "Existing guest": "Existing guest",
@@ -62,7 +61,6 @@
   "Default booking status": "Default booking status",
   "Booking statuses were successfully deleted": "Booking statuses were successfully deleted",
   "Booking status was successfully deleted": "Booking status was successfully deleted",
-  "Color": "Color",
   "No statistics": "No statistics",
   "Final state": "Final state",
   "Booking status properties": "Booking status properties",
@@ -108,7 +106,6 @@
   "Your first rentals": "",
   "Everything for a tourist rental owner": "",
   "Logo": "Logo",
-  "Type": "Type",
   "Display": "Display",
   "Show booking details on tooltip": "Show booking details on tooltip",
   "Show only summary in tooltip": "Show only summary in tooltip",
@@ -207,5 +204,7 @@
   "Scrolling timeline": "",
   "Annual calendar": "",
   "Holidays": "Holidays",
-  "Pricing": "Pricing"
+  "Pricing": "Pricing",
+  "Rate can't be negative": "Rate can't be negative",
+  "Need help?": ""
 }

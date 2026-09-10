@@ -30,7 +30,6 @@
   "week": "semaine",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})": "Du {{begin_date}} au {{end_date}}: {{count}} x {{rate}}€ ({{rate_name}})",
   "From {{begin_date}} to {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})_plural": "Du {{begin_date}} au {{end_date}}: {{day_count}} x {{rate}}€ ({{rate_name}})",
-  "Cancelled": "Annulée",
   "Modify description": "Modifier la description",
   "Page break": "Séparation de page",
   "Existing guest": "Locataire existant",
@@ -62,7 +61,6 @@
   "Default booking status": "Statut de réservation par défaut",
   "Booking statuses were successfully deleted": "Les statuts de réservation ont été supprimés avec success",
   "Booking status was successfully deleted": "Le statut de réservation a bien été supprimé",
-  "Color": "Couleur",
   "No statistics": "Pas de statistiques",
   "Final state": "Statut final",
   "Booking status properties": "Caractéristiques du statut de réservation",
@@ -108,7 +106,6 @@
   "Your first rentals": "Vos premières locations",
   "Everything for a tourist rental owner": "Tout pour le propriétaire d'une location touristique",
   "Logo": "Logo",
-  "Type": "Type",
   "Display": "Afficher",
   "Show booking details on tooltip": "Afficher les détails de la réservation dans l'info-bulle",
   "Show only summary in tooltip": "Afficher uniquement un résumé dans l'info-bulle",
@@ -181,5 +178,7 @@
   "Scrolling timeline": "Chronologie défilante",
   "Annual calendar": "Calendrier annuel",
   "Holidays": "Vacances",
-  "Pricing": "Tarifs"
+  "Pricing": "Tarifs",
+  "Rate can't be negative": "Le tarif ne peut être négatif",
+  "Need help?": "Besoin d'aide ?"
 }
