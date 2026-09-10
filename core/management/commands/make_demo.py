@@ -1,4 +1,5 @@
 import random
+from datetime import date
 from decimal import Decimal
 
 import arrow
@@ -15,11 +16,24 @@ from core.models import (
     Contract,
     ContractTemplate,
     Lodging,
+    LodgingSeasonRate,
     Payment,
     Plan,
+    PricingAdjustment,
+    Season,
+    SeasonCalendar,
+    SeasonDateRange,
     Subscription,
     User,
 )
+from core.pricing import compute_quote
+
+# name -> (nightly multiplier, weekend multiplier, min nights, [(start_month, start_day, end_month, end_day), ...])
+DEMO_SEASONS = [
+    ("Basse saison", Decimal("0.8"), Decimal("1"), 2, [(1, 1, 3, 31), (11, 1, 12, 31)]),
+    ("Moyenne saison", Decimal("1"), Decimal("1.1"), 3, [(4, 1, 6, 30), (9, 1, 10, 31)]),
+    ("Haute saison", Decimal("1.5"), Decimal("1.2"), 7, [(7, 1, 8, 31)]),
+]
 
 
 class Command(BaseCommand):
@@ -31,6 +45,63 @@ class Command(BaseCommand):
             "--clean",
             action="store_true",
             help="Delete all data before to generate new one",
+        )
+
+    def _setup_advanced_pricing(self, demo_account, lodgings):
+        """Give the demo account a shared season calendar, per-lodging season rates and a
+        couple of account-wide pricing rules, so the advanced pricing feature is populated."""
+        demo_account.pricingadjustment_set.all().delete()
+        SeasonCalendar.objects.filter(account=demo_account).delete()  # cascades to seasons / ranges / rates
+
+        calendar = SeasonCalendar.objects.create(account=demo_account, name="Saisons standard")
+        years = range(date.today().year - 4, date.today().year + 2)
+        seasons = {}
+        for rank, (name, nightly_mult, weekend_mult, min_nights, windows) in enumerate(DEMO_SEASONS):
+            season = Season.objects.create(calendar=calendar, name=name, rank=rank)
+            seasons[name] = (season, nightly_mult, weekend_mult, min_nights)
+            SeasonDateRange.objects.bulk_create(
+                SeasonDateRange(
+                    season=season,
+                    begin_date=date(year, sm, sd),
+                    end_date=date(year, em, ed),
+                )
+                for year in years
+                for (sm, sd, em, ed) in windows
+            )
+
+        for lodging in lodgings:
+            lodging.season_calendar = calendar
+            lodging.weekly_discount_percent = Decimal("10")
+            lodging.monthly_discount_percent = Decimal("25")
+            lodging.min_nights = 2
+            lodging.save(
+                update_fields=["season_calendar", "weekly_discount_percent", "monthly_discount_percent", "min_nights"]
+            )
+            for season, nightly_mult, weekend_mult, min_nights in seasons.values():
+                nightly = (lodging.daily_rate * nightly_mult).quantize(Decimal("1"))
+                LodgingSeasonRate.objects.create(
+                    lodging=lodging,
+                    season=season,
+                    nightly_rate=nightly,
+                    weekend_rate=(nightly * weekend_mult).quantize(Decimal("1")) if weekend_mult != 1 else None,
+                    min_nights=min_nights,
+                )
+
+        PricingAdjustment.objects.create(
+            account=demo_account,
+            name="Dernière minute",
+            adjustment_type=PricingAdjustment.AdjustmentType.PERCENT,
+            value=Decimal("-10"),
+            max_days_before_arrival=15,
+            priority=10,
+        )
+        PricingAdjustment.objects.create(
+            account=demo_account,
+            name="Réservation anticipée",
+            adjustment_type=PricingAdjustment.AdjustmentType.PERCENT,
+            value=Decimal("-8"),
+            min_days_before_arrival=120,
+            priority=20,
         )
 
     def handle(self, *args, **options):
@@ -110,6 +181,8 @@ class Command(BaseCommand):
             )
             lodgings.append(lodging)
 
+        self._setup_advanced_pricing(demo_account, lodgings)
+
         # create bookings
         channel_website = BookingChannel.objects.get(name="Site Web")
         channel_airbnb = BookingChannel.objects.get(name="Airbnb")
@@ -150,6 +223,24 @@ class Command(BaseCommand):
                             )[0]
                         else:
                             source = channel_website
+
+                        if status == BookingStatus.External:
+                            daily_rate = lodging.daily_rate
+                            price = lodging.daily_rate * duration
+                            deposit = round(float(lodging.daily_rate) * duration * 0.3, -1)
+                            price_details = None
+                        else:
+                            quote = compute_quote(
+                                lodgings=[lodging],
+                                begin_date=begin_date,
+                                end_date=end_date,
+                                booking_date=arrow.get(begin_date).shift(days=-random.randrange(20, 200)).date(),
+                            )
+                            daily_rate = quote.effective_daily_rate
+                            price = quote.total_price
+                            deposit = quote.total_deposit
+                            price_details = quote.as_dict()
+
                         booking = Booking.objects.create(
                             account=demo_account,
                             status=status.value,
@@ -167,9 +258,10 @@ class Command(BaseCommand):
                                     "babies": random.choices([0, 1], weights=(10, 1))[0],
                                 }
                             },
-                            daily_rate=lodging.daily_rate,
-                            price=lodging.daily_rate * duration,
-                            deposit=round(float(lodging.daily_rate) * duration * 0.3, -1),
+                            daily_rate=daily_rate,
+                            price=price,
+                            deposit=deposit,
+                            price_details=price_details,
                             commission_fees=(
                                 status == BookingStatus.External and float(lodging.daily_rate) * duration * 0.15 or None
                             ),
