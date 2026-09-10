@@ -40,7 +40,7 @@ class Command(BaseCommand):
             demo_account.cleanup_account()
             demo_account.fill_account_with_default_ressources()
 
-        if demo_account.is_free_plan:
+        if demo_account.is_free_plan or demo_account.trial_is_over:
             if demo_account.stripe_customer_id != "__DEMO__":
                 demo_account.stripe_customer_id = "__DEMO__"
                 demo_account.save(update_fields=["stripe_customer_id"])
@@ -74,6 +74,7 @@ class Command(BaseCommand):
                 last_name=fake.last_name(),
                 phone=fake.phone_number(),
                 address=fake.address(),
+                is_verified=True,
             ),
         )
         if created:
