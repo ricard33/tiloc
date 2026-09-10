@@ -786,10 +786,10 @@ class BookedService(models.Model):
     def __str__(self):
         return "%s -> %s" % (self.service.designation, self.booking)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(self, *args, **kwargs):
         if self.booking.lodging.account.id != self.service.account.id:
             raise ValidationError("BookingService: booking and service aren't from same account")
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(*args, **kwargs)
 
 
 class Holidays(models.Model):

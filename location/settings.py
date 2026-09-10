@@ -213,6 +213,11 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
+    # django-dbbackup 5 reads its target from STORAGES["dbbackup"] (was DBBACKUP_STORAGE*).
+    "dbbackup": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {"location": os.path.join(BASE_DIR, "backups")},
+    },
 }
 
 # Media files (uploaded, generated PDF, etc...)
@@ -320,8 +325,6 @@ def get_backup_filename(**kwargs):
     return "tiloc-{servername}-{datetime}-v{version}.{extension}".format(**dict(kwargs, **{"version": __version__}))
 
 
-DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
-DBBACKUP_STORAGE_OPTIONS = {"location": os.path.join(BASE_DIR, "backups")}
 DBBACKUP_FILENAME_TEMPLATE = get_backup_filename
 # DBBACKUP_CONNECTORS = {"default": {"SINGLE_TRANSACTION": False}}
 
