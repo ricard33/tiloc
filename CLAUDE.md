@@ -22,7 +22,7 @@ Backend uses **Poetry** (Python ^3.12). Run everything through `poetry run`.
 - `poetry run flake8 core location` — lint (CI runs exactly this; config in `.flake8`)
 - `poetry run black . && poetry run isort .` — format (line length 120; `pyproject.toml`; `black`/`isort` exclude `frontend`, `backup`, `files`, etc.)
 - `poetry run python runtests.py` — wrapper that runs pytest + flake8 + isort together (`--fast`, `--nolint`, `--lintonly` flags)
-- `poetry run python manage.py sync_bookings` / `export_bookings` / `purge_notifications` — the scheduled jobs (see "Cron jobs" below)
+- `poetry run python manage.py runcrons` — execute due cron jobs (see `CRON_CLASSES`)
 - `poetry run python manage.py make_demo` — populate the `__demo__` account with faked data
 - `poetry run python manage.py compilemessages` — compile `fr`/`en` translations under `locale/`
 
@@ -80,14 +80,15 @@ Every tenant is an `Account`. Data isolation is enforced in querysets, not middl
 - Outbound: `core/views.py::export_calendar` / `export_calendar_for_lodgings_list` serve `.ics` at
   `/calendar/<uuid>/`.
 
-### Cron jobs
+### Cron jobs (`django-cron`)
 
-Three plain job classes in `core/cron.py`, each invoked by a management command
-(`core/management/commands/`) scheduled by the host's cron (alwaysdata scheduler):
-`sync_bookings` (every 5 min; holds an `fcntl` lockfile so runs don't overlap),
-`export_bookings` (02:00, dumps model xlsx to `backup/` via django-import-export resources in
-`core/imp_exp_resources.py`), `purge_notifications` (00:30). (Was `django-cron`, dropped — it
-is unmaintained and breaks on Django ≥ 5.1.)
+Registered in `settings.CRON_CLASSES`, run via `manage.py runcrons` (one alwaysdata scheduler
+entry): `SyncBookingsJob` (every 5 min), `ExportBookingsJob` (02:00, dumps model xlsx to
+`backup/` via django-import-export resources in `core/imp_exp_resources.py`),
+`PurgeNotificationsJob` (00:30). Overlap protection is the DB lock
+(`DJANGO_CRON_LOCK_BACKEND`, `CronJobLock` rows). `django-cron` is the `ricard33/django-cron`
+`django-5` fork (pinned in `pyproject.toml`, like `ics`) — upstream Tivix is unmaintained and
+uses `index_together`, removed in Django 5.1.
 
 ### Billing (Stripe)
 

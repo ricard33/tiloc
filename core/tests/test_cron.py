@@ -1,6 +1,5 @@
 import arrow
 import pytest
-from django.core.management import call_command
 from requests import HTTPError
 
 from core import models
@@ -140,14 +139,6 @@ class TestSyncBookingsJob:
         SyncBookingsJob().do()
 
         assert calls == [sync]
-
-    def test_management_command_runs_the_job_under_the_lock(self, eligible_sync, monkeypatch):
-        calls = []
-        monkeypatch.setattr(SYNC_TARGET, calls.append)
-
-        call_command("sync_bookings")
-
-        assert calls == [eligible_sync]
 
 
 # --------------------------------------------------------------------------- #

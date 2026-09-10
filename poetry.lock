@@ -952,6 +952,25 @@ files = [
 redis = ["redis"]
 
 [[package]]
+name = "django-cron"
+version = "0.7.0"
+description = "Running python crons in a Django project"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = []
+develop = false
+
+[package.dependencies]
+Django = ">=4.2"
+
+[package.source]
+type = "git"
+url = "https://github.com/ricard33/django-cron"
+reference = "django-5"
+resolved_reference = "408733d008e40e2273051861fbb50eef8be078ce"
+
+[[package]]
 name = "django-dbbackup"
 version = "5.3.0"
 description = "Management commands to help backup and restore a project database and media."
@@ -2718,4 +2737,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "3a731ad1acb30377731c71917ea09ce28ce98675cd0a7e2116496f87a27562c1"
+content-hash = "acf0ac7ab0ad45ad68508a2937f5d953c4582c03629777dbfa4ae336bb393279"

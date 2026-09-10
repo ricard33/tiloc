@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "import_export",
     "knox",
     "simple_history",
+    "django_cron",
     "django_email_verification",
     "notifier",
     "core",
@@ -317,6 +318,16 @@ CONSTANCE_CONFIG = {
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 IMPORT_EXPORT_SKIP_ADMIN_LOG = True
+
+CRON_CLASSES = [
+    "core.cron.SyncBookingsJob",
+    "core.cron.ExportBookingsJob",
+    "core.cron.PurgeNotificationsJob",
+]
+DJANGO_CRON_DELETE_LOGS_OLDER_THAN = 30
+# There is no CACHES config, so the default CacheLock (LocMemCache) can't guard
+# against overlapping runs. Use the DB-backed lock (CronJobLock rows) instead.
+DJANGO_CRON_LOCK_BACKEND = "django_cron.backends.lock.database.DatabaseLock"
 
 WKHTMLTOPDF_PATH = config.get("PDF", "WKHTMLTOPDF_PATH", "wkhtmltopdf")
 
