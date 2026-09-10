@@ -8,6 +8,7 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import RoomServiceIcon from "@mui/icons-material/RoomService";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import DateRangeIcon from "@mui/icons-material/DateRange";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import BookingSourcesIcon  from "../../assets/icones/booking-sources.svg?react";
 import { styled } from "@mui/material/styles";
@@ -139,6 +140,11 @@ function SettingsIndex() {
       title: t("Contract templates"),
       href: "contract-templates",
       icon: DashboardIcon
+    },
+    {
+      title: t("Seasons & rates"),
+      href: "seasons",
+      icon: DateRangeIcon
     },
     {
       title: t("Booking channels"),

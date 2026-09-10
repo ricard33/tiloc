@@ -23,8 +23,11 @@ import { useFormContext } from "react-hook-form";
 import {
   useDeleteCalendarSyncMutation,
   useListContractTemplatesQuery,
+  useListSeasonCalendarsQuery,
   useListServicesQuery
 } from "../../services/api";
+import { LodgingSeasonRates } from "./LodgingSeasonRates";
+import DateRangeIcon from "@mui/icons-material/DateRange";
 import HelpTooltip from "../../components/HelpTooltip";
 import HouseOutlinedIcon from "@mui/icons-material/HouseOutlined";
 import RoomServiceOutlinedIcon from "@mui/icons-material/RoomServiceOutlined";
@@ -60,7 +63,10 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
   const isFlatRateTourismTax = watch("is_flat_rate_tourist_tax", getValues("is_flat_rate_tourist_tax"));
   const { data: services } = useListServicesQuery();
   const { data: templates } = useListContractTemplatesQuery();
+  const { data: seasonCalendars } = useListSeasonCalendarsQuery();
   const template = watch("contract_template", lodging?.contract_template);
+  const selectedSeasonCalendarId = watch("season_calendar", lodging?.season_calendar);
+  const selectedSeasonCalendar = (seasonCalendars || []).find(c => c.id === Number(selectedSeasonCalendarId));
   // const [expanded, setExpanded] = React.useState<string | false>("description");
   const [openImportCalDialog, setOpenImportCalDialog] = useState<Partial<CalendarSync> | undefined>(undefined);
   const [deleteCalendarSync] = useDeleteCalendarSyncMutation();
@@ -256,6 +262,45 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
                 InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
               />
             </HelpTooltip>
+          </Grid2>
+        </Grid2>
+      </Section>
+
+      <Section header={t("Advanced pricing")} icon={<DateRangeIcon />}>
+        <Grid2 container spacing={4}>
+          <Grid2 sm={6} xs={12}>
+            <SelectElement
+              name="season_calendar"
+              label={t("Season calendar")}
+              options={[
+                { id: "", label: t("None (flat daily rate)") },
+                ...(seasonCalendars || []).map(c => ({ id: c.id, label: c.name }))
+              ]}
+              fullWidth
+            />
+          </Grid2>
+          <Grid2 sm={6} xs={12}>
+            <TextFieldElement name="min_nights" label={t("Minimum nights")} type="number" fullWidth />
+          </Grid2>
+          <Grid2 sm={6} xs={12}>
+            <TextFieldElement
+              name="weekly_discount_percent" label={t("Weekly discount (%)")} type="number" fullWidth
+              helperText={t("Applied for stays of 7 nights or more")}
+              InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+            />
+          </Grid2>
+          <Grid2 sm={6} xs={12}>
+            <TextFieldElement
+              name="monthly_discount_percent" label={t("Monthly discount (%)")} type="number" fullWidth
+              helperText={t("Applied for stays of 28 nights or more")}
+              InputProps={{ endAdornment: <InputAdornment position="end">%</InputAdornment> }}
+            />
+          </Grid2>
+          <Grid2 xs={12}>
+            {lodging && lodging.id
+              ? <LodgingSeasonRates lodgingId={lodging.id} calendar={selectedSeasonCalendar} />
+              : <Alert severity="info">{t("Save the lodging first to set per-season rates.")}</Alert>
+            }
           </Grid2>
         </Grid2>
       </Section>

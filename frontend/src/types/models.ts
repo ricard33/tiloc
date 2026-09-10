@@ -105,6 +105,135 @@ export interface Lodging {
   contract_template: number;
   calendar_url: string;
   remote_calendars: Omit<CalendarSync, "lodging"|"lodging_id">[];
+  season_calendar?: number | null;
+  min_nights?: number;
+  weekly_discount_percent?: number | null;
+  monthly_discount_percent?: number | null;
+}
+
+export interface SeasonDateRange {
+  id?: number;
+  begin_date: Date;
+  end_date: Date;
+}
+
+export interface Season {
+  id?: number;
+  name: string;
+  color: string;
+  rank: number;
+  date_ranges: SeasonDateRange[];
+}
+
+export interface SeasonCalendar {
+  id?: number;
+  name: string;
+  notes: string;
+  seasons: Season[];
+  lodging_count?: number;
+}
+
+export interface LodgingSeasonRate {
+  id?: number;
+  lodging: number;
+  season: number;
+  nightly_rate: number;
+  weekend_rate?: number | null;
+  min_nights?: number | null;
+}
+
+export type PricingAdjustmentType = "percent" | "fixed";
+
+export interface PricingAdjustment {
+  id?: number;
+  name: string;
+  lodging?: number | null;
+  adjustment_type: PricingAdjustmentType;
+  value: number;
+  min_nights?: number | null;
+  max_nights?: number | null;
+  min_days_before_arrival?: number | null;
+  max_days_before_arrival?: number | null;
+  stay_begin?: Date | null;
+  stay_end?: Date | null;
+  booking_begin?: Date | null;
+  booking_end?: Date | null;
+  applicable_weekdays?: number[] | null;
+  priority: number;
+  stackable: boolean;
+  active: boolean;
+}
+
+export interface QuoteNight {
+  date: Date;
+  weekday: number;
+  season: string | null;
+  rate_source: "season_rate" | "lodging_default";
+  base_rate: number;
+  applied_rate: number;
+  is_weekend: boolean;
+}
+
+export interface QuoteAdjustment {
+  type: "los_discount" | "rule" | "flat_rate";
+  label: string;
+  amount: number;
+  basis?: number;
+  percent?: number;
+  rule_id?: number;
+  kind?: string;
+  value?: number;
+  stackable?: boolean;
+}
+
+export interface QuoteWarning {
+  code: "min_nights" | "season_overlap";
+  lodging_id: number;
+  required?: number;
+  actual?: number;
+  date?: string;
+}
+
+export interface QuoteLodging {
+  lodging_id: number;
+  lodging_name: string;
+  season_calendar_id: number | null;
+  nightly_subtotal: number;
+  price: number;
+  deposit: number;
+  nights: QuoteNight[];
+  adjustments: QuoteAdjustment[];
+  warnings: QuoteWarning[];
+}
+
+export interface Quote {
+  begin_date: Date;
+  end_date: Date;
+  nights: number;
+  booking_date: Date;
+  currency: string;
+  total_price: number;
+  total_deposit: number;
+  effective_daily_rate: number;
+  is_flat_rate: boolean;
+  warnings: QuoteWarning[];
+  lodgings: QuoteLodging[];
+}
+
+export interface QuoteRequest {
+  lodging_ids: number[];
+  begin_date: string;
+  end_date: string;
+  booking_date?: string;
+  is_flat_rate?: boolean;
+  flat_price?: string;
+}
+
+export interface RateCalendarEntry {
+  date: string;
+  rate: number;
+  season: string | null;
+  is_weekend: boolean;
 }
 
 export interface Service {
@@ -159,6 +288,7 @@ export interface Booking {
   daily_rate?: number;
   is_flat_rate: boolean;
   price?: number;
+  price_details?: Quote | null;
   deposit?: number;
   guaranty?: number;
   commission_fees?: number;

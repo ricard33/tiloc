@@ -22,6 +22,8 @@ import { ServicePage } from "./views/Services/ServicePage";
 import ContractTemplateList from "./views/ContractTemplate/ContractTemplateList";
 import CalendarSyncsList from "./views/CalendarSync/CalendarSyncsList";
 import CalendarSyncPage from "./views/CalendarSync/CalendarSyncPage";
+import SeasonCalendarList from "./views/Seasons/SeasonCalendarList";
+import { SeasonCalendarPage } from "./views/Seasons/SeasonCalendarPage";
 import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 import PaymentsList from "./views/Payment/PaymentsList";
@@ -130,6 +132,9 @@ const MyRoutes = () => {
             <Route path="calendar-syncs" element={<CalendarSyncsList />} />
             <Route path="calendar-syncs/new" element={<CalendarSyncPage />} />
             <Route path="calendar-syncs/:calendarSyncId" element={<CalendarSyncPage />} />
+            <Route path="seasons" element={<SeasonCalendarList />} />
+            <Route path="seasons/new" element={<SeasonCalendarPage />} />
+            <Route path="seasons/:calendarId" element={<SeasonCalendarPage />} />
           </Route>
           <Route path="/upgrade-plan" element={<Navigate to="/account/prices" replace />} />
           <Route path="/test-page" element={<TestPage />} />

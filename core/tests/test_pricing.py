@@ -491,6 +491,20 @@ def test_season_calendar_rejects_overlapping_ranges(admin_client) -> None:
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
+def test_lodging_accepts_and_clears_season_calendar(admin_client) -> None:
+    client, lodging = admin_client
+    calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
+    response = client.patch(f"/api/lodging/{lodging.id}/", {"season_calendar": calendar.id}, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.data
+    lodging.refresh_from_db()
+    assert lodging.season_calendar_id == calendar.id
+    # empty string clears it
+    response = client.patch(f"/api/lodging/{lodging.id}/", {"season_calendar": ""}, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.data
+    lodging.refresh_from_db()
+    assert lodging.season_calendar_id is None
+
+
 def test_rate_calendar_endpoint_returns_per_day_rates(priced_client) -> None:
     client, lodging = priced_client
     calendar = factories.SeasonCalendarFactory.create(account=lodging.account)

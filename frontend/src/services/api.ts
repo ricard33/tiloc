@@ -15,7 +15,8 @@ import {
   Payment,
   Service,
   User,
-  Notification, SignUpData, Activity, Account, BookingHistoryEntry
+  Notification, SignUpData, Activity, Account, BookingHistoryEntry,
+  SeasonCalendar, LodgingSeasonRate, PricingAdjustment, Quote, QuoteRequest, RateCalendarEntry
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import {
@@ -29,11 +30,19 @@ import {
   api2BookingHistoryEntry,
   api2Lodging, api2NextEvent, api2Notification,
   api2Payment,
+  api2PricingAdjustment,
+  api2Quote,
   api2Service,
+  api2SeasonCalendar,
+  api2LodgingSeasonRate,
   api2User,
   booking2api,
   comment2Api,
+  lodging2api,
+  lodgingSeasonRate2Api,
   payment2Api,
+  pricingAdjustment2Api,
+  seasonCalendar2Api,
   user2api
 } from "../types/models-convertion";
 import type { EndpointBuilder } from "@reduxjs/toolkit/query";
@@ -140,11 +149,15 @@ export interface BaseModel {
 type ApiModel = Record<string, any>;
 type AxiosEndpointBuilder = EndpointBuilder<BaseQueryFn<string | AxiosArgs, unknown, QueryError, {}, AxiosQueryMeta>, string, "api">;
 
+const PRICING_MODELS = ["SeasonCalendar", "LodgingSeasonRate", "PricingAdjustment", "Lodging"];
+
 function invalidatesDependentTags<T extends BaseModel>(modelName: string, obj: T) {
   if (modelName === "Comment")
     return [{ type: "Booking", id: (obj as any as Comment).booking_id }, { type: "Booking", id: "LIST" }];
   if (modelName === "Booking" && obj.id)
     return [{ type: "BookingHistory", id: obj.id }];
+  if (PRICING_MODELS.includes(modelName))
+    return [{ type: "Quote", id: "LIST" }, { type: "LodgingRateCalendar", id: "LIST" }];
   return [];
 }
 
@@ -279,7 +292,10 @@ function makeApi<T extends BaseModel>(url: string, modelName: string, convertFro
 const paymentApi = makeApi<Payment>("payment/", "Payment", api2Payment, payment2Api);
 const commentApi = makeApi<Comment>("comment/", "Comment", api2Comment, comment2Api);
 const bookingApi = makeApi<Booking>("booking/", "Booking", api2Booking, booking2api);
-const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging);
+const lodgingApi = makeApi<Lodging>("lodging/", "Lodging", api2Lodging, lodging2api);
+const seasonCalendarApi = makeApi<SeasonCalendar>("season_calendar/", "SeasonCalendar", api2SeasonCalendar, seasonCalendar2Api);
+const lodgingSeasonRateApi = makeApi<LodgingSeasonRate>("lodging_season_rate/", "LodgingSeasonRate", api2LodgingSeasonRate, lodgingSeasonRate2Api);
+const pricingAdjustmentApi = makeApi<PricingAdjustment>("pricing_adjustment/", "PricingAdjustment", api2PricingAdjustment, pricingAdjustment2Api);
 const userApi = makeApi<User>("user/", "User", api2User, user2api);
 const bookingChannelApi = makeApi<BookingChannel>("booking_channel/", "BookingChannel");
 const contractTemplateApi = makeApi<ContractTemplate>("contract_template/", "ContractTemplate", api2ContractTemplate);
@@ -305,7 +321,12 @@ export const api = createApi({
     "Service",
     "User",
     "Notification",
-    "BookingHistory"
+    "BookingHistory",
+    "SeasonCalendar",
+    "LodgingSeasonRate",
+    "PricingAdjustment",
+    "Quote",
+    "LodgingRateCalendar"
   ],
   // keepUnusedDataFor: 5,
   endpoints: (builder) => ({
@@ -532,7 +553,37 @@ export const api = createApi({
 
     // activity
     listActivities: activityApi.list(builder),
-    getActivity: activityApi.get(builder)
+    getActivity: activityApi.get(builder),
+
+    // Season calendars
+    listSeasonCalendars: seasonCalendarApi.list(builder),
+    getSeasonCalendar: seasonCalendarApi.get(builder),
+    createSeasonCalendar: seasonCalendarApi.create(builder),
+    updateSeasonCalendar: seasonCalendarApi.update(builder),
+    deleteSeasonCalendar: seasonCalendarApi.delete(builder),
+
+    // Lodging season rates
+    listLodgingSeasonRates: lodgingSeasonRateApi.list(builder),
+    createLodgingSeasonRate: lodgingSeasonRateApi.create(builder),
+    updateLodgingSeasonRate: lodgingSeasonRateApi.update(builder),
+    deleteLodgingSeasonRate: lodgingSeasonRateApi.delete(builder),
+
+    // Pricing adjustments
+    listPricingAdjustments: pricingAdjustmentApi.list(builder),
+    getPricingAdjustment: pricingAdjustmentApi.get(builder),
+    createPricingAdjustment: pricingAdjustmentApi.create(builder),
+    updatePricingAdjustment: pricingAdjustmentApi.update(builder),
+    deletePricingAdjustment: pricingAdjustmentApi.delete(builder),
+
+    getQuote: builder.query<Quote, QuoteRequest>({
+      query: (body) => ({ url: "booking/quote/", method: "POST", data: body }),
+      providesTags: [{ type: "Quote", id: "LIST" }],
+      transformResponse: (response) => api2Quote(response as ApiModel)
+    }),
+    getLodgingRateCalendar: builder.query<RateCalendarEntry[], { lodgingId: number; begin: string; end: string }>({
+      query: ({ lodgingId, begin, end }) => `lodging/${lodgingId}/rate_calendar/?begin=${begin}&end=${end}`,
+      providesTags: [{ type: "LodgingRateCalendar", id: "LIST" }]
+    })
 
   })
 });
@@ -629,5 +680,26 @@ export const {
   useListActivitiesQuery,
   useGetActivityQuery,
 
-  useGetBookingHistoryQuery
+  useGetBookingHistoryQuery,
+
+  useListSeasonCalendarsQuery,
+  useGetSeasonCalendarQuery,
+  useCreateSeasonCalendarMutation,
+  useUpdateSeasonCalendarMutation,
+  useDeleteSeasonCalendarMutation,
+
+  useListLodgingSeasonRatesQuery,
+  useCreateLodgingSeasonRateMutation,
+  useUpdateLodgingSeasonRateMutation,
+  useDeleteLodgingSeasonRateMutation,
+
+  useListPricingAdjustmentsQuery,
+  useGetPricingAdjustmentQuery,
+  useCreatePricingAdjustmentMutation,
+  useUpdatePricingAdjustmentMutation,
+  useDeletePricingAdjustmentMutation,
+
+  useLazyGetQuoteQuery,
+  useGetLodgingRateCalendarQuery,
+  useLazyGetLodgingRateCalendarQuery
 } = api;
