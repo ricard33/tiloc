@@ -291,9 +291,8 @@ REST_FRAMEWORK = {
 #     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
 
 REST_KNOX = {
-    "SECURE_HASH_ALGORITHM": UNITTEST
-    and "cryptography.hazmat.primitives.hashes.MD5"
-    or "cryptography.hazmat.primitives.hashes.SHA512",  # noqa: E131
+    # knox 5 takes a hashlib name here (was a cryptography.hazmat class in knox 4).
+    "SECURE_HASH_ALGORITHM": UNITTEST and "hashlib.md5" or "hashlib.sha512",  # noqa: E131
     # 'AUTH_TOKEN_CHARACTER_LENGTH': 64,
     "TOKEN_TTL": timedelta(days=30),
     # 'TOKEN_LIMIT_PER_USER': None,

@@ -319,7 +319,7 @@ version = "2.1.1"
 description = "Foreign Function Interface for Python calling C code."
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["dev"]
 markers = "platform_python_implementation != \"PyPy\""
 files = [
     {file = "cffi-2.1.1-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:baed1e86cc735622097354b9d1281406caf42ff42a886d29faa8e8d1630333be"},
@@ -774,7 +774,7 @@ version = "50.0.1"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 optional = false
 python-versions = "!=3.9.0,!=3.9.1,>=3.9"
-groups = ["main", "dev"]
+groups = ["dev"]
 files = [
     {file = "cryptography-50.0.1-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:b8f852c65863251b9e3a1b8c150ce21e59b522dbb6a7d4bc80e680d38388e986"},
     {file = "cryptography-50.0.1-cp311-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:53e279950892dc102c6b4e52af03ae5ea92fac572a1ddab78ca73a997f62b69f"},
@@ -1089,20 +1089,19 @@ Django = "*"
 
 [[package]]
 name = "django-rest-knox"
-version = "4.2.0"
+version = "5.1.0"
 description = "Authentication for django rest framework"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "django-rest-knox-4.2.0.tar.gz", hash = "sha256:4595f1dc23d6e41af7939e5f2d8fdaf6ade0a74a656218e7b56683db5566fcc9"},
-    {file = "django_rest_knox-4.2.0-py3-none-any.whl", hash = "sha256:62b8e374a44cd4e9617eaefe27c915b301bf224fa6550633d3013d3f9f415113"},
+    {file = "django_rest_knox-5.1.0-py3-none-any.whl", hash = "sha256:7dad21e91091db07796ea96f559fd2e1f67b8d42748d4e140d2fa7a0319538e7"},
+    {file = "django_rest_knox-5.1.0.tar.gz", hash = "sha256:78307dce32858679fe96afb06c4ab2d4fe0ed085c7a739a7ccc03a14dea2b37b"},
 ]
 
 [package.dependencies]
-cryptography = "*"
-django = ">=3.2"
-djangorestframework = "*"
+django = ">=4.2"
+djangorestframework = ">=3.14"
 
 [[package]]
 name = "django-simple-history"
@@ -2000,7 +1999,7 @@ version = "3.0"
 description = "C parser in Python"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "dev"]
+groups = ["dev"]
 markers = "platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""
 files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
@@ -2750,4 +2749,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "431f129cba49905988159b055b337854759d88571cdacf32342252d8a99952f8"
+content-hash = "8ff60f56afb7e80486cadb77d285c8802537bf1165c1fbcbb64ef4a8c798d0fd"
