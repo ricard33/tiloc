@@ -580,8 +580,8 @@ export const api = createApi({
       providesTags: [{ type: "Quote", id: "LIST" }],
       transformResponse: (response) => api2Quote(response as ApiModel)
     }),
-    getLodgingRateCalendar: builder.query<RateCalendarEntry[], { lodgingId: number; begin: string; end: string }>({
-      query: ({ lodgingId, begin, end }) => `lodging/${lodgingId}/rate_calendar/?begin=${begin}&end=${end}`,
+    getLodgingRateCalendar: builder.query<Record<number, RateCalendarEntry[]>, { begin: string; end: string }>({
+      query: ({ begin, end }) => `lodging/rate_calendar/?begin=${begin}&end=${end}`,
       providesTags: [{ type: "LodgingRateCalendar", id: "LIST" }]
     })
 

@@ -1,5 +1,5 @@
-import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Booking, BookingStatus, Lodging, paymentMethods } from "../../../types";
+import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Booking, BookingStatus, Lodging, paymentMethods, RateCalendarEntry } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import {
   add,
@@ -78,6 +78,7 @@ type Props = {
   onScroll?: (visibleStart: Date, visibleEnd: Date) => void,
   onBoundsChange?: (canvasStart: Date, canvasEnd: Date) => void,
   settings: PlanningSettings,
+  rateCalendars?: Record<number, RateCalendarEntry[]>,
   dayWidth?: number,
   dayHeight?: number,
   collapsed?: boolean,
@@ -87,7 +88,7 @@ type Props = {
 export const TimelineView: React.FC<Props> = props => {
   const {
     defaultBeginDate, visibleBeginDate, visibleEndDate, goToDate, bookings, lodgings, buffer,
-    settings, onScroll, onBoundsChange, onCreateBooking,
+    settings, rateCalendars, onScroll, onBoundsChange, onCreateBooking,
     dayWidth: initialDayWidth, dayHeight, collapsed: collapsedProps, onCollapse
   } = {
     defaultBeginDate: startOfMonth(new Date()),
@@ -98,6 +99,17 @@ export const TimelineView: React.FC<Props> = props => {
   };
   const fixed = Boolean(visibleBeginDate && visibleEndDate);
   const { t } = useTranslation();
+
+  // {lodgingId: {isoDate: "123.00"}} from the per-lodging rate calendars, for the day cells.
+  const rateByLodgingAndDay = useMemo(() => {
+    const map: Record<number, Record<string, string>> = {};
+    for (const [lodgingId, entries] of Object.entries(rateCalendars ?? {})) {
+      map[Number(lodgingId)] = Object.fromEntries((entries ?? []).map(e => [e.date, e.rate]));
+    }
+    return map;
+  }, [rateCalendars]);
+  const rateFor = (lodging: Lodging, date: Date) =>
+    rateByLodgingAndDay[lodging.id]?.[format(date, "yyyy-MM-dd")] ?? String(lodging.daily_rate);
   const { width: screenWidth } = useWindowDimensions();
   const isDesktop = screenWidth >= 900;
   const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
@@ -534,7 +546,7 @@ export const TimelineView: React.FC<Props> = props => {
                       })}
                       onMouseLeave={() => selectionEnd && setSelectionEnd(selectStart)}
                     >
-                      {settings.showPrices && !d.isBusy && <div className="day-price">{l.daily_rate} €</div>}
+                      {settings.showPrices && !d.isBusy && <div className="day-price">{rateFor(l, d.date)} €</div>}
                       {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}
                     </td>
                   );
