@@ -16,11 +16,9 @@ from django.http import Http404, HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-from django_email_verification import send_email as send_verification_email
-from django_email_verification import send_password as send_reset_password
+from django_email_verification import send_email as send_verification_email, send_password as send_reset_password
 from knox.models import AuthToken
-from knox.views import LoginView as KnoxLoginView
-from knox.views import LogoutView as KnoxLogoutView
+from knox.views import LoginView as KnoxLoginView, LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import APIException, AuthenticationFailed
@@ -28,14 +26,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from stripe import Invoice as StripeInvoice
-from stripe import PaymentIntent
-from stripe import Subscription as StripeSubscription
+from stripe import Invoice as StripeInvoice, PaymentIntent, Subscription as StripeSubscription
 
 from location import __date__, __version__
 from notifier.models import SentNotification
 from notifier.shortcuts import send_notification
-
 from . import models
 from .contracts import generate_contract, generate_preview_contract
 from .filters import BookingFilter, CommentFilter, PaymentFilter
@@ -191,7 +186,7 @@ class SignUpAPI(KnoxLoginView):
             account=account,
         )
         user.groups.set(Group.objects.filter(name="administrator"))
-        send_verification_email(user, context={"request": request})
+        send_verification_email(user, context={"request": request}, thread=False)
         # raise APIException(detail="TEST")
         login(request, user)
 
@@ -233,7 +228,7 @@ class ResetPasswordAPI(generics.GenericAPIView):
             return Response({"email": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = models.User.objects.get(email=email)
-            send_reset_password(user, context={"request": request})
+            send_reset_password(user, context={"request": request}, thread=False)
         except models.User.DoesNotExist:
             logger.warning("Reset password: user not found for %s", email)
         return Response({"message": "Reset link successfully sent"}, status=status.HTTP_200_OK)
@@ -313,7 +308,7 @@ class CurrentUserAPI(generics.RetrieveUpdateAPIView):
 @permission_classes([permissions.IsAuthenticated])
 def resend_verification(request, *args, **kwargs):
     user = request.user
-    send_verification_email(user, context={"request": request})
+    send_verification_email(user, context={"request": request}, thread=False)
     return Response("Email sent")
 
 
