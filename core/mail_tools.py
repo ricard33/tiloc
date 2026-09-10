@@ -13,7 +13,7 @@ logger = logging.getLogger("mail_tools")
 def get_email_backend(backend_name):
     if backend_name == "django":
         return "django.core.mail.backends.smtp.EmailBackend"
-    elif backend_name in ("sendinblue", "mailjet"):
+    elif backend_name in ("brevo", "mailjet"):
         return "anymail.backends.%s.EmailBackend" % backend_name
     from django.core.exceptions import ImproperlyConfigured
 
@@ -23,7 +23,7 @@ def get_email_backend(backend_name):
 def get_email_templates(user: models.User, backend_name: str):
     return {
         "welcome": {
-            "template_id": {"sendinblue": 1, "mailjet": "5448184"}.get(backend_name),
+            "template_id": {"brevo": 1, "mailjet": "5448184"}.get(backend_name),
             "template_html": {"django": "signup/welcome_body.html"}.get(backend_name),
             "template_text": {"django": "signup/welcome_body.txt"}.get(backend_name),
             "subject": {"django": "Je vous souhaite la bienvenue à votre essai gratuit Tiloc"}.get(backend_name),

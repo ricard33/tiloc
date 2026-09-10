@@ -15,7 +15,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--backend",
-            help="Backend to send email (django, sendinblue or mailjet)",
+            help="Backend to send email (django, brevo or mailjet)",
         )
 
     def handle(self, *args, **options):
