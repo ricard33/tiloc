@@ -43,7 +43,6 @@ django = "^4.2"
 # TODO: constance 4.x switches the DB backend from pickle to JSON — needs a stored-value
 # migration on the servers before bumping. Kept on 3.x for this refresh.
 django-constance = "^3.1.0"
-django-cron = "^0.6.0"
 django-dbbackup = "^4.0.2"
 django-filter = "^25.1"
 django-import-export = "^4.3.7"

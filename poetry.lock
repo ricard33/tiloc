@@ -952,21 +952,6 @@ django-picklefield = "*"
 redis = ["redis"]
 
 [[package]]
-name = "django-cron"
-version = "0.6.0"
-description = "Running python crons in a Django project"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "django-cron-0.6.0.tar.gz", hash = "sha256:dc3c0d3433a2e4e7012f77f6d8415ad90367ba068649db2674325bc36f935841"},
-    {file = "django_cron-0.6.0-py3-none-any.whl", hash = "sha256:016203554748512b7f19d7363b4fde8741c6ff63fe8a15051f3031f4a0506a41"},
-]
-
-[package.dependencies]
-Django = ">=3.2"
-
-[[package]]
 name = "django-dbbackup"
 version = "4.3.0"
 description = "Management commands to help backup and restore a project database and media."
@@ -2765,4 +2750,4 @@ dev = ["pytest", "setuptools"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "4bfae25549ebb36ca197c4cefe75cf3b0dcf4c0785f40504c517156307e532d8"
+content-hash = "431f129cba49905988159b055b337854759d88571cdacf32342252d8a99952f8"

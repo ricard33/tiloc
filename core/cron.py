@@ -8,7 +8,6 @@ import arrow
 import urllib3
 from django.conf import settings
 from django.db import transaction
-from django_cron import CronJobBase, Schedule
 from import_export.resources import modelresource_factory
 from requests import HTTPError
 
@@ -19,12 +18,13 @@ from notifier.models import SentNotification
 
 logger = logging.getLogger("cron")
 
+# These jobs used to be django-cron CronJobBase classes; django-cron is unmaintained and its
+# migrations break on Django >= 5.1. They are now plain classes invoked by the management
+# commands in core/management/commands/ (scheduled by the host's cron).
 
-class SyncBookingsJob(CronJobBase):
+
+class SyncBookingsJob:
     RUN_EVERY_MINS = 5
-
-    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
-    code = "core.sync_bookings"  # a unique code
 
     def do(self):
         if settings.IS_DEMO:
@@ -65,9 +65,7 @@ class SyncBookingsJob(CronJobBase):
         logger.info("Booking synchronizer finished in %.2f seconds", time() - t0)
 
 
-class ExportBookingsJob(CronJobBase):
-    schedule = Schedule(run_at_times=["02:00"])
-    code = "core.export_bookings"  # a unique code
+class ExportBookingsJob:
     PURGE_OLDER_THAN_DAYS = 30
 
     @staticmethod
@@ -106,9 +104,7 @@ class ExportBookingsJob(CronJobBase):
                     os.remove(fullpath)
 
 
-class PurgeNotificationsJob(CronJobBase):
-    schedule = Schedule(run_at_times=['00:30', ])
-    code = "core.purge_notifications"
+class PurgeNotificationsJob:
     READ_NOTIFICATIONS_MAX_DAYS = 7
     UNREAD_NOTIFICATIONS_MAX_DAYS = 180
 

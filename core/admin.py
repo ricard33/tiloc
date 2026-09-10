@@ -27,8 +27,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django_cron.admin import CronJobLogAdmin
-from django_cron.models import CronJobLock, CronJobLog
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from knox.admin import AuthTokenAdmin
 from knox.models import AuthToken
@@ -695,8 +693,6 @@ site.register(models.Comment, CommentAdmin)
 
 site.register([Config], ConstanceAdmin)
 site.register(Group, GroupAdmin)
-site.register(CronJobLog, CronJobLogAdmin)
-site.register(CronJobLock)
 site.register(AuthToken, AuthTokenAdmin)
 
 site.register(notifier.models.Backend, notifier.admin.BackendAdmin)
