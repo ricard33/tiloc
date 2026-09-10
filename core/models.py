@@ -205,10 +205,11 @@ class Account(models.Model):
         BookedService.objects.filter(booking__account=self).delete()
         Booking.objects.filter(lodgings__account=self).delete()
         BookingChannelSync.objects.filter(lodging__account=self).delete()
+        PricingAdjustment.objects.filter(account=self).delete()
         Lodging.objects.filter(account=self).delete()
+        SeasonCalendar.objects.filter(account=self).delete()
         ContractTemplate.objects.filter(account=self).delete()
         Service.objects.filter(account=self).delete()
-        Pricing.objects.filter(account=self).delete()
         User.objects.filter(account=self).delete()
 
     def fill_account_with_default_ressources(self, template=None):
@@ -227,6 +228,23 @@ class Account(models.Model):
             Service.objects.bulk_create(map(_set_account, template.service_set.all()))
             BookingChannel.objects.bulk_create(map(_set_account, template.bookingchannel_set.all()))
             ContractTemplate.objects.bulk_create(map(_set_account, template.contracttemplate_set.all()))
+
+            for template_calendar in template.seasoncalendar_set.all():
+                seasons = list(template_calendar.seasons.all())
+                calendar = SeasonCalendar.objects.create(
+                    account=self, name=template_calendar.name, notes=template_calendar.notes
+                )
+                for template_season in seasons:
+                    ranges = list(template_season.date_ranges.all())
+                    season = Season.objects.create(
+                        calendar=calendar,
+                        name=template_season.name,
+                        color=template_season.color,
+                        rank=template_season.rank,
+                    )
+                    SeasonDateRange.objects.bulk_create(
+                        SeasonDateRange(season=season, begin_date=r.begin_date, end_date=r.end_date) for r in ranges
+                    )
 
         except Account.DoesNotExist:
             logging.info(
@@ -387,6 +405,32 @@ class Lodging(models.Model):
         "Service", blank=True, help_text=_("Services added by default on new bookings")
     )
 
+    season_calendar = models.ForeignKey(
+        "SeasonCalendar",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="lodgings",
+        help_text=_("Shared season calendar driving seasonal rates for this lodging"),
+    )
+    min_nights = models.PositiveSmallIntegerField(_("minimum nights"), default=1)
+    weekly_discount_percent = models.DecimalField(
+        _("weekly discount rate"),
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Applied when the stay is at least 7 nights"),
+    )
+    monthly_discount_percent = models.DecimalField(
+        _("monthly discount rate"),
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Applied when the stay is at least 28 nights (supersedes the weekly discount)"),
+    )
+
     history = HistoricalRecords()
 
     class Meta:
@@ -540,6 +584,12 @@ class Booking(models.Model):
     )
     is_flat_rate = models.BooleanField(
         _("flat rate?"), default=False, help_text=_("Use flat rate price instead of daily price computation if true")
+    )
+    price_details = models.JSONField(
+        _("price details"),
+        null=True,
+        blank=True,
+        help_text=_("Snapshot of the price breakdown (per-night rates and adjustments) from the pricing engine"),
     )
     deposit = models.DecimalField(_("deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
     guaranty = models.DecimalField(_("security deposit"), max_digits=20, decimal_places=2, blank=True, null=True)
@@ -791,40 +841,202 @@ class BookedService(models.Model):
         super().save(*args, **kwargs)
 
 
-class Pricing(models.Model):  # or RatePlan
+class SeasonCalendar(models.Model):
+    """A named set of seasons shared by the lodgings of one account.
+
+    Only the season *definitions* (names and dates) are shared; the rates for each
+    season stay per-lodging on :class:`LodgingSeasonRate`.
+    """
+
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
-    name = models.CharField(_("name"), max_length=256)
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
-    included_guests = models.PositiveSmallIntegerField(_("Number of guests included in the price"))
-    supplement_per_additional_guest = models.PositiveSmallIntegerField(
-        _("Supplement per night and per additional guest")
-    )
-    info = models.TextField(_("info"), blank=True, null=True)
+    name = models.CharField(_("name"), max_length=200)
+    notes = models.TextField(_("notes"), blank=True)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = _("Season calendar")
+        ordering = ["name"]
+        unique_together = ("account", "name")
 
     _account_qs_path = "account"
-
     objects = ForUserQuerySet.as_manager()
 
+    def __str__(self):
+        return self.name
 
-class SeasonalVariation(models.Model):
-    pricing = models.ForeignKey(Pricing, on_delete=models.CASCADE)
-    name = models.CharField(_("name"), max_length=256)
-    begin_date = models.DateField(
-        _("begin date"),
-    )
-    end_date = models.DateField(
-        _("end date"),
-    )
-    daily_rate = models.DecimalField(_("daily rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    weekend_rate = models.DecimalField(_("weekend rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    weekly_rate = models.DecimalField(_("weekly rate"), max_digits=20, decimal_places=2, blank=True, null=True)
-    minimum_stay = models.PositiveSmallIntegerField(_("Minimum stay"))
 
-    _account_qs_path = "pricing__account"
+class Season(models.Model):
+    """A named tier ("Low", "High", ...) inside one :class:`SeasonCalendar`."""
+
+    calendar = models.ForeignKey(SeasonCalendar, on_delete=models.CASCADE, related_name="seasons")
+    name = models.CharField(_("name"), max_length=100)
+    color = models.CharField(_("color"), max_length=7, default="#3788d8")
+    rank = models.PositiveSmallIntegerField(
+        _("rank"),
+        default=0,
+        help_text=_("Display order, and the season kept when two date ranges overlap (lowest wins)"),
+    )
+
+    class Meta:
+        verbose_name = _("Season")
+        ordering = ["calendar", "rank", "name"]
+
+    _account_qs_path = "calendar__account"
     objects = ForUserQuerySet.as_manager()
+
+    def __str__(self):
+        return "%s / %s" % (self.calendar.name, self.name)
+
+
+class SeasonDateRange(models.Model):
+    """A dated interval covered by a :class:`Season`, defined year by year.
+
+    ``end_date`` is the **inclusive last night**, not the checkout date.
+    """
+
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="date_ranges")
+    begin_date = models.DateField(_("first night"))
+    end_date = models.DateField(_("last night"))
+
+    class Meta:
+        verbose_name = _("Season date range")
+        ordering = ["begin_date"]
+
+    _account_qs_path = "season__calendar__account"
+    objects = ForUserQuerySet.as_manager()
+
+    def __str__(self):
+        return "%s (%s → %s)" % (self.season.name, self.begin_date, self.end_date)
+
+    def clean(self):
+        if self.begin_date and self.end_date and self.begin_date > self.end_date:
+            raise ValidationError({"end_date": _("The last night cannot be before the first night.")})
+        if not (self.begin_date and self.end_date and self.season_id):
+            return
+        overlapping = (
+            SeasonDateRange.objects.filter(
+                season__calendar_id=self.season.calendar_id,
+                begin_date__lte=self.end_date,
+                end_date__gte=self.begin_date,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        )
+        if overlapping:
+            raise ValidationError(_("This date range overlaps another range of the same calendar."))
+
+
+class LodgingSeasonRate(models.Model):
+    """The rate a given lodging charges during a given season."""
+
+    lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE, related_name="season_rates")
+    season = models.ForeignKey(Season, on_delete=models.CASCADE, related_name="lodging_rates")
+    nightly_rate = models.DecimalField(_("nightly rate"), max_digits=20, decimal_places=2)
+    weekend_rate = models.DecimalField(
+        _("weekend rate"),
+        max_digits=20,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text=_("Friday and Saturday nights. Empty means the nightly rate is used."),
+    )
+    min_nights = models.PositiveSmallIntegerField(
+        _("minimum nights"), null=True, blank=True, help_text=_("Empty means the lodging default is used.")
+    )
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = _("Lodging season rate")
+        ordering = ["lodging", "season"]
+        unique_together = ("lodging", "season")
+
+    _account_qs_path = "lodging__account"
+    _lodging_qs_path = "lodging"
+    objects = ForUserQuerySet.as_manager()
+
+    def __str__(self):
+        return "%s @ %s" % (self.lodging.name, self.season.name)
+
+    def clean(self):
+        if self.lodging_id and self.season_id and self.season.calendar_id != self.lodging.season_calendar_id:
+            raise ValidationError(_("The season does not belong to the lodging's season calendar."))
+
+
+class PricingAdjustment(models.Model):
+    """A generic rule that adds a discount or a surcharge to a computed stay price.
+
+    ``lodging`` null means the rule applies to every lodging of the account.
+    A negative ``value`` is a discount, a positive one a surcharge. Conditions are
+    all optional and combined with AND; a null condition is not checked.
+    """
+
+    class AdjustmentType(models.TextChoices):
+        PERCENT = "percent", _("Percentage")
+        FIXED = "fixed", _("Fixed amount")
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
+    lodging = models.ForeignKey(
+        Lodging,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="pricing_adjustments",
+        help_text=_("Empty means the rule applies to every lodging of the account."),
+    )
+    name = models.CharField(_("name"), max_length=100)
+    adjustment_type = models.CharField(
+        _("adjustment type"), max_length=10, choices=AdjustmentType.choices, default=AdjustmentType.PERCENT
+    )
+    value = models.DecimalField(
+        _("value"),
+        max_digits=20,
+        decimal_places=2,
+        help_text=_("Negative for a discount, positive for a surcharge. Percent points or currency amount."),
+    )
+
+    min_nights = models.PositiveSmallIntegerField(_("minimum nights"), null=True, blank=True)
+    max_nights = models.PositiveSmallIntegerField(_("maximum nights"), null=True, blank=True)
+    min_days_before_arrival = models.IntegerField(
+        _("minimum days before arrival"), null=True, blank=True, help_text=_("Early booking discount.")
+    )
+    max_days_before_arrival = models.IntegerField(
+        _("maximum days before arrival"), null=True, blank=True, help_text=_("Last minute discount.")
+    )
+    stay_begin = models.DateField(_("stay window start"), null=True, blank=True)
+    stay_end = models.DateField(_("stay window end"), null=True, blank=True)
+    booking_begin = models.DateField(_("booking window start"), null=True, blank=True)
+    booking_end = models.DateField(_("booking window end"), null=True, blank=True)
+    applicable_weekdays = models.JSONField(
+        _("applicable weekdays"),
+        null=True,
+        blank=True,
+        help_text=_("List of weekday numbers (Monday=0). Empty applies to the whole stay."),
+    )
+
+    priority = models.PositiveSmallIntegerField(_("priority"), default=0, help_text=_("Lower is applied first."))
+    stackable = models.BooleanField(
+        _("stackable"), default=True, help_text=_("If off, no lower-priority rule is applied after this one.")
+    )
+    active = models.BooleanField(_("active"), default=True)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = _("Pricing adjustment")
+        ordering = ["priority", "id"]
+
+    _account_qs_path = "account"
+    _lodging_qs_path = "lodging"
+    objects = ForUserQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.lodging_id and self.lodging.account_id != self.account_id:
+            raise ValidationError(_("The lodging does not belong to the adjustment's account."))
 
 
 class Payment(models.Model):

@@ -307,29 +307,50 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     date = factory.Faker("date")
 
 
-class PricingFactory(factory.django.DjangoModelFactory):
+class SeasonCalendarFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.Pricing
+        model = models.SeasonCalendar
+        django_get_or_create = ("account", "name")
 
     account = factory.SubFactory(AccountFactory)
-    name = factory.Sequence(lambda n: "Price %d" % n)
-    daily_rate = factory.LazyAttribute(lambda x: random.choice([40, 50, 60, 70]))
-    weekend_rate = factory.LazyAttribute(lambda x: x.daily_rate * 0.25)
-    weekly_rate = factory.LazyAttribute(lambda x: x.daily_rate * 7)
-    minimum_stay = 7
-    included_guests = 4
-    supplement_per_additional_guest = 5.0
+    name = factory.Sequence(lambda n: "Calendar %d" % n)
 
 
-class SeasonalVariationFactory(factory.django.DjangoModelFactory):
+class SeasonFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.SeasonalVariation
+        model = models.Season
 
-    pricing = factory.SubFactory(PricingFactory)
+    calendar = factory.SubFactory(SeasonCalendarFactory)
     name = factory.Sequence(lambda n: "Season %d" % n)
+    rank = factory.Sequence(lambda n: n)
+
+
+class SeasonDateRangeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.SeasonDateRange
+
+    season = factory.SubFactory(SeasonFactory)
     begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
-    end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=random.randint(7, 21)).date())
-    daily_rate = factory.LazyAttribute(lambda x: random.choice([40, 50, 60, 70]))
-    weekend_rate = factory.LazyAttribute(lambda x: x.daily_rate * 0.25)
-    weekly_rate = factory.LazyAttribute(lambda x: x.daily_rate * 7)
-    minimum_stay = 7
+    end_date = factory.LazyAttribute(lambda r: arrow.get(r.begin_date).shift(days=random.randint(7, 21)).date())
+
+
+class LodgingSeasonRateFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.LodgingSeasonRate
+
+    lodging = factory.SubFactory(LodgingFactory)
+    season = factory.SubFactory(SeasonFactory)
+    nightly_rate = factory.LazyAttribute(lambda x: random.choice([40, 50, 60, 70]))
+    weekend_rate = factory.LazyAttribute(lambda x: x.nightly_rate * 1.25)
+    min_nights = 7
+
+
+class PricingAdjustmentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.PricingAdjustment
+
+    account = factory.SubFactory(AccountFactory)
+    lodging = None
+    name = factory.Sequence(lambda n: "Adjustment %d" % n)
+    adjustment_type = models.PricingAdjustment.AdjustmentType.PERCENT
+    value = -10

@@ -23,7 +23,7 @@ from knox.views import LoginView as KnoxLoginView
 from knox.views import LogoutView as KnoxLogoutView
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import APIException, AuthenticationFailed
+from rest_framework.exceptions import APIException, AuthenticationFailed, PermissionDenied, ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -44,6 +44,7 @@ from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
 from .pdf_tools import generate_pdf
 from .permissions import IsCompanyAdminPermissions
+from .pricing import compute_quote
 from .serializers import (
     AccountSerializer,
     ActivitySerializer,
@@ -57,12 +58,14 @@ from .serializers import (
     CreateUserSerializer,
     CurrentUserSerializer,
     GuestSerializer,
+    LodgingSeasonRateSerializer,
     LodgingSerializer,
     LoginUserSerializer,
     NextEventSerializer,
     PaymentSerializer,
-    PricingSerializer,
-    SeasonalVariationSerializer,
+    PricingAdjustmentSerializer,
+    QuoteRequestSerializer,
+    SeasonCalendarSerializer,
     SentNotificationSerializer,
     ServiceSerializer,
     SignUpSerializer,
@@ -179,7 +182,10 @@ class SignUpAPI(KnoxLoginView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
         if models.User.objects.filter(email=email):
-            return Response({"detail": "This email is already in use.", "code": "EMAIL_ALREADY_IN_USE"}, status=status.HTTP_409_CONFLICT)
+            return Response(
+                {"detail": "This email is already in use.", "code": "EMAIL_ALREADY_IN_USE"},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         account = models.Account.objects.create()
         user = models.User.objects.create_user(
@@ -324,10 +330,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = (
         models.Booking.objects.filter(deleted=False)
         .order_by("-begin_date")
-        .prefetch_related("lodgings__owner",
-                          "source", "payment_set", "comments",
-                          "bookedservice_set__service"
-                          )
+        .prefetch_related("lodgings__owner", "source", "payment_set", "comments", "bookedservice_set__service")
     )
     serializer_class = BookingSerializer
     pagination_class = LargeResultsSetPagination
@@ -447,6 +450,32 @@ class BookingViewSet(viewsets.ModelViewSet):
         )
         return Response(entries)
 
+    @action(detail=False, methods=["post"])
+    def quote(self, request, pk=None):
+        """Price a prospective stay: per-night rates, discounts and total, with a full breakdown."""
+        if not request.user.has_perm("core.view_prices"):
+            raise PermissionDenied
+
+        serializer = QuoteRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        lodgings = list(models.Lodging.objects.for_user(request.user).filter(id__in=data["lodging_ids"]))
+        if len(lodgings) != len(set(data["lodging_ids"])):
+            raise ValidationError({"lodging_ids": _("Unknown lodging.")})
+        # keep the caller's order
+        lodgings.sort(key=lambda lodging: data["lodging_ids"].index(lodging.id))
+
+        quote = compute_quote(
+            lodgings=lodgings,
+            begin_date=data["begin_date"],
+            end_date=data["end_date"],
+            booking_date=data.get("booking_date"),
+            is_flat_rate=data.get("is_flat_rate", False),
+            flat_price=data.get("flat_price"),
+        )
+        return Response(quote.as_dict())
+
 
 class BookingChannelViewSet(viewsets.ModelViewSet):
     queryset = models.BookingChannel.objects.all()
@@ -478,18 +507,56 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
             raise OverLimitError(detail="The maximum number of lodgings has been reached.")
         return super().create(request, *args, **kwargs)
 
+    @action(detail=True, methods=["get"])
+    def rate_calendar(self, request, pk=None):
+        """Per-night base rate for a lodging over ``?begin=YYYY-MM-DD&end=YYYY-MM-DD`` (end exclusive)."""
+        if not request.user.has_perm("core.view_prices"):
+            raise PermissionDenied
+        lodging = self.get_object()
+        try:
+            begin = arrow.get(request.query_params["begin"]).date()
+            end = arrow.get(request.query_params["end"]).date()
+        except (KeyError, ValueError, arrow.parser.ParserError):
+            raise ValidationError({"begin": _("Provide begin and end as YYYY-MM-DD dates.")})
+        if end <= begin:
+            raise ValidationError({"end": _("end must be after begin.")})
 
-class PricingViewSet(viewsets.ModelViewSet):
-    queryset = models.Pricing.objects.all().order_by("name")
-    serializer_class = PricingSerializer
+        quote = compute_quote(lodgings=[lodging], begin_date=begin, end_date=end, apply_adjustments=False)
+        nights = quote.lodgings[0].nights if quote.lodgings else []
+        return Response(
+            [
+                {
+                    "date": night.date.isoformat(),
+                    "rate": f"{night.applied_rate:.2f}",
+                    "season": night.season,
+                    "is_weekend": night.is_weekend,
+                }
+                for night in nights
+            ]
+        )
+
+
+class SeasonCalendarViewSet(viewsets.ModelViewSet):
+    queryset = models.SeasonCalendar.objects.all().order_by("name").prefetch_related("seasons__date_ranges", "lodgings")
+    serializer_class = SeasonCalendarSerializer
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
 
 
-class SeasonalVariationViewSet(viewsets.ModelViewSet):
-    queryset = models.SeasonalVariation.objects.all().order_by("begin_date")
-    serializer_class = SeasonalVariationSerializer
+class LodgingSeasonRateViewSet(viewsets.ModelViewSet):
+    queryset = models.LodgingSeasonRate.objects.all().order_by("lodging", "season")
+    serializer_class = LodgingSeasonRateSerializer
+    filterset_fields = ["lodging", "season"]
+
+    def get_queryset(self):
+        return self.queryset.for_user(self.request.user)
+
+
+class PricingAdjustmentViewSet(viewsets.ModelViewSet):
+    queryset = models.PricingAdjustment.objects.all().order_by("priority", "id")
+    serializer_class = PricingAdjustmentSerializer
+    filterset_fields = ["lodging", "active"]
 
     def get_queryset(self):
         return self.queryset.for_user(self.request.user)
@@ -514,13 +581,17 @@ class ContractTemplateViewSet(viewsets.ModelViewSet):
             lodging = models.Lodging.objects.for_user(request.user).get(pk=lodging_id)
         else:
             lodging = template.account.lodging_set.first()
-        full_path = os.path.join(settings.MEDIA_ROOT, template.account.name, "templates", "%d" % template.id, "preview_contract.pdf")
+        full_path = os.path.join(
+            settings.MEDIA_ROOT, template.account.name, "templates", "%d" % template.id, "preview_contract.pdf"
+        )
         os.makedirs(os.path.split(full_path)[0], exist_ok=True)
 
         sid = transaction.savepoint()
         try:
             generate_pdf(
-                generate_preview_contract(template_content, lodging, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")),
+                generate_preview_contract(
+                    template_content, lodging, request.scheme + "://" + request.META.get("HTTP_HOST", "localhost")
+                ),
                 full_path,
                 request.user.account.is_free_plan,
             )
@@ -529,7 +600,9 @@ class ContractTemplateViewSet(viewsets.ModelViewSet):
             return HttpResponse("Template error: " + ex.message, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             logger.exception("Unknown error during template generation")
-            return HttpResponse("Unknown error during template generation: " + str(ex), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return HttpResponse(
+                "Unknown error during template generation: " + str(ex), status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         transaction.savepoint_rollback(sid)
 

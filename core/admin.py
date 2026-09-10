@@ -69,9 +69,7 @@ class RestrictedModelAdminMixIn(object):
             if isinstance(account_field, list):
                 import operator
 
-                return qs.filter(
-                    reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field))
-                )
+                return qs.filter(reduce(operator.or_, map(lambda x: Q(**{x + "__id": account["id"]}), account_field)))
 
             return qs.filter(**{account_field + "__id": account["id"]})
         return qs
@@ -190,7 +188,7 @@ class AccountAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
 @admin.register(models.User, site=site)
 class UserAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     add_form_template = "admin/auth/user/add_form.html"
-    change_form_template = 'loginas/change_form.html'
+    change_form_template = "loginas/change_form.html"
     change_user_password_template = None
     fieldsets = (
         (None, {"fields": ("account", "password")}),
@@ -538,42 +536,37 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
     list_filter = ("owner", "active", "shown")
 
 
-class PricingAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = (
-        "id",
-        "name",
-        "daily_rate",
-        "weekend_rate",
-        "weekly_rate",
-        "minimum_stay",
-        "included_guests",
-        "supplement_per_additional_guest",
-        "account",
-    )
-    list_display_links = ("name",)
-    list_editable = (
-        "daily_rate",
-        "weekend_rate",
-        "weekly_rate",
-        "minimum_stay",
-        "included_guests",
-        "supplement_per_additional_guest",
-    )
+class SeasonDateRangeInline(admin.TabularInline):
+    model = models.SeasonDateRange
+    extra = 1
 
 
-class SeasonalVariationAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = (
-        "id",
-        "pricing",
-        "name",
-        "begin_date",
-        "end_date",
-        "daily_rate",
-        "weekend_rate",
-        "weekly_rate",
-        "minimum_stay",
-    )
-    list_display_links = ("name",)
+class SeasonInline(admin.TabularInline):
+    model = models.Season
+    extra = 1
+
+
+class SeasonCalendarAdmin(RestrictedModelAdminMixIn, SimpleHistoryAdmin):
+    list_display = ("id", "name", "account")
+    list_display_links = ("id", "name")
+    inlines = [SeasonInline]
+
+
+class SeasonAdmin(RestrictedModelAdminMixIn, admin.ModelAdmin):
+    list_display = ("id", "calendar", "name", "rank", "color")
+    list_display_links = ("id", "name")
+    inlines = [SeasonDateRangeInline]
+
+
+class LodgingSeasonRateAdmin(RestrictedModelAdminMixIn, SimpleHistoryAdmin):
+    list_display = ("id", "lodging", "season", "nightly_rate", "weekend_rate", "min_nights")
+    list_display_links = ("id",)
+
+
+class PricingAdjustmentAdmin(RestrictedModelAdminMixIn, SimpleHistoryAdmin):
+    list_display = ("id", "name", "account", "lodging", "adjustment_type", "value", "priority", "stackable", "active")
+    list_display_links = ("id", "name")
+    list_filter = ("adjustment_type", "stackable", "active")
 
 
 class ContractTemplateAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAdmin):
@@ -679,8 +672,10 @@ site.register(models.Lodging, LodgingAdmin)
 site.register(models.BookingChannel, BookingChannelAdmin)
 site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
 site.register(models.BookedService, BookedServiceAdmin)
-site.register(models.Pricing, PricingAdmin)
-site.register(models.SeasonalVariation, SeasonalVariationAdmin)
+site.register(models.SeasonCalendar, SeasonCalendarAdmin)
+site.register(models.Season, SeasonAdmin)
+site.register(models.LodgingSeasonRate, LodgingSeasonRateAdmin)
+site.register(models.PricingAdjustment, PricingAdjustmentAdmin)
 site.register(models.Contract, ContractAdmin)
 site.register(models.ContractTemplate, ContractTemplateAdmin)
 site.register(models.Payment, PaymentAdmin)
