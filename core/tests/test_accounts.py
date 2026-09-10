@@ -120,7 +120,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         factories.ContractTemplateFactory.create(account=account)
         pricing = factories.PricingFactory.create(account=account)
         factories.SeasonalVariationFactory.create(pricing=pricing)
-        factories.HolidaysFactory.create(account=account)
         for i in range(6):
             factories.ServiceFactory.create(account=account)
 
@@ -155,7 +154,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
         factories.ContractTemplateFactory.create(account=account)
         pricing = factories.PricingFactory.create(account=account)
         factories.SeasonalVariationFactory.create(pricing=pricing)
-        factories.HolidaysFactory.create(account=account)
         factories.PaymentFactory.create(booking=booking)
         factories.ContractFactory.create(booking=booking)
 
@@ -166,7 +164,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
 
         headers = force_login(user, self.client)
         assertItemsCount("/api/pricing/", 1)
-        assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)
         assertItemsCount("/api/contract_template/", 1)
         assertItemsCount("/api/user/", 1)
@@ -201,7 +198,6 @@ class MultipleAccountsSeparationTestCase(APITestCase):
 
         headers = force_login(user, self.client)
         assertItemsCount("/api/pricing/", 1)
-        assertItemsCount("/api/holidays/", 1)
         assertItemsCount("/api/seasonal_variation/", 1)
         assertItemsCount("/api/contract_template/", 1)
         assertItemsCount("/api/booking_channel/", 8)

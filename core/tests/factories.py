@@ -307,16 +307,6 @@ class PaymentFactory(factory.django.DjangoModelFactory):
     date = factory.Faker("date")
 
 
-class HolidaysFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Holidays
-
-    account = factory.SubFactory(AccountFactory)
-    name = factory.Sequence(lambda n: "Holidays %d" % n)
-    begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
-    end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=random.randint(7, 21)).date())
-
-
 class PricingFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Pricing
@@ -336,7 +326,7 @@ class SeasonalVariationFactory(factory.django.DjangoModelFactory):
         model = models.SeasonalVariation
 
     pricing = factory.SubFactory(PricingFactory)
-    name = factory.Sequence(lambda n: "Holidays %d" % n)
+    name = factory.Sequence(lambda n: "Season %d" % n)
     begin_date = factory.Faker("date_between", start_date="-5d", end_date="+1y")
     end_date = factory.LazyAttribute(lambda b: arrow.get(b.begin_date).shift(days=random.randint(7, 21)).date())
     daily_rate = factory.LazyAttribute(lambda x: random.choice([40, 50, 60, 70]))

@@ -534,18 +534,6 @@ class BookingNoPriceSerializer(BookingSerializer):
                    "custom_tourist_tax"]
 
 
-class HolidaysSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Holidays
-        exclude = ["account"]
-
-    def create(self, validated_data: dict):
-        if "account" not in validated_data:
-            validated_data["account"] = self.context["request"].user.account
-        instance = super().create(validated_data)
-        return instance
-
-
 class PricingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Pricing
