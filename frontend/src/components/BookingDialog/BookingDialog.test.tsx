@@ -374,4 +374,37 @@ describe("BookingDialog", () => {
       .find((cfg: any) => ["patch", "put", "post"].includes((cfg.method ?? "").toLowerCase()));
     expect(writeCall).toBeUndefined();
   });
+
+  test("prices a new booking from the server quote and shows the breakdown", async () => {
+    (axios as any).mockImplementation(async (config: any) => {
+      const url: string = config?.url ?? "";
+      if (url.includes("booking/quote/")) {
+        return {
+          status: 200,
+          data: {
+            begin_date: "2026-01-10", end_date: "2026-01-17", nights: 7, booking_date: "2026-01-01",
+            currency: "EUR", total_price: "630.00", total_deposit: "190.00", effective_daily_rate: "90.00",
+            is_flat_rate: false,
+            warnings: [{ code: "min_nights", lodging_id: 1, required: 10, actual: 7 }],
+            lodgings: [{
+              lodging_id: 1, lodging_name: "Villa Test", season_calendar_id: null,
+              nightly_subtotal: "700.00", price: "630.00", deposit: "190.00",
+              nights: [], warnings: [],
+              adjustments: [{ type: "los_discount", label: "Weekly discount", amount: "-70.00", basis: "700.00", percent: "-10.00" }]
+            }]
+          }
+        };
+      }
+      if ((config?.method ?? "get").toLowerCase() === "get") return { data: { count: 0, results: [] }, status: 200 };
+      return { data: bookingRestResponse, status: 201 };
+    });
+
+    const newBooking = makeBooking({ id: undefined });
+    renderDialog({ booking: newBooking });
+
+    await screen.findByRole("dialog");
+    expect(await screen.findByText(/below the minimum 10 nights/, {}, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.getByText("Weekly discount")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("spinbutton", { name: "Total" })).toHaveValue(630));
+  });
 });

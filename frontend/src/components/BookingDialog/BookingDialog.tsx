@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Contacts as ContactsIcon, Edit as EditIcon, Forward as ForwardIcon } from "@mui/icons-material";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import { Controller, useForm, useFormState } from "react-hook-form";
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { addDays, differenceInCalendarDays, format } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
+import { useDebounceEffect } from "../../common/useDebounceEffets";
 import { getDepositLabel } from "../../common/propertyPrefsUtils";
 import {
   AppBar,
   Button,
+  Alert,
   Dialog,
   DialogActions,
   DialogContent,
@@ -37,12 +39,17 @@ import useWindowDimensions from "../../common/windowDimensions";
 import Payments from "../Payments";
 import { formatCurrency } from "../../common/intlUtils";
 import OptionsList from "./OptionsList";
-import { useCreateBookingMutation, useListBookingChannelsQuery, useUpdateBookingMutation } from "../../services/api";
+import {
+  useCreateBookingMutation,
+  useLazyGetQuoteQuery,
+  useListBookingChannelsQuery,
+  useUpdateBookingMutation
+} from "../../services/api";
 import { fetchErrorDecode } from "../../common/apiUtils";
 import { useAlert } from "../../common/alertUtils";
 import "./BookingDialog.scss";
 import BookingActions from "../BookingActions";
-import { Account, Booking, BookingStatus, Lodging, Service, User } from "../../types";
+import { Account, Booking, BookingStatus, Lodging, Quote, Service, User } from "../../types";
 import { usePageUnloadAlert } from "../../common/formUtils";
 import { useUnsavedChangesConfirm } from "../../common/dialogs";
 import {
@@ -231,6 +238,39 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   const depositLabel = user ? getDepositLabel(t, lodging.deposit_label) : t("Deposit");
   const selectedLodgings = lodgings.filter(x => lodging_ids.includes(x.id));
+
+  // Server-side pricing engine: it is the source of truth for the total and yields the breakdown.
+  // `computeBookingPrice` still runs synchronously for an instant estimate; the quote overwrites it.
+  const beginDate = watch("begin_date", initialState.begin_date);
+  const endDate = watch("end_date", initialState.end_date);
+  const [priceDetails, setPriceDetails] = useState<Quote | null>(booking.price_details ?? null);
+  const [triggerQuote, { data: quote }] = useLazyGetQuoteQuery();
+
+  useDebounceEffect(() => {
+    if (isFlatRate || !beginDate || !endDate || !lodging_ids?.length) return;
+    if (differenceInCalendarDays(endDate, beginDate) < 1) return;
+    triggerQuote({
+      lodging_ids: [...lodging_ids],
+      begin_date: format(beginDate, "yyyy-MM-dd"),
+      end_date: format(endDate, "yyyy-MM-dd")
+    });
+  }, 400, [beginDate && beginDate.getTime(), endDate && endDate.getTime(), JSON.stringify(lodging_ids), isFlatRate]);
+
+  useEffect(() => {
+    if (!quote || isFlatRate || !Number.isFinite(quote.total_price)) return;
+    setPriceDetails(quote);
+    // Don't silently rewrite an existing booking the user hasn't touched yet.
+    if (booking.id && !isDirty) return;
+    setValue("price", quote.total_price, { shouldDirty: false });
+    setValue("daily_rate", quote.effective_daily_rate, { shouldDirty: false });
+    setValue("deposit", quote.total_deposit, { shouldDirty: false });
+    updateTouristTax();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quote]);
+
+  const activeDetails = !isFlatRate ? priceDetails : null;
+  const quoteWarnings = activeDetails?.warnings ?? [];
+  const quoteLodgings = activeDetails?.lodgings ?? [];
 
   function initializeDefaults(booking: Booking) {
     const initialLodgings = lodgings.filter(x => booking.lodging_ids.includes(x.id));
@@ -791,6 +831,35 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     />
                   </Grid>
                 </Grid>
+                {/* Price breakdown */}
+                {!isFlatRate && (quoteWarnings.length > 0 || quoteLodgings.some(l => l.adjustments.length > 0)) &&
+                  <Grid item xs={12}>
+                    {quoteWarnings.map((w, i) => (
+                      <Alert key={i} severity="warning" sx={{ mb: 1 }}>
+                        {w.code === "min_nights"
+                          ? t("This stay is below the minimum {{count}} nights", { count: w.required })
+                          : t("Overlapping seasons on {{date}}", { date: w.date })}
+                      </Alert>
+                    ))}
+                    {quoteLodgings.map(l => (
+                      <Table size="small" key={l.lodging_id} sx={{ "& td": { border: 0, py: 0.25 } }}>
+                        <TableBody>
+                          {quoteLodgings.length > 1 &&
+                            <TableRow><TableCell colSpan={2}><strong>{l.lodging_name}</strong></TableCell></TableRow>}
+                          {l.adjustments.map((a, i) => (
+                            <TableRow key={i}>
+                              <TableCell>{a.type === "los_discount"
+                                ? (a.label === "Weekly discount" ? t("Weekly discount")
+                                  : a.label === "Monthly discount" ? t("Monthly discount") : a.label)
+                                : a.label}</TableCell>
+                              <TableCell align="right">{formatCurrency(a.amount)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ))}
+                  </Grid>
+                }
                 {/* Deposit */}
                 <Grid item xs={12} className="flex-box-align-left">
                   <Typography>
