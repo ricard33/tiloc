@@ -209,7 +209,6 @@ class Account(models.Model):
         ContractTemplate.objects.filter(account=self).delete()
         Service.objects.filter(account=self).delete()
         Pricing.objects.filter(account=self).delete()
-        Holidays.objects.filter(account=self).delete()
         User.objects.filter(account=self).delete()
 
     def fill_account_with_default_ressources(self, template=None):
@@ -790,24 +789,6 @@ class BookedService(models.Model):
         if self.booking.lodging.account.id != self.service.account.id:
             raise ValidationError("BookingService: booking and service aren't from same account")
         super().save(*args, **kwargs)
-
-
-class Holidays(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name=_("account"))
-    name = models.CharField(_("name"), max_length=256)
-    begin_date = models.DateField(
-        _("begin date"),
-    )
-    end_date = models.DateField(
-        _("end date"),
-    )
-
-    class Meta:
-        verbose_name_plural = _("holidays")
-
-    _account_qs_path = "account"
-
-    objects = ForUserQuerySet.as_manager()
 
 
 class Pricing(models.Model):  # or RatePlan

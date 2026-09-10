@@ -57,7 +57,6 @@ from .serializers import (
     CreateUserSerializer,
     CurrentUserSerializer,
     GuestSerializer,
-    HolidaysSerializer,
     LodgingSerializer,
     LoginUserSerializer,
     NextEventSerializer,
@@ -478,14 +477,6 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
         if self.get_queryset().count() >= limit:
             raise OverLimitError(detail="The maximum number of lodgings has been reached.")
         return super().create(request, *args, **kwargs)
-
-
-class HolidaysViewSet(viewsets.ModelViewSet):
-    queryset = models.Holidays.objects.all().order_by("begin_date")
-    serializer_class = HolidaysSerializer
-
-    def get_queryset(self):
-        return self.queryset.for_user(self.request.user)
 
 
 class PricingViewSet(viewsets.ModelViewSet):

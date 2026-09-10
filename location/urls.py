@@ -33,7 +33,6 @@ router.register(r"booking_channel", api.BookingChannelViewSet, "booking_channel"
 router.register(r"booking_channel_sync", api.BookingChannelSyncViewSet, "booking_channel_sync")
 router.register(r"service", api.ServiceViewSet, "service")
 router.register(r"lodging", api.LodgingViewSet, "lodging")
-router.register(r"holidays", api.HolidaysViewSet, "holidays")
 router.register(r"pricing", api.PricingViewSet, "pricing")
 router.register(r"seasonal_variation", api.SeasonalVariationViewSet, "seasonal_variation")
 router.register(r"contract_template", api.ContractTemplateViewSet, "contract_template")

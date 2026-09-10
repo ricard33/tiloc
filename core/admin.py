@@ -538,12 +538,6 @@ class LodgingAdmin(RestrictedModelAdminMixIn, ImportExportMixin, SimpleHistoryAd
     list_filter = ("owner", "active", "shown")
 
 
-class HolidaysAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
-    list_display = ("id", "name", "begin_date", "end_date", "account")
-    list_display_links = ("name",)
-    ordering = ("begin_date",)
-
-
 class PricingAdmin(RestrictedModelAdminMixIn, ImportExportModelAdmin):
     list_display = (
         "id",
@@ -685,7 +679,6 @@ site.register(models.Lodging, LodgingAdmin)
 site.register(models.BookingChannel, BookingChannelAdmin)
 site.register(models.BookingChannelSync, BookingChannelSyncAdmin)
 site.register(models.BookedService, BookedServiceAdmin)
-site.register(models.Holidays, HolidaysAdmin)
 site.register(models.Pricing, PricingAdmin)
 site.register(models.SeasonalVariation, SeasonalVariationAdmin)
 site.register(models.Contract, ContractAdmin)
