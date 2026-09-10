@@ -69,7 +69,7 @@ django-email-verification = "^0.3.3"
 # both removed/relocated in stripe v8+.
 stripe = "^7.5.0"
 django-timezone-field = "^7.0"
-django-anymail = {extras = ["mailjet", "sendinblue"], version = "^10.2"}
+django-anymail = {extras = ["mailjet", "brevo"], version = ">=14.0,<16.0"}
 django-user-visit = "^2.0"
 django-loginas = "^0.3.11"
 django-request-logging = "^0.7.5"

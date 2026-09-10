@@ -254,7 +254,9 @@ EMAIL_USE_TLS = True
 EMAIL_SUBJECT_PREFIX = config.get("EMAIL", "SUBJECT_PREFIX", "[Tiloc]") + " "
 
 ANYMAIL = {
-    "SENDINBLUE_API_KEY": config.get("EMAIL", "SENDINBLUE_API_KEY", ""),
+    # anymail renamed the Sendinblue integration to Brevo (v11); the config.ini key on the
+    # servers moves from SENDINBLUE_API_KEY to BREVO_API_KEY too.
+    "BREVO_API_KEY": config.get("EMAIL", "BREVO_API_KEY", config.get("EMAIL", "SENDINBLUE_API_KEY", "")),
     "MAILJET_API_KEY": config.get("EMAIL", "MAILJET_API_KEY", ""),
     "MAILJET_SECRET_KEY": config.get("EMAIL", "MAILJET_SECRET_KEY", ""),
 }
