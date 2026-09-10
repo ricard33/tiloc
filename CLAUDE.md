@@ -148,11 +148,19 @@ New Relic config is `config/newrelic.ini`.
 - Mandatory type hints on all public code
 - Tests: pytest-django + factory_boy, never `setUp()` style unittest
 - Import order: stdlib, third-party, local
- 
+
 ## Commit conventions
+
 Never add "Co-Authored-By" lines or any AI attribution to git commit messages or metadata.
 
+# Code Style and Language Guidelines
+
+- **Code**: All variable names, function names, classes, and database schemas must be in English.
+- **Documentation**: All comments, docstrings, and README updates must be in English.
+- **Git Artifacts**: All commit messages, Pull Request (PR) titles/descriptions, and release notes must be written in professional English.
+
 ## Non-negotiable rules
+
 - Never commit without `poetry run python runtests.py` passing
 - All migration must be reversible (test `migrate <app> <previous>`)
 - Secrets go in `.env.local`, never in the code
