@@ -522,6 +522,46 @@ def test_rate_calendar_endpoint_returns_per_day_rates(priced_client) -> None:
     assert rows[0]["season"] == season.name
 
 
+def test_pricing_adjustment_crud_normalises_empty_optional_fields(admin_client) -> None:
+    client, lodging = admin_client
+    response = client.post(
+        "/api/pricing_adjustment/",
+        {
+            "name": "Last minute",
+            "lodging": "",
+            "adjustment_type": "percent",
+            "value": "-15.00",
+            "max_days_before_arrival": 10,
+            "min_nights": "",
+            "stay_begin": "",
+            "applicable_weekdays": "",
+            "priority": 0,
+            "stackable": True,
+            "active": True,
+        },
+        format="json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED, response.data
+    rule = models.PricingAdjustment.objects.get(pk=response.data["id"])
+    assert rule.lodging_id is None
+    assert rule.min_nights is None
+    assert rule.stay_begin is None
+    assert rule.max_days_before_arrival == 10
+    assert rule.account_id == lodging.account_id
+
+
+def test_pricing_adjustment_rejects_foreign_lodging(admin_client) -> None:
+    client, _ = admin_client
+    other = _lodging("100.00", account=factories.AccountFactory.create(name="foreign-adj"))
+    response = client.post(
+        "/api/pricing_adjustment/",
+        {"name": "x", "lodging": other.id, "adjustment_type": "percent", "value": "-5.00",
+         "priority": 0, "stackable": True, "active": True},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
 def test_lodging_season_rate_rejects_season_from_another_calendar(admin_client) -> None:
     client, lodging = admin_client
     own_calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
