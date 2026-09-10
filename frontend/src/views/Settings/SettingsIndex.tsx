@@ -9,6 +9,7 @@ import RoomServiceIcon from "@mui/icons-material/RoomService";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DateRangeIcon from "@mui/icons-material/DateRange";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import BookingSourcesIcon  from "../../assets/icones/booking-sources.svg?react";
 import { styled } from "@mui/material/styles";
@@ -145,6 +146,11 @@ function SettingsIndex() {
       title: t("Seasons & rates"),
       href: "seasons",
       icon: DateRangeIcon
+    },
+    {
+      title: t("Pricing rules"),
+      href: "pricing-rules",
+      icon: LocalOfferIcon
     },
     {
       title: t("Booking channels"),

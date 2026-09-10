@@ -24,6 +24,8 @@ import CalendarSyncsList from "./views/CalendarSync/CalendarSyncsList";
 import CalendarSyncPage from "./views/CalendarSync/CalendarSyncPage";
 import SeasonCalendarList from "./views/Seasons/SeasonCalendarList";
 import { SeasonCalendarPage } from "./views/Seasons/SeasonCalendarPage";
+import PricingRulesList from "./views/PricingRules/PricingRulesList";
+import { PricingRulePage } from "./views/PricingRules/PricingRulePage";
 import { BookingChannelPage } from "./views/BookingChannel/BookingChannelPage";
 import BookingChannelList from "./views/BookingChannel/BookingChannelList";
 import PaymentsList from "./views/Payment/PaymentsList";
@@ -135,6 +137,9 @@ const MyRoutes = () => {
             <Route path="seasons" element={<SeasonCalendarList />} />
             <Route path="seasons/new" element={<SeasonCalendarPage />} />
             <Route path="seasons/:calendarId" element={<SeasonCalendarPage />} />
+            <Route path="pricing-rules" element={<PricingRulesList />} />
+            <Route path="pricing-rules/new" element={<PricingRulePage />} />
+            <Route path="pricing-rules/:ruleId" element={<PricingRulePage />} />
           </Route>
           <Route path="/upgrade-plan" element={<Navigate to="/account/prices" replace />} />
           <Route path="/test-page" element={<TestPage />} />

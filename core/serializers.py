@@ -752,9 +752,31 @@ class QuoteRequestSerializer(serializers.Serializer):
 
 
 class PricingAdjustmentSerializer(serializers.ModelSerializer):
+    # Every optional field: the multipart form sends an empty string for "not set".
+    _NULLABLE_FIELDS = (
+        "lodging",
+        "min_nights",
+        "max_nights",
+        "min_days_before_arrival",
+        "max_days_before_arrival",
+        "stay_begin",
+        "stay_end",
+        "booking_begin",
+        "booking_end",
+        "applicable_weekdays",
+    )
+
     class Meta:
         model = models.PricingAdjustment
         exclude = ["account"]
+
+    def to_internal_value(self, data):
+        if any(data.get(field, None) in ("", "null") for field in self._NULLABLE_FIELDS):
+            data = data.copy()
+            for field in self._NULLABLE_FIELDS:
+                if data.get(field, None) in ("", "null"):
+                    data[field] = None
+        return super().to_internal_value(data)
 
     def validate_lodging(self, value):
         if value is not None and value.account_id != self.context["request"].user.account.id:
