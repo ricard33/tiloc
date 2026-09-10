@@ -449,3 +449,9 @@ def run_prod_locally(c):
     with c.cd(WORKSPACE):
         c.local("python manage.py collectstatic --clear --noinput -v 0 --no-post-process")
         c.local("python manage.py runserver 0.0.0.0:4000")
+
+@task
+def send_test_email(c, email):
+    with c.cd(c.TARGET_PATH):
+        with c.prefix(". .env/bin/activate"):
+            c.run("python manage.py send_email welcome {} --backend brevo".format(email))
