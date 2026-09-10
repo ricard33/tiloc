@@ -21,7 +21,7 @@ Package manager is **yarn** (yarn.lock is the source of truth).
 - `yarn test run` — run Vitest once, non-watch (CI-style)
 - `yarn test run <path or name pattern>` — run a single test file or filter by name
 - `yarn coverage` — Vitest run with coverage
-- `yarn extract` — extract i18next translation keys from source into locale JSON via `config/i18next-parser.config.cjs`
+- `yarn extract` — extract i18next translation keys from source into locale JSON (runs `i18next-parser` via `npx`; it is no longer a project dependency — its old build chain carried unfixable dev CVEs)
 
 Tests use Vitest with `jsdom` environment and `@testing-library/react`; setup file is `src/setupTests.ts`.
 Test files are colocated with the code they test (`*.test.ts`/`*.test.tsx`/`*.test.js`), not in a separate

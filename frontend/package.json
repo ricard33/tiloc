@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "extract": "i18next -c config/i18next-parser.config.cjs",
+    "extract": "npx --yes i18next-parser@9 -c config/i18next-parser.config.cjs",
     "lint": "eslint src",
     "compile": "tsc"
   },
@@ -101,7 +101,6 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^17.0.0",
-    "i18next-parser": "^8.12.0",
     "jsdom": "^30.0.1",
     "sass": "^1.69.5",
     "typescript": "^5.9.3",
