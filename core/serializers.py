@@ -337,12 +337,28 @@ class LodgingSerializer(serializers.ModelSerializer):
         source="bookingchannelsync_set", many=True, required=False, read_only=True
     )
 
+    season_calendar = serializers.PrimaryKeyRelatedField(
+        queryset=models.SeasonCalendar.objects.all(), required=False, allow_null=True
+    )
+
     class Meta:
         model = models.Lodging
         exclude = ["account"]
 
     def get_absolute_url(self, obj):
         return reverse("api:lodging-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
+
+    def to_internal_value(self, data):
+        # The multipart form encodes "no calendar" as an empty string; normalise it to null.
+        if data.get("season_calendar", None) in ("", "null"):
+            data = data.copy()
+            data["season_calendar"] = None
+        return super().to_internal_value(data)
+
+    def validate_season_calendar(self, value):
+        if value is not None and value.account_id != self.context["request"].user.account.id:
+            raise serializers.ValidationError("Unknown season calendar.")
+        return value
 
     def create(self, validated_data: dict):
         if "account" not in validated_data:

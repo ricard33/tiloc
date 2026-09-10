@@ -6,7 +6,13 @@ import {
   Contract,
   ContractTemplate,
   Lodging,
+  LodgingSeasonRate,
   Payment,
+  PricingAdjustment,
+  Quote,
+  Season,
+  SeasonCalendar,
+  SeasonDateRange,
   Service,
   User,
   Notification, NextEvent, Activity, BookingHistoryEntry
@@ -131,6 +137,135 @@ export function api2Lodging(lodging: Record<string, any>): Lodging {
     max_daily_tourist_tax: Number(lodging.max_daily_tourist_tax),
     tourist_tax_rate: Number(lodging.tourist_tax_rate),
     remote_calendars: lodging.remote_calendars ? lodging.remote_calendars.map(api2CalendarSync) : [],
+    season_calendar: lodging.season_calendar ?? null,
+    min_nights: Number(lodging.min_nights ?? 1),
+    weekly_discount_percent: toNumberOrUndefined(lodging.weekly_discount_percent) ?? null,
+    monthly_discount_percent: toNumberOrUndefined(lodging.monthly_discount_percent) ?? null,
+  };
+}
+
+export function lodging2api(lodging: Partial<Lodging>): Record<string, any> {
+  return {
+    ...lodging,
+    weekly_discount_percent: toDecimal(lodging.weekly_discount_percent ?? undefined),
+    monthly_discount_percent: toDecimal(lodging.monthly_discount_percent ?? undefined),
+  };
+}
+
+// ----- SEASON CALENDAR -----
+
+export function api2SeasonDateRange(range: Record<string, any>): SeasonDateRange {
+  return {
+    ...range as SeasonDateRange,
+    begin_date: parseISO(range.begin_date),
+    end_date: parseISO(range.end_date),
+  };
+}
+
+export function api2Season(season: Record<string, any>): Season {
+  return {
+    ...season as Season,
+    date_ranges: (season.date_ranges ?? []).map(api2SeasonDateRange),
+  };
+}
+
+export function api2SeasonCalendar(calendar: Record<string, any>): SeasonCalendar {
+  return {
+    ...calendar as SeasonCalendar,
+    seasons: (calendar.seasons ?? []).map(api2Season),
+  };
+}
+
+export function seasonCalendar2Api(calendar: Partial<SeasonCalendar>): Record<string, any> {
+  return {
+    ...calendar,
+    seasons: (calendar.seasons ?? []).map((season) => ({
+      ...(season.id ? { id: season.id } : {}),
+      name: season.name,
+      color: season.color || "#3788d8",
+      rank: season.rank ?? 0,
+      date_ranges: (season.date_ranges ?? []).map((range) => ({
+        ...(range.id ? { id: range.id } : {}),
+        begin_date: formatISO(range.begin_date),
+        end_date: formatISO(range.end_date),
+      })),
+    })),
+  };
+}
+
+// ----- LODGING SEASON RATE -----
+
+export function api2LodgingSeasonRate(rate: Record<string, any>): LodgingSeasonRate {
+  return {
+    ...rate as LodgingSeasonRate,
+    nightly_rate: Number(rate.nightly_rate),
+    weekend_rate: toNumberOrUndefined(rate.weekend_rate) ?? null,
+    min_nights: rate.min_nights ?? null,
+  };
+}
+
+export function lodgingSeasonRate2Api(rate: Partial<LodgingSeasonRate>): Record<string, any> {
+  return {
+    ...rate,
+    nightly_rate: toDecimal(rate.nightly_rate ?? undefined),
+    weekend_rate: toDecimal(rate.weekend_rate ?? undefined),
+  };
+}
+
+// ----- PRICING ADJUSTMENT -----
+
+export function api2PricingAdjustment(adjustment: Record<string, any>): PricingAdjustment {
+  return {
+    ...adjustment as PricingAdjustment,
+    value: Number(adjustment.value),
+    stay_begin: adjustment.stay_begin ? parseISO(adjustment.stay_begin) : null,
+    stay_end: adjustment.stay_end ? parseISO(adjustment.stay_end) : null,
+    booking_begin: adjustment.booking_begin ? parseISO(adjustment.booking_begin) : null,
+    booking_end: adjustment.booking_end ? parseISO(adjustment.booking_end) : null,
+  };
+}
+
+export function pricingAdjustment2Api(adjustment: Partial<PricingAdjustment>): Record<string, any> {
+  return {
+    ...adjustment,
+    value: toDecimal(adjustment.value ?? undefined),
+    ...(adjustment.stay_begin ? { stay_begin: formatISO(adjustment.stay_begin) } : {}),
+    ...(adjustment.stay_end ? { stay_end: formatISO(adjustment.stay_end) } : {}),
+    ...(adjustment.booking_begin ? { booking_begin: formatISO(adjustment.booking_begin) } : {}),
+    ...(adjustment.booking_end ? { booking_end: formatISO(adjustment.booking_end) } : {}),
+  };
+}
+
+// ----- QUOTE -----
+
+export function api2Quote(quote: Record<string, any>): Quote {
+  return {
+    ...quote as Quote,
+    begin_date: parseISO(quote.begin_date),
+    end_date: parseISO(quote.end_date),
+    booking_date: parseISO(quote.booking_date),
+    total_price: Number(quote.total_price),
+    total_deposit: Number(quote.total_deposit),
+    effective_daily_rate: Number(quote.effective_daily_rate),
+    lodgings: (quote.lodgings ?? []).map((lodging: Record<string, any>) => ({
+      ...lodging,
+      nightly_subtotal: Number(lodging.nightly_subtotal),
+      price: Number(lodging.price),
+      deposit: Number(lodging.deposit),
+      nights: (lodging.nights ?? []).map((night: Record<string, any>) => ({
+        ...night,
+        date: parseISO(night.date),
+        base_rate: Number(night.base_rate),
+        applied_rate: Number(night.applied_rate),
+      })),
+      adjustments: (lodging.adjustments ?? []).map((adjustment: Record<string, any>) => ({
+        ...adjustment,
+        amount: Number(adjustment.amount),
+        ...(adjustment.basis !== undefined ? { basis: Number(adjustment.basis) } : {}),
+        ...(adjustment.percent !== undefined ? { percent: Number(adjustment.percent) } : {}),
+        ...(adjustment.value !== undefined ? { value: Number(adjustment.value) } : {}),
+      })),
+    })),
   };
 }
 
@@ -158,14 +293,16 @@ export function api2Booking(booking: Record<string, any>): Booking {
     custom_tourist_tax: toNumberOrUndefined(booking.custom_tourist_tax),
     options: booking.options ? booking.options.map(api2Service) : [],
     comments: booking.comments ? booking.comments.map(api2Comment) : [],
+    price_details: booking.price_details ? api2Quote(booking.price_details) : null,
     created: parseISO(booking.created),
     modified: parseISO(booking.modified)
   };
 }
 
 export function booking2api(booking: Partial<Booking>): Record<string, any> {
+  const { price_details, ...rest } = booking;
   const newVar = {
-    ...booking,
+    ...rest,
     ...(booking.begin_date && { begin_date: formatISO(booking.begin_date) }),
     ...(booking.end_date && { end_date: formatISO(booking.end_date) }),
     daily_rate: booking.daily_rate!.toFixed(2),

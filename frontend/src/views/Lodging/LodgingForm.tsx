@@ -37,8 +37,10 @@ export const LodgingForm: React.FC<Props> = ({ lodging, users, onSubmit, onCance
     owner_id: currentUser.id,
     address: currentUser.address,
     deposit_label: "deposit",
-    deposit_percent: 30
-  } as Lodging;
+    deposit_percent: 30,
+    min_nights: 1,
+    season_calendar: ""
+  } as unknown as Lodging;
   const formContext = useForm<Lodging>({
     defaultValues: defaultValues
   });
