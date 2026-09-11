@@ -14,7 +14,7 @@ describe("planning settings persistence", () => {
     expect(loadPlanningSettings()).toEqual({
       monthsToDisplay: 12,
       showPaymentStatus: true,
-      showPrices: false,
+      showPrices: true,
       anonymized: false,
     });
   });
