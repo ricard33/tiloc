@@ -23,7 +23,7 @@ export const loadPlanningSettings = (): PlanningSettings => {
   return {
     monthsToDisplay: getStorageValue("planning.monthsToDisplay", 12),
     showPaymentStatus: getStorageValue("planning.showPaymentStatus", true),
-    showPrices: getStorageValue("planning.showPrices", false),
+    showPrices: getStorageValue("planning.showPrices", true),
     anonymized: getStorageValue("planning.anonymized", false)
   };
 };
