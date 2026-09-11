@@ -66,7 +66,7 @@ requests = "^2.28.1"
 smartconfigparser = "^1.0.0"
 whitenoise = { version = "^6.2.0", extras = ["brotli"] }
 psycopg2-binary = "^2.9.7"
-faker = "^37.0"
+faker = ">=37,<41"
 django-email-verification = "^0.3.3"
 # Pinned to v7: code uses stripe.Invoice.upcoming and stripe.error.SignatureVerificationError,
 # both removed/relocated in stripe v8+.
