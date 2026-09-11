@@ -61,9 +61,9 @@
     "notistack": "^3.0.1",
     "prop-types": "^15.8.1",
     "query-string": "^9.5.1",
-    "react": "^18.2.0",
+    "react": "^19.2.8",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^19.2.8",
     "react-error-boundary": "^4.0.12",
     "react-google-recaptcha": "^3.1.0",
     "react-hook-form": "^7.50.1",
@@ -87,9 +87,9 @@
     "@testing-library/user-event": "^14.5.1",
     "@types/md5": "^2.3.5",
     "@types/node": "^22.0.0",
-    "@types/react": "^18.3.31",
+    "@types/react": "^19.2.18",
     "@types/react-date-range": "^1.4.9",
-    "@types/react-dom": "^18.3.7",
+    "@types/react-dom": "^19.2.7",
     "@types/react-google-recaptcha": "^2.1.9",
     "@types/react-redux": "^7.1.33",
     "@vitejs/plugin-react": "^5.2.0",
@@ -110,6 +110,6 @@
     "vitest": "^5.0.0"
   },
   "resolutions": {
-    "@types/react": "^18.3.31"
+    "@types/react": "^19.2.18"
   }
 }
