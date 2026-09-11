@@ -7,7 +7,13 @@ import { DateRange } from "../../components/DateRangeSelector";
  * already used by the Dashboard's FillingRate/ChannelsDistribution widgets.
  * Pass `enabled: false` to skip the request entirely (e.g. an endpoint gated behind a
  * permission the current user doesn't have) and keep returning `defaultValue`. */
-export function useStatsEndpoint<T>(endpoint: string, dateRange: DateRange, defaultValue: T, enabled = true) {
+export function useStatsEndpoint<T>(
+  endpoint: string,
+  dateRange: DateRange,
+  defaultValue: T,
+  enabled = true,
+  lodgingIds: number[] = []
+) {
   const [data, setData] = useState<T>(defaultValue);
   const [loaded, setLoaded] = useState(false);
   // Depend on primitive timestamps, not the Date objects: a caller that recomputes its
@@ -18,6 +24,8 @@ export function useStatsEndpoint<T>(endpoint: string, dateRange: DateRange, defa
   // re-render that produced yet another new Date, looping the fetch forever.
   const startTime = dateRange.startDate.getTime();
   const endTime = dateRange.endDate.getTime();
+  // Same reference-churn trap as above: depend on the joined string, not the array.
+  const lodgingParam = lodgingIds.join(",");
 
   useEffect(() => {
     if (!enabled) {
@@ -26,11 +34,12 @@ export function useStatsEndpoint<T>(endpoint: string, dateRange: DateRange, defa
       return;
     }
     setLoaded(false);
+    const query = lodgingParam ? `?lodging=${lodgingParam}` : "";
     axios
       // absolute path: unlike the Dashboard's `stats/...` (relative, only correct from "/"),
       // this page can be reached from a nested route (`/reports/stats`), where a relative URL
       // would resolve against the current path instead of the site root.
-      .get(`/stats/${endpoint}/${formatISO(startTime)}/${formatISO(endTime)}/`)
+      .get(`/stats/${endpoint}/${formatISO(startTime)}/${formatISO(endTime)}/${query}`)
       .then(response => {
         setData(response.data);
         setLoaded(true);
@@ -39,7 +48,7 @@ export function useStatsEndpoint<T>(endpoint: string, dateRange: DateRange, defa
         setLoaded(true);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endpoint, startTime, endTime, enabled]);
+  }, [endpoint, startTime, endTime, enabled, lodgingParam]);
 
   return { data, loaded };
 }

@@ -9,6 +9,7 @@ import { FillingRateRow } from "../types";
 
 type Props = {
   data: FillingRateRow[];
+  lodgingIds?: number[];
 };
 
 type LodgingTotals = {
@@ -16,13 +17,14 @@ type LodgingTotals = {
   days: number;
 };
 
-const LodgingRanking: React.FC<Props> = ({ data }) => {
+const LodgingRanking: React.FC<Props> = ({ data, lodgingIds = [] }) => {
   const { t } = useTranslation();
   const user = useAppSelector(store => store.auth.user) as User;
   const canViewPrices = user.permissions.includes("core.view_prices");
   const { data: lodgings } = useListLodgingsQuery({ shown: true, active: true });
 
   const rows = (lodgings ?? [])
+    .filter(lodging => !lodgingIds.length || lodgingIds.includes(lodging.id))
     .map(lodging => {
       const totals = data.reduce(
         (acc, row) => {

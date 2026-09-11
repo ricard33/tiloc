@@ -54,14 +54,17 @@ def aggregate_month_for_range(
     end = arrow.get(end).ceil("month")
     data = {}
     dates_range = [begin.date(), end.date()]
-    bookings = models.Booking.objects.prefetch_related(
-        'lodgings'
-    ).filter(
-        Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
-        lodgings__id__in=lodging_ids,
-        cancelled=False,
-        deleted=False,
-    ).exclude(status__in=status_no_stats).distinct()
+    bookings = (
+        models.Booking.objects.prefetch_related("lodgings")
+        .filter(
+            Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
+            lodgings__id__in=lodging_ids,
+            cancelled=False,
+            deleted=False,
+        )
+        .exclude(status__in=status_no_stats)
+        .distinct()
+    )
     for booking in bookings:
         for d1, d2 in arrow.Arrow.interval("month", begin.floor("month").datetime, end.ceil("month").datetime):
             days_in_month = d2.day
@@ -79,20 +82,31 @@ def aggregate_month_for_range(
     return sorted_data
 
 
-def fill_rate_and_turnover(
-    value: dict[str, int], booking: models.Booking, booked_days: int, capacity: int, turnover
-):
+def fill_rate_and_turnover(value: dict[str, int], booking: models.Booking, booked_days: int, capacity: int, turnover):
     if booked_days > 0:
         value["days"] = value["days"] + booked_days
         if turnover > 0 and booking.duration > 0:
-            value["turnover"] = value.get("turnover", 0) + booked_days * booking.price / booking.duration / booking.lodgings.count()
+            value["turnover"] = (
+                value.get("turnover", 0) + booked_days * booking.price / booking.duration / booking.lodgings.count()
+            )
     value["rate"] = round(value["days"] / capacity * 100)
 
 
+def _scope_lodging_ids(user: models.User, requested_ids: list[int] | None) -> list[int]:
+    qs = models.Lodging.objects.for_user(user).filter(active=True)
+    if requested_ids:
+        qs = qs.filter(id__in=requested_ids)
+    return list(qs.values_list(flat=True))
+
+
 def get_filling_rate_and_turnover(
-    user: models.User, begin: arrow.Arrow, end: arrow.Arrow, with_turnover: bool = True
+    user: models.User,
+    begin: arrow.Arrow,
+    end: arrow.Arrow,
+    with_turnover: bool = True,
+    lodging_ids: list[int] | None = None,
 ):
-    lodging_ids = list(models.Lodging.objects.for_user(user).filter(active=True).values_list(flat=True))
+    lodging_ids = _scope_lodging_ids(user, lodging_ids)
     lodging_count = len(lodging_ids)
 
     def aggregate(month: str, days_in_month: int, booking: models.Booking, booked_days: int, value: dict):
@@ -100,7 +114,9 @@ def get_filling_rate_and_turnover(
         turnover = with_turnover and (booked_days * booking.price / booking.duration) or 0
         if not value:
             value = {"date": month, "days": 0, "capacity": days_in_month * lodging_count, "lodgings": lodging_ids}
-        fill_rate_and_turnover(value, booking, booked_days * booked_lodgings_count, days_in_month * lodging_count, turnover)
+        fill_rate_and_turnover(
+            value, booking, booked_days * booked_lodgings_count, days_in_month * lodging_count, turnover
+        )
         # split turnover between lodgings in booking
         for lodging in booking.lodgings.all():
             lodging_value = value.setdefault(str(lodging.id), {"days": 0})
@@ -115,7 +131,9 @@ def _overlap_days(begin: arrow.Arrow, end: arrow.Arrow, booking: models.Booking)
     return (min(end, arrow.get(booking.end_date)) - max(begin, arrow.get(booking.begin_date))).days
 
 
-def get_booking_funnel_and_conversion(user: models.User, begin: arrow.Arrow, end: arrow.Arrow) -> dict:
+def get_booking_funnel_and_conversion(
+    user: models.User, begin: arrow.Arrow, end: arrow.Arrow, lodging_ids: list[int] | None = None
+) -> dict:
     """Booking-status funnel plus cancellation/signature/duration/lead-time figures. No pricing data."""
     begin = arrow.get(begin).floor("day")
     end = arrow.get(end).ceil("day")
@@ -124,6 +142,8 @@ def get_booking_funnel_and_conversion(user: models.User, begin: arrow.Arrow, end
     base_qs = models.Booking.objects.for_user(user).filter(
         Q(begin_date__range=dates_range) | Q(end_date__range=dates_range)
     )
+    if lodging_ids:
+        base_qs = base_qs.filter(lodgings__id__in=lodging_ids)
     # materialize once: `for_user()` already applies `.distinct()`, which only dedupes correctly
     # when selecting full rows (as here), not when chained into `.values_list()` on a single field
     bookings = list(base_qs.filter(deleted=False, cancelled=False).exclude(status__in=status_no_stats))
@@ -161,7 +181,9 @@ def get_booking_funnel_and_conversion(user: models.User, begin: arrow.Arrow, end
     }
 
 
-def get_channel_revenue(user: models.User, begin: arrow.Arrow, end: arrow.Arrow) -> dict:
+def get_channel_revenue(
+    user: models.User, begin: arrow.Arrow, end: arrow.Arrow, lodging_ids: list[int] | None = None
+) -> dict:
     """Turnover per booking channel (`None` key = direct bookings), prorated like `fill_rate_and_turnover`."""
     begin = arrow.get(begin).floor("day")
     end = arrow.get(end).ceil("day")
@@ -182,6 +204,8 @@ def get_channel_revenue(user: models.User, begin: arrow.Arrow, end: arrow.Arrow)
         )
         .exclude(status__in=status_no_stats)
     )
+    if lodging_ids:
+        bookings = bookings.filter(lodgings__id__in=lodging_ids)
 
     revenue: dict = defaultdict(lambda: Decimal(0))
     for booking in bookings:
@@ -196,7 +220,11 @@ def get_channel_revenue(user: models.User, begin: arrow.Arrow, end: arrow.Arrow)
 
 
 def get_season_breakdown(
-    user: models.User, begin: arrow.Arrow, end: arrow.Arrow, with_turnover: bool = True
+    user: models.User,
+    begin: arrow.Arrow,
+    end: arrow.Arrow,
+    with_turnover: bool = True,
+    lodging_ids: list[int] | None = None,
 ) -> dict:
     """Occupied days / bookings / turnover per season, bucketed by each lodging's season at check-in.
 
@@ -207,7 +235,12 @@ def get_season_breakdown(
     end = arrow.get(end).ceil("day")
     dates_range = [begin.date(), end.date()]
 
-    lodgings = list(models.Lodging.objects.for_user(user).filter(active=True).only("id", "season_calendar_id"))
+    scoped_lodging_ids = set(_scope_lodging_ids(user, lodging_ids))
+    lodgings = list(
+        models.Lodging.objects.for_user(user)
+        .filter(active=True, id__in=scoped_lodging_ids)
+        .only("id", "season_calendar_id")
+    )
     calendar_by_lodging = {lodging.id: lodging.season_calendar_id for lodging in lodgings}
     calendar_ids = [calendar_id for calendar_id in calendar_by_lodging.values() if calendar_id]
 
@@ -238,10 +271,14 @@ def get_season_breakdown(
         .exclude(status__in=status_no_stats)
         .prefetch_related("lodgings")
     )
+    if lodging_ids:
+        bookings = bookings.filter(lodgings__id__in=scoped_lodging_ids)
 
     data: dict = defaultdict(lambda: {"days": 0, "bookings": 0, "turnover": Decimal(0)})
     for booking in bookings:
         booked_lodgings = list(booking.lodgings.all())
+        if lodging_ids:
+            booked_lodgings = [lodging for lodging in booked_lodgings if lodging.id in scoped_lodging_ids]
         if not booked_lodgings or booking.duration <= 0:
             continue
         overlap_days = _overlap_days(begin, end, booking)
@@ -266,7 +303,9 @@ def get_season_breakdown(
     return result
 
 
-def get_payments_overview(user: models.User, begin: arrow.Arrow, end: arrow.Arrow) -> dict:
+def get_payments_overview(
+    user: models.User, begin: arrow.Arrow, end: arrow.Arrow, lodging_ids: list[int] | None = None
+) -> dict:
     """Payment-method breakdown for payments received in the period, plus booking-level totals
     (outstanding balance, tourist tax, guests) for stays overlapping the period.
 
@@ -281,23 +320,24 @@ def get_payments_overview(user: models.User, begin: arrow.Arrow, end: arrow.Arro
     # `Payment._lodging_qs_path` goes through the `booking__lodgings` M2M, so `for_user()`'s join can
     # duplicate rows for a multi-lodging booking; `id` is a safe `.distinct()` field (it's the PK) but
     # `method`/`amount` aren't, so scope through already-deduped booking ids instead of `for_user()` here.
-    visible_booking_ids = models.Booking.objects.for_user(user).values_list("id", flat=True)
+    visible_bookings_qs = models.Booking.objects.for_user(user)
+    if lodging_ids:
+        visible_bookings_qs = visible_bookings_qs.filter(lodgings__id__in=lodging_ids)
+    visible_booking_ids = visible_bookings_qs.values_list("id", flat=True)
     payments = models.Payment.objects.filter(booking_id__in=visible_booking_ids, date__range=dates_range)
     payment_methods = list(
         payments.values("method").annotate(count=Count("id"), total=Sum("amount")).order_by("method")
     )
     total_collected = payments.aggregate(total=Sum("amount"))["total"] or Decimal(0)
 
-    bookings = list(
-        models.Booking.objects.for_user(user)
-        .filter(
-            Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
-            cancelled=False,
-            deleted=False,
-        )
-        .exclude(status__in=status_no_stats)
-        .prefetch_related("payment_set")
+    bookings_qs = models.Booking.objects.for_user(user).filter(
+        Q(begin_date__range=dates_range) | Q(end_date__range=dates_range),
+        cancelled=False,
+        deleted=False,
     )
+    if lodging_ids:
+        bookings_qs = bookings_qs.filter(lodgings__id__in=lodging_ids)
+    bookings = list(bookings_qs.exclude(status__in=status_no_stats).prefetch_related("payment_set"))
 
     total_outstanding = sum((booking.left_to_pay for booking in bookings), Decimal(0))
     total_tourist_tax = sum((booking.tourist_tax for booking in bookings), Decimal(0))

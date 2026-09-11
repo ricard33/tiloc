@@ -55,15 +55,15 @@ def exception_handler(exc, context):
 
     if isinstance(exc, drf_exceptions.APIException):
         headers = {}
-        if getattr(exc, 'auth_header', None):
-            headers['WWW-Authenticate'] = exc.auth_header
-        if getattr(exc, 'wait', None):
-            headers['Retry-After'] = '%d' % exc.wait
+        if getattr(exc, "auth_header", None):
+            headers["WWW-Authenticate"] = exc.auth_header
+        if getattr(exc, "wait", None):
+            headers["Retry-After"] = "%d" % exc.wait
 
         if isinstance(exc.detail, (list, dict)):
             data = exc.detail
         else:
-            data = {'detail': exc.detail, 'code': exc.detail.code}
+            data = {"detail": exc.detail, "code": exc.detail.code}
 
         set_rollback()
         return Response(data, status=exc.status_code, headers=headers)
@@ -131,10 +131,11 @@ def export_calendar_for_lodgings_list(request):
             logger.warning("Calender request for a FREE account [%s]. Request rejected.", lodging.account)
             return HttpResponseForbidden("No calendar export for FREE account")
 
-    qs = models.Booking.objects.filter(lodgings__uid__in=uids, end_date__gte=timezone.now(), cancelled=False,
-                                       deleted=False)
+    qs = models.Booking.objects.filter(
+        lodgings__uid__in=uids, end_date__gte=timezone.now(), cancelled=False, deleted=False
+    )
     lodging_names = models.Lodging.objects.filter(uid__in=uids).values_list("name", flat=True)
-    logger.info("Full calendar requested for lodging [%s]", ', '.join(lodging_names))
+    logger.info("Full calendar requested for lodging [%s]", ", ".join(lodging_names))
 
     c = Calendar(creator="-//Ti'Gecko//Location")
     for booking in qs.order_by("begin_date", "lodgings__rank"):
@@ -187,6 +188,11 @@ def export_full_planning(request):
     return response
 
 
+def _parse_lodging_ids(request) -> list[int] | None:
+    raw = request.GET.get("lodging")
+    return [int(v) for v in raw.split(",") if v] if raw else None
+
+
 @api_view(
     [
         "GET",
@@ -199,7 +205,11 @@ def filling_rate(request, begin=None, end=arrow.utcnow()):
     if begin is None:
         begin = arrow.utcnow().shift(months=-11).replace(day=1)
     sorted_data = get_filling_rate_and_turnover(
-        request.user, begin, end, with_turnover=request.user.has_perm("core.view_prices")
+        request.user,
+        begin,
+        end,
+        with_turnover=request.user.has_perm("core.view_prices"),
+        lodging_ids=_parse_lodging_ids(request),
     )
     return Response(sorted_data)
 
@@ -215,10 +225,13 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     end = arrow.get(end).ceil("month")
     data = []
     dates_range = [begin.date(), end.date()]
+    lodging_ids = _parse_lodging_ids(request)
     filter = Q(booking__begin_date__range=dates_range) | Q(booking__end_date__range=dates_range)
     filter &= Q(booking__account=request.user.account)
     if not request.user.has_perm("core.administrator"):
         filter &= Q(booking__lodgings__in=request.user.lodgings.all())
+    if lodging_ids:
+        filter &= Q(booking__lodgings__id__in=lodging_ids)
 
     booking_count = Count(
         "booking",
@@ -232,22 +245,22 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
     )
     for row in channels:
         data.append({"channel": row.name, "count": row.booking_count})
+    direct_bookings_qs = models.Booking.objects.for_user(request.user).filter(
+        cancelled=False,
+        deleted=False,
+        # status__in=status_finalized,
+        source_id__isnull=True,
+    )
+    if lodging_ids:
+        direct_bookings_qs = direct_bookings_qs.filter(lodgings__id__in=lodging_ids)
     data.append(
         {
             "channel": None,
-            "count": models.Booking.objects.for_user(request.user)
-            .filter(
-                cancelled=False,
-                deleted=False,
-                # status__in=status_finalized,
-                source_id__isnull=True,
-            )
-            .exclude(status__in=status_no_stats)
-            .aggregate(count=Count("id"))["count"],
+            "count": direct_bookings_qs.exclude(status__in=status_no_stats).aggregate(count=Count("id"))["count"],
         }
     )
     if request.user.has_perm("core.view_prices"):
-        revenue = get_channel_revenue(request.user, begin, end)
+        revenue = get_channel_revenue(request.user, begin, end, lodging_ids=lodging_ids)
         for row in data:
             row["turnover"] = revenue.get(row["channel"], 0)
     return Response(data)
@@ -264,7 +277,9 @@ def booking_funnel(request, begin=None, end=None):
         end = arrow.utcnow().shift(months=+1).replace(day=1).shift(days=-1)
     if begin is None:
         begin = arrow.utcnow().shift(months=-11).replace(day=1)
-    return Response(get_booking_funnel_and_conversion(request.user, begin, end))
+    return Response(
+        get_booking_funnel_and_conversion(request.user, begin, end, lodging_ids=_parse_lodging_ids(request))
+    )
 
 
 @api_view(
@@ -279,7 +294,11 @@ def season_breakdown(request, begin=None, end=None):
     if begin is None:
         begin = arrow.utcnow().shift(months=-11).replace(day=1)
     with_turnover = request.user.has_perm("core.view_prices")
-    return Response(get_season_breakdown(request.user, begin, end, with_turnover=with_turnover))
+    return Response(
+        get_season_breakdown(
+            request.user, begin, end, with_turnover=with_turnover, lodging_ids=_parse_lodging_ids(request)
+        )
+    )
 
 
 @api_view(
@@ -295,7 +314,7 @@ def payments_overview(request, begin=None, end=None):
         end = arrow.utcnow().shift(months=+1).replace(day=1).shift(days=-1)
     if begin is None:
         begin = arrow.utcnow().shift(months=-11).replace(day=1)
-    return Response(get_payments_overview(request.user, begin, end))
+    return Response(get_payments_overview(request.user, begin, end, lodging_ids=_parse_lodging_ids(request)))
 
 
 @permission_classes([IsAdminUser])
@@ -330,9 +349,13 @@ def preview_welcome(request):
 
 @permission_classes([IsAdminUser])
 def preview_reset_password(request):
-    return render(request, "password/password_change_template.html", {"user": request.user, "base_url": get_base_url(request)})
+    return render(
+        request, "password/password_change_template.html", {"user": request.user, "base_url": get_base_url(request)}
+    )
 
 
 @permission_classes([IsAdminUser])
 def preview_password_changed(request):
-    return render(request, "password/password_changed_template.html", {"user": request.user, "base_url": get_base_url(request)})
+    return render(
+        request, "password/password_changed_template.html", {"user": request.user, "base_url": get_base_url(request)}
+    )

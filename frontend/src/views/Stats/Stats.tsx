@@ -4,6 +4,7 @@ import { addMonths, endOfMonth, startOfMonth, subYears } from "date-fns";
 import { useTranslation } from "react-i18next";
 import Page from "../../layouts/Main/Page";
 import DateRangeSelector, { DateRange, RangeNames } from "../../components/DateRangeSelector";
+import LodgingSelector from "../../components/LodgingSelector";
 import { useAppSelector } from "../../app/hooks";
 import { User } from "../../types";
 import { useStatsEndpoint } from "./useStatsEndpoint";
@@ -35,18 +36,44 @@ const Stats = () => {
     startDate: subYears(dateRange.startDate, 1),
     endDate: subYears(dateRange.endDate, 1),
   };
+  const [lodgingIds, setLodgingIds] = useState<number[]>([]);
 
   // one fetch per theme, shared by every card in that theme's section
-  const { data: fillingRate } = useStatsEndpoint<FillingRateRow[]>("filling_rate", dateRange, []);
-  const { data: previousYearFillingRate } = useStatsEndpoint<FillingRateRow[]>("filling_rate", previousYearRange, []);
-  const { data: channelDistribution } = useStatsEndpoint<ChannelRow[]>("channel_distribution", dateRange, []);
-  const { data: bookingFunnel } = useStatsEndpoint("booking_funnel", dateRange, emptyBookingFunnelData);
-  const { data: seasonBreakdown } = useStatsEndpoint<SeasonBreakdownData>("season_breakdown", dateRange, {});
+  const { data: fillingRate } = useStatsEndpoint<FillingRateRow[]>("filling_rate", dateRange, [], true, lodgingIds);
+  const { data: previousYearFillingRate } = useStatsEndpoint<FillingRateRow[]>(
+    "filling_rate",
+    previousYearRange,
+    [],
+    true,
+    lodgingIds
+  );
+  const { data: channelDistribution } = useStatsEndpoint<ChannelRow[]>(
+    "channel_distribution",
+    dateRange,
+    [],
+    true,
+    lodgingIds
+  );
+  const { data: bookingFunnel } = useStatsEndpoint(
+    "booking_funnel",
+    dateRange,
+    emptyBookingFunnelData,
+    true,
+    lodgingIds
+  );
+  const { data: seasonBreakdown } = useStatsEndpoint<SeasonBreakdownData>(
+    "season_breakdown",
+    dateRange,
+    {},
+    true,
+    lodgingIds
+  );
   const { data: paymentsOverview } = useStatsEndpoint(
     "payments_overview",
     dateRange,
     emptyPaymentsOverviewData,
-    canViewPrices
+    canViewPrices,
+    lodgingIds
   );
 
   const loading = <div>{t("Loading...")}</div>;
@@ -54,9 +81,10 @@ const Stats = () => {
   return (
     <Page>
       <Grid container spacing={4}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
           <DateRangeSelector startDate={dateRange.startDate} endDate={dateRange.endDate} onChange={setDateRange}
                              rangeNames={[RangeNames.All, RangeNames.Today, RangeNames.LastMonth, RangeNames.ThisMonth, RangeNames.LastYear, RangeNames.ThisYear]}/>
+          <LodgingSelector value={lodgingIds} onChange={setLodgingIds} />
         </Grid>
 
         <Grid item xs={12}>
@@ -123,7 +151,7 @@ const Stats = () => {
 
         <Grid item xs={12}>
           <Suspense fallback={loading}>
-            <LodgingRanking data={fillingRate} />
+            <LodgingRanking data={fillingRate} lodgingIds={lodgingIds} />
           </Suspense>
         </Grid>
       </Grid>

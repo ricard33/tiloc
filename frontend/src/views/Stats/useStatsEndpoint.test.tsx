@@ -47,4 +47,40 @@ describe("useStatsEndpoint", () => {
 
     await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
   });
+
+  it("does not append a lodging query param when no lodging filter is set", async () => {
+    renderHook(() => useStatsEndpoint("filling_rate", makeRange(), []));
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+    expect((axios.get as any).mock.calls[0][0]).not.toContain("?lodging=");
+  });
+
+  it("appends the selected lodging ids as a comma-separated query param", async () => {
+    renderHook(() => useStatsEndpoint("filling_rate", makeRange(), [], true, [1, 2]));
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+    expect((axios.get as any).mock.calls[0][0]).toContain("?lodging=1,2");
+  });
+
+  it("does not refetch when a re-render hands it a new but equal-valued lodgingIds array", async () => {
+    const { rerender } = renderHook(({ ids }) => useStatsEndpoint("filling_rate", makeRange(), [], true, ids), {
+      initialProps: { ids: [1, 2] },
+    });
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+
+    rerender({ ids: [1, 2] });
+    rerender({ ids: [1, 2] });
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(axios.get).toHaveBeenCalledTimes(1);
+  });
+
+  it("does refetch when the lodging filter actually changes", async () => {
+    const { rerender } = renderHook(({ ids }) => useStatsEndpoint("filling_rate", makeRange(), [], true, ids), {
+      initialProps: { ids: [1] },
+    });
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+
+    rerender({ ids: [1, 2] });
+
+    await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(2));
+  });
 });

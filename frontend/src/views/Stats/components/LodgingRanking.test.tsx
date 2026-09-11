@@ -44,4 +44,11 @@ describe("LodgingRanking", () => {
     expect(await screen.findByText("Villa Rose")).toBeInTheDocument();
     expect(screen.queryByText("Turnover")).not.toBeInTheDocument();
   });
+
+  it("only shows lodgings selected in the lodging filter", async () => {
+    renderWithProviders(<LodgingRanking data={data} lodgingIds={[1]} />, { user: { permissions: ["core.view_prices"] } });
+
+    expect(await screen.findByText("Villa Rose")).toBeInTheDocument();
+    expect(screen.queryByText("Studio Blue")).not.toBeInTheDocument();
+  });
 });
