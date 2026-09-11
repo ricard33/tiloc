@@ -183,12 +183,24 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   });
 
   // Apply a synchronous price estimate, but never overwrite a deposit the user edited by hand.
+  // The deposit itself goes through resetField(..., {defaultValue}) rather than setValue: RHF
+  // computes dirtyFields by diffing the current value against the field's ORIGINAL defaultValue,
+  // regardless of any shouldDirty option — so a plain setValue() would get flagged dirty (and
+  // permanently block further auto-recalculation) as soon as it first differs from that default.
+  // resetField moves the recorded default forward to the new estimate, keeping the field "clean"
+  // (and thus auto-recalculable) until the user genuinely types into it.
   const applyPriceEstimate = (priceObj: Partial<Booking>) => {
     const { deposit, ...withoutDeposit } = priceObj;
-    setMultipleValues(dirtyFields.deposit ? withoutDeposit : priceObj);
+    setMultipleValues(withoutDeposit);
+    if (deposit !== undefined && !dirtyFields.deposit) {
+      resetField("deposit", { defaultValue: deposit });
+    }
   };
 
-  let lodging: Lodging = booking.lodgings[0];  // first lodging for defaults values like taxes
+  // Same rounding rule as computeBookingPrice()'s deposit calc (priceUtils.ts) and the
+  // backend's core/pricing.py::_deposit — kept in sync manually, there is no shared import boundary.
+  const estimateDeposit = (basePrice: number, depositPercent: number) =>
+    DecimalPrecision.round(basePrice * depositPercent / 100, -1);
 
   const defaultDistribution = { adults: 2, children: 0, babies: 0 };
   const initialState = initializeDefaults(booking);
@@ -196,7 +208,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const formContext = useForm<Booking>({
     defaultValues: initialState
   });
-  const { register, control, setValue, getValues, watch, formState, reset, setError, clearErrors } = formContext;
+  const { register, control, setValue, getValues, watch, formState, reset, resetField, setError, clearErrors } = formContext;
   const { errors, isDirty } = formState;
   const { dirtyFields } = useFormState({
     control
@@ -219,8 +231,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const leftToPay = fullPrice + (booking.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
   const guestsDistribution = watch("guests_distribution", {});
 
-  const depositLabel = user ? getDepositLabel(t, lodging.deposit_label) : t("Deposit");
   const selectedLodgings = lodgings.filter(x => lodging_ids.includes(x.id));
+  let lodging: Lodging = selectedLodgings[0] ?? lodgings[0];
+  const depositLabel = user ? getDepositLabel(t, lodging.deposit_label) : t("Deposit");
 
   // Server-side pricing engine: it is the source of truth for the total and yields the breakdown.
   // `computeBookingPrice` still runs synchronously for an instant estimate; the quote overwrites it.
@@ -255,8 +268,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     setValue("price", quote.total_price, { shouldDirty: false });
     setValue("daily_rate", quote.effective_daily_rate, { shouldDirty: false });
     // The deposit follows the price automatically, unless the user has edited it by hand.
+    // resetField (not setValue) keeps the field "clean" — see applyPriceEstimate's comment.
     if (!dirtyFields.deposit) {
-      setValue("deposit", quote.total_deposit, { shouldDirty: false });
+      resetField("deposit", { defaultValue: quote.total_deposit });
     }
     updateTouristTax();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -268,7 +282,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   function initializeDefaults(booking: Booking) {
     const initialLodgings = lodgings.filter(x => booking.lodging_ids.includes(x.id));
-    lodging = booking.lodging_ids ? initialLodgings[0] : lodgings[0];
+    const defaultLodging = booking.lodging_ids ? initialLodgings[0] : lodgings[0];
 
     // Only include editable fields because to make `isDirty` reseted to false working after a submit
     // ==> dirty state is computed comparing default values and stored values (output of getValues())
@@ -296,21 +310,21 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     initialState.is_flat_rate = booking.is_flat_rate || false;
     if (initialState.price === undefined)
       Object.assign(initialState, computeBookingPrice(initialState.begin_date, initialState.end_date,
-        initialState.daily_rate, 0, 0, [], lodging.deposit_percent).price);
-    initialState.guaranty = booking.guaranty || lodging.guaranty;
+        initialState.daily_rate, 0, 0, [], defaultLodging.deposit_percent).price);
+    initialState.guaranty = booking.guaranty || defaultLodging.guaranty;
     initialState.commission_fees = booking.commission_fees || 0;
-    initialState.is_flat_rate_tourist_tax = booking.is_flat_rate_tourist_tax ?? lodging.is_flat_rate_tourist_tax;
-    initialState.tourist_tax_included_in_payment = booking.tourist_tax_included_in_payment ?? lodging.tourist_tax_included_in_payment;
-    initialState.max_daily_tourist_tax = booking.max_daily_tourist_tax ?? (lodging.max_daily_tourist_tax || 0);
-    initialState.tourist_tax_rate = booking.tourist_tax_rate ?? (lodging.tourist_tax_rate || 0);
+    initialState.is_flat_rate_tourist_tax = booking.is_flat_rate_tourist_tax ?? defaultLodging.is_flat_rate_tourist_tax;
+    initialState.tourist_tax_included_in_payment = booking.tourist_tax_included_in_payment ?? defaultLodging.tourist_tax_included_in_payment;
+    initialState.max_daily_tourist_tax = booking.max_daily_tourist_tax ?? (defaultLodging.max_daily_tourist_tax || 0);
+    initialState.tourist_tax_rate = booking.tourist_tax_rate ?? (defaultLodging.tourist_tax_rate || 0);
     initialState.guests_distribution = booking.guests_distribution ?? {
-      [lodging.id]: defaultDistribution
+      [defaultLodging.id]: defaultDistribution
     };
     initialState.adults = booking.adults || defaultDistribution.adults;
     initialState.children = booking.children || defaultDistribution.children;
     initialState.babies = booking.babies || defaultDistribution.babies;
     initialState.source_id = booking.source_id || ("" as any);
-    initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => lodging.default_services.includes(o.reference)) : []);
+    initialState.options = booking.options || (!booking.id ? allOptions.filter((o: Service) => defaultLodging.default_services.includes(o.reference)) : []);
     initialState.arrival_details = booking.arrival_details ?? "";
     initialState.departure_details = booking.departure_details ?? "";
     initialState.notes = booking.notes ?? "";
@@ -374,6 +388,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           setValue("daily_rate", DecimalPrecision.round(value / getValues().duration));
           setValue("price", value);
           setValue("is_flat_rate", true);
+          applyPriceEstimate({ deposit: estimateDeposit(value, lodging.deposit_percent) });
           updateTouristTax();
         }
         break;
@@ -409,10 +424,12 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     }
     const formValues = getValues();
     lodging = lodgings.filter(x => ids.includes(x.id))[0];
-    const daily_rate = lodgings.filter(x => ids.includes(x.id)).reduce((pValue, lodging) => pValue + lodging.daily_rate, 0);
+    const daily_rate = lodgings.filter(x => ids.includes(x.id)).reduce((pValue, l) => pValue + l.daily_rate, 0);
     if (!isFlatRate && formValues.daily_rate !== daily_rate) {
       const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, daily_rate, 0, 0, [], lodging.deposit_percent);
       applyPriceEstimate(priceObj);
+    } else if (isFlatRate) {
+      applyPriceEstimate({ deposit: estimateDeposit(formValues.price ?? 0, lodging.deposit_percent) });
     }
 
     const newDistribution = ids.reduce((d, id) => {

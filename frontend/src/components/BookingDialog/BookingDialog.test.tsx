@@ -460,4 +460,52 @@ describe("BookingDialog", () => {
     await waitFor(() => expect(screen.getByRole("spinbutton", { name: "Total" })).toHaveValue(700));
     expect(depositInput).toHaveValue(250);
   });
+
+  test("recalculates the deposit when the total price is edited manually", async () => {
+    const uiUser = userEvent.setup();
+    renderDialog();
+    await screen.findByRole("dialog");
+
+    const priceInput = screen.getByRole("spinbutton", { name: "Total" });
+    await uiUser.clear(priceInput);
+    await uiUser.type(priceInput, "1000");
+
+    const depositInput = await screen.findByRole("spinbutton", { name: /Deposit/ });
+    await waitFor(() => expect(depositInput).toHaveValue(300));
+  });
+
+  test("does not overwrite a manually edited deposit when the total price is edited afterwards", async () => {
+    const uiUser = userEvent.setup();
+    renderDialog();
+    await screen.findByRole("dialog");
+
+    const depositInput = await screen.findByRole("spinbutton", { name: /Deposit/ });
+    await waitFor(() => expect(depositInput).toHaveValue(200));
+    await uiUser.clear(depositInput);
+    await uiUser.type(depositInput, "250");
+
+    const priceInput = screen.getByRole("spinbutton", { name: "Total" });
+    await uiUser.clear(priceInput);
+    await uiUser.type(priceInput, "1000");
+
+    await waitFor(() => expect(priceInput).toHaveValue(1000));
+    expect(depositInput).toHaveValue(250);
+  });
+
+  test("recalculates the deposit when switching lodging in flat-rate mode", async () => {
+    const uiUser = userEvent.setup();
+    const lodgingB = makeLodging({ id: 2, name: "Villa B", deposit_percent: 50 });
+    const flatBooking = makeBooking({ is_flat_rate: true, price: 1000, deposit: 300 });
+    renderDialog({ booking: flatBooking, lodgings: [lodging, lodgingB] });
+    await screen.findByRole("dialog");
+
+    const depositInput = await screen.findByRole("spinbutton", { name: /Deposit/ });
+    await waitFor(() => expect(depositInput).toHaveValue(300));
+
+    const lodgingSelect = screen.getByLabelText("Lodging");
+    await uiUser.click(lodgingSelect);
+    await uiUser.click(await screen.findByRole("option", { name: "Villa B" }));
+
+    await waitFor(() => expect(depositInput).toHaveValue(500));
+  });
 });
