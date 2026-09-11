@@ -495,7 +495,7 @@ class BookingChannelSyncViewSet(viewsets.ModelViewSet):
 
 
 class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
-    queryset = models.Lodging.objects.all()  # .order_by("name")
+    queryset = models.Lodging.objects.all().prefetch_related("season_rates")  # .order_by("name")
     serializer_class = LodgingSerializer
     filterset_fields = ["shown", "active"]
 

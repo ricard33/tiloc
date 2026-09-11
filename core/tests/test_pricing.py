@@ -532,6 +532,112 @@ def test_lodging_accepts_and_clears_season_calendar(admin_client) -> None:
     assert lodging.season_calendar_id is None
 
 
+def test_create_lodging_with_nested_season_rates_in_one_request(admin_client) -> None:
+    client, lodging = admin_client  # existing lodging only used for its account/owner
+    calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
+    high = factories.SeasonFactory.create(calendar=calendar, name="High")
+    low = factories.SeasonFactory.create(calendar=calendar, name="Low")
+
+    response = client.post(
+        "/api/lodging/",
+        {
+            "name": "Nouveau logement",
+            "owner_id": lodging.owner_id,
+            "address": "1 rue du Test",
+            "daily_rate": "90.00",
+            "season_calendar": calendar.id,
+            "season_rates": [
+                {"season": high.id, "nightly_rate": "200.00", "weekend_rate": "250.00"},
+                {"season": low.id, "nightly_rate": ""},  # blank: no rate for this season
+            ],
+        },
+        format="json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED, response.data
+    new_lodging = models.Lodging.objects.get(pk=response.data["id"])
+    assert new_lodging.season_calendar_id == calendar.id
+    rates = list(new_lodging.season_rates.all())
+    assert len(rates) == 1
+    assert rates[0].season_id == high.id
+    assert rates[0].nightly_rate == Decimal("200.00")
+    assert rates[0].weekend_rate == Decimal("250.00")
+
+
+def test_update_lodging_season_rates_replaces_the_full_set(admin_client) -> None:
+    client, lodging = admin_client
+    calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
+    high = factories.SeasonFactory.create(calendar=calendar, name="High")
+    low = factories.SeasonFactory.create(calendar=calendar, name="Low")
+    lodging.season_calendar = calendar
+    lodging.save()
+    factories.LodgingSeasonRateFactory.create(
+        lodging=lodging, season=high, nightly_rate=Decimal("100.00"), weekend_rate=None, min_nights=None
+    )
+    factories.LodgingSeasonRateFactory.create(
+        lodging=lodging, season=low, nightly_rate=Decimal("50.00"), weekend_rate=None, min_nights=None
+    )
+
+    response = client.patch(
+        f"/api/lodging/{lodging.id}/",
+        {"season_rates": [{"season": high.id, "nightly_rate": "175.00"}]},  # low is dropped
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK, response.data
+    rates = list(lodging.season_rates.all())
+    assert len(rates) == 1
+    assert rates[0].season_id == high.id
+    assert rates[0].nightly_rate == Decimal("175.00")
+
+
+def test_update_lodging_without_season_rates_key_does_not_touch_existing_rates(admin_client) -> None:
+    client, lodging = admin_client
+    calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
+    season = factories.SeasonFactory.create(calendar=calendar)
+    lodging.season_calendar = calendar
+    lodging.save()
+    factories.LodgingSeasonRateFactory.create(
+        lodging=lodging, season=season, nightly_rate=Decimal("120.00"), weekend_rate=None, min_nights=None
+    )
+
+    response = client.patch(f"/api/lodging/{lodging.id}/", {"shown": False}, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.data
+    assert lodging.season_rates.count() == 1
+
+
+def test_lodging_season_rate_row_rejects_season_from_another_calendar(admin_client) -> None:
+    client, lodging = admin_client
+    calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
+    lodging.season_calendar = calendar
+    lodging.save()
+    stray_season = factories.SeasonFactory.create(
+        calendar=factories.SeasonCalendarFactory.create(account=lodging.account)
+    )
+
+    response = client.patch(
+        f"/api/lodging/{lodging.id}/",
+        {"season_rates": [{"season": stray_season.id, "nightly_rate": "150.00"}]},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_lodging_get_returns_nested_season_rates(admin_client) -> None:
+    client, lodging = admin_client
+    calendar = factories.SeasonCalendarFactory.create(account=lodging.account)
+    season = factories.SeasonFactory.create(calendar=calendar)
+    lodging.season_calendar = calendar
+    lodging.save()
+    factories.LodgingSeasonRateFactory.create(
+        lodging=lodging, season=season, nightly_rate=Decimal("130.00"), weekend_rate=None, min_nights=None
+    )
+
+    response = client.get(f"/api/lodging/{lodging.id}/")
+    assert response.status_code == status.HTTP_200_OK, response.data
+    assert len(response.data["season_rates"]) == 1
+    assert response.data["season_rates"][0]["season"] == season.id
+    assert response.data["season_rates"][0]["nightly_rate"] == "130.00"
+
+
 def test_rate_calendar_endpoint_returns_per_day_rates(priced_client) -> None:
     client, lodging = priced_client
     calendar = factories.SeasonCalendarFactory.create(account=lodging.account)

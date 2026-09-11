@@ -109,6 +109,7 @@ export interface Lodging {
   min_nights?: number;
   weekly_discount_percent?: number | null;
   monthly_discount_percent?: number | null;
+  season_rates?: LodgingSeasonRateRow[];
 }
 
 export interface SeasonDateRange {
@@ -140,6 +141,17 @@ export interface LodgingSeasonRate {
   nightly_rate: number;
   weekend_rate?: number | null;
   min_nights?: number | null;
+}
+
+// A LodgingSeasonRate row as edited inline in the Lodging form's "Advanced pricing" section
+// (nested under Lodging.season_rates, saved together with the lodging — no `lodging` field,
+// and the number fields may be "" while a row is blank/being edited).
+export interface LodgingSeasonRateRow {
+  id?: number;
+  season: number;
+  nightly_rate?: number | string | null;
+  weekend_rate?: number | string | null;
+  min_nights?: number | string | null;
 }
 
 export type PricingAdjustmentType = "percent" | "fixed";

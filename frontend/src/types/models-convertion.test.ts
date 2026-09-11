@@ -1,13 +1,15 @@
 import {
+  api2Lodging,
   api2Quote,
   api2SeasonCalendar,
   booking2api,
+  lodging2api,
   pricingAdjustment2Api,
   seasonCalendar2Api,
   toDecimal,
   toNumberOrUndefined
 } from "./models-convertion";
-import { Booking } from "./models";
+import { Booking, Lodging } from "./models";
 
 describe("Models conversions", function() {
   it("toNumber", () => {
@@ -69,6 +71,36 @@ describe("Models conversions", function() {
     const payload = pricingAdjustment2Api({ name: "x", adjustment_type: "percent", value: -15, priority: 0, stackable: true, active: true });
     expect(payload.value).toEqual("-15.00");
     expect(payload).not.toHaveProperty("stay_begin");
+  });
+
+  it("lodging2api formats filled season_rates rows and nulls out blank ones", () => {
+    const payload = lodging2api({
+      season_rates: [
+        { id: 5, season: 10, nightly_rate: 180, weekend_rate: 220, min_nights: 3 },
+        { season: 11, nightly_rate: "", weekend_rate: "", min_nights: "" }
+      ]
+    } as Partial<Lodging>);
+    expect(payload.season_rates).toEqual([
+      { id: 5, season: 10, nightly_rate: "180.00", weekend_rate: "220.00", min_nights: 3 },
+      { season: 11, nightly_rate: null, weekend_rate: null, min_nights: null }
+    ]);
+  });
+
+  it("api2Lodging parses nested season_rates rows back into numbers", () => {
+    const lodging = api2Lodging({
+      daily_rate: "100.00",
+      guaranty: "0.00",
+      max_daily_tourist_tax: "0.00",
+      tourist_tax_rate: "0.00",
+      season_rates: [
+        { id: 5, season: 10, nightly_rate: "180.00", weekend_rate: "220.00", min_nights: 3 },
+        { id: 6, season: 11, nightly_rate: null, weekend_rate: null, min_nights: null }
+      ]
+    });
+    expect(lodging.season_rates).toEqual([
+      { id: 5, season: 10, nightly_rate: 180, weekend_rate: 220, min_nights: 3 },
+      { id: 6, season: 11, nightly_rate: null, weekend_rate: null, min_nights: null }
+    ]);
   });
 
   it("booking2api drops the engine-computed daily_rate and price_details", () => {

@@ -4,6 +4,7 @@ from decimal import Decimal
 import stripe
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.db.models import Max
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -324,6 +325,21 @@ class BookingChannelSyncSubSerializerForLodging(BookingChannelSyncSerializer):
         ]
 
 
+class LodgingSeasonRateNestedSerializer(serializers.ModelSerializer):
+    """A LodgingSeasonRate row nested under LodgingSerializer.season_rates.
+
+    ``lodging`` is implicit (the parent); a row with no ``nightly_rate`` means "no rate for
+    this season" rather than a validation error -- see ``LodgingSerializer._write_season_rates``.
+    """
+
+    id = serializers.IntegerField(required=False)
+    nightly_rate = serializers.DecimalField(max_digits=20, decimal_places=2, required=False, allow_null=True)
+
+    class Meta:
+        model = models.LodgingSeasonRate
+        fields = ["id", "season", "nightly_rate", "weekend_rate", "min_nights"]
+
+
 class LodgingSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField(method_name="get_absolute_url")
     owner = UserSubSerializer(read_only=True)
@@ -340,6 +356,7 @@ class LodgingSerializer(serializers.ModelSerializer):
     season_calendar = serializers.PrimaryKeyRelatedField(
         queryset=models.SeasonCalendar.objects.all(), required=False, allow_null=True
     )
+    season_rates = LodgingSeasonRateNestedSerializer(many=True, required=False)
 
     class Meta:
         model = models.Lodging
@@ -349,10 +366,23 @@ class LodgingSerializer(serializers.ModelSerializer):
         return reverse("api:lodging-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
 
     def to_internal_value(self, data):
-        # The multipart form encodes "no calendar" as an empty string; normalise it to null.
-        if data.get("season_calendar", None) in ("", "null"):
+        # The multipart form encodes "no calendar" / "no rate" as an empty string; normalise
+        # to null (the JSON-array path already carries real nulls, this is defensive).
+        normalize_calendar = data.get("season_calendar", None) in ("", "null")
+        season_rates = data.get("season_rates")
+        if normalize_calendar or season_rates:
             data = data.copy()
+        if normalize_calendar:
             data["season_calendar"] = None
+        if season_rates:
+            normalized_rows = []
+            for row in season_rates:
+                row = dict(row)
+                for field in ("nightly_rate", "weekend_rate", "min_nights"):
+                    if row.get(field) in ("", "null"):
+                        row[field] = None
+                normalized_rows.append(row)
+            data["season_rates"] = normalized_rows
         return super().to_internal_value(data)
 
     def validate_season_calendar(self, value):
@@ -360,6 +390,29 @@ class LodgingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Unknown season calendar.")
         return value
 
+    def _write_season_rates(self, lodging, rows):
+        kept_season_ids = []
+        for row in rows:
+            if row.get("nightly_rate") is None:
+                continue  # no rate entered for this season: nothing to save
+            season = row["season"]
+            if season.calendar_id != lodging.season_calendar_id:
+                raise serializers.ValidationError(
+                    {"season_rates": "A season must belong to the lodging's season calendar."}
+                )
+            models.LodgingSeasonRate.objects.update_or_create(
+                lodging=lodging,
+                season=season,
+                defaults={
+                    "nightly_rate": row["nightly_rate"],
+                    "weekend_rate": row.get("weekend_rate"),
+                    "min_nights": row.get("min_nights"),
+                },
+            )
+            kept_season_ids.append(season.id)
+        lodging.season_rates.exclude(season_id__in=kept_season_ids).delete()
+
+    @transaction.atomic
     def create(self, validated_data: dict):
         if "account" not in validated_data:
             validated_data["account"] = self.context["request"].user.account
@@ -367,7 +420,18 @@ class LodgingSerializer(serializers.ModelSerializer):
         if rank < 0:
             rank = (models.Lodging.objects.aggregate(Max("rank"))["rank__max"] or 0) + 1
         validated_data["rank"] = rank
+        season_rates_data = validated_data.pop("season_rates", None)
         instance = super().create(validated_data)
+        if season_rates_data is not None:
+            self._write_season_rates(instance, season_rates_data)
+        return instance
+
+    @transaction.atomic
+    def update(self, instance, validated_data: dict):
+        season_rates_data = validated_data.pop("season_rates", None)
+        instance = super().update(instance, validated_data)
+        if season_rates_data is not None:
+            self._write_season_rates(instance, season_rates_data)
         return instance
 
     def get_calendar_url(self, obj: models.Lodging):

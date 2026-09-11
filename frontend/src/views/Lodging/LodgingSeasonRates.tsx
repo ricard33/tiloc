@@ -1,67 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useFormContext } from "react-hook-form";
+import { TextFieldElement } from "react-hook-form-mui";
 import {
   Alert,
   Button,
-  IconButton,
   InputAdornment,
   Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
-  TextField
+  TableRow
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import ClearIcon from "@mui/icons-material/Clear";
-import { LodgingSeasonRate, SeasonCalendar } from "../../types";
-import {
-  useCreateLodgingSeasonRateMutation,
-  useDeleteLodgingSeasonRateMutation,
-  useListLodgingSeasonRatesQuery,
-  useUpdateLodgingSeasonRateMutation
-} from "../../services/api";
-import { useAlert } from "../../common/alertUtils";
-import { fetchErrorDecode } from "../../common/apiUtils";
+import { LodgingSeasonRateRow, SeasonCalendar } from "../../types";
 
 type Props = {
-  lodgingId: number;
   calendar?: SeasonCalendar;
 };
 
-type RowState = {
-  nightly_rate: string;
-  weekend_rate: string;
-  min_nights: string;
-};
+const BLANK_ROW = (season: number): LodgingSeasonRateRow => ({ season, nightly_rate: "", weekend_rate: "", min_nights: "" });
 
-const toRowState = (rate?: LodgingSeasonRate): RowState => ({
-  nightly_rate: rate ? String(rate.nightly_rate) : "",
-  weekend_rate: rate && rate.weekend_rate != null ? String(rate.weekend_rate) : "",
-  min_nights: rate && rate.min_nights != null ? String(rate.min_nights) : ""
-});
-
-export const LodgingSeasonRates: React.FC<Props> = ({ lodgingId, calendar }) => {
+// Bound directly to the parent Lodging form's `season_rates` field (no API calls of its
+// own): the grid is edited in memory and saved together with the rest of the lodging in one
+// submit, for both a brand-new and an existing lodging.
+export const LodgingSeasonRates: React.FC<Props> = ({ calendar }) => {
   const { t } = useTranslation();
-  const { data: rates } = useListLodgingSeasonRatesQuery({ lodging: lodgingId });
-  const [createRate] = useCreateLodgingSeasonRateMutation();
-  const [updateRate] = useUpdateLodgingSeasonRateMutation();
-  const [deleteRate] = useDeleteLodgingSeasonRateMutation();
-  const { showError, showSuccess } = useAlert();
-  const [edited, setEdited] = useState<Record<number, RowState>>({});
-
-  const rateForSeason = (seasonId: number) => (rates || []).find((r) => r.season === seasonId);
+  const { control, getValues, setValue } = useFormContext();
 
   useEffect(() => {
-    if (!rates || !calendar) return;
-    const initial: Record<number, RowState> = {};
-    for (const season of calendar.seasons) {
-      if (season.id) initial[season.id] = toRowState(rateForSeason(season.id));
+    if (!calendar) {
+      setValue("season_rates", []);
+      return;
     }
-    setEdited(initial);
+    const existing = (getValues("season_rates") || []) as LodgingSeasonRateRow[];
+    const bySeasonId = new Map(existing.map((row) => [row.season, row]));
+    setValue(
+      "season_rates",
+      calendar.seasons.map((season) => bySeasonId.get(season.id as number) ?? BLANK_ROW(season.id as number))
+    );
+    // Only resync when the selected calendar itself changes, not on every keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rates, calendar]);
+  }, [calendar?.id]);
 
   if (!calendar) {
     return <Alert severity="info">{t("Select a season calendar above to set per-season rates.")}</Alert>;
@@ -69,48 +49,6 @@ export const LodgingSeasonRates: React.FC<Props> = ({ lodgingId, calendar }) => 
   if (!calendar.seasons.length) {
     return <Alert severity="info">{t("This season calendar has no season yet.")}</Alert>;
   }
-
-  const setField = (seasonId: number, field: keyof RowState, value: string) => {
-    setEdited((prev) => ({ ...prev, [seasonId]: { ...prev[seasonId], [field]: value } }));
-  };
-
-  const onSave = async (seasonId: number) => {
-    const row = edited[seasonId];
-    if (!row || row.nightly_rate === "") {
-      showError(t("A nightly rate is required."));
-      return;
-    }
-    const payload: Partial<LodgingSeasonRate> = {
-      lodging: lodgingId,
-      season: seasonId,
-      nightly_rate: Number(row.nightly_rate),
-      weekend_rate: row.weekend_rate === "" ? null : Number(row.weekend_rate),
-      min_nights: row.min_nights === "" ? null : Number(row.min_nights)
-    };
-    const existing = rateForSeason(seasonId);
-    const result = existing
-      ? await updateRate({ ...payload, id: existing.id })
-      : await createRate(payload);
-    if ((result as any).error) {
-      showError(t("Impossible to save: ") + fetchErrorDecode((result as any).error));
-    } else {
-      showSuccess(t("Rate saved"));
-    }
-  };
-
-  const onClear = async (seasonId: number) => {
-    const existing = rateForSeason(seasonId);
-    if (existing) {
-      const result = await deleteRate(existing);
-      if ((result as any).error) {
-        showError(t("Impossible to delete: ") + fetchErrorDecode((result as any).error));
-        return;
-      }
-    }
-    setField(seasonId, "nightly_rate", "");
-    setField(seasonId, "weekend_rate", "");
-    setField(seasonId, "min_nights", "");
-  };
 
   return (
     <Stack spacing={1}>
@@ -124,53 +62,40 @@ export const LodgingSeasonRates: React.FC<Props> = ({ lodgingId, calendar }) => 
             <TableCell>{t("Nightly rate")}</TableCell>
             <TableCell>{t("Weekend rate")}</TableCell>
             <TableCell>{t("Minimum nights")}</TableCell>
-            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
-          {calendar.seasons.map((season) => {
-            const seasonId = season.id as number;
-            const row = edited[seasonId] || toRowState();
-            return (
-              <TableRow key={seasonId}>
-                <TableCell>{season.name}</TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={row.nightly_rate}
-                    onChange={(e) => setField(seasonId, "nightly_rate", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={row.weekend_rate}
-                    onChange={(e) => setField(seasonId, "weekend_rate", e.target.value)}
-                    InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={row.min_nights}
-                    onChange={(e) => setField(seasonId, "min_nights", e.target.value)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton aria-label={t("Save")} onClick={() => onSave(seasonId)} size="small">
-                    <SaveIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton aria-label={t("Clear")} onClick={() => onClear(seasonId)} size="small">
-                    <ClearIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {calendar.seasons.map((season, index) => (
+            <TableRow key={season.id}>
+              <TableCell>{season.name}</TableCell>
+              <TableCell>
+                <TextFieldElement
+                  control={control}
+                  name={`season_rates.${index}.nightly_rate`}
+                  type="number"
+                  size="small"
+                  InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                />
+              </TableCell>
+              <TableCell>
+                <TextFieldElement
+                  control={control}
+                  name={`season_rates.${index}.weekend_rate`}
+                  type="number"
+                  size="small"
+                  InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
+                />
+              </TableCell>
+              <TableCell>
+                <TextFieldElement
+                  control={control}
+                  name={`season_rates.${index}.min_nights`}
+                  type="number"
+                  size="small"
+                />
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
       <Button component="a" href="/settings/seasons" target="_blank" size="small">
