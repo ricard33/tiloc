@@ -39,4 +39,15 @@ describe("useDebounceEffect()", () => {
     expect(fn).toHaveBeenCalledTimes(1);
     expect(fn).toHaveBeenCalledWith(3);
   });
+
+  it("does not restart the timer on a re-render that leaves the deps unchanged", () => {
+    const fn = vi.fn();
+    const { rerender } = renderHook(() => useDebounceEffect(fn, 100, [1]));
+
+    act(() => vi.advanceTimersByTime(90));
+    rerender(); // fresh `fn` / `deps` references, same dep value
+    act(() => vi.advanceTimersByTime(10));
+
+    expect(fn).toHaveBeenCalledTimes(1); // fired at 100ms, not pushed back by the re-render
+  });
 });
