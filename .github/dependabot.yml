@@ -9,6 +9,25 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      django-major:
+        patterns:
+          - "django*"
+        update-types:
+          - "major"
+      testing-major:
+        patterns:
+          - "pytest*"
+          - "coverage"
+          - "factory_boy"
+        update-types:
+          - "major"
+      linting-major:
+        patterns:
+          - "flake8"
+          - "isort"
+          - "black"
+        update-types:
+          - "major"
 
   - package-ecosystem: "npm"
     directory: "/frontend"
@@ -22,6 +41,67 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      mui-major:
+        patterns:
+          - "@mui/*"
+          - "mui-*"
+        update-types:
+          - "major"
+      react-major:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-redux"
+          - "react-router-dom"
+          - "@types/react"
+          - "@types/react-dom"
+        update-types:
+          - "major"
+      redux-major:
+        patterns:
+          - "@reduxjs/toolkit"
+          - "redux"
+          - "redux-saga"
+        update-types:
+          - "major"
+      i18next-major:
+        patterns:
+          - "i18next*"
+          - "react-i18next"
+        update-types:
+          - "major"
+      eslint-major:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "typescript-eslint"
+        update-types:
+          - "major"
+      vite-major:
+        patterns:
+          - "vite"
+          - "vite-*"
+          - "@vitejs/*"
+        update-types:
+          - "major"
+      testing-major:
+        patterns:
+          - "@testing-library/*"
+          - "vitest"
+          - "@vitest/*"
+          - "jsdom"
+        update-types:
+          - "major"
+      stripe-major:
+        patterns:
+          - "@stripe/*"
+        update-types:
+          - "major"
+      fortawesome-major:
+        patterns:
+          - "@fortawesome/*"
+        update-types:
+          - "major"
 
   - package-ecosystem: "github-actions"
     directory: "/"
