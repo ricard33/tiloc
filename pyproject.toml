@@ -81,7 +81,7 @@ watchdog = ">=4.0,<7.0"  # used by location/logging_config.py (was transitive vi
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.3.2"
-django-stubs = "^5.2"
+django-stubs = ">=5.2,<7.0"
 djangorestframework-stubs = "^3.16.7"
 fabric = "^3.0"
 factory_boy = "^3.3.1"
