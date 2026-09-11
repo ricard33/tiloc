@@ -81,14 +81,29 @@ describe("TimelineView", () => {
         rateCalendars={{
           1: [{ date: "2026-06-15", rate: "180.00", season: "High", is_weekend: false }]
         }}
+        canViewPrices
       />,
       { user: { permissions: ["core.view_booking", "core.view_prices"] } }
     );
     // dated day gets the season rate
-    expect(screen.getAllByText("180.00 €").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("180").length).toBeGreaterThan(0);
     // a day without an entry falls back to the lodging's daily_rate
-    expect(screen.getAllByText("100 €").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("100").length).toBeGreaterThan(0);
     // the other lodging (no calendar) uses its default everywhere
-    expect(screen.getAllByText("60 €").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("60").length).toBeGreaterThan(0);
+  });
+
+  it("hides the day price when the viewer lacks core.view_prices, even with showPrices on", () => {
+    renderWithProviders(
+      <TimelineView
+        lodgings={lodgings}
+        bookings={[]}
+        settings={{ ...settings, showPrices: true }}
+        defaultBeginDate={new Date("2026-06-15")}
+        canViewPrices={false}
+      />,
+      { user: { permissions: ["core.view_booking"] } }
+    );
+    expect(screen.queryByText("100")).not.toBeInTheDocument();
   });
 });

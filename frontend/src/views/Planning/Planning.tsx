@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { add, format, parse, startOfMonth, sub } from "date-fns";
+import { add, format, min as dateMin, parse, startOfMonth, sub } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, IconButton, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
@@ -61,10 +61,21 @@ const Planning = () => {
   const user = useAppSelector(store => store.auth.user) as User;
   const account = useAppSelector(store => store.auth.account) as Account;
   const canAdd = user.permissions.includes("core.add_booking");
-  const { data: rateCalendars } = useGetLodgingRateCalendarQuery(
-    { begin: format(dates.start, "yyyy-MM-dd"), end: format(add(dates.end, { days: 1 }), "yyyy-MM-dd") },
-    { skip: !settings.showPrices || !user.permissions.includes("core.view_prices") || view !== "timeline" }
+  const canViewPrices = user.permissions.includes("core.view_prices");
+  // Set from the timeline's actual canvas bounds (onBoundsChange below), never from `dates`:
+  // `dates` is sized for the bookings filter (up to a year) and fetching the rate calendar
+  // over that span made the request slow/unreliable. Null until the timeline reports its
+  // real, buffered bounds.
+  const [rateWindow, setRateWindow] = useState<{ begin: string; end: string } | null>(null);
+  const { data: rateCalendars, error: rateCalendarError } = useGetLodgingRateCalendarQuery(
+    rateWindow ?? { begin: "", end: "" },
+    { skip: !rateWindow || !settings.showPrices || !canViewPrices || view !== "timeline" }
   );
+  useEffect(() => {
+    if (rateCalendarError) {
+      console.warn("Failed to load the lodging rate calendar", rateCalendarError);
+    }
+  }, [rateCalendarError]);
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -91,6 +102,10 @@ const Planning = () => {
     // console.log("onBoundsChange", formatISODate(start), formatISODate(end), differenceInDays(start, end));
     // const delta = canvasTimeEnd - canvasTimeStart;
     setDates({ start, end });
+    // Cap at ~8 months regardless of the canvas width, so a very wide screen can't turn
+    // this into the same huge-window problem `dates` has.
+    const cappedEnd = dateMin([add(end, { days: 1 }), add(start, { months: 8 })]);
+    setRateWindow({ begin: format(start, "yyyy-MM-dd"), end: format(cappedEnd, "yyyy-MM-dd") });
   }, []);
 
   const onCreateBooking = useCallback((lodging: Lodging, beginDate: Date, endDate?: Date) => {
@@ -183,6 +198,7 @@ const Planning = () => {
           onBoundsChange={onBoundsChange}
           settings={settings}
           rateCalendars={rateCalendars}
+          canViewPrices={canViewPrices}
           disabled={isLoadingBookings}
         />}
       {view === "annual" &&
