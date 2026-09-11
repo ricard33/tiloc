@@ -184,12 +184,13 @@ $primary-red: #f45b69;
         top: 0;
         right: 0;
         font-size: 0.6rem;
+        text-align: center;
         color: $primary-grey;
 
       }
 
       &.today .day-price {
-        color: $secondary-grey;
+        color: $primary-red;
       }
 
     }
