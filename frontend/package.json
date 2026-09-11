@@ -81,7 +81,7 @@
     "validate.js": "^0.13.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.1",
@@ -96,9 +96,9 @@
     "@vitest/coverage-v8": "^5.0.0",
     "babel-plugin-direct-import": "^1.0.0",
     "babel-plugin-import": "^1.13.8",
-    "eslint": "^9.39.5",
+    "eslint": "^10.10.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.0.0",
     "jsdom": "^30.0.1",
     "sass": "^1.69.5",
