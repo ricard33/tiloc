@@ -18,6 +18,20 @@ updates:
       # Local file: dependency, vendored under frontend/ckeditor5 — not on a registry.
       - dependency-name: "@ti-gecko/tiloc-ckeditor5"
 
+  # frontend/ckeditor5 is a vendored sub-package with its own package.json/yarn.lock.
+  # GitHub's dependency graph scans it regardless of whether it's listed here (that's
+  # why alerts on it appeared before this entry existed) and security-update PRs fire
+  # independently of open-pull-requests-limit. An unscoped "ignore everything" rule is
+  # the one setting documented to suppress security-update PRs too, not just version
+  # updates, so this entry exists purely to silence it.
+  - package-ecosystem: "npm"
+    directory: "/frontend/ckeditor5"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: "*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
