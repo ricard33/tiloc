@@ -409,6 +409,13 @@ describe("BookingDialog", () => {
     // the average nightly rate is shown as plain text, not an editable field
     expect(screen.getByText("€90.00")).toBeInTheDocument();
     expect(screen.queryByRole("spinbutton", { name: /nightly rate/i })).not.toBeInTheDocument();
+
+    // regression: the quote must not be polled while the inputs are unchanged
+    const quoteCalls = () =>
+      (axios as any).mock.calls.filter((c: any[]) => String(c[0]?.url).includes("booking/quote/")).length;
+    const before = quoteCalls();
+    await new Promise((r) => setTimeout(r, 1200)); // > 2 debounce cycles
+    expect(quoteCalls()).toBe(before);
   });
 
   test("keeps a manually edited deposit when the price is recomputed", async () => {

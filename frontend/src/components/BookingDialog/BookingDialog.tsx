@@ -5,7 +5,6 @@ import BackspaceIcon from "@mui/icons-material/Backspace";
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { addDays, differenceInCalendarDays, format } from "date-fns";
 import { computeBookingPrice, computeOptionsPrice, DecimalPrecision } from "../../common/priceUtils";
-import { useDebounceEffect } from "../../common/useDebounceEffets";
 import { getDepositLabel } from "../../common/propertyPrefsUtils";
 import {
   AppBar,
@@ -253,15 +252,23 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const [priceDetails, setPriceDetails] = useState<Quote | null>(booking.price_details ?? null);
   const [triggerQuote, { data: quote }] = useLazyGetQuoteQuery();
 
-  useDebounceEffect(() => {
-    if (isFlatRate || !beginDate || !endDate || !lodging_ids?.length) return;
-    if (differenceInCalendarDays(endDate, beginDate) < 1) return;
-    triggerQuote({
-      lodging_ids: [...lodging_ids],
-      begin_date: format(beginDate, "yyyy-MM-dd"),
-      end_date: format(endDate, "yyyy-MM-dd")
-    });
-  }, 400, [beginDate && beginDate.getTime(), endDate && endDate.getTime(), JSON.stringify(lodging_ids), isFlatRate]);
+  // A stable primitive key: the effect below only re-runs (and only debounces a new request)
+  // when the actual quote inputs change, never merely because the component re-rendered.
+  const quoteKey = (!isFlatRate
+    && beginDate && endDate && lodging_ids?.length
+    && differenceInCalendarDays(endDate, beginDate) >= 1)
+    ? `${[...lodging_ids].sort((a, b) => a - b).join(",")}|${format(beginDate, "yyyy-MM-dd")}|${format(endDate, "yyyy-MM-dd")}`
+    : null;
+
+  useEffect(() => {
+    if (!quoteKey) return;
+    const [ids, begin_date, end_date] = quoteKey.split("|");
+    const timer = setTimeout(() => {
+      // `true` = preferCacheValue: identical inputs return the cached quote without a refetch.
+      triggerQuote({ lodging_ids: ids.split(",").map(Number), begin_date, end_date }, true);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [quoteKey, triggerQuote]);
 
   useEffect(() => {
     if (!quote || isFlatRate || !Number.isFinite(quote.total_price)) return;
