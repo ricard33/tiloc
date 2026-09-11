@@ -1,37 +1,4 @@
 .booking-dialog {
-  .MuiAccordionSummary-root {
-     background-color: rgba(0, 0, 0, .03);
-     border-bottom: 1px solid rgba(0, 0, 0, .125);
-     margin-bottom: -1px;
-     min-height: 56px;
-     &.Mui-expanded {
-       min-height: 38px;
-     }
-
-    .MuiAccordionSummary-content {
-      &.Mui-expanded {
-        margin: 3px 0;
-      }
-      & p {
-        margin-bottom: 0;
-      }
-    }
-
-    .accordion-heading {
-      font-size: 0.9375rem;
-      flex-shrink: 0;
-      font-weight: 700;
-    }
-
-    .accordion-secondary-heading {
-      color: #546e7a;
-      right: 60px;
-      position: absolute;
-      font-size: 0.9375rem;
-    }
-
-  }
-
   .full-width {
     width: 100%;
   }
@@ -39,7 +6,6 @@
   .flex-box-align-left {
     align-items: center;
     display: flex;
-    // justify-content: stretch;
   }
 
   .flex-box-stretched {
@@ -52,32 +18,8 @@
     flex-basis: 1em
   }
 
-  .button {
-    margin: 8px
-  }
-
-  .delete-button {
-    color: red;
-    margin: 8px;
-  }
-
   .price-input {
     width: 7em;
-  }
-
-  .commission_fees {
-    width: 10em;
-  }
-
-  .option-price-input {
-    font-size: medium;
-    width: 5em;
-  }
-
-  .options {
-    align-items: center;
-    font-size: small;
-    text-align: center
   }
 
   .total-wrapper {
@@ -92,15 +34,10 @@
   }
 
   .left-to-pay {
-    // color: 'orange';
   }
 
   .too-perceived {
     color: orange
-  }
-
-  .fully-paid {
-    color: darkgreen
   }
 }
 
@@ -110,21 +47,6 @@
   //noinspection CssInvalidPropertyValue
   width: -moz-fill-available;
 
-  //width: stretch;
   padding: 0;
   display: block;
-  //margin: 0px;
-  // height: 1em;
-  // marginRight: 5px
-}
-
-#menu-status_id {
-  li {
-    padding: 0;
-    margin: 4px;
-
-    .booking-status-item {
-      padding: 4px;
-    }
-  }
 }

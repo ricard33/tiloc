@@ -89,13 +89,8 @@ const AntTabs = styled(Tabs)({
 const AntTab = styled((props: TabProps) => <Tab disableRipple {...props} />)(
   ({ theme }) => ({
     textTransform: "none",
-    // minWidth: 0,
-    // [theme.breakpoints.up('sm')]: {
-    //   minWidth: 0,
-    // },
     fontWeight: theme.typography.fontWeightRegular,
     marginRight: theme.spacing(1),
-    // color: 'rgba(0, 0, 0, 0.85)',
     fontFamily: [
       "-apple-system",
       "BlinkMacSystemFont",
@@ -114,10 +109,6 @@ const AntTab = styled((props: TabProps) => <Tab disableRipple {...props} />)(
     },
     "&.MuiTab-fullWidth": {
       minWidth: 0
-    },
-    "&.Mui-selected": {
-      // color: '#1890ff',
-      // fontWeight: theme.typography.fontWeightMedium,
     },
     "&.Mui-focusVisible": {
       backgroundColor: "#d1eaff"
@@ -187,9 +178,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const hasGroupedBooking = account.current_plan.grouped_bookings;
   const [selectedTab, setSelectedTab] = useState(0);
 
-  // console.debug("booking", booking);
-  console.assert(!!booking, "Booking not initialized");
-
   const setMultipleValues = (object: Partial<Booking>) => Object.keys(object).forEach(function(key) {
     setValue(key as any, (object as any)[key]);
   });
@@ -209,22 +197,13 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     defaultValues: initialState
   });
   const { register, control, setValue, getValues, watch, formState, reset, setError, clearErrors } = formContext;
-  const { errors, isDirty /*isValid*/ } = formState;
+  const { errors, isDirty } = formState;
   const { dirtyFields } = useFormState({
     control
   });
 
-  // console.log("ERRORS", errors);
-  // console.log("isDirty: ", isDirty, dirtyFields);
-  // console.log("defaultValues: ", initialState);
-  // console.log("values: ", getValues());
-  // console.log("DIFF", deepDiff(initialState, getValues()));
-
   usePageUnloadAlert(Object.keys(dirtyFields).length > 0);
   const unsavedChangesConfirm = useUnsavedChangesConfirm();
-
-  const formValues = getValues();
-  // console.debug("formValues: ", formValues);
 
   const lodging_ids = watch("lodging_ids", initialState.lodging_ids);
   const deposit = watch("deposit", initialState.deposit);
@@ -236,10 +215,8 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const touristTax = watch("tourist_tax", computeTouristTax(initialState));
   const options = watch("options");
   const [includedInPriceOptions, excludedFromPriceOptions] = computeOptionsPrice(options, duration);
-  // const fullPrice = watch("fullPrice", Number(price) + includedInPriceOptions);
   const fullPrice = Number(price) + includedInPriceOptions;
   const leftToPay = fullPrice + (booking.tourist_tax_included_in_payment ? touristTax : 0) - totalPayment - (commissionFees ?? 0);
-  // console.log("options", options, fullPrice);
   const guestsDistribution = watch("guests_distribution", {});
 
   const depositLabel = user ? getDepositLabel(t, lodging.deposit_label) : t("Deposit");
@@ -338,7 +315,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
     initialState.departure_details = booking.departure_details ?? "";
     initialState.notes = booking.notes ?? "";
 
-    // console.debug("initialState", initialState);
     return initialState;
   }
 
@@ -353,8 +329,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function computeTouristTax(values: Pick<Booking, "adults" | "children" | "babies" | "price" | "duration" | "max_daily_tourist_tax" | "is_flat_rate_tourist_tax" | "tourist_tax_rate">) {
-    // console.log("computeTouristTax", filterObject(values, (v, k) => ["adults", "children", "babies", "price", "duration", "max_daily_tourist_tax"].includes(k)));
-    // console.log("computeTouristTax", filterObject(values, (v, k) => ["max_daily_tourist_tax", "is_flat_rate_tourist_tax", "tourist_tax_rate"].includes(k)));
     let daily_rate = values.max_daily_tourist_tax ?? 0;
     if (!values.is_flat_rate_tourist_tax) {
       if (values.adults + values.children + values.babies > 0) {
@@ -378,14 +352,9 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
    * @param value
    */
   function handleChange(fieldName: string, value: string | number | boolean) {
-    // console.log("VALUE", fieldName, value, typeof value, parseFloat(value as string), Number(value));
     switch (fieldName) {
-      case "status_id": {
-        return value;
-      }
       case "existing-guest": {
         const guest = allGuests.filter(guest => guest.name === value);
-        // console.log(guest, typeof guest);
         if (guest && guest.length > 0) {
           setValue("guest_name", guest[0].name);
           setValue("guest_contact", guest[0].contact);
@@ -399,14 +368,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
         updateTouristTax();
         return duration;
       }
-      case "daily_rate":
-        value = parseFloat(value as string);
-        if (!isNaN(value)) {
-          const { price: priceObj } = computeBookingPrice(formValues.begin_date, formValues.end_date, value, 0, 0, [], lodging.deposit_percent);
-          applyPriceEstimate(priceObj);
-          updateTouristTax();
-        }
-        break;
       case "price":
         value = parseFloat(value as string);
         if (!isNaN(value)) {
@@ -427,11 +388,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
           updateTouristTax();
           return false;
         }
-      case "adults":
-      case "children":
-      case "babies":
-        updateTouristTax();
-        return value;
       default:
         console.warn("Unhandled input:", fieldName);
         return value;
@@ -439,7 +395,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function handleLodgingsChange(value: number[] | number | string) {
-    // console.log("handleLodgingsChange", value);
     const ids = typeof value === "string"
       ? value.split(",").map(Number)
       : typeof value === "number" ? [value] : value;
@@ -476,9 +431,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   function handleDistributionChange(lodging: Lodging, fieldName: "adults" | "children" | "babies", value: number) {
-    // let newDistribution = structuredClone(guestsDistribution);
-    // if (!newDistribution)
-    //   newDistribution = {};
     if (!guestsDistribution[lodging.id]) {
       guestsDistribution[lodging.id] = defaultDistribution;
     }
@@ -509,7 +461,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
       return newDate;
     const newBooking = {
       ...formValues,
-      // [fieldName]: format(newDate, "yyyy-MM-dd")
       [fieldName]: newDate
     };
     const duration = differenceInCalendarDays(newBooking.end_date, newBooking.begin_date);
@@ -542,7 +493,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   }
 
   async function saveBooking(data: Booking, callback?: (booking: Booking) => void) {
-    console.log("Submit: ", data);
     const submittedBooking = {
       ...data,
       source_id: data.source_id ? data.source_id : undefined
@@ -564,7 +514,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
 
   function onSubmit(data: Booking) {
     return saveBooking(data, () => {
-      console.debug("Closing...");
       onClose();
     });
   }
@@ -628,23 +577,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
             />
           </Toolbar>
         </AppBar>
-        // :
-        // <DialogTitle id="simple-dialog-title">
-        //   <Grid justifyContent="space-between" container spacing={4}>
-        //     <Grid item xs={6}>
-        //       {dialogTitle}
-        //     </Grid>
-        //     <Grid item xs={6} className="total-wrapper">
-        //       <span className="total-price">
-        //         {t("total = {{ fullPrice }}", { fullPrice: formatCurrency(fullPrice) })}</span>
-        //       {(excludedFromPriceOptions) > 0 && (
-        //         <span
-        //           className="third-party-price"
-        //         ><br />(+ {formatCurrency(excludedFromPriceOptions)} {t("for third party services")})</span>)
-        //       }
-        //     </Grid>
-        //   </Grid>
-        // </DialogTitle>
       }
       <DialogContent dividers sx={{ ...(fullScreen && { padding: 1 }) }}>
         {booking &&
@@ -749,7 +681,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         name="begin_date"
                         label={t("Arrival")}
                         onChange={(date) => onDateChange(date, "begin_date")}
-                        // inputProps={{ size: "small" }}
                       />
                     </Grid>
                     <Hidden smDown>
@@ -763,7 +694,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         name="end_date"
                         label={t("Departure")}
                         onChange={(date) => onDateChange(date, "end_date")}
-                        // inputProps={{ size: "small" }}
                       />
                     </Grid>
                   </Grid>
@@ -781,7 +711,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       label={t("Nights")}
                       variant={variant}
                       margin={margin}
-                      // size="small"
                       type="number"
                       sx={{ width: "6em" }}
                       onChange={(value) => handleChange("duration", Number(value))}
@@ -823,7 +752,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       }}
                       InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                       margin={margin}
-                      // size="small"
                       variant={variant}
                       onChange={event => handleChange(event.target.name, event.target.value)}
                     />
@@ -881,7 +809,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     label={depositLabel}
                     className="price-input"
                     type={"number"}
-                    // required
                     validation={{
                       min: {
                         value: 0,
@@ -895,7 +822,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     }}
                     InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                     margin={margin}
-                    // size="small"
                     variant={variant}
                   />
                   <div className="spacer" />
@@ -911,8 +837,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     label={t("Commission fees")}
                     sx={{ width: "10em;" }}
                     type={"number"}
-                    // size="small"
-                    // required
                     validation={{
                       min: { value: 0, message: t("Commission fees can't be negative") },
                       validate: { validateNumber: (v) => (typeof v !== "undefined") }
@@ -936,7 +860,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                         }}
                         InputProps={{ endAdornment: <InputAdornment position="end">&euro;</InputAdornment> }}
                         margin={margin}
-                        // size="small"
                         variant={variant}
                       />
                       <IconButton
@@ -1000,7 +923,6 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                       variant: variant,
                       helperText: errors.guest_name && t("Guest name is required"),
                       InputProps: {
-                        // endAdornment: null,
                         startAdornment: <ContactsIcon />
                       }
                     }}
@@ -1052,13 +974,11 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                               {[["adults", t("Adults")], ["children", t("Children")], ["babies", t("Babies")]].map(([name, _]) =>
                                 <TableCell key={name} align="right">
                                   <FormControl fullWidth>
-                                    {/*<InputLabel id={`${l.id}-${label}`}>{label}</InputLabel>*/}
                                     <Select
                                       variant="standard"
                                       size="small"
                                       margin={margin}
                                       type="number"
-                                      // sx={{ width: "5em" }}
                                       value={(guestsDistribution && guestsDistribution[l.id] && guestsDistribution[l.id][name as "adults" | "children" | "babies"]) ?? 0}
                                       onChange={(event) => handleDistributionChange(l, name as any, event.target.value as number)}
                                     >

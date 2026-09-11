@@ -29,7 +29,6 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   } : undefined;
   const { data: loadedBooking, isLoading, error: bookingError } = useGetBookingQuery(Number(bookingId), {
     skip: bookingId === "new",
-    // pollingInterval: 1000,
     refetchOnMountOrArgChange: true,
     refetchOnReconnect: true
   });
@@ -46,7 +45,6 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
   }
 
   if(bookingError) {
-    // navigate(-1);
     return <></>;
   }
 
@@ -61,7 +59,6 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           onClose={onClose}
           onCancelBooking={() => cancelBooking(booking)}
           onUncancelBooking={() => uncancelBooking(booking)}
-          // onDelete={() => deleteBooking(booking).then(() => onClose())}
           onOpenContract={onOpenContract}
         />
       );
@@ -73,7 +70,6 @@ const BookingDialogLoader: React.FunctionComponent<BookingDialogLoaderProps> = (
           onClose={onClose}
           onCancelBooking={() => cancelBooking(booking)}
           onUncancelBooking={() => uncancelBooking(booking)}
-          // onDelete={() => deleteBooking(booking).then(() => onClose())}
           onOpenContract={onOpenContract}
         />
       );

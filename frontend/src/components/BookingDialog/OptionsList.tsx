@@ -53,15 +53,12 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
 
   function onAddOption(data: any) {
     if (allOptions) {
-      console.debug("ADD OPTION", data.target.value);
       const value = Number(data.target.value);
       const option = allOptions.filter((o: Service) => o.id === value)[0];
-      console.debug("  --> ", option);
       append(option);
     }
   }
 
-  // console.log(options)
   return (
     <>
       <Paper>
@@ -173,7 +170,6 @@ const OptionsList: React.FunctionComponent<OptionsListProps> = ({
           {allOptions && allOptions.map((option: Service) => (
             <option
               key={option.id} value={option.id}
-              // disabled={options.filter((o: Service) => Number(o.id) === option.id).length > 0}
             >
               {getDesignation(option)}
             </option>
