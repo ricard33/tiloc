@@ -46,7 +46,6 @@
     "@ti-gecko/tiloc-ckeditor5": "file:./ckeditor5",
     "axios": "^1.7.9",
     "chart.js": "^4.4.1",
-    "classnames": "^2.3.2",
     "clsx": "^2.1.0",
     "date-fns": "^2.29.3",
     "history": "^5.3.0",
