@@ -75,7 +75,7 @@ const Sidebar: React.FC<Props> = props => {
         // ...(appInfo.isDebug ? [{ title: "Planning bêta", href: "/planning2", icon: <CalendarIcon /> }] : []),
         { title: t("Bookings"), href: "/bookings", icon: <ListIcon /> },
         { title: t("Payments"), href: "/payments", icon: <PriceCheckIcon />, premium: account.trial_is_over },
-        // { title: t("Reports"), href: "/reports", icon: <MovingIcon />, disabled: true, premium: true },
+        { title: t("Reports"), href: "/reports", icon: <BarChartIcon />, premium: account.trial_is_over },
         // { title: t("Prices"), href: "/prices", icon: <MoneyIcon />, disabled: true },
         { title: t("Contacts"), href: "/guests", icon: <GroupIcon />, disabled: false, premium: account.trial_is_over },
         { title: t("Settings"), href: "/settings", icon: <SettingsIcon /> }

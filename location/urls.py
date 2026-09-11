@@ -75,6 +75,12 @@ urlpatterns = [
     path(r"stats/filling_rate/<str:begin>/<str:end>/", views.filling_rate),
     path(r"stats/channel_distribution/", views.channel_distribution),
     path(r"stats/channel_distribution/<str:begin>/<str:end>/", views.channel_distribution),
+    path(r"stats/booking_funnel/", views.booking_funnel),
+    path(r"stats/booking_funnel/<str:begin>/<str:end>/", views.booking_funnel),
+    path(r"stats/season_breakdown/", views.season_breakdown),
+    path(r"stats/season_breakdown/<str:begin>/<str:end>/", views.season_breakdown),
+    path(r"stats/payments_overview/", views.payments_overview),
+    path(r"stats/payments_overview/<str:begin>/<str:end>/", views.payments_overview),
 
     path('admin/', include('loginas.urls')),  # make sure to add loginas urls before the admin site urls
     path("admin/", admin.site.urls),

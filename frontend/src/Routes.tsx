@@ -49,6 +49,7 @@ import { User } from "./types";
 
 const PlanningView = React.lazy(() => import("./views/Planning"));
 const GuestsList = React.lazy(() => import("./views/Guests/GuestsList"));
+const StatsView = React.lazy(() => import("./views/Stats"));
 
 const MyRoutes = () => {
   const currentUser = useAppSelector(store => store.auth.user) as User;
@@ -96,7 +97,15 @@ const MyRoutes = () => {
           <Route path="/bookings/*" element={<BookingList />} />
           <Route path="/bookings/:bookingId/contract" element={<ContractEdit />} />
           <Route path="/payments" element={<PaymentsList />} />
-          <Route path="/reports" element={<TestPage />} />
+          <Route path="/reports" element={<Navigate to="/reports/stats" replace />} />
+          <Route
+            path="/reports/stats"
+            element={
+              <React.Suspense fallback={<>...</>}>
+                <StatsView />
+              </React.Suspense>
+            }
+          />
           <Route
             path="/guests"
             element={

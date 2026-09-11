@@ -18,6 +18,7 @@ from django_email_verification.errors import NotAllFieldCompiled
 from ics import Calendar, ContentLine, Event
 from proxy.views import proxy_view
 from rest_framework import exceptions as drf_exceptions
+from rest_framework import status as drf_status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -25,7 +26,13 @@ from rest_framework.views import set_rollback
 
 from core import models
 from core.models import status_no_stats
-from core.stats import get_filling_rate_and_turnover
+from core.stats import (
+    get_booking_funnel_and_conversion,
+    get_channel_revenue,
+    get_filling_rate_and_turnover,
+    get_payments_overview,
+    get_season_breakdown,
+)
 
 logger = logging.getLogger("view")
 
@@ -239,7 +246,56 @@ def channel_distribution(request, begin=arrow.utcnow().shift(years=-5), end=arro
             .aggregate(count=Count("id"))["count"],
         }
     )
+    if request.user.has_perm("core.view_prices"):
+        revenue = get_channel_revenue(request.user, begin, end)
+        for row in data:
+            row["turnover"] = revenue.get(row["channel"], 0)
     return Response(data)
+
+
+@api_view(
+    [
+        "GET",
+    ]
+)
+@permission_classes([IsAuthenticated])
+def booking_funnel(request, begin=None, end=None):
+    if end is None:
+        end = arrow.utcnow().shift(months=+1).replace(day=1).shift(days=-1)
+    if begin is None:
+        begin = arrow.utcnow().shift(months=-11).replace(day=1)
+    return Response(get_booking_funnel_and_conversion(request.user, begin, end))
+
+
+@api_view(
+    [
+        "GET",
+    ]
+)
+@permission_classes([IsAuthenticated])
+def season_breakdown(request, begin=None, end=None):
+    if end is None:
+        end = arrow.utcnow().shift(months=+1).replace(day=1).shift(days=-1)
+    if begin is None:
+        begin = arrow.utcnow().shift(months=-11).replace(day=1)
+    with_turnover = request.user.has_perm("core.view_prices")
+    return Response(get_season_breakdown(request.user, begin, end, with_turnover=with_turnover))
+
+
+@api_view(
+    [
+        "GET",
+    ]
+)
+@permission_classes([IsAuthenticated])
+def payments_overview(request, begin=None, end=None):
+    if not request.user.has_perm("core.view_prices"):
+        return Response(status=drf_status.HTTP_403_FORBIDDEN)
+    if end is None:
+        end = arrow.utcnow().shift(months=+1).replace(day=1).shift(days=-1)
+    if begin is None:
+        begin = arrow.utcnow().shift(months=-11).replace(day=1)
+    return Response(get_payments_overview(request.user, begin, end))
 
 
 @permission_classes([IsAdminUser])
