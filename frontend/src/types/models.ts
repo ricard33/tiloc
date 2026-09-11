@@ -245,6 +245,7 @@ export interface RateCalendarEntry {
   date: string;   // ISO date
   rate: string;   // formatted "123.00"
   season: string | null;
+  season_color: string | null;
   is_weekend: boolean;
 }
 

@@ -653,6 +653,7 @@ def test_rate_calendar_endpoint_returns_per_day_rates(priced_client) -> None:
     rows = response.data[str(lodging.id)] if str(lodging.id) in response.data else response.data[lodging.id]
     assert [row["rate"] for row in rows] == ["175.00", "175.00", "175.00"]
     assert rows[0]["season"] == season.name
+    assert rows[0]["season_color"] == season.color
 
 
 def test_resolve_rate_calendar_uses_a_constant_number_of_queries() -> None:
