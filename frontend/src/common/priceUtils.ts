@@ -36,17 +36,17 @@ export const DecimalPrecision = {
   }
 };
 
+// Client-side estimate only (no seasons/discounts) — the backend `/quote/` endpoint is the
+// source of truth for the final price. BookingDialog calls this to show an instant, optimistic
+// value while the debounced server quote is in flight, then the server response overwrites it.
+// In `is_flat_rate` mode the server is never queried, so this stays the only price computation
+// (used there just to derive `daily_rate` from the flat price entered by the user).
 export const computeBookingPrice = (beginDate: Date, endDate: Date, dailyRate: number,
   weekendRate: number, weekRate: number, _seasonalRates = [], depositPercent: number)
   : {
   price: Pick<Booking, "price" | "deposit" | "daily_rate">,
   price_details: { begin_date: Date, end_date: Date, day_count: number, rate_name: string | null, is_week_rate: boolean }[]
 } => {
-  // TODO compute price using seasonal rates
-  // if (typeof beginDate === "string")
-  //   beginDate = parseISO(beginDate);
-  // if (typeof endDate === "string")
-  //   endDate = parseISO(endDate);
   const duration = differenceInCalendarDays(endDate, beginDate);
   const isWeekRate = weekRate > 0 && duration >= 7;
   const rate = isWeekRate ? Number(weekRate) / 7 : Number(dailyRate);
