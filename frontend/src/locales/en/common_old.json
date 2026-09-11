@@ -206,5 +206,7 @@
   "Holidays": "Holidays",
   "Pricing": "Pricing",
   "Rate can't be negative": "Rate can't be negative",
-  "Need help?": ""
+  "Need help?": "",
+  "Average nightly rate": "",
+  "Computed from the pricing rules": ""
 }

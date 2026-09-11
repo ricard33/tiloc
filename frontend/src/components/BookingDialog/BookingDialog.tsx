@@ -231,6 +231,7 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
   const deposit = watch("deposit", initialState.deposit);
   const isFlatRate = watch("is_flat_rate", initialState.is_flat_rate);
   const duration = watch("duration", initialState.duration);
+  const dailyRate = watch("daily_rate", initialState.daily_rate);
   const price = watch("price", initialState.price);
   const commissionFees = watch("commission_fees", initialState.commission_fees);
   const touristTax = watch("tourist_tax", computeTouristTax(initialState));
@@ -788,22 +789,14 @@ const BookingDialog: React.FC<BookingDialogProps> = props => {
                     {!isFlatRate &&
                       <>
                         <span>&nbsp;x&nbsp;</span>
-                        <TextFieldElement
-                          control={control}
-                          name={"daily_rate"}
-                          label={t("Average nightly rate")}
+                        <Typography
+                          component="span"
                           className="price-input"
-                          type={"number"}
-                          helperText={t("Computed from the pricing rules")}
-                          InputProps={{
-                            readOnly: true,
-                            endAdornment: <InputAdornment position="end">&euro;</InputAdornment>
-                          }}
-                          sx={{ "& .MuiInputBase-input": { color: "text.secondary" } }}
-                          margin={margin}
-                          // size="small"
-                          variant={variant}
-                        />
+                          color="text.secondary"
+                          title={t("Average nightly rate, computed from the pricing rules")}
+                        >
+                          {formatCurrency(Number(dailyRate) || 0)}
+                        </Typography>
                       </>}
                     <div className="spacer" />
                     =

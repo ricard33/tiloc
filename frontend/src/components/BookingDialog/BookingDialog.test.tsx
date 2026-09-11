@@ -406,8 +406,9 @@ describe("BookingDialog", () => {
     expect(await screen.findByText(/below the minimum 10 nights/, {}, { timeout: 4000 })).toBeInTheDocument();
     expect(screen.getByText("Weekly discount")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole("spinbutton", { name: "Total" })).toHaveValue(630));
-    // the average nightly rate is read-only (derived from the pricing rules)
-    expect(screen.getByRole("spinbutton", { name: "Average nightly rate" })).toHaveAttribute("readonly");
+    // the average nightly rate is shown as plain text, not an editable field
+    expect(screen.getByText("€90.00")).toBeInTheDocument();
+    expect(screen.queryByRole("spinbutton", { name: /nightly rate/i })).not.toBeInTheDocument();
   });
 
   test("keeps a manually edited deposit when the price is recomputed", async () => {

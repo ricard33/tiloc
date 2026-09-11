@@ -180,5 +180,7 @@
   "Holidays": "Vacances",
   "Pricing": "Tarifs",
   "Rate can't be negative": "Le tarif ne peut être négatif",
-  "Need help?": "Besoin d'aide ?"
+  "Need help?": "Besoin d'aide ?",
+  "Average nightly rate": "Tarif moyen par nuit",
+  "Computed from the pricing rules": "Calculé à partir des règles de tarification"
 }
