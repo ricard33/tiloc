@@ -22,8 +22,8 @@ import { useTranslation } from "react-i18next";
 import { ChartDataset, TooltipItem } from "chart.js";
 import { formatCurrency } from "../../../common/intlUtils";
 import { useListLodgingsQuery } from "../../../services/api";
-import DateRangeSelector from "../../../components/DateRangeSelector";
-import { addMonths, addYears, endOfMonth, endOfYear, startOfMonth, startOfYear, subYears } from "date-fns";
+import DateRangeSelector, { RangeNames } from "../../../components/DateRangeSelector";
+import { addMonths, endOfMonth, startOfMonth, subYears } from "date-fns";
 import { formatISO } from "../../../common/tzUtils";
 import { Lodging } from "../../../types";
 import { colorGen } from "../../../common/colorTools";
@@ -87,23 +87,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
       });
   }, [dateRange.endDate, dateRange.startDate, dispatch, t]);
 
-  const dateRanges = [
-    {
-      label: t("Last year"),
-      startDate: startOfYear(addYears(today, -1)),
-      endDate: endOfYear(addYears(today, -1))
-    },
-    {
-      label: t("This year"),
-      startDate: startOfYear(today),
-      endDate: endOfYear(today)
-    },
-    {
-      label: t("Next year"),
-      startDate: startOfYear(addYears(today, 1)),
-      endDate: endOfYear(addYears(today, 1))
-    }
-  ];
+  const dateRanges = [RangeNames.LastYear, RangeNames.ThisYear, RangeNames.NextYear];
 
   function getGlobalTurnover(data: FillingRateData[]) {
     return data ?
@@ -142,7 +126,7 @@ const FillingRate: React.FC<FillingRateProps> = props => {
           <FormControl>
             <DateRangeSelector
               startDate={dateRange.startDate} endDate={dateRange.endDate} onChange={setDateRange}
-              definedRanges={dateRanges}
+              rangeNames={dateRanges}
             />
             <RadioGroup
               row

@@ -8,8 +8,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import {
   add,
   addDays,
-  addMonths,
-  addWeeks,
+  addMonths, addWeeks,
   addYears,
   endOfDay,
   endOfMonth,
@@ -20,7 +19,7 @@ import {
   startOfMonth,
   startOfWeek,
   startOfYear, sub,
-  subDays
+  subDays, subMonths, subWeeks, subYears
 } from "date-fns";
 import frLocale from "date-fns/locale/fr";
 
@@ -34,10 +33,25 @@ type Props = {
   startDate?: Date;
   endDate?: Date;
   onChange: (range: DateRange) => void;
+  rangeNames?: RangeNames[],
   definedRanges?: DefinedRange[]
 };
 
-const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate, onChange, definedRanges }: Props) => {
+export enum RangeNames {
+  All = "ALL",
+  Today = "TODAY",
+  LastWeek = "LAST_WEEK",
+  ThisWeek = "THIS_WEEK",
+  NextWeek = "NEXT_WEEK",
+  LastMonth = "LAST_MONTH",
+  ThisMonth = "THIS_MONTH",
+  NextMonth = "NEXT_MONTH",
+  LastYear = "LAST_YEAR",
+  ThisYear = "THIS_YEAR",
+  NextYear = "NEXT_YEAR"
+}
+
+const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate, onChange, rangeNames, definedRanges }: Props) => {
   const { t } = useTranslation();
   // const [dateRangePopup, setDateRangePopup] = useState({ open: false, anchorEl: undefined });
   const today = new Date();
@@ -49,49 +63,20 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
     endDate: endDate ?? maxDate
   });
 
-
-  const defaultRanges = definedRanges ?? [
-    {
-      label: t("All"),
-      startDate: minDate,
-      endDate: maxDate
-    },
-    {
-      label: t("Today"),
-      startDate: today,
-      endDate: today
-    },
-    {
-      label: t("This week"),
-      startDate: startOfWeek(today, { locale: frLocale }),
-      endDate: endOfWeek(today, { locale: frLocale })
-    },
-    {
-      label: t("Next week"),
-      startDate: startOfWeek(addWeeks(today, 1), { locale: frLocale }),
-      endDate: endOfWeek(addWeeks(today, 1), { locale: frLocale })
-    },
-    {
-      label: t("This month"),
-      startDate: startOfMonth(today),
-      endDate: endOfMonth(today)
-    },
-    {
-      label: t("Next month"),
-      startDate: startOfMonth(addMonths(today, 1)),
-      endDate: endOfMonth(addMonths(today, 1))
-    },
-    {
-      label: t("This year"),
-      startDate: startOfYear(today),
-      endDate: endOfYear(today)
-    },
-    {
-      label: t("Next year"),
-      startDate: startOfYear(addYears(today, 1)),
-      endDate: endOfYear(addYears(today, 1))
-    }
-  ];
+  const selectedRangeNames = rangeNames || Object.values(RangeNames);
+  const displayedRanges = [
+    ...(selectedRangeNames.indexOf(RangeNames.All) > -1 ? [{ label: t("All"), startDate: minDate, endDate: maxDate }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.Today) > -1 ? [{ label: t("Today"), startDate: today, endDate: today }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.LastWeek) > -1 ? [{ label: t("Last week"), startDate: startOfWeek(subWeeks(today, 1), { locale: frLocale }), endDate: endOfWeek(subWeeks(today, 1), { locale: frLocale }) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.ThisWeek) > -1 ? [{ label: t("This week"), startDate: startOfWeek(today, { locale: frLocale }), endDate: endOfWeek(today, { locale: frLocale }) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.NextWeek) > -1 ? [{ label: t("Next week"), startDate: startOfWeek(addWeeks(today, 1), { locale: frLocale }), endDate: endOfWeek(addWeeks(today, 1), { locale: frLocale }) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.LastMonth) > -1 ? [{ label: t("Last month"), startDate: startOfMonth(subMonths(today, 1)), endDate: endOfMonth(subMonths(today, 1)) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.ThisMonth) > -1 ? [{ label: t("This month"), startDate: startOfMonth(today), endDate: endOfMonth(today) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.NextMonth) > -1 ? [{ label: t("Next month"), startDate: startOfMonth(addMonths(today, 1)), endDate: endOfMonth(addMonths(today, 1)) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.LastYear) > -1 ? [{ label: t("Last year"), startDate: startOfYear(subYears(today, 1)), endDate: endOfYear(subYears(today, 1)) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.ThisYear) > -1 ? [{ label: t("This year"), startDate: startOfYear(today), endDate: endOfYear(today) }] : []),
+    ...(selectedRangeNames.indexOf(RangeNames.NextYear) > -1 ? [{ label: t("Next year"), startDate: startOfYear(addYears(today, 1)), endDate: endOfYear(addYears(today, 1)) }] : []),
+  ]
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popper" : undefined;
@@ -138,7 +123,7 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
   };
 
   const getRangeLabel = (range: MuiDateRange) => {
-    const ranges = defaultRanges.filter(r => isSameRange(r, range));
+    const ranges = displayedRanges.filter(r => isSameRange(r, range));
     if (ranges.length > 0) {
       return ranges[0].label;
     }
@@ -166,7 +151,7 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
           open
           toggle={() => toggle(undefined)}
           onChange={handleChange}
-          definedRanges={defaultRanges}
+          definedRanges={displayedRanges}
           initialDateRange={range}
           minDate={minDate}
           maxDate={maxDate}

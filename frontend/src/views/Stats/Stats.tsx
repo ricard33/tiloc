@@ -3,7 +3,7 @@ import { Grid } from "@mui/material";
 import { addMonths, endOfMonth, startOfMonth, subYears } from "date-fns";
 import { useTranslation } from "react-i18next";
 import Page from "../../layouts/Main/Page";
-import DateRangeSelector, { DateRange } from "../../components/DateRangeSelector";
+import DateRangeSelector, { DateRange, RangeNames } from "../../components/DateRangeSelector";
 import { useAppSelector } from "../../app/hooks";
 import { User } from "../../types";
 import { useStatsEndpoint } from "./useStatsEndpoint";
@@ -55,7 +55,8 @@ const Stats = () => {
     <Page>
       <Grid container spacing={4}>
         <Grid item xs={12}>
-          <DateRangeSelector startDate={dateRange.startDate} endDate={dateRange.endDate} onChange={setDateRange} />
+          <DateRangeSelector startDate={dateRange.startDate} endDate={dateRange.endDate} onChange={setDateRange}
+                             rangeNames={[RangeNames.All, RangeNames.Today, RangeNames.LastMonth, RangeNames.ThisMonth, RangeNames.LastYear, RangeNames.ThisYear]}/>
         </Grid>
 
         <Grid item xs={12}>
