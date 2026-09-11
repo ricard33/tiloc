@@ -53,12 +53,14 @@ class QuoteNight:
     base_rate: Decimal
     applied_rate: Decimal
     is_weekend: bool
+    season_color: Optional[str] = None
 
     def as_dict(self) -> dict:
         return {
             "date": self.date.isoformat(),
             "weekday": self.weekday,
             "season": self.season,
+            "season_color": self.season_color,
             "rate_source": self.rate_source,
             "base_rate": _s(self.base_rate),
             "applied_rate": _s(self.applied_rate),
@@ -219,6 +221,7 @@ def _resolve_nights(lodging, night_dates: list, season_ranges=None, rates_by_sea
                 base_rate=Decimal(base_rate),
                 applied_rate=Decimal(applied_rate),
                 is_weekend=is_weekend,
+                season_color=season.color if season else None,
             )
         )
 
@@ -234,7 +237,7 @@ def resolve_rate_calendar(lodgings: Iterable, begin_date: date, end_date: date) 
     ``SeasonDateRange`` across all the lodgings' calendars, one for every ``LodgingSeasonRate``
     across all the lodgings.
 
-    Returns ``{lodging_id: [{"date", "rate", "season", "is_weekend"}, ...]}``.
+    Returns ``{lodging_id: [{"date", "rate", "season", "season_color", "is_weekend"}, ...]}``.
     """
     lodgings = list(lodgings)
     night_dates = _night_dates(begin_date, end_date)
@@ -268,6 +271,7 @@ def resolve_rate_calendar(lodgings: Iterable, begin_date: date, end_date: date) 
                 "date": night.date.isoformat(),
                 "rate": f"{night.applied_rate:.2f}",
                 "season": night.season,
+                "season_color": night.season_color,
                 "is_weekend": night.is_weekend,
             }
             for night in night_lines

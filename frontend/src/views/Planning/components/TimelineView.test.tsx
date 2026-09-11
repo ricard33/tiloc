@@ -79,7 +79,7 @@ describe("TimelineView", () => {
         settings={{ ...settings, showPrices: true }}
         defaultBeginDate={new Date("2026-06-15")}
         rateCalendars={{
-          1: [{ date: "2026-06-15", rate: "180.00", season: "High", is_weekend: false }]
+          1: [{ date: "2026-06-15", rate: "180.00", season: "High", season_color: "#ff0000", is_weekend: false }]
         }}
         canViewPrices
       />,
@@ -91,6 +91,28 @@ describe("TimelineView", () => {
     expect(screen.getAllByText("100").length).toBeGreaterThan(0);
     // the other lodging (no calendar) uses its default everywhere
     expect(screen.getAllByText("60").length).toBeGreaterThan(0);
+  });
+
+  it("shows the season color as a bottom bar on a priced day, but not on a day without a season", () => {
+    const { container } = renderWithProviders(
+      <TimelineView
+        lodgings={lodgings}
+        bookings={[]}
+        settings={{ ...settings, showPrices: true }}
+        defaultBeginDate={new Date("2026-06-15")}
+        rateCalendars={{
+          1: [{ date: "2026-06-15", rate: "180.00", season: "High", season_color: "#ff0000", is_weekend: false }]
+        }}
+        canViewPrices
+      />,
+      { user: { permissions: ["core.view_booking", "core.view_prices"] } }
+    );
+    const bars = container.querySelectorAll(".season-color-bar");
+    expect(bars.length).toBeGreaterThan(0);
+    expect((bars[0] as HTMLElement).style.backgroundColor).toBe("rgb(255, 0, 0)");
+    // Studio Blue has no season calendar at all: no color bar anywhere on its row
+    const studioRow = screen.getByText("Studio Blue").closest("tr");
+    expect(studioRow?.querySelectorAll(".season-color-bar").length).toBe(0);
   });
 
   it("hides the day price when the viewer lacks core.view_prices, even with showPrices on", () => {

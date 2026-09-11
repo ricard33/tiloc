@@ -41,7 +41,7 @@ describe("AnnualView", () => {
         beginDate={new Date("2026-01-01")}
         disabled={false}
         rateCalendars={{
-          1: [{ date: "2026-01-15", rate: "180.00", season: "High", is_weekend: false }]
+          1: [{ date: "2026-01-15", rate: "180.00", season: "High", season_color: "#ff0000", is_weekend: false }]
         }}
         canViewPrices
       />,

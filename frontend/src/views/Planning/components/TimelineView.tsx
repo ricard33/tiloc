@@ -111,6 +111,17 @@ export const TimelineView: React.FC<Props> = props => {
   }, [rateCalendars]);
   const rateFor = (lodging: Lodging, date: Date) =>
     rateByLodgingAndDay[lodging.id]?.[format(date, "yyyy-MM-dd")] ?? lodging.daily_rate.toFixed(0);
+
+  // {lodgingId: {isoDate: "#rrggbb"}} -- null/missing entries (no season matched) show no color bar.
+  const seasonColorByLodgingAndDay = useMemo(() => {
+    const map: Record<number, Record<string, string | null>> = {};
+    for (const [lodgingId, entries] of Object.entries(rateCalendars ?? {})) {
+      map[Number(lodgingId)] = Object.fromEntries((entries ?? []).map(e => [e.date, e.season_color]));
+    }
+    return map;
+  }, [rateCalendars]);
+  const seasonColorFor = (lodging: Lodging, date: Date) =>
+    seasonColorByLodgingAndDay[lodging.id]?.[format(date, "yyyy-MM-dd")] ?? null;
   const { width: screenWidth } = useWindowDimensions();
   const isDesktop = screenWidth >= 900;
   const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
@@ -548,6 +559,8 @@ export const TimelineView: React.FC<Props> = props => {
                       onMouseLeave={() => selectionEnd && setSelectionEnd(selectStart)}
                     >
                       {settings.showPrices && canViewPrices && !d.isBusy && <div className="day-price">{rateFor(l, d.date)}</div>}
+                      {settings.showPrices && canViewPrices && seasonColorFor(l, d.date) &&
+                        <div className="season-color-bar" style={{ backgroundColor: seasonColorFor(l, d.date)! }} />}
                       {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}
                     </td>
                   );

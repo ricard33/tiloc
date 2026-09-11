@@ -193,6 +193,15 @@ $primary-red: #f45b69;
         color: $primary-red;
       }
 
+      .season-color-bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 4px;
+        opacity: 0.5;
+      }
+
     }
   }
 
