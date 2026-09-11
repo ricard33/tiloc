@@ -49,7 +49,6 @@
   "Method": "Method",
   "Only show a small resume on tooltip": "Only show a small resume on tooltip",
   "User users": "User users",
-  "nights": "nights",
   "Change our comment": "",
   "Sort": "Sort",
   "Properties": "Properties",
@@ -208,5 +207,9 @@
   "Rate can't be negative": "Rate can't be negative",
   "Need help?": "",
   "Average nightly rate": "",
-  "Computed from the pricing rules": ""
+  "Computed from the pricing rules": "",
+  "Save the lodging first to set per-season rates.": "",
+  "A nightly rate is required.": "",
+  "Rate saved": "",
+  "Clear": ""
 }

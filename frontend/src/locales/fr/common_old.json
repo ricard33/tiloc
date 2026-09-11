@@ -49,7 +49,6 @@
   "Edit booking": "Éditer la réservation",
   "Method": "Methode",
   "User users": "User users",
-  "nights": "nuits",
   "Change our comment": "Modifier notre commentaire",
   "Sort": "Trier",
   "Properties": "Propriétés",
@@ -182,5 +181,9 @@
   "Rate can't be negative": "Le tarif ne peut être négatif",
   "Need help?": "Besoin d'aide ?",
   "Average nightly rate": "Tarif moyen par nuit",
-  "Computed from the pricing rules": "Calculé à partir des règles de tarification"
+  "Computed from the pricing rules": "Calculé à partir des règles de tarification",
+  "Save the lodging first to set per-season rates.": "Enregistrez d'abord le logement pour définir les tarifs par saison.",
+  "A nightly rate is required.": "Un tarif par nuit est requis.",
+  "Rate saved": "Tarif enregistré",
+  "Clear": "Effacer"
 }
