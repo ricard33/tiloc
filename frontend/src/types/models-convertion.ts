@@ -7,6 +7,7 @@ import {
   ContractTemplate,
   Lodging,
   LodgingSeasonRate,
+  LodgingSeasonRateRow,
   Payment,
   PricingAdjustment,
   Quote,
@@ -129,6 +130,30 @@ export function account2Api(account: Partial<Account>): Record<string, any> {
 
 // ----- LODGING -----
 
+function api2LodgingSeasonRateRow(row: Record<string, any>): LodgingSeasonRateRow {
+  return {
+    id: row.id,
+    season: row.season,
+    nightly_rate: toNumberOrUndefined(row.nightly_rate) ?? null,
+    weekend_rate: toNumberOrUndefined(row.weekend_rate) ?? null,
+    min_nights: row.min_nights ?? null,
+  };
+}
+
+function isBlank(value: number | string | null | undefined): boolean {
+  return value === "" || value === null || typeof value === "undefined";
+}
+
+function lodgingSeasonRateRow2Api(row: LodgingSeasonRateRow): Record<string, any> {
+  return {
+    ...(row.id ? { id: row.id } : {}),
+    season: row.season,
+    nightly_rate: isBlank(row.nightly_rate) ? null : toDecimal(Number(row.nightly_rate)),
+    weekend_rate: isBlank(row.weekend_rate) ? null : toDecimal(Number(row.weekend_rate)),
+    min_nights: isBlank(row.min_nights) ? null : Number(row.min_nights),
+  };
+}
+
 export function api2Lodging(lodging: Record<string, any>): Lodging {
   return {
     ...lodging as Lodging,
@@ -141,6 +166,7 @@ export function api2Lodging(lodging: Record<string, any>): Lodging {
     min_nights: Number(lodging.min_nights ?? 1),
     weekly_discount_percent: toNumberOrUndefined(lodging.weekly_discount_percent) ?? null,
     monthly_discount_percent: toNumberOrUndefined(lodging.monthly_discount_percent) ?? null,
+    season_rates: (lodging.season_rates ?? []).map(api2LodgingSeasonRateRow),
   };
 }
 
@@ -149,6 +175,7 @@ export function lodging2api(lodging: Partial<Lodging>): Record<string, any> {
     ...lodging,
     weekly_discount_percent: toDecimal(lodging.weekly_discount_percent ?? undefined),
     monthly_discount_percent: toDecimal(lodging.monthly_discount_percent ?? undefined),
+    ...(lodging.season_rates ? { season_rates: lodging.season_rates.map(lodgingSeasonRateRow2Api) } : {}),
   };
 }
 

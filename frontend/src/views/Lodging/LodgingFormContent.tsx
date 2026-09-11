@@ -297,10 +297,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
             />
           </Grid2>
           <Grid2 xs={12}>
-            {lodging && lodging.id
-              ? <LodgingSeasonRates lodgingId={lodging.id} calendar={selectedSeasonCalendar} />
-              : <Alert severity="info">{t("Save the lodging first to set per-season rates.")}</Alert>
-            }
+            <LodgingSeasonRates calendar={selectedSeasonCalendar} />
           </Grid2>
         </Grid2>
       </Section>
