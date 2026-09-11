@@ -20,6 +20,7 @@ def generate_pdf(content: str, full_path: str, add_watermark: bool):
         "footer-font-size": "9",
         "custom-header": [("Accept-Encoding", "gzip")],
         "enable-local-file-access": False,
+        "disable-javascript": None,
         "no-outline": None,
         # "disable-smart-shrinking": None,
         "dpi": "96",
