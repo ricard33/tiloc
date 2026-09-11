@@ -51,7 +51,11 @@ const OccupancyAndRevenue: React.FC<Props> = ({ data, previousYearData }) => {
       )}
       {canViewPrices && (
         <Grid item md={3} xs={6}>
-          <StatTile label={t("RevPAR")} value={formatCurrency(revPar)} />
+          <StatTile
+            label={t("RevPAR")}
+            value={formatCurrency(revPar)}
+            tooltip={t("Revenue per available night: turnover divided by the number of nights your lodgings were available to book, occupied or not.")}
+          />
         </Grid>
       )}
       <Grid item md={canViewPrices ? 6 : 12} xs={12}>
