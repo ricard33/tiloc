@@ -151,7 +151,8 @@ New Relic config is `config/newrelic.ini`.
 
 ## Commit conventions
 
-Never add "Co-Authored-By" lines or any AI attribution to git commit messages or metadata.
+- Never add "Co-Authored-By" lines or any AI attribution to git commit messages or metadata.
+- No PR on Github. Merge FF on local and ask for push.
 
 # Code Style and Language Guidelines
 
