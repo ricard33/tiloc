@@ -84,4 +84,21 @@ describe("Planning", () => {
       expect(rateCalls[0].url).toContain("end=2026-05-01"); // the mock's bounds, +1 day — not a year out
     });
   });
+
+  it("also fetches the rate calendar for the annual view", async () => {
+    localStorage.setItem("planning.showPrices", "true");
+    renderWithProviders(<Planning />, {
+      ...opts,
+      route: "/planning?view=annual",
+      user: { permissions: ["core.view_booking", "core.view_prices"] },
+    });
+    await screen.findByText("annual view");
+
+    await waitFor(() => {
+      const rateCalls = (axios as any).mock.calls
+        .map((c: any[]) => c[0])
+        .filter((cfg: any) => String(cfg.url).includes("lodging/rate_calendar/"));
+      expect(rateCalls.length).toBeGreaterThan(0);
+    });
+  });
 });
