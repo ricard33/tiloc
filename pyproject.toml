@@ -39,13 +39,13 @@ readme = "README.md"
 python = "^3.12"
 arrow = "^1.2.3"
 babel = "^2.10.3"
-django = "~5.2"
+django = ">=5.2,<6.2"
 django-constance = "^4.3"
 # Maintenance fork of the unmaintained Tivix/django-cron, made Django 5.1+ compatible
 # (index_together -> Meta.indexes). Do not swap for the PyPI release. Branch: django-5.
 django-cron = { git = "https://github.com/ricard33/django-cron", branch = "django-5" }
 django-dbbackup = "^5.3"
-django-filter = "^25.1"
+django-filter = ">=25.1,<27.0"
 django-import-export = "^4.3.7"
 django-proxy = "^1.2.1"
 django-rest-knox = "^5.1.0"
@@ -81,7 +81,7 @@ watchdog = ">=4.0,<7.0"  # used by location/logging_config.py (was transitive vi
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.3.2"
-django-stubs = "^5.2"
+django-stubs = ">=5.2,<7.0"
 djangorestframework-stubs = "^3.16.7"
 fabric = "^3.0"
 factory_boy = "^3.3.1"
