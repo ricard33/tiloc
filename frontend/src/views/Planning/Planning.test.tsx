@@ -1,12 +1,22 @@
 import React from "react";
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
 import { renderWithProviders } from "../../common/testRender";
 import Planning from "./Planning";
 
 vi.mock("axios");
-vi.mock("./components/TimelineView", () => ({ TimelineView: () => <div>timeline view</div> }));
+vi.mock("./components/TimelineView", () => ({
+  // Mimics the real component reporting its (buffered, bounded) canvas once it has measured
+  // itself, so Planning's rate-calendar window can be exercised without mounting the canvas.
+  TimelineView: (props: any) => {
+    React.useEffect(() => {
+      props.onBoundsChange?.(new Date(2026, 0, 1), new Date(2026, 3, 30));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    return <div>timeline view</div>;
+  }
+}));
 vi.mock("./components/AnnualView", () => ({ default: () => <div>annual view</div> }));
 
 beforeEach(() => {
@@ -55,5 +65,23 @@ describe("Planning", () => {
 
     await user.click(screen.getByRole("button", { name: "Show legend" }));
     expect(screen.getByRole("button", { name: "Hide legend" })).toBeInTheDocument();
+  });
+
+  it("fetches the rate calendar for the timeline's bounded canvas, never the ~1 year booking window", async () => {
+    localStorage.setItem("planning.showPrices", "true");
+    renderWithProviders(<Planning />, {
+      ...opts,
+      user: { permissions: ["core.view_booking", "core.view_prices"] },
+    });
+    await screen.findByText("timeline view");
+
+    await waitFor(() => {
+      const rateCalls = (axios as any).mock.calls
+        .map((c: any[]) => c[0])
+        .filter((cfg: any) => String(cfg.url).includes("lodging/rate_calendar/"));
+      expect(rateCalls).toHaveLength(1);
+      expect(rateCalls[0].url).toContain("begin=2026-01-01");
+      expect(rateCalls[0].url).toContain("end=2026-05-01"); // the mock's bounds, +1 day — not a year out
+    });
   });
 });

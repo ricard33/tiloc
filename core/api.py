@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from datetime import timedelta
 from decimal import Decimal
 
 import arrow
@@ -44,7 +45,7 @@ from .mail_tools import send_generic_email
 from .pagination import LargeResultsSetPagination, StandardResultsSetPagination
 from .pdf_tools import generate_pdf
 from .permissions import IsCompanyAdminPermissions
-from .pricing import compute_quote
+from .pricing import compute_quote, resolve_rate_calendar
 from .serializers import (
     AccountSerializer,
     ActivitySerializer,
@@ -522,26 +523,14 @@ class LodgingViewSet(viewsets.ModelViewSet, OrderedModelMixin):
             raise ValidationError({"begin": _("Provide begin and end as YYYY-MM-DD dates.")})
         if end <= begin:
             raise ValidationError({"end": _("end must be after begin.")})
+        end = min(end, begin + timedelta(days=800))  # defensive cap; callers should send a bounded window
 
         lodgings = self.get_queryset().filter(shown=True)
         ids = request.query_params.get("lodging_ids")
         if ids:
             lodgings = lodgings.filter(id__in=[int(part) for part in ids.split(",") if part.strip().isdigit()])
 
-        result = {}
-        for lodging in lodgings:
-            quote = compute_quote(lodgings=[lodging], begin_date=begin, end_date=end, apply_adjustments=False)
-            nights = quote.lodgings[0].nights if quote.lodgings else []
-            result[lodging.id] = [
-                {
-                    "date": night.date.isoformat(),
-                    "rate": f"{night.applied_rate:.2f}",
-                    "season": night.season,
-                    "is_weekend": night.is_weekend,
-                }
-                for night in nights
-            ]
-        return Response(result)
+        return Response(resolve_rate_calendar(lodgings, begin, end))
 
 
 class SeasonCalendarViewSet(viewsets.ModelViewSet):

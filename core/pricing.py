@@ -154,20 +154,27 @@ def _night_dates(begin_date: date, end_date: date) -> list:
     return [begin_date + timedelta(days=n) for n in range((end_date - begin_date).days)]
 
 
-def _resolve_nights(lodging, night_dates: list):
-    """Return ``(night_lines, min_nights_required, overlap_dates)`` for one lodging."""
-    season_ranges = []
-    if lodging.season_calendar_id:
-        season_ranges = list(
-            SeasonDateRange.objects.filter(
-                season__calendar_id=lodging.season_calendar_id,
-                begin_date__lte=night_dates[-1],
-                end_date__gte=night_dates[0],
-            ).select_related("season")
-        )
-    rates_by_season = {
-        rate.season_id: rate for rate in LodgingSeasonRate.objects.filter(lodging=lodging).select_related("season")
-    }
+def _resolve_nights(lodging, night_dates: list, season_ranges=None, rates_by_season=None):
+    """Return ``(night_lines, min_nights_required, overlap_dates)`` for one lodging.
+
+    ``season_ranges`` / ``rates_by_season`` may be pre-fetched by the caller (see
+    :func:`resolve_rate_calendar`) to resolve many lodgings without a per-lodging query;
+    left as ``None`` they are fetched here, as before.
+    """
+    if season_ranges is None:
+        season_ranges = []
+        if lodging.season_calendar_id:
+            season_ranges = list(
+                SeasonDateRange.objects.filter(
+                    season__calendar_id=lodging.season_calendar_id,
+                    begin_date__lte=night_dates[-1],
+                    end_date__gte=night_dates[0],
+                ).select_related("season")
+            )
+    if rates_by_season is None:
+        rates_by_season = {
+            rate.season_id: rate for rate in LodgingSeasonRate.objects.filter(lodging=lodging).select_related("season")
+        }
 
     default_min_nights = lodging.min_nights or 1
     lines = []
@@ -216,6 +223,56 @@ def _resolve_nights(lodging, night_dates: list):
         )
 
     return lines, min_nights_required, overlap_dates
+
+
+def resolve_rate_calendar(lodgings: Iterable, begin_date: date, end_date: date) -> dict:
+    """Per-night base rate (season / weekend, no length-of-stay or adjustment discounts)
+    for several lodgings over one window, e.g. for a planning calendar.
+
+    Unlike calling :func:`compute_quote` once per lodging, this resolves every lodging in a
+    constant number of queries (independent of the lodging count): one for every matching
+    ``SeasonDateRange`` across all the lodgings' calendars, one for every ``LodgingSeasonRate``
+    across all the lodgings.
+
+    Returns ``{lodging_id: [{"date", "rate", "season", "is_weekend"}, ...]}``.
+    """
+    lodgings = list(lodgings)
+    night_dates = _night_dates(begin_date, end_date)
+    if not night_dates or not lodgings:
+        return {lodging.id: [] for lodging in lodgings}
+
+    calendar_ids = {lodging.season_calendar_id for lodging in lodgings if lodging.season_calendar_id}
+    ranges_by_calendar: dict = {}
+    if calendar_ids:
+        for date_range in SeasonDateRange.objects.filter(
+            season__calendar_id__in=calendar_ids,
+            begin_date__lte=night_dates[-1],
+            end_date__gte=night_dates[0],
+        ).select_related("season"):
+            ranges_by_calendar.setdefault(date_range.season.calendar_id, []).append(date_range)
+
+    rates_by_lodging: dict = {}
+    for rate in LodgingSeasonRate.objects.filter(lodging__in=lodgings).select_related("season"):
+        rates_by_lodging.setdefault(rate.lodging_id, {})[rate.season_id] = rate
+
+    result = {}
+    for lodging in lodgings:
+        night_lines, _, _ = _resolve_nights(
+            lodging,
+            night_dates,
+            season_ranges=ranges_by_calendar.get(lodging.season_calendar_id, []),
+            rates_by_season=rates_by_lodging.get(lodging.id, {}),
+        )
+        result[lodging.id] = [
+            {
+                "date": night.date.isoformat(),
+                "rate": f"{night.applied_rate:.2f}",
+                "season": night.season,
+                "is_weekend": night.is_weekend,
+            }
+            for night in night_lines
+        ]
+    return result
 
 
 def _los_discount(lodging, night_count: int, nightly_subtotal: Decimal):

@@ -4,11 +4,13 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from core import models
-from core.pricing import compute_quote
+from core.pricing import compute_quote, resolve_rate_calendar
 from core.tests import factories
 from core.tests.helpers import force_login
 
@@ -547,6 +549,41 @@ def test_rate_calendar_endpoint_returns_per_day_rates(priced_client) -> None:
     assert rows[0]["season"] == season.name
 
 
+def test_resolve_rate_calendar_uses_a_constant_number_of_queries() -> None:
+    # Regression: resolve_rate_calendar must not issue per-lodging queries (that pathology
+    # is what made the planning timeline's rate calendar slow/unreliable over a wide window).
+    account = factories.AccountFactory.create(name="rate-calendar-perf")
+    calendar = factories.SeasonCalendarFactory.create(account=account)
+    season = factories.SeasonFactory.create(calendar=calendar)
+    factories.SeasonDateRangeFactory.create(season=season, begin_date=date(2027, 1, 1), end_date=date(2027, 12, 31))
+
+    seasonal_lodgings = []
+    for _ in range(6):
+        lodging = _lodging("100.00", account=account, season_calendar=calendar)
+        factories.LodgingSeasonRateFactory.create(
+            lodging=lodging, season=season, nightly_rate=Decimal("150.00"), weekend_rate=None, min_nights=None
+        )
+        seasonal_lodgings.append(lodging)
+    flat_lodging = _lodging("60.00", account=account)  # no season calendar at all
+    lodgings = seasonal_lodgings + [flat_lodging]
+
+    with CaptureQueriesContext(connection) as ctx:
+        result = resolve_rate_calendar(lodgings, date(2027, 3, 1), date(2027, 9, 1))  # ~6 months
+
+    assert len(ctx.captured_queries) <= 4  # constant: independent of len(lodgings)
+    for lodging in seasonal_lodgings:
+        assert {row["rate"] for row in result[lodging.id]} == {"150.00"}
+    assert {row["rate"] for row in result[flat_lodging.id]} == {"60.00"}
+
+
+def test_rate_calendar_endpoint_clamps_an_excessive_window(priced_client) -> None:
+    client, lodging = priced_client
+    response = client.get("/api/lodging/rate_calendar/?begin=2027-01-01&end=2030-01-01")
+    assert response.status_code == status.HTTP_200_OK, response.data
+    rows = response.data[str(lodging.id)] if str(lodging.id) in response.data else response.data[lodging.id]
+    assert len(rows) == 800
+
+
 def test_pricing_adjustment_crud_normalises_empty_optional_fields(admin_client) -> None:
     client, lodging = admin_client
     response = client.post(
@@ -580,8 +617,15 @@ def test_pricing_adjustment_rejects_foreign_lodging(admin_client) -> None:
     other = _lodging("100.00", account=factories.AccountFactory.create(name="foreign-adj"))
     response = client.post(
         "/api/pricing_adjustment/",
-        {"name": "x", "lodging": other.id, "adjustment_type": "percent", "value": "-5.00",
-         "priority": 0, "stackable": True, "active": True},
+        {
+            "name": "x",
+            "lodging": other.id,
+            "adjustment_type": "percent",
+            "value": "-5.00",
+            "priority": 0,
+            "stackable": True,
+            "active": True,
+        },
         format="json",
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST

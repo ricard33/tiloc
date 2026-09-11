@@ -79,6 +79,7 @@ type Props = {
   onBoundsChange?: (canvasStart: Date, canvasEnd: Date) => void,
   settings: PlanningSettings,
   rateCalendars?: Record<number, RateCalendarEntry[]>,
+  canViewPrices?: boolean,
   dayWidth?: number,
   dayHeight?: number,
   collapsed?: boolean,
@@ -88,7 +89,7 @@ type Props = {
 export const TimelineView: React.FC<Props> = props => {
   const {
     defaultBeginDate, visibleBeginDate, visibleEndDate, goToDate, bookings, lodgings, buffer,
-    settings, rateCalendars, onScroll, onBoundsChange, onCreateBooking,
+    settings, rateCalendars, canViewPrices, onScroll, onBoundsChange, onCreateBooking,
     dayWidth: initialDayWidth, dayHeight, collapsed: collapsedProps, onCollapse
   } = {
     defaultBeginDate: startOfMonth(new Date()),
@@ -104,12 +105,12 @@ export const TimelineView: React.FC<Props> = props => {
   const rateByLodgingAndDay = useMemo(() => {
     const map: Record<number, Record<string, string>> = {};
     for (const [lodgingId, entries] of Object.entries(rateCalendars ?? {})) {
-      map[Number(lodgingId)] = Object.fromEntries((entries ?? []).map(e => [e.date, e.rate]));
+      map[Number(lodgingId)] = Object.fromEntries((entries ?? []).map(e => [e.date, Number(e.rate).toFixed(0)]));
     }
     return map;
   }, [rateCalendars]);
   const rateFor = (lodging: Lodging, date: Date) =>
-    rateByLodgingAndDay[lodging.id]?.[format(date, "yyyy-MM-dd")] ?? String(lodging.daily_rate);
+    rateByLodgingAndDay[lodging.id]?.[format(date, "yyyy-MM-dd")] ?? lodging.daily_rate.toFixed(0);
   const { width: screenWidth } = useWindowDimensions();
   const isDesktop = screenWidth >= 900;
   const [collapsedState, setCollapsed] = useState<boolean | undefined>(undefined);
@@ -546,7 +547,7 @@ export const TimelineView: React.FC<Props> = props => {
                       })}
                       onMouseLeave={() => selectionEnd && setSelectionEnd(selectStart)}
                     >
-                      {settings.showPrices && !d.isBusy && <div className="day-price">{rateFor(l, d.date)} €</div>}
+                      {settings.showPrices && canViewPrices && !d.isBusy && <div className="day-price">{rateFor(l, d.date)}</div>}
                       {d.booking && renderBookingItem(d.booking, d.bookingOffset ?? 0)}
                     </td>
                   );
