@@ -444,7 +444,8 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Booking
         exclude = ["account"]
-        extra_kwargs = {"price": {"required": False}}
+        # `daily_rate` is the engine's computed average; clients never set it.
+        extra_kwargs = {"price": {"required": False}, "daily_rate": {"read_only": True}}
 
     def get_absolute_url(self, obj):
         return reverse("api:booking-detail", kwargs={"pk": obj.pk}, request=self.context["request"])
@@ -489,7 +490,8 @@ class BookingSerializer(serializers.ModelSerializer):
                 flat_price=instance.price,
             )
             instance.price_details = quote.as_dict()
-            cls._save_without_history(instance, ["price_details"])
+            instance.daily_rate = quote.effective_daily_rate
+            cls._save_without_history(instance, ["price_details", "daily_rate"])
             return
 
         quote = compute_quote(

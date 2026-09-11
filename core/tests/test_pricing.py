@@ -371,15 +371,40 @@ def test_booking_create_computes_price_from_engine(priced_client) -> None:
             "begin_date": "2027-04-05",
             "end_date": "2027-04-10",
             "duration": 5,
+            "daily_rate": "999.00",  # read-only: must be ignored
         },
         format="json",
     )
     assert response.status_code == status.HTTP_201_CREATED, response.data
     booking = models.Booking.objects.get(pk=response.data["id"])
     assert booking.price == Decimal("500.00")
-    assert booking.daily_rate == Decimal("100.00")
+    assert booking.daily_rate == Decimal("100.00")  # engine value, not the submitted 999
     assert booking.price_details is not None
     assert booking.price_details["total_price"] == "500.00"
+
+
+def test_booking_flat_rate_sets_effective_daily_rate(priced_client) -> None:
+    client, lodging = priced_client
+    response = client.post(
+        "/api/booking/",
+        {
+            "lodging_ids": [lodging.id],
+            "guest_name": "Flat",
+            "guest_contact": "flat@example.com",
+            "status": "option",
+            "begin_date": "2027-04-05",
+            "end_date": "2027-04-09",
+            "duration": 4,
+            "is_flat_rate": True,
+            "price": "480.00",
+            "daily_rate": "1.00",
+        },
+        format="json",
+    )
+    assert response.status_code == status.HTTP_201_CREATED, response.data
+    booking = models.Booking.objects.get(pk=response.data["id"])
+    assert booking.price == Decimal("480.00")
+    assert booking.daily_rate == Decimal("120.00")  # 480 / 4
 
 
 def test_booking_flat_rate_keeps_client_price_but_stores_breakdown(priced_client) -> None:

@@ -300,12 +300,12 @@ export function api2Booking(booking: Record<string, any>): Booking {
 }
 
 export function booking2api(booking: Partial<Booking>): Record<string, any> {
-  const { price_details, ...rest } = booking;
+  // `daily_rate` and `price_details` are engine-computed and read-only on the API.
+  const { price_details, daily_rate, ...rest } = booking;
   const newVar = {
     ...rest,
     ...(booking.begin_date && { begin_date: formatISO(booking.begin_date) }),
     ...(booking.end_date && { end_date: formatISO(booking.end_date) }),
-    daily_rate: booking.daily_rate!.toFixed(2),
     price: booking.price!.toFixed(2),
     deposit: booking.deposit!.toFixed(2),
     guaranty: booking.guaranty!.toFixed(2),

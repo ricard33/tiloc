@@ -1,11 +1,13 @@
 import {
   api2Quote,
   api2SeasonCalendar,
+  booking2api,
   pricingAdjustment2Api,
   seasonCalendar2Api,
   toDecimal,
   toNumberOrUndefined
 } from "./models-convertion";
+import { Booking } from "./models";
 
 describe("Models conversions", function() {
   it("toNumber", () => {
@@ -67,6 +69,22 @@ describe("Models conversions", function() {
     const payload = pricingAdjustment2Api({ name: "x", adjustment_type: "percent", value: -15, priority: 0, stackable: true, active: true });
     expect(payload.value).toEqual("-15.00");
     expect(payload).not.toHaveProperty("stay_begin");
+  });
+
+  it("booking2api drops the engine-computed daily_rate and price_details", () => {
+    const payload = booking2api({
+      begin_date: new Date(2027, 3, 5),
+      end_date: new Date(2027, 3, 8),
+      daily_rate: 123.45,
+      price: 370,
+      deposit: 110,
+      guaranty: 300,
+      commission_fees: 0,
+      price_details: {} as Booking["price_details"]
+    });
+    expect(payload).not.toHaveProperty("daily_rate");
+    expect(payload).not.toHaveProperty("price_details");
+    expect(payload.price).toEqual("370.00");
   });
 
 });
