@@ -25,8 +25,12 @@ export function toNumberOrUndefined(value?: number|string) {
   return value ? Number(value) : undefined;
 }
 
-export function toDecimal(value?: number, fractionDigits?: number) {
-  return typeof value === "undefined" ? null : value.toFixed(fractionDigits ?? 2);
+export function toDecimal(value?: number | string | null, fractionDigits?: number) {
+  // Form fields round-trip a cleared number as "" (not undefined): treat it like "no value"
+  // instead of crashing on `"".toFixed`.
+  if (value === null || typeof value === "undefined" || value === "") return null;
+  const n = Number(value);
+  return isNaN(n) ? null : n.toFixed(fractionDigits ?? 2);
 }
 
 

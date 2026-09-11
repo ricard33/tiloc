@@ -25,6 +25,10 @@ describe("Models conversions", function() {
     expect(toDecimal(23.3554, 3)).toEqual("23.355");
     expect(toDecimal(23.3556, 3)).toEqual("23.356");
     expect(toDecimal(undefined)).toBeNull();
+    // a cleared form field round-trips as "" (not undefined): must not crash on "".toFixed
+    expect(toDecimal("")).toBeNull();
+    expect(toDecimal(null)).toBeNull();
+    expect(toDecimal("23.5")).toEqual("23.50");
   });
 
   it("api2SeasonCalendar parses nested seasons and dated ranges", () => {
@@ -84,6 +88,14 @@ describe("Models conversions", function() {
       { id: 5, season: 10, nightly_rate: "180.00", weekend_rate: "220.00", min_nights: 3 },
       { season: 11, nightly_rate: null, weekend_rate: null, min_nights: null }
     ]);
+  });
+
+  it("lodging2api does not crash when a discount percent field is cleared to an empty string", () => {
+    // Regression: react-hook-form leaves a cleared number field as "" rather than undefined,
+    // which used to make toDecimal() call "".toFixed() and throw.
+    const payload = lodging2api({ weekly_discount_percent: "", monthly_discount_percent: 10 } as unknown as Partial<Lodging>);
+    expect(payload.weekly_discount_percent).toBeNull();
+    expect(payload.monthly_discount_percent).toEqual("10.00");
   });
 
   it("api2Lodging parses nested season_rates rows back into numbers", () => {
