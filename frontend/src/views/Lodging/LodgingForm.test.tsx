@@ -33,6 +33,19 @@ const lodging = {
 
 const opts = { user: { id: 1, address: "1 rue du Test", permissions: ["core.change_lodging"] } };
 
+const calendar = {
+  id: 1,
+  name: "Standard",
+  notes: "",
+  seasons: [{ id: 10, name: "High", color: "#f00", rank: 0, date_ranges: [] }]
+};
+
+const lodgingWithSeasonRates = {
+  ...lodging,
+  season_calendar: 1,
+  season_rates: [{ id: 99, season: 10, nightly_rate: 180, weekend_rate: 220, min_nights: 3 }]
+} as unknown as Lodging;
+
 describe("LodgingForm", () => {
   it("pre-fills the name and shows Delete + Close for an existing lodging", async () => {
     renderWithProviders(
@@ -62,6 +75,39 @@ describe("LodgingForm", () => {
       opts
     );
     expect(await screen.findByText("Lodging properties")).toBeInTheDocument();
+  });
+
+  it("keeps the already-saved season rates when the season calendars list resolves after the initial render", async () => {
+    // Regression: on a cold page load (e.g. a browser refresh), useListSeasonCalendarsQuery()
+    // starts out loading and resolves a moment later. LodgingSeasonRates used to treat that
+    // transient "no calendar yet" state as "no calendar selected" and wipe season_rates before
+    // the real calendar ever arrived.
+    let resolveCalendars: (value: unknown) => void = () => {};
+    (axios as any).mockImplementation(async (config: any) => {
+      if (String(config?.url ?? "").includes("season_calendar")) {
+        return new Promise((resolve) => {
+          resolveCalendars = resolve;
+        });
+      }
+      if (String(config?.url ?? "").includes("contract_template")) {
+        return { data: { count: 1, results: [{ id: 1, name: "Default template" }] }, status: 200 };
+      }
+      return { data: { count: 0, results: [] }, status: 200 };
+    });
+
+    renderWithProviders(
+      <LodgingForm lodging={lodgingWithSeasonRates} users={users} onSubmit={vi.fn()} onCancel={vi.fn()} />,
+      opts
+    );
+    expect(await screen.findByText("Lodging properties")).toBeInTheDocument();
+    // the season calendars list is still in flight: the grid must not render blank yet
+    expect(screen.queryByText("High")).not.toBeInTheDocument();
+
+    resolveCalendars({ data: { count: 1, results: [calendar] }, status: 200 });
+
+    expect(await screen.findByText("High")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("180")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("220")).toBeInTheDocument();
   });
 
   it("confirms unsaved changes before cancelling", async () => {

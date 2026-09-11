@@ -63,7 +63,7 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
   const isFlatRateTourismTax = watch("is_flat_rate_tourist_tax", getValues("is_flat_rate_tourist_tax"));
   const { data: services } = useListServicesQuery();
   const { data: templates } = useListContractTemplatesQuery();
-  const { data: seasonCalendars } = useListSeasonCalendarsQuery();
+  const { data: seasonCalendars, isLoading: isSeasonCalendarsLoading } = useListSeasonCalendarsQuery();
   const template = watch("contract_template", lodging?.contract_template);
   const selectedSeasonCalendarId = watch("season_calendar", lodging?.season_calendar);
   const selectedSeasonCalendar = (seasonCalendars || []).find(c => c.id === Number(selectedSeasonCalendarId));
@@ -297,7 +297,13 @@ export const LodgingFormContent: React.FC<Props> = ({ lodging, users, isSetupWiz
             />
           </Grid2>
           <Grid2 xs={12}>
-            <LodgingSeasonRates calendar={selectedSeasonCalendar} />
+            {isSeasonCalendarsLoading
+              // Don't mount the grid until the season calendars list has actually loaded: while
+              // it's still in flight, `selectedSeasonCalendar` is momentarily undefined even for a
+              // lodging that does have one, and LodgingSeasonRates would wrongly read that as "no
+              // calendar selected" and wipe the already-saved season_rates before the list arrives.
+              ? <Skeleton variant="rectangular" height={120} />
+              : <LodgingSeasonRates calendar={selectedSeasonCalendar} />}
           </Grid2>
         </Grid2>
       </Section>
