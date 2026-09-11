@@ -1,114 +1,25 @@
 version: 2
 updates:
+  # Routine version-update PRs are disabled (open-pull-requests-limit: 0) — this
+  # only stops Dependabot's scheduled "you're behind" bumps. Security-fix PRs for
+  # actual vulnerabilities are a separate, always-on GitHub feature and keep working.
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
-    groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-      django-major:
-        patterns:
-          - "django*"
-        update-types:
-          - "major"
-      testing-major:
-        patterns:
-          - "pytest*"
-          - "coverage"
-          - "factory_boy"
-        update-types:
-          - "major"
-      linting-major:
-        patterns:
-          - "flake8"
-          - "isort"
-          - "black"
-        update-types:
-          - "major"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
     ignore:
       # Local file: dependency, vendored under frontend/ckeditor5 — not on a registry.
       - dependency-name: "@ti-gecko/tiloc-ckeditor5"
-    groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-      mui-major:
-        patterns:
-          - "@mui/*"
-          - "mui-*"
-        update-types:
-          - "major"
-      react-major:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "react-redux"
-          - "react-router-dom"
-          - "@types/react"
-          - "@types/react-dom"
-        update-types:
-          - "major"
-      redux-major:
-        patterns:
-          - "@reduxjs/toolkit"
-          - "redux"
-          - "redux-saga"
-        update-types:
-          - "major"
-      i18next-major:
-        patterns:
-          - "i18next*"
-          - "react-i18next"
-        update-types:
-          - "major"
-      eslint-major:
-        patterns:
-          - "eslint*"
-          - "@eslint/*"
-          - "typescript-eslint"
-        update-types:
-          - "major"
-      vite-major:
-        patterns:
-          - "vite"
-          - "vite-*"
-          - "@vitejs/*"
-        update-types:
-          - "major"
-      testing-major:
-        patterns:
-          - "@testing-library/*"
-          - "vitest"
-          - "@vitest/*"
-          - "jsdom"
-        update-types:
-          - "major"
-      stripe-major:
-        patterns:
-          - "@stripe/*"
-        update-types:
-          - "major"
-      fortawesome-major:
-        patterns:
-          - "@fortawesome/*"
-        update-types:
-          - "major"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
+    open-pull-requests-limit: 0
