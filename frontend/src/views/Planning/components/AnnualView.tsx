@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState } from "react";
 import { add, startOfMonth, sub } from "date-fns";
 import clsx from "clsx";
 import useWindowDimensions from "../../../common/windowDimensions";
-import { Booking, Lodging } from "../../../types";
+import { Booking, Lodging, RateCalendarEntry } from "../../../types";
 import { PlanningSettings } from "./PlanningSettingsDialog";
 import { TimelineView } from "./TimelineView";
 
@@ -14,6 +14,8 @@ type Props = {
   lodgings: Lodging[],
   onCreateBooking?: (lodging: Lodging, startDate: Date) => void,
   settings: PlanningSettings,
+  rateCalendars?: Record<number, RateCalendarEntry[]>,
+  canViewPrices?: boolean,
 };
 
 
@@ -21,7 +23,8 @@ const AnnualView: React.FC<Props> = props => {
   const {
     bookings, lodgings, beginDate: _beginDate,
     onCreateBooking,
-    settings, disabled
+    settings, disabled,
+    rateCalendars, canViewPrices
   } = props;
   const { width, height } = useWindowDimensions();
   const isDesktop = width >= 900;
@@ -69,6 +72,8 @@ const AnnualView: React.FC<Props> = props => {
         dayHeight={lineHeight}
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        rateCalendars={rateCalendars}
+        canViewPrices={canViewPrices}
       />
     );
   }

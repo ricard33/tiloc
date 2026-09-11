@@ -69,13 +69,22 @@ const Planning = () => {
   const [rateWindow, setRateWindow] = useState<{ begin: string; end: string } | null>(null);
   const { data: rateCalendars, error: rateCalendarError } = useGetLodgingRateCalendarQuery(
     rateWindow ?? { begin: "", end: "" },
-    { skip: !rateWindow || !settings.showPrices || !canViewPrices || view !== "timeline" }
+    { skip: !rateWindow || !settings.showPrices || !canViewPrices || (view !== "timeline" && view !== "annual") }
   );
   useEffect(() => {
     if (rateCalendarError) {
       console.warn("Failed to load the lodging rate calendar", rateCalendarError);
     }
   }, [rateCalendarError]);
+  // The annual view shows a fixed `settings.monthsToDisplay` window from `beginDate` (no
+  // scroll/canvas measurement like the scrolling timeline), so its rate window can be
+  // derived directly instead of waiting for an onBoundsChange-style callback.
+  useEffect(() => {
+    if (view !== "annual") return;
+    const start = startOfMonth(beginDate);
+    const end = add(start, { months: settings.monthsToDisplay ?? 12 });
+    setRateWindow({ begin: format(start, "yyyy-MM-dd"), end: format(end, "yyyy-MM-dd") });
+  }, [view, beginDate, settings.monthsToDisplay]);
   // const [manualFetching, setManualFetching] = useState(false);
 
   // console.log(performance.now().toFixed(2), "Planning", bookings?.length);
@@ -208,6 +217,8 @@ const Planning = () => {
           beginDate={startOfMonth(beginDate)}
           onCreateBooking={canAdd ? onCreateBooking : undefined}
           settings={settings}
+          rateCalendars={rateCalendars}
+          canViewPrices={canViewPrices}
           disabled={isLoadingBookings}
         />
       }
