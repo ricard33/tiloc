@@ -76,6 +76,7 @@ const DateRangeSelector: React.FunctionComponent<Props> = ({ startDate, endDate,
     ...(selectedRangeNames.indexOf(RangeNames.LastYear) > -1 ? [{ label: t("Last year"), startDate: startOfYear(subYears(today, 1)), endDate: endOfYear(subYears(today, 1)) }] : []),
     ...(selectedRangeNames.indexOf(RangeNames.ThisYear) > -1 ? [{ label: t("This year"), startDate: startOfYear(today), endDate: endOfYear(today) }] : []),
     ...(selectedRangeNames.indexOf(RangeNames.NextYear) > -1 ? [{ label: t("Next year"), startDate: startOfYear(addYears(today, 1)), endDate: endOfYear(addYears(today, 1)) }] : []),
+    ...(definedRanges ?? [])
   ]
 
   const open = Boolean(anchorEl);
