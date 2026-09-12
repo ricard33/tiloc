@@ -1,0 +1,6 @@
+Un commentaire a été modifié sur la réservation :
+{{ comment.booking }}
+
+    Auteur : {{ comment.created_by }}
+    Commentaire :
+    {{ comment.content }}

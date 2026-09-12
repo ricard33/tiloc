@@ -404,6 +404,12 @@ export interface Notification {
   read: boolean;
 }
 
+export interface NotificationPreference {
+  name: string;
+  display_name: string;
+  backends: Record<string, boolean>; // e.g. { noop: true, email: false }
+}
+
 export interface Activity {
   id: number;
   type: string;

@@ -35,6 +35,7 @@ import { SignUp } from "./views/SignUp/SignUp";
 import NewAccountWizard from "./views/Wizards/NewAccountWizard";
 import SettingsIndex from "./views/Settings/SettingsIndex";
 import { MyProfile } from "./views/Users/MyProfile";
+import { NotificationPreferences } from "./views/Users/NotificationPreferences";
 import { EmailVerified } from "./views/SignUp/EmailVerified";
 import Subscription from "./views/Subscription/Subscription";
 import PricingTable from "./views/Subscription/PricingTable";
@@ -116,6 +117,7 @@ const MyRoutes = () => {
           />
           <Route path="account" element={<MyAccount />}>
             <Route index element={<MyProfile />} />
+            <Route path="notifications" element={<NotificationPreferences />} />
             <Route path="subscription" element={<Subscription />} />
             <Route path="cancel" element={<SubscriptionCancel />} />
             <Route path="prices" element={<PricingTable />} />

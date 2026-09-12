@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 import os
 
 from django.conf import settings
@@ -42,6 +43,7 @@ router.register(r"payment", api.PaymentViewSet, "payment")
 router.register(r"comment", api.CommentViewSet, "comment")
 router.register(r"user", api.UserViewSet, "user")
 router.register(r"notification", api.NotificationViewSet, "notification")
+router.register(r"notification_preference", api.NotificationPreferenceViewSet, "notification_preference")
 router.register(r"activity", api.ActivityViewSet, "activity")
 
 router.register(r"subscription", api.SubscriptionViewSet, "subscription")
@@ -49,7 +51,6 @@ router.register(r"subscription", api.SubscriptionViewSet, "subscription")
 urlpatterns = [
     path("api/", include((router.urls, "api"), namespace="api")),
     path("email/", include(email_urls)),  # connect them to an arbitrary path
-
     re_path(r"^api/info/", api.info_view, name="version"),
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # re_path("^api/auth/register/$", api.RegistrationAPI.as_view()),
@@ -59,14 +60,11 @@ urlpatterns = [
     re_path("^api/auth/reset_password/$", api.ResetPasswordAPI.as_view()),
     re_path(r"^api/auth/resend_verification/$", api.resend_verification),
     re_path(r"^api/auth/", include("knox.urls")),
-
     re_path("^api/signup/$", api.SignUpAPI.as_view()),
-
-    re_path(r'^api/my-account/$', api.CurrentAccountViewSet.as_view(), name='my-account'),
-    re_path(r'^api/stripe_config/$', api.StripeConfig.as_view(), name='stripe_config'),
-    re_path(r'^api/prices/$', api.Prices.as_view(), name='prices'),
-    re_path(r'^api/stripe_webhook/$', api.stripe_webhook, name='stripe_webhook'),
-
+    re_path(r"^api/my-account/$", api.CurrentAccountViewSet.as_view(), name="my-account"),
+    re_path(r"^api/stripe_config/$", api.StripeConfig.as_view(), name="stripe_config"),
+    re_path(r"^api/prices/$", api.Prices.as_view(), name="prices"),
+    re_path(r"^api/stripe_webhook/$", api.stripe_webhook, name="stripe_webhook"),
     path(r"calendar/<uuid:uid>/", views.export_calendar, name="calendar_sync"),
     path(r"calendar/<uuid:uid>.ics", views.export_calendar, name="calendar_sync"),
     path(r"calendar/", views.export_calendar_for_lodgings_list, name="calendar_sync"),
@@ -81,13 +79,11 @@ urlpatterns = [
     path(r"stats/season_breakdown/<str:begin>/<str:end>/", views.season_breakdown),
     path(r"stats/payments_overview/", views.payments_overview),
     path(r"stats/payments_overview/<str:begin>/<str:end>/", views.payments_overview),
-
-    path('admin/', include('loginas.urls')),  # make sure to add loginas urls before the admin site urls
+    path("admin/", include("loginas.urls")),  # make sure to add loginas urls before the admin site urls
     path("admin/", admin.site.urls),
     # path('', include('frontend.urls')),
     # re_path(r'^', IndexPage.as_view(template_name="index.html")),
     re_path("loggly/(?P<path>.*)", views.loggly_proxy),
-
     re_path("preview/verif/", views.preview_verification_email),
     re_path("preview/verified/", views.preview_verified),
     re_path("preview/welcome/", views.preview_welcome),
@@ -108,6 +104,11 @@ if settings.ENV == "dev":
                 -1, re_path(relative_path, never_cache(serve_static_file), kwargs={"document_path": fullpath})
             )
 
-urlpatterns.append(re_path(r"^", never_cache(serve_static_file),
-                           kwargs={"document_path": os.path.join(settings.STATIC_ROOT, "index.html")},
-                           name="home"))
+urlpatterns.append(
+    re_path(
+        r"^",
+        never_cache(serve_static_file),
+        kwargs={"document_path": os.path.join(settings.STATIC_ROOT, "index.html")},
+        name="home",
+    )
+)

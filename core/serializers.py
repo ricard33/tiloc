@@ -15,7 +15,7 @@ from timezone_field.rest_framework import TimeZoneSerializerField
 from core import models
 from core.models import Account, Lodging
 from core.pricing import compute_quote
-from notifier.models import SentNotification
+from notifier.models import Notification, SentNotification
 
 logger = logging.getLogger(__name__)
 
@@ -886,6 +886,16 @@ class SentNotificationSerializer(serializers.ModelSerializer):
 
     def get_date(self, instance: SentNotification):
         return instance.created
+
+
+class NotificationPreferenceSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    display_name = serializers.CharField()
+    backends = serializers.SerializerMethodField()
+
+    def get_backends(self, notification: Notification) -> dict[str, bool]:
+        user = self.context["request"].user
+        return {backend.name: enabled for backend, enabled in notification.get_user_prefs(user).items()}
 
 
 class GuestSerializer(serializers.Serializer):

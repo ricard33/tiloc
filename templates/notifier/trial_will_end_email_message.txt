@@ -1,0 +1,6 @@
+La période d'essai de votre abonnement Tiloc se termine bientôt :
+
+    Compte : {{ account }}
+    Fin de l'essai : {{ trial_end }}
+
+Pensez à choisir un abonnement pour continuer à utiliser Tiloc sans interruption.

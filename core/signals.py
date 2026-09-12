@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
 from core import models
+from notifier.models import Notification
 from notifier.shortcuts import send_notification
 
 logger = logging.getLogger("signals")
@@ -23,7 +24,9 @@ def get_current_user():
 
 def get_listening_users_for_lodging(lodgings: List[models.Lodging], current_user):
     current_user_id = current_user and current_user.id or 0
-    users = models.User.objects.filter(account=lodgings[0].account, groups__name="administrator", is_active=True).exclude(id=current_user_id)
+    users = models.User.objects.filter(
+        account=lodgings[0].account, groups__name="administrator", is_active=True
+    ).exclude(id=current_user_id)
     for lodging in lodgings:
         users = users.union(lodging.users.filter(is_active=True).exclude(id=current_user_id))
     return users
@@ -106,6 +109,7 @@ def booking_lodging_changed(sender, instance, action, reverse, model, pk_set, **
                 # lodging = models.Lodging.objects.get(id=pk)
                 if instance.account.id != lodging.account.id:
                     from django.db import IntegrityError
+
                     raise IntegrityError("Cannot add lodging from another account")
     if action == "post_add":
         on_booking_saved(sender, instance, created=True, update_fields=[])
@@ -168,3 +172,32 @@ def on_subscription_saved(sender, instance: models.Subscription, created: bool, 
         _("New subscription: [%(subscription)s]") % {"subscription": instance},
         context={"subscription": instance, "account": instance.customer, "user": get_current_user()},
     )
+
+
+# Keep in sync with CUSTOMER_NOTIFICATION_NAMES in
+# core/migrations/0031_seed_notification_email_off.py. Deliberately not imported from
+# `core.notifications` (importing that module executes its top-level `create_notification()`
+# calls, which hit the database - fine when done once via `post_migrate`, not as a side effect
+# of importing this signals module).
+CUSTOMER_NOTIFICATION_NAMES = [
+    "booking-added",
+    "booking-modified",
+    "booking-canceled",
+    "booking-uncanceled",
+    "booking-deleted",
+    "comment-added",
+    "comment-modified",
+    "comment-deleted",
+    "trial_will_end",
+]
+
+
+@receiver(post_save, sender=models.User)
+def on_user_created(sender, instance: models.User, created: bool, **kwargs):
+    # email is opt-in: give every new user an explicit "off" preference for every
+    # notification type that offers it, so nobody starts receiving emails by surprise
+    # (mirrors the data migration that seeds the same default for existing users).
+    if not created:
+        return
+    for notification in Notification.objects.filter(name__in=CUSTOMER_NOTIFICATION_NAMES, backends__name="email"):
+        notification.update_user_prefs(instance, {"email": False})

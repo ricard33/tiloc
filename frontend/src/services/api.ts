@@ -15,7 +15,7 @@ import {
   Payment,
   Service,
   User,
-  Notification, SignUpData, Activity, Account, BookingHistoryEntry,
+  Notification, NotificationPreference, SignUpData, Activity, Account, BookingHistoryEntry,
   SeasonCalendar, LodgingSeasonRate, PricingAdjustment, Quote, QuoteRequest, RateCalendarEntry
 } from "../types";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
@@ -321,6 +321,7 @@ export const api = createApi({
     "Service",
     "User",
     "Notification",
+    "NotificationPreference",
     "BookingHistory",
     "SeasonCalendar",
     "LodgingSeasonRate",
@@ -362,6 +363,19 @@ export const api = createApi({
         return api2User(response as ApiModel);
       }
     }),
+    notificationPreferences: builder.query<NotificationPreference[], void>({
+      query: () => "notification_preference/",
+      providesTags: ["NotificationPreference"],
+    }),
+    updateNotificationPreference: builder.mutation<NotificationPreference, { name: string; backends: Record<string, boolean> }>({
+      query: ({ name, backends }) => ({
+        url: `notification_preference/${name}/`,
+        method: "PATCH",
+        data: { backends }
+      }),
+      invalidatesTags: ["NotificationPreference"]
+    }),
+
     login: builder.mutation<LoginInfo, { email: string; password: string, keep_connected: boolean }>({
       query(args) {
         return {
@@ -593,6 +607,9 @@ export const api = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useMyAccountQuery,
+
+  useNotificationPreferencesQuery,
+  useUpdateNotificationPreferenceMutation,
 
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,

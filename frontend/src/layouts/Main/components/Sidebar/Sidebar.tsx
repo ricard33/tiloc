@@ -15,6 +15,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import { Account, AppInfo } from "../../../../types";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
 import { useAppSelector } from "../../../../app/hooks";
 import Box from "@mui/material/Box";
 
@@ -63,6 +64,7 @@ const Sidebar: React.FC<Props> = props => {
       pages: [
         { title: t("Back"), href: "/", icon: <ArrowBackIcon /> },
         { title: t("My account"), href: "/account", icon: <AccountBoxIcon />, disabled: false },
+        { title: t("Notifications"), href: "/account/notifications", icon: <NotificationsIcon /> },
         { title: t("Subscription"), href: "/account/subscription", icon: <WorkspacePremiumIcon /> }
         // { title: t("Prices"), href: "/account/prices", icon: <MoneyIcon /> },
       ]

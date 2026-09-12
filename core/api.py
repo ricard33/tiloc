@@ -34,7 +34,7 @@ from stripe import PaymentIntent
 from stripe import Subscription as StripeSubscription
 
 from location import __date__, __version__
-from notifier.models import SentNotification
+from notifier.models import Notification, SentNotification
 from notifier.shortcuts import send_notification
 
 from . import models
@@ -63,6 +63,7 @@ from .serializers import (
     LodgingSerializer,
     LoginUserSerializer,
     NextEventSerializer,
+    NotificationPreferenceSerializer,
     PaymentSerializer,
     PricingAdjustmentSerializer,
     QuoteRequestSerializer,
@@ -680,6 +681,36 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
+class NotificationPreferenceViewSet(viewsets.ViewSet):
+    """Lets a user configure, per notification type, which backends (in-app / email) they use."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self, request):
+        return [n for n in Notification.objects.filter(public=True) if n.check_perms(request.user)]
+
+    def list(self, request):
+        serializer = NotificationPreferenceSerializer(
+            self.get_queryset(request), many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+    def partial_update(self, request, pk=None):
+        try:
+            notification = Notification.objects.get(name=pk, public=True)
+        except Notification.DoesNotExist:
+            raise Http404
+        if not notification.check_perms(request.user):
+            raise Http404
+
+        allowed = {backend.name for backend in notification.backends.filter(enabled=True)}
+        prefs = {name: bool(value) for name, value in request.data.get("backends", {}).items() if name in allowed}
+        notification.update_user_prefs(request.user, prefs)
+
+        serializer = NotificationPreferenceSerializer(notification, context={"request": request})
+        return Response(serializer.data)
+
+
 class ActivityViewSet(viewsets.ModelViewSet):
     queryset = models.Activity.objects.order_by("-date")
     serializer_class = ActivitySerializer
@@ -962,13 +993,14 @@ def stripe_webhook(request):
             subscription: StripeSubscription = event.data.object
             try:
                 account = models.Account.objects.get(stripe_customer_id=subscription.customer)
-                # TODO send email to customer
+                trial_end = arrow.get(subscription.trial_end).date()
                 send_notification(
                     "trial_will_end",
                     account.user_set.all(),
                     _("The trial period of your subscription will end on %(date)s")
-                    % {"date": arrow.get(subscription.trial_end).date().strftime("%x")},
+                    % {"date": trial_end.strftime("%x")},
                     "/account/subscription",
+                    context={"account": account, "trial_end": trial_end},
                 )
             except models.Account.DoesNotExist:
                 logger.warning("'Trial will end' notification for unknown customer '%s'", subscription.customer)

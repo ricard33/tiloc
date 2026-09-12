@@ -1,0 +1,1 @@
+Tiloc : 💬 nouveau commentaire sur la réservation {{ comment.booking.lodging.name }}
