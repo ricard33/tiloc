@@ -46,7 +46,10 @@ const Main = () => {
       "calendar-syncs": t("Calendars synchronization"),
       "profile": t("My profile"),
       "account": t("My account"),
-      "subscription": t("Subscription")
+      "subscription": t("Subscription"),
+      "pricing-rules": t("Pricing rules"),
+      "seasons": t("Seasons"),
+      "stats": t("Statistics"),
     };
   }, [t]);
 
